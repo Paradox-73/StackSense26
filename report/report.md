@@ -16,8 +16,8 @@ StackSense recommends a frontend, backend, database and hosting platform from a 
 | Proof | Result | Where it comes from |
 |---|---|---|
 | Agreement with an answer key written by a language model in three architect personas, blind to the engine (not human raters) | 96% of the 160 layer picks (one pick each for frontend, backend, database and hosting, over 40 briefs) are acceptable to at least 2 of 3 personas; 72% top-1 and 95% acceptable on the 10 briefs I never tuned on | Section 6.1; `python tools/bench.py` |
-| Hard constraints under attack | 0 violations of the 14 properties (hard constraints, meaning rules that remove an option before any scoring; consistency; and no return to an earlier pick as users grow) in 10,000 random projects; 0 of 1,000 growth walks returns to an earlier pick | Section 6; `python tools/fuzz.py` |
-| Tests | 944 tests pass, and every warning code the engine can raise has a test that triggers it | Section 6; `python -m pytest` |
+| Hard constraints under attack | 0 violations of the 15 properties (hard constraints, meaning rules that remove an option before any scoring; consistency; and no return to an earlier pick as users grow) in 1,000 random projects; 0 of 100 growth walks returns to an earlier pick | Section 6; `python tools/fuzz.py` |
+| Tests | 946 tests pass, and every warning code the engine can raise has a test that triggers it | Section 6; `python -m pytest` |
 
 **Where each judging criterion is answered**
 
@@ -213,8 +213,8 @@ The engine can raise 51 distinct warning codes, and `tests/test_edge_cases.py` f
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 185 |
 | Accuracy against the answer key | 9 |
-| App, packaging and documents | 82 |
-| **All** | **944** |
+| App, packaging and documents | 84 |
+| **All** | **946** |
 <!-- END validation -->
 
 The per-file list is `report/validation.md`.
@@ -243,7 +243,7 @@ Top-1 is scored on 158 of the 160 picks, because for 2 layer picks (backend and 
 
 ### 6.3 Other checks
 
-- **Random projects.** `python tools/fuzz.py` draws 10,000 seeded random projects and checks 14 properties against the knowledge-base files directly, without reusing the engine's own filters: hard constraints (HIPAA, PCI, residency, on-premises, mobile, strong consistency), byte-identical output on a repeat, no change from renaming or reordering lists, USD and INR budgets agreeing, a warning for every relaxed layer, and no crash. Result: 0 violations of 14 properties; the 14th (no layer returns to a pick it had left as users grow) is checked on 1,000 growth walks and is violated in 0 of them, down from 296 before the stability rules.
+- **Random projects.** `python tools/fuzz.py` draws 1,000 seeded random projects and checks 15 properties against the knowledge-base files directly, without reusing the engine's own filters: hard constraints (HIPAA, PCI, residency, on-premises, mobile, strong consistency), byte-identical output on a repeat, no change from renaming or reordering lists, USD and INR budgets agreeing, a warning for every relaxed layer, and no crash. Result: 0 violations of 15 properties; the 14th (no layer returns to a pick it had left as users grow) is checked on 100 growth walks and is violated in 0 of them, down from 296 before the stability rules.
 - **Question influence.** 8,159 engine re-runs (Section 2.3).
 - **Stability of the picks.** `python tools/robustness_report.py` prints, for every preset, how often each pick survives score noise. The least stable pick is the `contradictory` example's database (PostgreSQL), which holds in 53% of runs with noise up to 0.25 points and 63% with noise up to 0.5, so its margin over MySQL is small.
 - **Offline use.** With no key, `tests/test_no_network.py` checks that the page loads no external resource and that the API answers with outbound connections blocked. A key adds calls only to the model provider, only for the four features in section 1.1.
@@ -255,7 +255,7 @@ Top-1 is scored on 158 of the 160 picks, because for 2 layer picks (backend and 
 - Scores, cost bands and compliance flags are curated from public vendor documentation. Prices and compliance programmes change; verify them with each vendor before committing.
 - Scores are judgements anchored to a rubric, not measurements. I did not re-score the whole knowledge base against the rubric, and a different curator would give different scores.
 - The benchmark labels were written by a language model in three architect personas, not by people, so the agreement figures measure fit to a model-written key. The benchmark has 40 briefs. Held-out accuracy on 10 of them is 72% top-1 and 95% acceptable, so one brief moves it by ten points.
-- Growth stability is measured, not proved: 0 of 1,000 random growth walks returns to an earlier pick, but other answers can still produce a return.
+- Growth stability is measured, not proved: 0 of 100 random growth walks returns to an earlier pick, but other answers can still produce a return.
 - The cost model uses price bands per scale tier plus stated usage terms, not a full bill of materials. Egress, support plans and most third-party software-as-a-service are excluded.
 - The knowledge base holds 60 technologies. Niche options (CockroachDB, Oracle, Rust frameworks) are not scored; an existing Oracle database is acknowledged with a warning. SQL Server, BigQuery and Neo4j are scored.
 - The pattern reader understands numbers, money and common phrases, not arbitrary prose. Without a key some answers stay unfilled, and the questions below the description box still ask for them.

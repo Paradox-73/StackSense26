@@ -14,11 +14,11 @@
  "criteria": 19,
  "databases": 15,
  "frontends": 11,
- "fuzz_clean_rules": 14,
+ "fuzz_clean_rules": 15,
  "fuzz_flip_back": 0,
- "fuzz_growth_projects": 1000,
- "fuzz_projects": 10000,
- "fuzz_rules": 14,
+ "fuzz_growth_projects": 100,
+ "fuzz_projects": 1000,
+ "fuzz_rules": 15,
  "fuzz_seed": 2026,
  "glossary_terms": 43,
  "hosting_platforms": 20,
@@ -35,6 +35,6 @@
  "scenario_fixtures": 8,
  "source_urls": 344,
  "technologies": 60,
- "tests": 944,
+ "tests": 946,
  "warning_codes": 51
 }

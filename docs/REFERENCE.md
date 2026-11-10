@@ -26,6 +26,7 @@ Contents: [Troubleshooting](#troubleshooting), [Using the app](#using-the-app), 
 6. **Details.** *Why these picks* (per-answer score trace and sources), *Growth path* (the stack at 1x, 10x and 100x your users), *Architecture* (generated diagram), *Cost*, *Alternatives*, *Inputs & weights*; export as JSON, Markdown or Print/PDF.
 7. **Share.** *Copy link* puts the answers you gave in the address (`#a=...`); opening it on another machine gives the same four picks. *Answers (JSON)* downloads the same answers as a small file and *Load answers* reads one back (a scenario file with an `input` object or a bare answers object also works; unknown keys are listed and ignored).
 8. **Mobile.** A bar at the bottom always shows the four picks and the cost; tap it to jump to the full result.
+9. **Scenario file** (`/scenario`). Every field of the problem statement's standard schema as a form, with the default of each empty field shown. *Load scenario file* reads a JSON file (unknown or invalid values are kept and reported), the P1-P6 and E1-E9 buttons load the example files, *Run scenario* shows the standard output, and *Download output JSON* saves it.
 
 ## Project layout
 
@@ -36,8 +37,9 @@ stacksense/
   requirements.txt       run-time and test packages (requirements.lock.txt: exact versions)
   requirements-dev.txt   report-building packages only (PDF, screenshots)
   app/main.py            FastAPI routes
-  app/static/            index.html, app.js, share.js, styles.css, fonts/ (vanilla JS, no build step)
+  app/static/            index.html, app.js, share.js, styles.css, scenario.html/.js/.css, fonts/ (no build step)
   engine/
+    standard.py          the standard scenario format: validate, map to answers, build the section 4 output
     kb.py                loads + validates the knowledge base, criterion lists
     profile.py           input normalisation and derived quantities
     conflicts.py         contradictory/risky input detection
@@ -64,11 +66,13 @@ stacksense/
     rubric.json          the 1/3/5 anchors of every scored criterion
     explain_templates.json  sentence templates for the justification paragraphs
     llm_cache/           saved model answers, one small JSON file each (optional, created on first use)
+  scenarios/             public/ (P1-P6 from the problem statement), edge/ (E1-E9, one per edge-case category)
+  outputs/               the engine's output for P1-P6 (python cli.py --scenario scenarios/public --out outputs)
   docs/                  architecture.svg, pipeline.svg (the two figures above)
   tests/                 pytest suite + 8 scenario fixtures (tests/scenarios/*.json); tests/benchmark/ holds the answer key
   tools/                 build_assets.py (samples, tables, appendices), build_report.py (counts + PDF), capture_screenshots.py,
                          bench.py, llm_baseline.py, fuzz.py, question_influence.py, robustness_report.py, check_links.py, run_scenarios.py,
-                         package_submission.py (the submission zip), demo_captions.py (video captions), ci_launch_check.py
+                         package_submission.py (the submission folder), baseline_grading.py, demo_captions.py (video captions), ci_launch_check.py
   report/                report.md (the PDF's source), StackSense_Report.pdf, facts.json, samples/, screenshots/, sources.md
 ```
 
@@ -78,6 +82,7 @@ stacksense/
 
 | Variable | Meaning | Default |
 |---|---|---|
+| `STACKSENSE_LLM` | `off` (or `0`, `false`, `no`) switches every language-model feature off: no request, no saved answer. `run.py --no-llm` and `cli.py --no-llm` set it. The stack is the same either way. | on |
 | `STACKSENSE_LLM_API_KEY` or `OPENROUTER_API_KEY` | API key. Never logged or returned by the API. | none (LLM features off) |
 | `STACKSENSE_LLM_BASE_URL` | Any OpenAI-compatible chat API | `https://generativelanguage.googleapis.com/v1beta/openai` (Google Gemini free tier) |
 | `STACKSENSE_LLM_MODELS` | Comma-separated model chain, tried in order after a 404, 429, 5xx or a 30 s timeout | `gemini-3.5-flash-lite`, `gemini-flash-lite-latest`, `gemini-2.5-flash-lite` |
@@ -161,7 +166,7 @@ The questionnaire is defined in `data/questions.json`. That file also drives def
 
 ## Knowledge base
 
-`data/kb/*.json` holds 10 frontends, 14 backends, 15 databases and 17 hosting platforms (56 technologies) and 61 compatibility rules. Each entry has:
+`data/kb/*.json` holds 11 frontends, 14 backends, 15 databases and 20 hosting platforms (60 technologies) and 62 compatibility rules. Each entry has:
 
 - 1-5 scores per criterion
 - compliance maturity 1-5 with a note and sources (hosting and BaaS only)
@@ -182,7 +187,10 @@ The questionnaire is defined in `data/questions.json`. That file also drives def
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/api/health` | status and knowledge-base counts |
+| GET | `/api/health` | status, knowledge-base counts, `llm_enabled` and `llm_switched_off` |
+| POST | `/api/scenario` | body = a scenario in the standard schema (problem statement 3.2), returns the section 4 output; invalid input gives status `invalid_input` with field errors, never an HTTP error |
+| GET | `/api/scenario/fields` | every field of the standard schema with kind, required, default, allowed values and meaning (the scenario page's form) |
+| GET | `/api/scenario/examples`, `/api/scenario/examples/{name}` | the example files in `scenarios/public` (P1-P6) and `scenarios/edge` (E1-E9) |
 | GET | `/api/questions` | questionnaire/input schema |
 | GET | `/api/presets` | scenario presets |
 | GET | `/api/kb` | full knowledge base + rules |

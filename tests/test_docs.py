@@ -49,6 +49,7 @@ import sys
 
 sys.path.insert(0, str(ROOT / "tools"))
 import build_report  # noqa: E402
+import package_submission  # noqa: E402
 
 
 @pytest.fixture(scope="module")
@@ -172,7 +173,9 @@ def test_no_assistant_or_team_wording_in_shipped_files():
             continue
         if path.suffix.lower() not in {".py", ".md", ".json", ".js", ".html", ".css", ".svg", ".txt", ".yml", ".yaml", ".sha256"}:
             continue
-        assert not banned.search(path.read_text(encoding="utf-8", errors="ignore")), path.relative_to(ROOT)
+        rel = path.relative_to(ROOT).as_posix()
+        # The report's section 11 (AI assistance declaration, required by the statement) is the one allowed mention.
+        assert not banned.search(package_submission.shippable_text(rel, path.read_text(encoding="utf-8", errors="ignore"))), rel
 
 
 def test_svg_files_are_well_formed():

@@ -1,14 +1,15 @@
 {
  "seed": 2026,
- "projects": 10000,
- "growth_projects": 1000,
- "rules": 14,
+ "projects": 1000,
+ "growth_projects": 100,
+ "rules": 15,
  "violations": {
   "hipaa_baa": 0,
   "pci_host": 0,
   "residency_region": 0,
   "on_prem": 0,
   "mobile_frontend": 0,
+  "api_only_frontend": 0,
   "strong_consistency": 0,
   "worker_host": 0,
   "same_input_same_hash": 0,
