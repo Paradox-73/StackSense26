@@ -755,9 +755,10 @@ def run_text(text: str) -> dict:
     """run() on the text of a scenario file; text that is not JSON is an invalid_input result, not an exception."""
     try:
         doc = json.loads(text)
-    except ValueError as e:
+    except (ValueError, RecursionError) as e:  # RecursionError: arrays or objects nested past Python's limit
         out = run(None)
-        out["validation_errors"] = [{"field": "(file)", "message": f"not valid JSON: {e}"}]
+        out["validation_errors"] = [{"field": "(file)", "message": f"not valid JSON: {e}" if isinstance(e, ValueError)
+                                     else "nested too deeply to be a scenario file"}]
         return out
     return run(doc)
 

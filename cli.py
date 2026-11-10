@@ -88,8 +88,14 @@ def run_scenarios(src: Path, out: str | None) -> int:
         return 1
     folder = out and (len(files) > 1 or src.is_dir() or not out.lower().endswith(".json"))
     written: set[str] = set()
+    failed = 0
     for f in files:
-        result = run_text(read_text(f))
+        try:
+            result = run_text(read_text(f))
+        except Exception as e:  # a file the engine cannot handle must not stop the rest of a folder
+            print(f"{f}: not run ({type(e).__name__}: {e})", file=sys.stderr)
+            failed += 1
+            continue
         text = json.dumps(result, indent=2, ensure_ascii=False) + "\n"
         if not out:
             sys.stdout.write(text)
@@ -103,7 +109,7 @@ def run_scenarios(src: Path, out: str | None) -> int:
         dest.write_text(text, encoding="utf-8")
         picks = " | ".join(result["stack"][l]["choice"] for l in LAYERS) if result.get("stack") else "no stack"
         print(f"{sid:10} {result['status']:17} {picks}  -> {dest}")
-    return 0
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

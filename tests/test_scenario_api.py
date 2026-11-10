@@ -39,7 +39,7 @@ def test_post_returns_the_engine_output():
     assert r.status_code == 200 and r.json() == run(doc)
 
 
-@pytest.mark.parametrize("body", ['{"scenario_id": ', "[1, 2]", '"text"', "", "null"])
+@pytest.mark.parametrize("body", ['{"scenario_id": ', "[1, 2]", '"text"', "", "null", "[" * 3000])
 def test_bodies_that_are_not_scenarios_are_invalid_input_not_errors(body):
     r = client.post("/api/scenario", content=body, headers={"Content-Type": "application/json"})
     assert r.status_code == 200

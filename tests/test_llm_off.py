@@ -95,3 +95,24 @@ def test_cli_reads_utf16_files_and_keeps_outputs_with_the_same_id_apart(tmp_path
     names = sorted(f.name for f in (tmp_path / "out").iterdir())
     assert names == ["P2_b_output.json", "P2_output.json", "x_output.json"], names
     assert json.loads((tmp_path / "out" / "x_output.json").read_text(encoding="utf-8"))["status"] == "invalid_input"
+
+
+def test_a_folder_run_survives_a_file_nested_past_the_recursion_limit_and_a_file_that_fails(tmp_path, capsys, monkeypatch):
+    import engine.standard
+    src = tmp_path / "in"
+    src.mkdir()
+    (src / "a_deep.json").write_text("[" * 3000, encoding="utf-8")
+    (src / "b_boom.json").write_text('{"scenario_id": "boom"}', encoding="utf-8")
+    (src / "c_ok.json").write_text((ROOT / "scenarios" / "public" / "P1.json").read_text(encoding="utf-8"), encoding="utf-8")
+    real = engine.standard.run
+
+    def run_or_fail(doc):
+        if isinstance(doc, dict) and doc.get("scenario_id") == "boom":
+            raise RuntimeError("injected failure")
+        return real(doc)
+    monkeypatch.setattr(engine.standard, "run", run_or_fail)
+    assert cli.main(["--scenario", str(src), "--out", str(tmp_path / "out")]) == 1
+    deep = json.loads((tmp_path / "out" / "a_deep_output.json").read_text(encoding="utf-8"))
+    assert deep["status"] == "invalid_input" and deep["validation_errors"][0]["field"] == "(file)"
+    assert json.loads((tmp_path / "out" / "P1_output.json").read_text(encoding="utf-8"))["status"] == "ok"
+    assert "b_boom.json: not run (RuntimeError: injected failure)" in capsys.readouterr().err
