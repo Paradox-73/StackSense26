@@ -176,6 +176,16 @@ def test_air_gapped_payments_and_sms_are_flagged():
     assert any(a.startswith("Relaxed or flagged (AIR_GAPPED_EXTERNAL)") for a in out["assumptions"])
 
 
+def test_outside_service_warnings_name_only_the_services_the_project_uses():
+    for deploy, code, payment_words in (("air_gapped", "AIR_GAPPED_EXTERNAL", "payments run on a separate connected system"),
+                                        ("on_premise", "ONPREM_EXTERNAL", "a payment gateway's hosted checkout")):
+        pays, free = ([w for w in edited("P2", infrastructure={"deployment_model": deploy}, requirements={"payments": on})["warnings"]
+                       if w["code"] == code][0] for on in (True, False))
+        assert payment_words in pays["message"] and "requirements.payments" in pays["fields"], deploy
+        assert payment_words not in free["message"] and "requirements.payments" not in free["fields"], free["message"]
+        assert "SMS" in free["message"], deploy
+
+
 def test_api_only_has_no_frontend():
     doc = load("P2")
     doc["project"].update(type="api_platform", platforms=["api_only"])

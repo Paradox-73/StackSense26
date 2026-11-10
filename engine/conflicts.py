@@ -129,26 +129,31 @@ def detect(p: dict, d: dict) -> list[dict]:
                        ["has_devops", "deployment"]))
     pays = "pay" in (p.get("user_actions") or []) or (
         p["app_type"] in ("ecommerce", "fintech") and "user_actions" in d.get("defaulted", ()))
-    outside = [label for label, on in (
-        ("taking payments", pays), ("SMS one-time codes", "phone_otp" in (p.get("special_workloads") or [])),
-        ("push notifications", d["mobile"])) if on] if p["deployment"] == "on_prem" else []
+    # Each outside service the project needs: (what, the answer behind it, how on-premises keeps it, how air-gapped relaxes it)
+    needs = [n for n, on in (
+        (("taking payments", "user_actions", "a payment gateway's hosted checkout",
+          "payments run on a separate connected system and are imported for reconciliation"), pays),
+        (("SMS one-time codes", "special_workloads", "an SMS gateway",
+          "SMS goes through a GSM modem inside the network or authenticator-app codes replace it"),
+         "phone_otp" in (p.get("special_workloads") or [])),
+        (("push notifications", "platforms", "the phone push services (FCM and APNs)", "phones get in-app notifications only"),
+         d["mobile"])) if on] if p["deployment"] == "on_prem" else []
+    outside, fields = [n[0] for n in needs], [n[1] for n in needs]
     if outside and not p.get("air_gapped"):
         w.append(_warn("ONPREM_EXTERNAL", "critical", "On-premises, but the project needs outside services",
                        f"The project needs {', '.join(outside)}, and no payment network, SMS network or phone push service "
                        "can run on your own servers.",
-                       "Kept as outside services reached through your firewall's outbound rules: a payment gateway's hosted "
-                       "checkout, an SMS gateway and the phone push services (FCM and APNs). Every other component in the "
-                       "stack is self-hosted, and uploads are served by your own reverse proxy instead of a CDN.",
-                       ["deployment", "user_actions", "special_workloads", "platforms"]))
+                       "Kept as outside services reached through your firewall's outbound rules: "
+                       f"{', '.join(n[2] for n in needs)}. Every other component in the stack is self-hosted, and uploads "
+                       "are served by your own reverse proxy instead of a CDN.",
+                       ["deployment"] + fields))
     if p.get("air_gapped"):
         if outside:
             w.append(_warn("AIR_GAPPED_EXTERNAL", "critical", "Air-gapped network, but the project needs outside services",
                            f"A network with no internet connection cannot reach a payment gateway, an SMS provider or the "
                            f"phone push services, and the project needs {', '.join(outside)}.",
-                           "Relaxed: payments run on a separate connected system and are imported for reconciliation; "
-                           "SMS goes through a GSM modem inside the network or authenticator-app codes replace it; "
-                           "phones get in-app notifications only. Confirm each with the network's security owner.",
-                           ["air_gapped", "user_actions", "special_workloads", "platforms"]))
+                           f"Relaxed: {'; '.join(n[3] for n in needs)}. Confirm each with the network's security owner.",
+                           ["air_gapped"] + fields))
     if p["team_size"] > 200 and tier <= 1:
         w.append(_warn("TEAM_OVERSIZED", "info", "Very large team for a small user base",
                        "Check the team size counts engineers on this product only.", "Kept as given.", ["team_size"]))
