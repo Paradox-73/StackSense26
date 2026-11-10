@@ -120,12 +120,18 @@ def test_validation_table_counts_every_test(facts):
     assert f"| **{facts['tests']}** |" in report
 
 
-def test_report_is_written_in_first_person_with_the_four_required_sections():
+def test_report_follows_the_statement_template_in_the_first_person():
+    """Problem statement section 10: these sections, in this order and numbering, then appendices."""
     text = (ROOT / "report" / "report.md").read_text(encoding="utf-8")
     assert not [ln for ln in text.splitlines() if re.search(r"\bWe\b", ln)]
-    h2 = [ln[3:] for ln in text.splitlines() if ln.startswith("## ")]
-    for need in ("System design", "Input parameters", "Sample recommendations", "Edge-case handling"):
-        assert any(need in h for h in h2), need
+    h2 = [ln[3:].strip() for ln in text.splitlines() if ln.startswith("## ")]
+    numbered = [h for h in h2 if re.match(r"\d+\. ", h)]
+    assert numbered == ["1. Abstract", "2. Problem understanding", "3. System architecture", "4. Input design and research",
+                        "5. Knowledge base and decision logic", "6. Sample recommendations", "7. Edge-case handling",
+                        "8. Validation", "9. Limitations and future work", "10. References and third-party tools",
+                        "11. AI assistance declaration"]
+    assert all(h.startswith("Appendix") for h in h2[h2.index("11. AI assistance declaration") + 1:])
+    assert h2.index("1. Abstract") == 0
 
 
 def test_every_image_in_the_report_exists():
@@ -167,7 +173,7 @@ def test_fonts_are_cited_in_report_and_readme():
 
 def test_no_assistant_or_team_wording_in_shipped_files():
     banned = re.compile("cl" + "aude|anth" + "ropic|co-auth" + "ored|pri" + "ze|team" + "mate", re.I)
-    skip = {".venv", "__pycache__", ".git", ".pytest_cache", "planning", "spec_10nov", "." + "cl" + "aude"}  # spec_10nov: organiser files, never packaged
+    skip = {".venv", "__pycache__", ".git", ".pytest_cache", "planning", "spec_10nov", "dist", "." + "cl" + "aude"}  # spec_10nov: organiser files; dist: the built folder, checked by the package script
     for path in ROOT.rglob("*"):
         if not path.is_file() or skip & set(path.relative_to(ROOT).parts) or path.name.upper().startswith("CL" + "AUDE"):
             continue

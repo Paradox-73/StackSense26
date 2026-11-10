@@ -1,13 +1,14 @@
 {
-  "event": "Synergy '26 · IIIT Bangalore · StackSense Challenge",
+  "event": "Synergy '26 · StackSense Challenge",
   "title": "StackSense",
   "pitch": "Describe a software project in a few answers and get a frontend, backend, database and hosting stack with the arithmetic behind every pick.",
   "author": "Kanav Bhardwaj",
   "institute": "IIIT Bangalore",
-  "unstop": "Kanav Bhardwaj",
+  "email": "",
   "date": "November 2026",
   "links": {
-    "Demo video": "StackSense_Demo.mp4 in this Drive folder",
-    "Source code": "StackSense_submission.zip in this Drive folder (run locally: see README)"
+    "GitHub": "https://github.com/Paradox-73/StackSense26",
+    "Source code": "source/ in this Drive folder (README.md at its root)",
+    "Outputs": "outputs/P1_output.json ... P6_output.json in this Drive folder"
   }
 }

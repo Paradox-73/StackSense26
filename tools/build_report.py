@@ -369,7 +369,7 @@ def cover_html(cover: dict) -> str:
             f'<p class="cover-pitch">{html.escape(cover["pitch"])}</p>'
             f'<table class="cover-meta"><tr><td>Author</td><td>{html.escape(cover["author"])}</td></tr>'
             f'<tr><td>Institute</td><td>{html.escape(cover["institute"])}</td></tr>'
-            f'<tr><td>Unstop username</td><td>{html.escape(cover["unstop"])}</td></tr>'
+            f'<tr><td>Unstop registered email</td><td>{html.escape(cover.get("email") or "to be added by the entrant")}</td></tr>'
             f'<tr><td>Date</td><td>{html.escape(cover["date"])}</td></tr>{links}</table></section>')
 
 
@@ -470,7 +470,26 @@ def build_pdf(draft: bool) -> int:
         print_pdf(doc, PDF)
         pages2, n2 = heading_pages(PDF, heads, 2)
     print(f"{PDF.relative_to(ROOT)}: {n2} pages, {len(todo)} TODO placeholders{' (draft)' if draft else ''}")
-    return 0
+    if not json.loads((REPORT / "cover.json").read_text(encoding="utf-8")).get("email"):
+        print("NOTE: report/cover.json has no Unstop registered email; add it and rebuild before submitting")
+    leaks = pdf_mentions(PDF)
+    for leak in leaks:
+        print("PDF names the coding assistant outside the declaration line:", leak)
+    return 1 if leaks else 0
+
+
+def pdf_mentions(pdf: Path) -> list[str]:
+    """Places in the built PDF that name the coding assistant other than the one declaration line of section 11."""
+    from pypdf import PdfReader
+    sys.path.insert(0, str(ROOT / "tools"))
+    from package_submission import DECLARATION
+    text = " ".join(" ".join((page.extract_text() or "").split()) for page in PdfReader(str(pdf)).pages)
+    opening = DECLARATION.lstrip("- ").strip()
+    if text.count(opening) != 1:
+        return [f"the declaration line appears {text.count(opening)} times, not once"]
+    rest = text.replace(opening, " ", 1)
+    banned = re.compile("cl" + "aude|anth" + "ropic", re.I)
+    return [rest[max(0, m.start() - 40): m.end() + 40] for m in banned.finditer(rest)]
 
 
 def main() -> int:
