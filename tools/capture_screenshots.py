@@ -16,6 +16,7 @@ the other 17 are taken as usual. With a key set, the shots that do not click a m
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import socket
 import subprocess
@@ -117,6 +118,60 @@ ACTS = {"f09-describe-project": _act_brief, "f10-plain-summary": _act_summary}
 
 CAPTIONS = {n: c for n, _l, _s, c, _e in SHOTS}
 LINKS = {n: l for n, l, *_ in SHOTS}
+
+# The scenario-file page (/scenario) running the six public scenarios and the nine edge cases in scenarios/edge:
+# (name, example file stem, where the picture ends). "core" ends under the four core components, "top" above the
+# Stack heading (status, summary, errors and warnings), "all" takes the whole result.
+SCENARIO_SHOTS = [(f"s-P{i}", f"P{i}", "core") for i in range(1, 7)] + [
+    ("e-E1", "E1_missing_fields", "top"), ("e-E2", "E2_invalid_values", "all"), ("e-E3", "E3_contradictions", "top"),
+    ("e-E4", "E4_static_at_scale", "core"), ("e-E5", "E5_regulatory", "core"), ("e-E6", "E6_existing_systems", "top"),
+    ("e-E7", "E7_air_gapped", "top"), ("e-E8", "E8_skill_mismatch", "core"), ("e-E9", "E9_deprecated", "top"),
+]
+
+
+def scenario_expect(stem: str) -> list[str]:
+    """Text the page must show for this scenario: the engine's own status and choices, or its field errors."""
+    from engine.standard import run
+    path = next(p for p in (ROOT / "scenarios").glob(f"*/{stem}.json"))
+    out = run(json.loads(path.read_text(encoding="utf-8")))
+    if out["stack"] is None:
+        return [out["status"]] + [e["field"] for e in out["validation_errors"]]
+    return [out["status"]] + [out["stack"][l]["choice"] for l in LAYERS]
+
+
+def scenario_clip(page, end: str) -> dict:
+    page.evaluate("window.scrollTo(0, 0)")
+    box = page.locator("#sc-out").bounding_box()
+    bottom = box["y"] + box["height"]
+    if end == "core":
+        core = page.locator("#sc-out .sc-core").bounding_box()
+        bottom = core["y"] + core["height"] + 8
+    elif end == "top" and page.locator("#sc-out h2", has_text="Stack").count():
+        bottom = page.locator("#sc-out h2", has_text="Stack").bounding_box()["y"] - 4
+    return {"x": box["x"] - 8, "y": box["y"] - 8, "width": box["width"] + 16, "height": min(bottom - box["y"] + 8, MAX_H)}
+
+
+def capture_scenarios(browser, port: int, only: str | None, check_only: bool) -> tuple[list, int]:
+    mismatches, written = [], 0
+    for name, stem, end in SCENARIO_SHOTS:
+        if only and only != name:
+            continue
+        page = browser.new_page(viewport={"width": 1280, "height": 900}, device_scale_factor=1.5)
+        page.goto(f"http://127.0.0.1:{port}/scenario?theme=light&example={stem}")
+        page.wait_for_selector("#sc-out .sc-status", timeout=30000)
+        page.wait_for_timeout(500)
+        text = page.evaluate("document.querySelector('#sc-out').innerText")
+        missing = [t for t in scenario_expect(stem) if t.lower() not in text.lower()]
+        if missing:
+            mismatches.append((name, missing))
+            print(f"MISMATCH {name}: page lacks {missing}")
+        else:
+            print(f"ok       {name}")
+        if not check_only:
+            page.screenshot(path=str(OUT / f"{name}.png"), full_page=True, clip=scenario_clip(page, end))
+            written += 1
+        page.close()
+    return mismatches, written
 
 
 def content_h(page, sel: str, box: dict) -> float:
@@ -227,19 +282,24 @@ def main() -> int:
                         page.screenshot(path=str(dest))
                     written += 1
                 page.close()
+            more, n = capture_scenarios(browser, port, a.only, a.check)
+            mismatches += more
+            written += n
             if not a.only:  # phone widths must not scroll sideways
                 for width in (320, 360, 390):
-                    page = browser.new_page(viewport={"width": width, "height": 740})
-                    page.goto(f"http://127.0.0.1:{port}/?theme=light#preset=hipaa_telehealth")
-                    page.wait_for_selector("#out .pick-b", timeout=30000)
-                    page.wait_for_timeout(1000)
-                    sw = page.evaluate("document.documentElement.scrollWidth")
-                    if sw > width:
-                        mismatches.append((f"phone-{width}", [f"page is {sw} px wide"]))
-                        print(f"MISMATCH phone width {width}: scrollWidth {sw}")
-                    else:
-                        print(f"ok       phone width {width}")
-                    page.close()
+                    for link, ready in (("?theme=light#preset=hipaa_telehealth", "#out .pick-b"),
+                                        ("scenario?theme=light&example=P2", "#sc-out .sc-c")):
+                        page = browser.new_page(viewport={"width": width, "height": 740})
+                        page.goto(f"http://127.0.0.1:{port}/{link}")
+                        page.wait_for_selector(ready, timeout=30000)
+                        page.wait_for_timeout(1000)
+                        sw = page.evaluate("document.documentElement.scrollWidth")
+                        if sw > width:
+                            mismatches.append((f"phone-{width} /{link}", [f"page is {sw} px wide"]))
+                            print(f"MISMATCH phone width {width} /{link}: scrollWidth {sw}")
+                        else:
+                            print(f"ok       phone width {width} /{link.split('?')[0]}")
+                        page.close()
             browser.close()
     finally:
         server.terminate()

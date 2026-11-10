@@ -17,7 +17,7 @@ Only paths on the allowlist go into source/, so a stray file in the working fold
   * no .venv, caches, .git, tool-settings folders, planning notes or secrets files
   * no text file that mentions a local path or a name that should not ship; the report's section 11, the AI
     assistance declaration the statement asks for, is the one place allowed to name the coding assistant
-  * source/ is under 10 MB and the whole folder under 1 GB
+  * source/ is under 25 MB and the whole folder under 1 GB
 Exit code 1 if any check fails.
 """
 from __future__ import annotations
@@ -36,7 +36,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-MAX_BYTES = 10 * 1024 * 1024
+MAX_BYTES = 25 * 1024 * 1024  # source/ budget (the statement allows 1 GB for the whole folder); screenshots are most of it
 MAX_FOLDER_BYTES = 1024 ** 3
 REPORT_PDF = ROOT / "report" / "StackSense_Report.pdf"
 PUBLIC = ROOT / "scenarios" / "public"
@@ -167,7 +167,7 @@ def check(dest: Path) -> list[str]:
     if [p.name for p in pdfs] != [f"Report_{dest.name[len('StackSense26_'):]}.pdf"] or pdfs[0].read_bytes()[:4] != b"%PDF":
         bad.append("the folder needs exactly one Report_<FullName>.pdf (run python tools/build_report.py first)")
     if source.is_dir() and _size(source) >= MAX_BYTES:
-        bad.append(f"source/ is {_size(source) / 1e6:.1f} MB, over the 10 MB limit")
+        bad.append(f"source/ is {_size(source) / 1e6:.1f} MB, over the 25 MB limit")
     if _size(dest) >= MAX_FOLDER_BYTES:
         bad.append("the folder is over 1 GB")
     return sorted(set(bad))
