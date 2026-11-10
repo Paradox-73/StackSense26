@@ -10,6 +10,7 @@ with every language-model feature switched off.
 """
 from __future__ import annotations
 
+import json
 import re
 
 from . import __version__
@@ -677,6 +678,17 @@ def _summary(result: dict, stack: dict, style: str, cost: dict) -> str:
     money = f"${cost['min']:,}" if cost["min"] == cost["max"] else f"${cost['min']:,}-{cost['max']:,}"
     why = result.get("architecture", {}).get("why", "")
     return f"{first} About {money} a month. {why.split('. ')[0].rstrip('.')}."
+
+
+def run_text(text: str) -> dict:
+    """run() on the text of a scenario file; text that is not JSON is an invalid_input result, not an exception."""
+    try:
+        doc = json.loads(text)
+    except ValueError as e:
+        out = run(None)
+        out["validation_errors"] = [{"field": "(file)", "message": f"not valid JSON: {e}"}]
+        return out
+    return run(doc)
 
 
 def run(doc) -> dict:

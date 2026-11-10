@@ -1,4 +1,4 @@
-"""One-command launcher:  python run.py  [--port 8000] [--no-browser]
+"""One-command launcher:  python run.py  [--port 8000] [--no-browser] [--no-llm]
 
 Creates .venv and installs requirements on first run, then starts the server at
 http://127.0.0.1:8000 . Works on Windows, macOS and Linux with Python 3.9 to 3.14.
@@ -93,7 +93,10 @@ def main() -> int:
     ap.add_argument("--port", type=int, default=8000)
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--no-browser", action="store_true")
+    ap.add_argument("--no-llm", action="store_true", help="switch every language-model feature off (STACKSENSE_LLM=off)")
     a = ap.parse_args()
+    if a.no_llm:
+        os.environ["STACKSENSE_LLM"] = "off"
     try:
         import fastapi  # noqa: F401
         import uvicorn

@@ -1,0 +1,331 @@
+{
+  "scenario_id": "P4",
+  "engine_version": "1.0.0",
+  "status": "ok",
+  "summary": "A modular monolith build: React SPA on the frontend, Java/Kotlin + Spring Boot for the backend, PostgreSQL for data, hosted on AWS ECS on Fargate. About $1,945-7,310 a month. With 8 engineer(s), one deployable with strict internal module boundaries is the fastest and cheapest to run; modules can be extracted into services later.",
+  "architecture_style": "modular_monolith",
+  "stack": {
+    "frontend": {
+      "choice": "React SPA (Vite) + Native iOS + Android (Swift / Kotlin) for the Android/iOS app",
+      "justification": "React SPA (Vite) is the frontend for a Fintech / payments / ledger project with about 60,000 daily users (~833 requests/s at peak), built by a team of 8 in 16 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. Angular is within 0.8 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note). You also target iOS/Android. Native iOS + Android (Swift / Kotlin) scored best among mobile toolkits with the same weights and backend.",
+      "driven_by": [
+        "team.languages",
+        "priorities.security",
+        "priorities.scalability",
+        "priorities.maintainability",
+        "project.platforms"
+      ],
+      "alternatives": [
+        {
+          "choice": "Angular",
+          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.8 points higher; either is defensible. React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), development speed (4.0 vs 3.0); Angular is stronger on structure for large teams (5.0 vs 2.0), team skill match (4.0 vs 3.5)."
+        },
+        {
+          "choice": "Next.js (React)",
+          "why_not": "Swapping it in lowers the stack score by 1.2 points. React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), portability (low lock-in) (5.0 vs 4.0); Next.js (React) is stronger on performance / latency (4.0 vs 3.0), development speed (5.0 vs 4.0); Next.js (React) takes a penalty: No search visibility needed: server rendering adds a Node.js server for pages that React SPA (Vite) serves as static files."
+        },
+        {
+          "choice": "React Native (Expo)",
+          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
+        },
+        {
+          "choice": "Flutter",
+          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
+        }
+      ],
+      "tradeoffs": [
+        "Client-side rendering hurts SEO and first paint on slow phones",
+        "Routing, data fetching and state are your own architecture decisions"
+      ]
+    },
+    "backend": {
+      "choice": "Java/Kotlin + Spring Boot",
+      "justification": "Java/Kotlin + Spring Boot serves the API at about 833 requests/s at peak (Large (5,000-50,000 users online at once)) for a team of 8. It runs as a long-running Java/Kotlin service, so background jobs, WebSockets and database connection pools live in one deployable process. It leads the runner-up, Go (net/http, chi or Gin), by 3.0 stack points (points of the overall stack score, the average of the four layer scores).",
+      "driven_by": [
+        "priorities.security",
+        "priorities.scalability",
+        "priorities.maintainability",
+        "team.languages",
+        "infrastructure.cloud_preference",
+        "compliance",
+        "infrastructure.data_residency"
+      ],
+      "alternatives": [
+        {
+          "choice": "Go (net/http, chi or Gin)",
+          "why_not": "Swapping it in lowers the stack score by 3.0 points. Java/Kotlin + Spring Boot is stronger on team skill match (5.0 vs 3.5), ecosystem maturity (5.0 vs 4.0); Go (net/http, chi or Gin) is stronger on low ops burden (5.0 vs 3.0), performance / latency (5.0 vs 4.0)."
+        },
+        {
+          "choice": "Node.js + Express",
+          "why_not": "Swapping it in lowers the stack score by 3.5 points. Java/Kotlin + Spring Boot is stronger on scalability (5.0 vs 4.0), structure for large teams (5.0 vs 1.0); Node.js + Express is stronger on low ops burden (4.0 vs 3.0), development speed (4.0 vs 3.0)."
+        },
+        {
+          "choice": "Python + Django",
+          "why_not": "Swapping it in lowers the stack score by 7.1 points. Java/Kotlin + Spring Boot is stronger on team skill match (5.0 vs 1.5), scalability (5.0 vs 4.0); Python + Django is stronger on development speed (5.0 vs 3.0), low ops burden (4.0 vs 3.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn."
+        },
+        {
+          "choice": "Supabase (BaaS on Postgres)",
+          "why_not": "Ruled out: Not on AWS, the cloud you require; No ISO/IEC 27001 certification published"
+        }
+      ],
+      "tradeoffs": [
+        "Higher memory footprint, slow JVM cold starts (mitigated by GraalVM/SnapStart)",
+        "Verbose for small MVPs"
+      ]
+    },
+    "database": {
+      "choice": "PostgreSQL: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)",
+      "justification": "Your data is mainly relational and reaches about 500 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $800-$1,600 a month, against a total budget of $6,000 a month. MySQL is within 0.1 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).",
+      "driven_by": [
+        "project.type",
+        "priorities.security",
+        "priorities.scalability",
+        "priorities.maintainability",
+        "scale.data_volume_gb_12_months",
+        "requirements.availability"
+      ],
+      "alternatives": [
+        {
+          "choice": "MySQL",
+          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.1 points lower; either is defensible. PostgreSQL is stronger on realtime fit (3.0 vs 2.0)."
+        },
+        {
+          "choice": "MongoDB",
+          "why_not": "Swapping it in lowers the stack score by 6.8 points. PostgreSQL is stronger on data-model fit (5.0 vs 2.0), consistency fit (5.0 vs 3.5); MongoDB is stronger on team skill match (3.5 vs 1.5), scalability (5.0 vs 4.0); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data."
+        },
+        {
+          "choice": "Redis / Valkey",
+          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data; In-memory store: ~500 GB within 12 months cannot sensibly live in RAM as the system of record (use it as a cache)"
+        },
+        {
+          "choice": "Apache Cassandra / ScyllaDB",
+          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data"
+        }
+      ],
+      "tradeoffs": [
+        "Team skill match is only 1.5/5 (weight 2.5).",
+        "Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless",
+        "Connection-per-process model needs PgBouncer/RDS Proxy under serverless",
+        "Nobody on the team listed PostgreSQL or a closely related skill; plan 2-4 weeks to learn it."
+      ]
+    },
+    "hosting": {
+      "choice": "AWS ECS on Fargate, region ap-south-1 (Mumbai)",
+      "justification": "AWS ECS on Fargate hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes, sized for ~833 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is $800-$4,000 a month, against a total budget of $6,000 a month. It leads the runner-up, AWS Lambda + API Gateway, by 2.9 stack points.",
+      "driven_by": [
+        "priorities.security",
+        "priorities.scalability",
+        "priorities.maintainability",
+        "scale.users_12_months",
+        "requirements.availability",
+        "infrastructure.cloud_preference",
+        "compliance"
+      ],
+      "alternatives": [
+        {
+          "choice": "AWS Lambda + API Gateway",
+          "why_not": "Swapping it in lowers the stack score by 2.9 points. AWS ECS on Fargate is stronger on performance / latency (4.0 vs 3.0), portability (low lock-in) (3.0 vs 2.0); AWS Lambda + API Gateway is stronger on team skill match (3.5 vs 1.5), low ops burden (5.0 vs 3.0)."
+        },
+        {
+          "choice": "Vercel",
+          "why_not": "Ruled out for your answers: Not on AWS, the cloud you require."
+        },
+        {
+          "choice": "Render",
+          "why_not": "Ruled out for your answers: Not on AWS, the cloud you require."
+        },
+        {
+          "choice": "Netlify",
+          "why_not": "Ruled out: Not on AWS, the cloud you require; No India region; data must stay in India"
+        }
+      ],
+      "tradeoffs": [
+        "Team skill match is only 1.5/5 (weight 2.5).",
+        "AWS networking/IAM learning curve",
+        "ALB + NAT gateway base costs even when idle",
+        "Nobody on the team listed AWS ECS on Fargate or a closely related skill; plan 2-4 weeks to learn it."
+      ]
+    },
+    "supporting": [
+      {
+        "layer": "queue",
+        "choice": "Spring Batch / SQS listeners",
+        "justification": "Send emails, process uploads and call slow APIs outside the request path.",
+        "driven_by": [
+          "requirements.file_media_storage",
+          "scale.workload"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://12factor.net/processes"
+      },
+      {
+        "layer": "storage",
+        "choice": "Amazon S3 (a separate bucket for uploaded files, served through the same CloudFront as the static frontend)",
+        "justification": "Uploaded files and video belong in object storage, not the database.",
+        "driven_by": [
+          "requirements.file_media_storage",
+          "infrastructure.data_residency"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://aws.amazon.com/s3/"
+      },
+      {
+        "layer": "cdn",
+        "choice": "CDN in front of the object storage, with image resizing at the edge",
+        "justification": "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.",
+        "driven_by": [
+          "project.platforms",
+          "scale.users_12_months"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://developers.cloudflare.com/r2/pricing/"
+      },
+      {
+        "layer": "auth",
+        "choice": "MSG91 or Twilio Verify, with DLT-registered SMS templates",
+        "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates.",
+        "driven_by": [
+          "requirements.auth",
+          "infrastructure.data_residency"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://www.twilio.com/en-us/verify/pricing"
+      },
+      {
+        "layer": "payments",
+        "choice": "Razorpay / Cashfree (India) or Stripe with hosted checkout (card tokens)",
+        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).",
+        "driven_by": [
+          "requirements.payments",
+          "compliance"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://www.pcisecuritystandards.org/document_library/"
+      },
+      {
+        "layer": "cdn",
+        "choice": "Amazon S3 + CloudFront",
+        "justification": "React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Java/Kotlin + Spring Boot instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.",
+        "driven_by": [
+          "project.platforms",
+          "scale.users_12_months"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html"
+      },
+      {
+        "layer": "auth",
+        "choice": "Amazon Cognito in the Mumbai region",
+        "justification": "Do not hand-roll password storage, MFA or SSO.",
+        "driven_by": [
+          "requirements.auth",
+          "infrastructure.data_residency"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+      },
+      {
+        "layer": "other",
+        "choice": "Firebase Cloud Messaging (+ APNs) or Expo Notifications",
+        "justification": "Standard channel for mobile engagement on Android and iOS.",
+        "driven_by": [
+          "project.platforms"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://firebase.google.com/docs/cloud-messaging"
+      },
+      {
+        "layer": "ml",
+        "choice": "Amazon SageMaker real-time endpoint",
+        "justification": "Serve the model from its own endpoint, versioned and monitored apart from the web tier; a small scoring model runs on CPU.",
+        "driven_by": [
+          "requirements.ml_features",
+          "infrastructure.data_residency"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html"
+      },
+      {
+        "layer": "observability",
+        "choice": "OpenTelemetry instrumentation -> CloudWatch + X-Ray",
+        "justification": "Traces, metrics and error tracking from day one; required to defend an availability target.",
+        "driven_by": [
+          "requirements.availability",
+          "infrastructure.data_residency"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://opentelemetry.io/docs/"
+      },
+      {
+        "layer": "other",
+        "choice": "Encrypted storage (KMS), audit logging, least-privilege IAM, WAF",
+        "justification": "PCI-DSS requires access controls, audit trails and encryption.",
+        "driven_by": [
+          "compliance"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://www.pcisecuritystandards.org/document_library/"
+      },
+      {
+        "layer": "ci_cd",
+        "choice": "GitHub Actions",
+        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate.",
+        "driven_by": [
+          "infrastructure.deployment_model",
+          "team.size"
+        ],
+        "alternatives": [
+          {
+            "choice": "GitLab CI/CD",
+            "why_not": "Equivalent pipelines; one more tool to learn for no gain here"
+          }
+        ],
+        "tradeoffs": [
+          "Pipeline minutes are metered on hosted runners"
+        ],
+        "source": "https://docs.github.com/actions"
+      }
+    ]
+  },
+  "estimated_monthly_cost_usd": {
+    "min": 1945,
+    "max": 7310,
+    "assumptions": [
+      "Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
+      "Scale tier: Large (5,000-50,000 users online at once)",
+      "Budget check: $6,000/month stated, status 'stretch'",
+      "Hosting: AWS ECS on Fargate: $800-4,000 (Large (5,000-50,000 users online at once) price band; x2 for 99.95% availability (redundant instances))",
+      "Database: PostgreSQL: $800-1,600 (Large (5,000-50,000 users online at once) database tier (~500 GB in 12 months); upper end for ~500 GB of data: the band's top is priced for the largest data of the tier; x2 for 99.95% availability (standby/replicas))",
+      "Media delivery: $90-810 (~9,000 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)",
+      "Phone login (SMS OTP): $180-450 (~90,000 SMS a month (one login every ~20 days per active user) at $0.002-0.005 each)",
+      "Static frontend: AWS S3 + CloudFront (static): $15-200 (Large (5,000-50,000 users online at once) price band (the app's scale))",
+      "Model serving: CPU endpoint: $60-250 (one or two always-on small CPU instances behind a real-time endpoint (about $0.10-0.17 an hour each, https://aws.amazon.com/sagemaker/pricing/))"
+    ]
+  },
+  "warnings": [],
+  "assumptions": [
+    "project.description is not parsed for a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm)",
+    "Sized for scale.users_12_months: 300,000 users, about 60,000 active on a day (20% daily-to-monthly ratio); scale.users_at_launch (10,000) is the starting point",
+    "rbi_localisation: RBI's 2018 directive on storage of payment system data requires payment data to be stored only in India, so every store must have an Indian region",
+    "iso27001: only hosts and managed services (backend-as-a-service, managed-only databases) that publish ISO/IEC 27001 certification are kept",
+    "Priorities rated 4 or 5 raise their criteria's weights, strongest first: security (5), scalability (4), maintainability (4)",
+    "Priorities rated 1 or 2 (cost) keep their criteria at the baseline weight",
+    "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",
+    "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
+    "Architecture preference: Not provided; using default 'auto'.",
+    "Vendor lock-in tolerance: Not provided; using default 'medium'.",
+    "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies."
+  ],
+  "validation_errors": []
+}

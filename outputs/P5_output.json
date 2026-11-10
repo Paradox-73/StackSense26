@@ -1,0 +1,262 @@
+{
+  "scenario_id": "P5",
+  "engine_version": "1.0.0",
+  "status": "ok",
+  "summary": "A modular monolith build: Server-rendered HTML + HTMX on the frontend, C# + ASP.NET Core for the backend, Microsoft SQL Server / Azure SQL Database for data, hosted on Azure App Service / Container Apps. About $44-375 a month. With 2 engineer(s), one deployable with strict internal module boundaries is the fastest and cheapest to run; modules can be extracted into services later.",
+  "architecture_style": "modular_monolith",
+  "stack": {
+    "frontend": {
+      "choice": "Server-rendered HTML + HTMX",
+      "justification": "Server-rendered HTML + HTMX is the frontend for an Internal tool / admin panel project with about 300 daily users (~1.6 requests/s at peak), built by a team of 2 in 6 weeks. Its strongest weighted criterion for your answers is low ops burden: 5.0/5 at weight 4.0, the largest share of its score. It leads the runner-up, React SPA (Vite), by 1.4 stack points (points of the overall stack score, the average of the four layer scores).",
+      "driven_by": [
+        "priorities.time_to_market",
+        "priorities.maintainability",
+        "priorities.security",
+        "team.languages",
+        "project.platforms"
+      ],
+      "alternatives": [
+        {
+          "choice": "React SPA (Vite)",
+          "why_not": "Swapping it in lowers the stack score by 1.4 points. Server-rendered HTML + HTMX is stronger on team skill match (4.5 vs 3.5), learning curve (5.0 vs 4.0); React SPA (Vite) is stronger on ecosystem maturity (5.0 vs 3.0), rich client interactivity (5.0 vs 2.0)."
+        },
+        {
+          "choice": "Next.js (React)",
+          "why_not": "Swapping it in lowers the stack score by 3.2 points. Server-rendered HTML + HTMX is stronger on learning curve (5.0 vs 3.0), low ops burden (5.0 vs 4.0); Next.js (React) is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Next.js (React) takes a penalty: No search visibility needed: server rendering adds a Node.js server for pages that React SPA (Vite) serves as static files."
+        },
+        {
+          "choice": "React Native (Expo)",
+          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
+        },
+        {
+          "choice": "Flutter",
+          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
+        }
+      ],
+      "tradeoffs": [
+        "Structure for large teams is only 2.0/5 (weight 1.0).",
+        "Rich client interactions (drag-drop editors, offline) get awkward",
+        "Requires a server-rendering backend; does not pair with BaaS"
+      ]
+    },
+    "backend": {
+      "choice": "C# + ASP.NET Core",
+      "justification": "C# + ASP.NET Core serves the API at about 1.6 requests/s at peak (Small (50-500 users online at once)) for a team of 2. It runs as a long-running C#/.NET service, so background jobs, WebSockets and database connection pools live in one deployable process. It leads the runner-up, PHP + Laravel, by 3.7 stack points.",
+      "driven_by": [
+        "priorities.time_to_market",
+        "priorities.maintainability",
+        "priorities.security",
+        "team.languages",
+        "infrastructure.cloud_preference",
+        "compliance",
+        "infrastructure.data_residency"
+      ],
+      "alternatives": [
+        {
+          "choice": "PHP + Laravel",
+          "why_not": "Swapping it in lowers the stack score by 3.7 points. C# + ASP.NET Core is stronger on team skill match (4.5 vs 3.5), learning curve (5.0 vs 4.0); PHP + Laravel is stronger on development speed (5.0 vs 4.0); PHP + Laravel takes a penalty: Company-account sign-in (SSO) needs an identity broker such as Keycloak that you run beside this backend."
+        },
+        {
+          "choice": "Node.js + Express",
+          "why_not": "Swapping it in lowers the stack score by 5.1 points. C# + ASP.NET Core is stronger on structure for large teams (5.0 vs 1.0), performance / latency (5.0 vs 3.0); Node.js + Express is stronger on hiring pool (5.0 vs 4.0); Node.js + Express takes a penalty: Company-account sign-in (SSO) needs an identity broker such as Keycloak that you run beside this backend."
+        },
+        {
+          "choice": "Python + Django",
+          "why_not": "Swapping it in lowers the stack score by 7.8 points. C# + ASP.NET Core is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 4.0); Python + Django is stronger on development speed (5.0 vs 4.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn."
+        },
+        {
+          "choice": "Supabase (BaaS on Postgres)",
+          "why_not": "Ruled out: Not on Azure, the cloud you require; No ISO/IEC 27001 certification published"
+        }
+      ],
+      "tradeoffs": [
+        "Ecosystem is centred on Microsoft tooling",
+        "Smaller startup community than Node/Python",
+        "Company-account sign-in (SSO) needs an identity broker such as Keycloak that you run beside this backend (-3)."
+      ]
+    },
+    "database": {
+      "choice": "Microsoft SQL Server / Azure SQL Database: Azure SQL Database (General Purpose, serverless or provisioned)",
+      "justification": "Your data is mainly relational and reaches about 20 GB within 12 months; Microsoft SQL Server / Azure SQL Database fits relational data 5/5. You need strong consistency, and Microsoft SQL Server / Azure SQL Database gives it: a read after a write always sees that write. Its share of the estimated bill is $22-$225 a month, against a total budget of $300 a month. It leads the runner-up, PostgreSQL, by 2.2 stack points.",
+      "driven_by": [
+        "infrastructure.existing_systems",
+        "team.languages",
+        "team.size",
+        "project.type",
+        "infrastructure.cloud_preference",
+        "scale.data_volume_gb_12_months"
+      ],
+      "alternatives": [
+        {
+          "choice": "PostgreSQL",
+          "why_not": "Swapping it in lowers the stack score by 2.2 points. PostgreSQL is stronger on portability (low lock-in) (5.0 vs 3.0), cost at your scale (4.7 vs 4.4)."
+        },
+        {
+          "choice": "MySQL",
+          "why_not": "Swapping it in lowers the stack score by 2.2 points. MySQL is stronger on portability (low lock-in) (5.0 vs 3.0), cost at your scale (4.7 vs 4.4)."
+        },
+        {
+          "choice": "MongoDB",
+          "why_not": "Swapping it in lowers the stack score by 12.1 points. Microsoft SQL Server / Azure SQL Database is stronger on data-model fit (5.0 vs 2.0), consistency fit (5.0 vs 3.5); MongoDB is stronger on scalability (5.0 vs 4.0), cost at your scale (4.7 vs 4.4); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data."
+        },
+        {
+          "choice": "Amazon DynamoDB",
+          "why_not": "Ruled out: Not on Azure, the cloud you require"
+        }
+      ],
+      "tradeoffs": [
+        "Commercial licence: managed instances cost more than PostgreSQL or MySQL of the same size",
+        "T-SQL and its features are specific to SQL Server, so moving off it is a migration"
+      ]
+    },
+    "hosting": {
+      "choice": "Azure App Service / Container Apps, region Central India (Pune)",
+      "justification": "Azure App Service / Container Apps hosts the stack for users in India at a 99.9% availability target. It runs the C# + ASP.NET Core API as long-running processes, sized for ~1.6 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is $22-$150 a month, against a total budget of $300 a month.",
+      "driven_by": [
+        "infrastructure.cloud_preference",
+        "priorities.time_to_market",
+        "priorities.maintainability",
+        "priorities.security",
+        "compliance",
+        "infrastructure.data_residency"
+      ],
+      "alternatives": [
+        {
+          "choice": "Vercel",
+          "why_not": "Ruled out for your answers: Not on Azure, the cloud you require."
+        },
+        {
+          "choice": "AWS ECS on Fargate",
+          "why_not": "Ruled out for your answers: Not on Azure, the cloud you require."
+        },
+        {
+          "choice": "Render",
+          "why_not": "Ruled out for your answers: Not on Azure, the cloud you require."
+        },
+        {
+          "choice": "Netlify",
+          "why_not": "Ruled out: Not on Azure, the cloud you require; No India region; data must stay in India"
+        }
+      ],
+      "tradeoffs": [
+        "Portal/config complexity; pricing tiers are confusing"
+      ]
+    },
+    "supporting": [
+      {
+        "layer": "queue",
+        "choice": "Hangfire / Azure Queue",
+        "justification": "Send emails, process uploads and call slow APIs outside the request path.",
+        "driven_by": [
+          "requirements.file_media_storage",
+          "scale.workload"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://12factor.net/processes"
+      },
+      {
+        "layer": "storage",
+        "choice": "Blob Storage + Front Door",
+        "justification": "Uploaded files and video belong in object storage, not the database.",
+        "driven_by": [
+          "requirements.file_media_storage",
+          "infrastructure.data_residency"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://aws.amazon.com/s3/"
+      },
+      {
+        "layer": "auth",
+        "choice": "Microsoft Entra ID (existing), signed in over OpenID Connect",
+        "justification": "infrastructure.existing_systems lists Microsoft Entra ID: users sign in with the accounts it already manages, so there is no new user store, MFA and password rules come from it, and removing someone there removes their access here.",
+        "driven_by": [
+          "infrastructure.existing_systems",
+          "requirements.auth"
+        ],
+        "alternatives": [
+          {
+            "choice": "Keycloak self-hosted in your Indian region, or framework built-in auth",
+            "why_not": "A second identity system to run beside Microsoft Entra ID, which already holds the users"
+          },
+          {
+            "choice": "Keycloak identity brokering (self-hosted, free): each customer's Entra ID / Azure AD, Okta or Google Workspace over SAML 2.0 or OIDC",
+            "why_not": "A second identity system to run beside Microsoft Entra ID, which already holds the users"
+          }
+        ],
+        "tradeoffs": [
+          "Sign-in depends on Microsoft Entra ID being reachable"
+        ],
+        "source": "https://learn.microsoft.com/entra/identity-platform/v2-protocols-oidc"
+      },
+      {
+        "layer": "observability",
+        "choice": "OpenTelemetry instrumentation -> Azure Monitor / App Insights",
+        "justification": "Traces, metrics and error tracking from day one; required to defend an availability target.",
+        "driven_by": [
+          "requirements.availability",
+          "infrastructure.data_residency"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://opentelemetry.io/docs/"
+      },
+      {
+        "layer": "ci_cd",
+        "choice": "GitHub Actions",
+        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate.",
+        "driven_by": [
+          "infrastructure.deployment_model",
+          "team.size"
+        ],
+        "alternatives": [
+          {
+            "choice": "GitLab CI/CD",
+            "why_not": "Equivalent pipelines; one more tool to learn for no gain here"
+          }
+        ],
+        "tradeoffs": [
+          "Pipeline minutes are metered on hosted runners"
+        ],
+        "source": "https://docs.github.com/actions"
+      }
+    ]
+  },
+  "estimated_monthly_cost_usd": {
+    "min": 44,
+    "max": 375,
+    "assumptions": [
+      "Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
+      "Scale tier: Small (50-500 users online at once)",
+      "Budget check: $300/month stated, status 'stretch'",
+      "Hosting: Azure App Service / Container Apps: $22-150 (Small (50-500 users online at once) price band; x1.5 for 99.9% availability (redundant instances))",
+      "Database: Microsoft SQL Server / Azure SQL Database: $22-225 (Small (10-100 GB of data) database tier (~20 GB in 12 months); x1.5 for 99.9% availability (standby/replicas))"
+    ]
+  },
+  "warnings": [
+    {
+      "code": "EXISTING_SYSTEM_EXTENDED_SUPPORT",
+      "severity": "info",
+      "message": "'On-prem SQL Server 2019': SQL Server 2019 mainstream support ended 28 Feb 2025; security updates continue until 8 Jan 2030 (https://learn.microsoft.com/lifecycle/products/sql-server-2019). Keeping it is fine; schedule the upgrade before that date.",
+      "fields": [
+        "infrastructure.existing_systems"
+      ]
+    }
+  ],
+  "assumptions": [
+    "project.description is not parsed for a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm)",
+    "Sized for scale.users_12_months: 1,500 users, about 300 active on a day (20% daily-to-monthly ratio); scale.users_at_launch (1,200) is the starting point",
+    "iso27001: only hosts and managed services (backend-as-a-service, managed-only databases) that publish ISO/IEC 27001 certification are kept",
+    "Priorities rated 4 or 5 raise their criteria's weights, strongest first: time_to_market (5), maintainability (5), security (4)",
+    "Priorities rated 1 or 2 (scalability, performance) keep their criteria at the baseline weight",
+    "Existing identity provider Microsoft Entra ID: sign-in reuses it over OpenID Connect or SAML instead of a new user store",
+    "Existing database 'On-prem SQL Server 2019': Microsoft SQL Server / Azure SQL Database gets a bonus for staying; keep it by moving its data to the recommended offering with the vendor's migration tool, or reach it over a private link (site-to-site VPN) while it stays where it is",
+    "Existing system 'Microsoft 365': integrated through Microsoft Graph API (mail, calendar and Teams notifications, files); it stays the system of record for its own data",
+    "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",
+    "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
+    "Architecture preference: Not provided; using default 'auto'.",
+    "Vendor lock-in tolerance: Not provided; using default 'medium'."
+  ],
+  "validation_errors": []
+}

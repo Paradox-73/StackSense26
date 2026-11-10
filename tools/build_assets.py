@@ -95,7 +95,7 @@ CATEGORIES = {
     "Inputs, edge cases and warnings": ["test_standard", "test_edge_cases", "test_input_validation", "test_input_questions", "test_questions", "test_next",
                                         "test_sensitivity", "test_defaults_used", "test_scale_warnings", "test_question_influence", "test_question_wording"],
     "Stability and properties": ["test_stability", "test_invariants", "test_scenarios"],
-    "Language-model layer (checks and fallbacks)": ["test_llm", "test_brief", "test_brief_audit", "test_brief_regression", "test_summary", "test_whatif", "test_llm_baseline"],
+    "Language-model layer (checks and fallbacks)": ["test_llm_off", "test_llm", "test_brief", "test_brief_audit", "test_brief_regression", "test_summary", "test_whatif", "test_llm_baseline"],
     "Accuracy against the answer key": ["test_benchmark"],
     "App, packaging and documents": ["test_api", "test_launcher", "test_no_network", "test_share", "test_links", "test_docs",
                                      "test_package", "test_ci", "test_openapi", "test_demo_script"],

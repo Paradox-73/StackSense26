@@ -1,0 +1,197 @@
+{
+  "scenario_id": "P1",
+  "engine_version": "1.0.0",
+  "status": "ok",
+  "summary": "A static build: Astro on the frontend, hosted on Netlify; no backend or database is needed. About $0 a month. Users only read what the team publishes, so every page is built at deploy time and served as files: no server code or database to run, patch or pay for.",
+  "architecture_style": "static",
+  "stack": {
+    "frontend": {
+      "choice": "Astro",
+      "justification": "Astro is the frontend for a Content / blog / marketing (SEO) project with about 600 daily users (~0.2 requests/s at peak), built by a solo developer in 2 weeks. Search visibility is marked critical (organic traffic is the business), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. It leads the runner-up, SvelteKit, by 1.1 stack points (points of the overall stack score, the average of the four layer scores).",
+      "driven_by": [
+        "requirements.seo_critical",
+        "timeline.mvp_weeks",
+        "team.size",
+        "team.experience",
+        "project.platforms"
+      ],
+      "alternatives": [
+        {
+          "choice": "SvelteKit",
+          "why_not": "Swapping it in lowers the stack score by 1.1 points. Astro is stronger on low ops burden (5.0 vs 4.0), team skill match (4.0 vs 3.5); SvelteKit is stronger on rich client interactivity (5.0 vs 2.0), hiring pool (3.0 vs 2.0)."
+        },
+        {
+          "choice": "Server-rendered HTML + HTMX",
+          "why_not": "Swapping it in lowers the stack score by 4.5 points. Astro is stronger on performance / latency (5.0 vs 4.0), structure for large teams (3.0 vs 2.0); Server-rendered HTML + HTMX is stronger on learning curve (5.0 vs 4.0), team skill match (4.5 vs 4.0)."
+        },
+        {
+          "choice": "Next.js (React)",
+          "why_not": "Swapping it in lowers the stack score by 2.7 points. Astro is stronger on low ops burden (5.0 vs 4.0), learning curve (4.0 vs 3.0); Next.js (React) is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0)."
+        },
+        {
+          "choice": "React Native (Expo)",
+          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
+        }
+      ],
+      "tradeoffs": [
+        "Not designed for highly interactive app-like UIs",
+        "Smaller hiring pool"
+      ]
+    },
+    "backend": {
+      "choice": "None",
+      "justification": "No server code (static site). The site serves about 600 daily users read-only, so the pages are built once and served as files: there is no API server to run, patch or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 7.0, the largest share of its score. It leads the runner-up, Serverless functions (Node/Python FaaS), by 2.3 stack points.",
+      "driven_by": [
+        "timeline.mvp_weeks",
+        "team.languages",
+        "budget.monthly_infra_usd",
+        "team.size"
+      ],
+      "alternatives": [
+        {
+          "choice": "Serverless functions (Node/Python FaaS)",
+          "why_not": "Swapping it in lowers the stack score by 2.3 points. No server code (static site) is stronger on learning curve (5.0 vs 4.0), performance / latency (5.0 vs 3.0)."
+        },
+        {
+          "choice": "Node.js + Express",
+          "why_not": "Swapping it in lowers the stack score by 7.2 points. No server code (static site) is stronger on low ops burden (5.0 vs 4.0), performance / latency (5.0 vs 3.0); Node.js + Express is stronger on realtime fit (4.0 vs 1.0)."
+        },
+        {
+          "choice": "Python + Django",
+          "why_not": "Swapping it in lowers the stack score by 16.5 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), low ops burden (5.0 vs 4.0); Python + Django is stronger on structure for large teams (4.0 vs 3.0), realtime fit (2.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn."
+        }
+      ],
+      "tradeoffs": [
+        "No sign-in, posting, payments or per-user pages: add server code or a BaaS when those arrive",
+        "Contact forms and comments need a third-party service or one serverless function"
+      ]
+    },
+    "database": {
+      "choice": "None",
+      "justification": "No database (content files in git). The content is about 1.0 GB of files kept in git, so there is no database server to run, back up or pay for. You need strong consistency, and No database (content files in git) gives it: a read after a write always sees that write. It leads the runner-up, Cloud Firestore, by 8.8 stack points.",
+      "driven_by": [
+        "budget.monthly_infra_usd",
+        "team.size",
+        "team.experience",
+        "timeline.mvp_weeks",
+        "project.type"
+      ],
+      "alternatives": [
+        {
+          "choice": "Cloud Firestore",
+          "why_not": "Swapping it in lowers the stack score by 8.8 points. No database (content files in git) is stronger on team skill match (4.5 vs 3.5), performance / latency (5.0 vs 4.0); Cloud Firestore is stronger on data-model fit (5.0 vs 4.0), realtime fit (5.0 vs 1.0)."
+        },
+        {
+          "choice": "PostgreSQL",
+          "why_not": "Swapping it in lowers the stack score by 12.6 points. No database (content files in git) is stronger on team skill match (4.5 vs 1.5), cost at your scale (5.0 vs 4.1); PostgreSQL is stronger on realtime fit (3.0 vs 1.0); PostgreSQL takes a penalty: No free option at your scale (from ~$5/month)."
+        },
+        {
+          "choice": "MySQL",
+          "why_not": "Swapping it in lowers the stack score by 14.3 points. No database (content files in git) is stronger on team skill match (4.5 vs 1.5), low ops burden (5.0 vs 4.0); MySQL is stronger on realtime fit (2.0 vs 1.0); MySQL takes a penalty: Only 3/5 fit for your primary 'document' data."
+        },
+        {
+          "choice": "Redis / Valkey",
+          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data; In-memory store: with the default append-only-file setting (fsync every second) a crash loses up to the last second of writes, and snapshots alone lose minutes; it holds key-value data but not tables of records: your document data needs a durable general-purpose primary store, with Redis / Valkey beside it as a supporting store"
+        }
+      ],
+      "tradeoffs": [
+        "Only for content the team publishes: as soon as users sign in, post or pay, add a real database",
+        "Every content change needs a rebuild and deploy (seconds to minutes)"
+      ]
+    },
+    "hosting": {
+      "choice": "Netlify",
+      "justification": "Netlify hosts the stack for users in regions you did not state at a 99% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~0.2 requests/s at peak without servers to manage. Its share of the estimated bill is $0 a month, against a total budget of $0 a month. It leads the runner-up, Cloudflare Pages + Workers, by 1.1 stack points.",
+      "driven_by": [
+        "budget.monthly_infra_usd",
+        "team.size",
+        "team.experience",
+        "priorities.cost",
+        "infrastructure.deployment_model"
+      ],
+      "alternatives": [
+        {
+          "choice": "Cloudflare Pages + Workers",
+          "why_not": "Swapping it in lowers the stack score by 1.1 points. Netlify is stronger on learning curve (5.0 vs 4.0); Cloudflare Pages + Workers is stronger on realtime fit (3.0 vs 1.0)."
+        },
+        {
+          "choice": "Vercel",
+          "why_not": "Swapping it in lowers the stack score by 8.4 points. Netlify is stronger on cost at your scale (5.0 vs 2.9); Vercel is stronger on realtime fit (2.0 vs 1.0); Vercel takes a penalty: No free option at your scale (from ~$20/month)."
+        },
+        {
+          "choice": "AWS ECS on Fargate",
+          "why_not": "Swapping it in lowers the stack score by 23.3 points. Netlify is stronger on cost at your scale (5.0 vs 1.8), low ops burden (5.0 vs 3.0); AWS ECS on Fargate is stronger on ecosystem maturity (5.0 vs 4.0), realtime fit (4.0 vs 1.0); AWS ECS on Fargate takes a penalty: Usually needs a team of 2+ to operate."
+        },
+        {
+          "choice": "On-prem VMs + Docker Compose",
+          "why_not": "Ruled out: On-premises option; you chose public cloud"
+        }
+      ],
+      "tradeoffs": [
+        "Paid plans bill in credits (Personal $9/month with 1,000 credits, Pro $20/month for unlimited members with 3,000, no per-seat charge) spent on deploys, bandwidth and requests, so the bill follows usage once the credits run out",
+        "No long-running servers"
+      ]
+    },
+    "supporting": [
+      {
+        "layer": "observability",
+        "choice": "An uptime check plus the host's web analytics",
+        "justification": "With no server code there is nothing to trace; watch that the pages are up and how fast they load.",
+        "driven_by": [
+          "requirements.availability"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://web.dev/articles/vitals"
+      },
+      {
+        "layer": "ci_cd",
+        "choice": "GitHub Actions",
+        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate.",
+        "driven_by": [
+          "infrastructure.deployment_model",
+          "team.size"
+        ],
+        "alternatives": [
+          {
+            "choice": "GitLab CI/CD",
+            "why_not": "Equivalent pipelines; one more tool to learn for no gain here"
+          }
+        ],
+        "tradeoffs": [
+          "Pipeline minutes are metered on hosted runners"
+        ],
+        "source": "https://docs.github.com/actions"
+      }
+    ]
+  },
+  "estimated_monthly_cost_usd": {
+    "min": 0,
+    "max": 0,
+    "assumptions": [
+      "Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
+      "Scale tier: Small (50-500 users online at once)",
+      "Budget check: $0/month stated, status 'within'",
+      "Hosting: Netlify: $0-0 (free static plan: pre-built files only)"
+    ]
+  },
+  "warnings": [],
+  "assumptions": [
+    "project.description is not parsed for a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm)",
+    "No sign-in and a read-heavy workload: visitors only read, so pre-built static pages are allowed",
+    "Sized for scale.users_12_months: 3,000 users, about 600 active on a day (20% daily-to-monthly ratio); scale.users_at_launch (200) is the starting point",
+    "requirements.p95_latency_ms is null: no latency target, so the engine plans for its 300 ms default",
+    "team.languages not in the knowledge base, so they move no score: css",
+    "Priorities rated 4 or 5 raise their criteria's weights, strongest first: cost (5), time_to_market (4)",
+    "Priorities rated 1 or 2 (scalability, security) keep their criteria at the baseline weight",
+    "What kinds of data do you store? (pick the main kind first): Not provided; using the default for this app type, 'document' (pages and posts are documents).",
+    "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
+    "How fast must the app answer? (slowest 1 in 20 requests, ms): Not provided; using default '300'.",
+    "Where are your users?: Not provided: no region is favoured when hosts are scored.",
+    "Architecture preference: Not provided; using default 'auto'.",
+    "Preferred cloud: Not provided; using default 'none'.",
+    "Vendor lock-in tolerance: Not provided; using default 'medium'.",
+    "requirements.full_text_search is false, so no search service is recommended, although projects of this type usually add one"
+  ],
+  "validation_errors": []
+}

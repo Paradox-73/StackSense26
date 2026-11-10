@@ -12,6 +12,9 @@ summaries, and every caller has a fallback that works without it:
     gives the same output, and the saved files can be committed for reviewers.
 
 Configuration (environment variables, or a `.env` file in the repository root):
+  STACKSENSE_LLM=off                             switches every language-model feature off: no request is sent and
+                                                 no saved answer is served (`python run.py --no-llm` and
+                                                 `python cli.py --no-llm` set it); the stack never depends on it
   STACKSENSE_LLM_API_KEY or OPENROUTER_API_KEY   the key (never logged, never returned)
   STACKSENSE_LLM_BASE_URL                        default https://generativelanguage.googleapis.com/v1beta/openai
                                                  (Gemini free tier); https://openrouter.ai/api/v1 also works
@@ -114,6 +117,11 @@ def _api_key() -> str:
     return _setting("STACKSENSE_LLM_API_KEY") or _setting("OPENROUTER_API_KEY")
 
 
+def switched_off() -> bool:
+    """True when STACKSENSE_LLM is off (or 0, false, no): the LLM-off switch of problem statement section 5.1."""
+    return _setting("STACKSENSE_LLM").lower() in ("off", "0", "false", "no")
+
+
 def base_url() -> str:
     return (_setting("STACKSENSE_LLM_BASE_URL") or DEFAULT_BASE_URL).rstrip("/")
 
@@ -166,7 +174,7 @@ def limit_reached() -> bool:
 def available() -> bool:
     """True when an API key is configured and today's request limit is not used up.
     Otherwise every feature uses its rule-based fallback (saved answers are still served by chat())."""
-    return bool(_api_key()) and not limit_reached()
+    return not switched_off() and bool(_api_key()) and not limit_reached()
 
 
 # ------------------------------------------------------------------ disk cache
@@ -230,6 +238,8 @@ def _message_text(body: dict) -> str | None:
 
 def chat(messages: list[dict], json_mode: bool = True, use_cache: bool = True) -> Reply:
     """Send `messages` to the first model in the chain that answers. Raises LLMError when none does."""
+    if switched_off():
+        raise LLMError("language-model features are switched off (STACKSENSE_LLM=off)")
     chain = models()
     key = cache_key(chain, messages, json_mode)
     if use_cache and (hit := _cache_read(key)):

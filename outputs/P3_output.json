@@ -1,0 +1,302 @@
+{
+  "scenario_id": "P3",
+  "engine_version": "1.0.0",
+  "status": "ok",
+  "summary": "A modular monolith build: React SPA on the frontend, Go for the backend, PostgreSQL for data, hosted on Fly.io. About $1,190-4,635 a month. With 5 engineer(s), one deployable with strict internal module boundaries is the fastest and cheapest to run; modules can be extracted into services later.",
+  "architecture_style": "modular_monolith",
+  "stack": {
+    "frontend": {
+      "choice": "React SPA (Vite)",
+      "justification": "React SPA (Vite) is the frontend for a Realtime chat / collaboration / multiplayer project with about 10,000 daily users (~521 requests/s at peak), built by a team of 5 in 12 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. Next.js (React) is within 0.7 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).",
+      "driven_by": [
+        "team.languages",
+        "requirements.realtime",
+        "project.type",
+        "priorities.scalability",
+        "project.platforms"
+      ],
+      "alternatives": [
+        {
+          "choice": "Next.js (React)",
+          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.7 points lower; either is defensible. React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), learning curve (4.0 vs 3.0); Next.js (React) is stronger on performance / latency (4.0 vs 3.0), development speed (5.0 vs 4.0); Next.js (React) takes a penalty: No search visibility needed: server rendering adds a Node.js server for pages that React SPA (Vite) serves as static files."
+        },
+        {
+          "choice": "React Native (Expo)",
+          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
+        },
+        {
+          "choice": "Flutter",
+          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
+        },
+        {
+          "choice": "Native iOS + Android (Swift / Kotlin)",
+          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
+        }
+      ],
+      "tradeoffs": [
+        "Client-side rendering hurts SEO and first paint on slow phones",
+        "Routing, data fetching and state are your own architecture decisions"
+      ]
+    },
+    "backend": {
+      "choice": "Go (net/http, chi or Gin)",
+      "justification": "Go (net/http, chi or Gin) serves the API at about 521 requests/s at peak (Large (5,000-50,000 users online at once)) for a team of 5. It runs as a long-running Go service, so background jobs, WebSockets and database connection pools live in one deployable process. Realtime is core, and it scores 4.0/5 on realtime fit. It leads the runner-up, Elixir + Phoenix, by 3.1 stack points (points of the overall stack score, the average of the four layer scores).",
+      "driven_by": [
+        "team.languages",
+        "priorities.scalability",
+        "priorities.performance",
+        "priorities.maintainability",
+        "requirements.auth",
+        "requirements.payments"
+      ],
+      "alternatives": [
+        {
+          "choice": "Elixir + Phoenix",
+          "why_not": "Swapping it in lowers the stack score by 3.1 points. Go (net/http, chi or Gin) is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 2.0); Elixir + Phoenix is stronger on realtime fit (5.0 vs 4.0), development speed (4.0 vs 3.0); Elixir + Phoenix takes a penalty: Nobody on the team listed Elixir or a closely related skill: a new server language to learn."
+        },
+        {
+          "choice": "Node.js + Express",
+          "why_not": "Swapping it in lowers the stack score by 5.1 points. Go (net/http, chi or Gin) is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0); Node.js + Express is stronger on development speed (4.0 vs 3.0), ecosystem maturity (5.0 vs 4.0)."
+        },
+        {
+          "choice": "Python + Django",
+          "why_not": "Swapping it in lowers the stack score by 11.0 points. Go (net/http, chi or Gin) is stronger on realtime fit (4.0 vs 2.0), performance / latency (5.0 vs 3.0); Python + Django is stronger on development speed (5.0 vs 3.0), ecosystem maturity (5.0 vs 4.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn."
+        },
+        {
+          "choice": "No server code (static site)",
+          "why_not": "Ruled out: Only for read-only sites; your users sign in, post or pay"
+        }
+      ],
+      "tradeoffs": [
+        "More code for CRUD than Rails/Django",
+        "Smaller web-framework ecosystem"
+      ]
+    },
+    "database": {
+      "choice": "PostgreSQL: Fly Managed Postgres",
+      "justification": "Your data is mainly relational and reaches about 200 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $600-$1,200 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server / Azure SQL Database, by 2.1 stack points.",
+      "driven_by": [
+        "priorities.scalability",
+        "priorities.performance",
+        "priorities.maintainability",
+        "requirements.realtime",
+        "scale.workload",
+        "project.type",
+        "scale.data_volume_gb_12_months"
+      ],
+      "alternatives": [
+        {
+          "choice": "Microsoft SQL Server / Azure SQL Database",
+          "why_not": "Swapping it in lowers the stack score by 2.1 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0), portability (low lock-in) (5.0 vs 3.0)."
+        },
+        {
+          "choice": "MySQL",
+          "why_not": "Swapping it in lowers the stack score by 3.1 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0); MySQL takes a penalty: Customers share one database and in MySQL privileges stop at table and column level, so the tenant filter lives in every application query."
+        },
+        {
+          "choice": "MongoDB",
+          "why_not": "Ruled out for your answers: Write-heavy load at Large (5,000-50,000 users online at once) on a store that fits 'relational' data 2/5 with write scaling 4/5."
+        },
+        {
+          "choice": "Amazon DynamoDB",
+          "why_not": "Ruled out: Write-heavy load at Large (5,000-50,000 users online at once) on a store that fits 'relational' data 1/5 with write scaling 5/5"
+        }
+      ],
+      "tradeoffs": [
+        "Team skill match is only 1.5/5 (weight 2.5).",
+        "Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless",
+        "Connection-per-process model needs PgBouncer/RDS Proxy under serverless",
+        "Nobody on the team listed PostgreSQL or a closely related skill; plan 2-4 weeks to learn it."
+      ]
+    },
+    "hosting": {
+      "choice": "Fly.io",
+      "justification": "Fly.io hosts the stack for users in regions you did not state at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~521 requests/s at peak. Its share of the estimated bill is $375-$1,800 a month, against a total budget of $1,500 a month. It leads the runner-up, Google Cloud Run, by 3.1 stack points.",
+      "driven_by": [
+        "requirements.realtime",
+        "project.type",
+        "priorities.scalability",
+        "priorities.performance",
+        "requirements.auth",
+        "requirements.payments",
+        "infrastructure.deployment_model"
+      ],
+      "alternatives": [
+        {
+          "choice": "Google Cloud Run",
+          "why_not": "Swapping it in lowers the stack score by 3.1 points. Fly.io is stronger on realtime fit (5.0 vs 3.0), performance / latency (5.0 vs 4.0); Google Cloud Run is stronger on scalability (5.0 vs 4.0), low ops burden (5.0 vs 4.0)."
+        },
+        {
+          "choice": "Vercel",
+          "why_not": "Swapping it in lowers the stack score by 10.9 points. Fly.io is stronger on realtime fit (5.0 vs 2.0), portability (low lock-in) (4.0 vs 3.0); Vercel is stronger on scalability (5.0 vs 4.0), low ops burden (5.0 vs 4.0)."
+        },
+        {
+          "choice": "AWS ECS on Fargate",
+          "why_not": "Swapping it in lowers the stack score by 4.7 points. Fly.io is stronger on realtime fit (5.0 vs 4.0), team skill match (3.5 vs 1.5); AWS ECS on Fargate is stronger on scalability (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0)."
+        },
+        {
+          "choice": "AWS S3 + CloudFront (static)",
+          "why_not": "Ruled out: Only for read-only sites; your users sign in, post or pay"
+        }
+      ],
+      "tradeoffs": [
+        "More hands-on than Render/Railway",
+        "No free plan for new organizations (a trial of 2 machine-hours or 7 days); the smallest always-on machine costs about $2.19 a month"
+      ]
+    },
+    "supporting": [
+      {
+        "layer": "cache",
+        "choice": "Redis/Valkey (Upstash Redis on Fly)",
+        "justification": "Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database.",
+        "driven_by": [
+          "scale.workload",
+          "requirements.p95_latency_ms",
+          "scale.users_12_months"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://redis.io/docs/latest/develop/use/client-side-caching/"
+      },
+      {
+        "layer": "realtime",
+        "choice": "Redis pub/sub for cross-instance fan-out (Upstash Redis on Fly)",
+        "justification": "With several app instances, a message published on one must reach sockets on all others.",
+        "driven_by": [
+          "requirements.realtime",
+          "scale.peak_concurrent_users"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://redis.io/docs/latest/develop/interact/pubsub/"
+      },
+      {
+        "layer": "other",
+        "choice": "Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus or y-websocket as the sync server",
+        "justification": "Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke.",
+        "driven_by": [
+          "project.description"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://docs.yjs.dev/"
+      },
+      {
+        "layer": "queue",
+        "choice": "River / Asynq",
+        "justification": "Send emails, process uploads and call slow APIs outside the request path.",
+        "driven_by": [
+          "requirements.file_media_storage",
+          "scale.workload"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://12factor.net/processes"
+      },
+      {
+        "layer": "storage",
+        "choice": "S3-compatible storage (Cloudflare R2 / Backblaze B2) + CDN",
+        "justification": "Uploaded files and video belong in object storage, not the database.",
+        "driven_by": [
+          "requirements.file_media_storage"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://aws.amazon.com/s3/"
+      },
+      {
+        "layer": "cdn",
+        "choice": "CDN in front of the object storage, with image resizing at the edge",
+        "justification": "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.",
+        "driven_by": [
+          "project.platforms",
+          "scale.users_12_months"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://developers.cloudflare.com/r2/pricing/"
+      },
+      {
+        "layer": "payments",
+        "choice": "Stripe / Adyen with hosted checkout (card tokens)",
+        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).",
+        "driven_by": [
+          "requirements.payments",
+          "compliance"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://www.pcisecuritystandards.org/document_library/"
+      },
+      {
+        "layer": "auth",
+        "choice": "Clerk / Auth0 / framework built-in auth",
+        "justification": "Do not hand-roll password storage, MFA or SSO.",
+        "driven_by": [
+          "requirements.auth"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+      },
+      {
+        "layer": "observability",
+        "choice": "OpenTelemetry instrumentation -> Grafana Cloud / Sentry",
+        "justification": "Traces, metrics and error tracking from day one; required to defend an availability target.",
+        "driven_by": [
+          "requirements.availability"
+        ],
+        "alternatives": [],
+        "tradeoffs": [],
+        "source": "https://opentelemetry.io/docs/"
+      },
+      {
+        "layer": "ci_cd",
+        "choice": "GitHub Actions",
+        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate.",
+        "driven_by": [
+          "infrastructure.deployment_model",
+          "team.size"
+        ],
+        "alternatives": [
+          {
+            "choice": "GitLab CI/CD",
+            "why_not": "Equivalent pipelines; one more tool to learn for no gain here"
+          }
+        ],
+        "tradeoffs": [
+          "Pipeline minutes are metered on hosted runners"
+        ],
+        "source": "https://docs.github.com/actions"
+      }
+    ]
+  },
+  "estimated_monthly_cost_usd": {
+    "min": 1190,
+    "max": 4635,
+    "assumptions": [
+      "Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
+      "Scale tier: Large (5,000-50,000 users online at once)",
+      "Budget check: $1,500/month stated, status 'stretch'",
+      "Hosting: Fly.io: $375-1,800 (Large (5,000-50,000 users online at once) price band; x1.5 for 99.9% availability (redundant instances))",
+      "Database: PostgreSQL: $600-1,200 (Large (5,000-50,000 users online at once) database tier (~200 GB in 12 months); upper end for ~200 GB of data: the band's top is priced for the largest data of the tier; x1.5 for 99.9% availability (standby/replicas))",
+      "Cache: Redis / Valkey: $200-1,500 (Large (5,000-50,000 users online at once) price band (the app's scale))",
+      "Media delivery: $15-135 (~1,500 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)"
+    ]
+  },
+  "warnings": [],
+  "assumptions": [
+    "project.description is not parsed for a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm)",
+    "Sized for scale.users_12_months: 50,000 users, about 10,000 active on a day (20% daily-to-monthly ratio); scale.users_at_launch (1,000) is the starting point",
+    "gdpr: sign a data processing agreement (DPA) with every vendor that stores or processes personal data (host, database, sign-in, payments, monitoring); with no EU residency stated, personal data may leave the EU only under an adequacy decision or the vendor's Standard Contractual Clauses (GDPR Chapter V); set infrastructure.data_residency to eu to keep it in EU regions",
+    "Priorities rated 4 or 5 raise their criteria's weights, strongest first: scalability (5), performance (5), maintainability (4)",
+    "Priorities rated 1 or 2 (cost) keep their criteria at the baseline weight",
+    "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",
+    "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
+    "Where are your users?: Not provided: no region is favoured when hosts are scored.",
+    "Architecture preference: Not provided; using default 'auto'.",
+    "Preferred cloud: Not provided; using default 'none'.",
+    "Vendor lock-in tolerance: Not provided; using default 'medium'."
+  ],
+  "validation_errors": []
+}
