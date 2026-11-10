@@ -65,6 +65,34 @@ FIELDS = [
     ("compliance", "enums", False, [], COMPLIANCE),
 ]
 FIELD_PATHS = tuple(f[0] for f in FIELDS) + tuple(f"priorities.{k}" for k in PRIORITY_KEYS)
+# What each field means (problem statement table 3.1), for the scenario form in the app.
+FIELD_HELP = {
+    "project.name": "Free text", "project.type": "The kind of product",
+    "project.description": "Free text; read by people, not used to choose the stack",
+    "project.platforms": "Client platforms; api_only means no user interface",
+    "scale.users_at_launch": "Registered or monthly active users at launch",
+    "scale.users_12_months": "Expected users after 12 months; the stack is sized for this",
+    "scale.peak_concurrent_users": "Simultaneous users at peak", "scale.traffic_pattern": "How traffic varies",
+    "scale.workload": "Mostly reads, balanced, or mostly writes",
+    "scale.data_volume_gb_12_months": "Total stored data after 12 months, GB",
+    "team.size": "Number of engineers", "team.experience": "The team's experience level",
+    "team.languages": "Lower-case names, one per line (python, typescript, java, csharp, go ...)",
+    "team.has_devops": "Someone can operate infrastructure",
+    "budget.monthly_infra_usd": "Monthly infrastructure and third-party service budget, USD",
+    "timeline.mvp_weeks": "Weeks until the first usable release",
+    "infrastructure.cloud_preference": "A named cloud is a hard constraint; none rules out AWS, Google Cloud and Azure",
+    "infrastructure.deployment_model": "Where the system runs (hard constraint)",
+    "infrastructure.data_residency": "Where the data must stay (hard constraint)",
+    "infrastructure.existing_systems": "Systems to integrate with or reuse, one per line",
+    "requirements.realtime": "Live updates, chat, collaboration, presence",
+    "requirements.offline_support": "Must work without connectivity", "requirements.full_text_search": "Search over text content",
+    "requirements.file_media_storage": "User uploads: images, video, documents", "requirements.payments": "Takes money from users",
+    "requirements.auth": "How users sign in",
+    "requirements.multi_tenant": "Several customer organisations share the system",
+    "requirements.ml_features": "Machine-learning features", "requirements.seo_critical": "Public pages must rank in search engines",
+    "requirements.availability": "Availability target, percent", "requirements.p95_latency_ms": "Target 95th-percentile response time; empty means no target",
+    "compliance": "Regulations that apply (hard constraints)",
+}
 KNOWN_KEYS = {sec: {f[0].split(".", 1)[1] for f in FIELDS if f[0].startswith(sec + ".")} for sec in SECTIONS}
 TOP_LEVEL = set(SECTIONS) | {"scenario_id", "compliance", "priorities"}
 

@@ -97,7 +97,7 @@ CATEGORIES = {
     "Stability and properties": ["test_stability", "test_invariants", "test_scenarios"],
     "Language-model layer (checks and fallbacks)": ["test_llm_off", "test_llm", "test_brief", "test_brief_audit", "test_brief_regression", "test_summary", "test_whatif", "test_llm_baseline"],
     "Accuracy against the answer key": ["test_benchmark"],
-    "App, packaging and documents": ["test_api", "test_launcher", "test_no_network", "test_share", "test_links", "test_docs",
+    "App, packaging and documents": ["test_scenario_api", "test_api", "test_launcher", "test_no_network", "test_share", "test_links", "test_docs",
                                      "test_package", "test_ci", "test_openapi", "test_demo_script"],
 }
 

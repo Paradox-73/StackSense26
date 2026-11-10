@@ -1,0 +1,10 @@
+{
+  "scenario_id": "E1",
+  "project": {
+    "name": "Leave tracker (few fields)",
+    "type": "internal_tool",
+    "platforms": [
+      "web"
+    ]
+  }
+}

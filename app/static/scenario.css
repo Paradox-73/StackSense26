@@ -1,0 +1,50 @@
+/* Scenario-file page: the standard input schema as a form beside the standard output. Uses the tokens of styles.css. */
+.sc { display: grid; grid-template-columns: minmax(300px, 400px) minmax(0, 1fr); gap: 32px; padding-top: 24px; align-items: start; }
+.sc h1 { font-family: var(--font-display); font-size: 28px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; }
+.sc h2 { font-size: 16px; margin: 22px 0 8px; }
+.sc-bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 8px; }
+.sc-btn { display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line-2);
+  background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 500; cursor: pointer; }
+.sc-btn:hover { border-color: var(--gold-line); }
+.sc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sc-go { background: linear-gradient(180deg, var(--cta-a), var(--cta-b)); color: var(--cta-ink); border-color: transparent; font-weight: 600; }
+.sc-ex button { border: 0; background: var(--surface-2); color: var(--ink-2); border-radius: 999px; padding: 3px 10px; margin: 2px 2px 2px 0;
+  font-size: 13px; cursor: pointer; }
+.sc-ex button[aria-pressed="true"] { background: var(--sel-bg); color: var(--sel-ink); }
+.sc-form fieldset { border: 0; border-top: 1px solid var(--line); margin: 14px 0 0; padding: 10px 0 0; }
+.sc-form legend { font-weight: 600; font-size: 14px; padding: 0 6px 0 0; }
+.sc-f { display: grid; gap: 3px; margin: 8px 0; }
+.sc-f label, .sc-f .sc-l { font-size: 13px; font-weight: 500; }
+.sc-f code { font-size: 12px; }
+.sc-f input[type="text"], .sc-f input[type="number"], .sc-f select, .sc-f textarea { font: inherit; font-size: 14px; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 8px; width: 100%; box-sizing: border-box; }
+.sc-f textarea { min-height: 64px; resize: vertical; }
+.sc-f .sc-h { font-size: 12px; color: var(--muted); }
+.sc-f .sc-req { color: var(--neg); }
+.sc-checks { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13.5px; }
+.sc-checks label { font-weight: 400; display: inline-flex; gap: 5px; align-items: center; }
+.sc-out { min-width: 0; }
+.sc-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.sc-status, .sc-style { font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); }
+.sc-status.ok { background: rgba(45, 106, 79, 0.14); color: var(--pos); }
+.sc-status.ok_with_warnings { background: var(--gold-soft); color: var(--gold-ink); }
+.sc-status.infeasible, .sc-status.invalid_input { background: rgba(176, 42, 55, 0.12); color: var(--neg); }
+.sc-sum { font-size: 15.5px; line-height: 1.55; margin: 6px 0 10px; }
+.sc-cost { font-size: 14.5px; margin: 0 0 12px; }
+.sc-core, .sc-sup { display: grid; gap: 12px; }
+.sc-c { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 12px 14px; }
+.sc-c h3 { font-size: 15.5px; margin-bottom: 6px; line-height: 1.5; }
+.sc-c p { font-size: 14px; line-height: 1.55; margin: 0 0 6px; }
+.sc-layer { display: inline-block; font-family: var(--font-mono); font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--gold-ink); background: var(--gold-soft); border-radius: 6px; padding: 2px 6px; margin-right: 6px; vertical-align: 2px; }
+.sc-c ul { margin: 4px 0 0; padding-left: 18px; font-size: 13.5px; line-height: 1.5; }
+.sc-c .sc-k { font-size: 12.5px; font-weight: 600; color: var(--muted); margin-top: 6px; }
+.sc-list { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.55; }
+.sc-list li { margin: 4px 0; }
+.sc-w b { text-transform: uppercase; font-size: 11.5px; letter-spacing: 0.04em; }
+.sc-w.critical b { color: var(--neg); }
+.sc-w.warning b { color: var(--gold-ink); }
+.sc-w.info b { color: var(--muted); }
+.sc details { margin-top: 14px; font-size: 14px; }
+.sc summary { cursor: pointer; font-weight: 600; }
+@media (max-width: 860px) { .sc { grid-template-columns: 1fr; } }

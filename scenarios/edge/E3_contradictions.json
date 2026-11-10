@@ -1,0 +1,65 @@
+{
+  "scenario_id": "E3",
+  "project": {
+    "name": "Hobby portfolio at national scale",
+    "type": "content_site",
+    "description": "Five million users, a zero budget, four nines from a beginner solo developer, three platforms in three weeks.",
+    "platforms": [
+      "web",
+      "android",
+      "ios"
+    ]
+  },
+  "scale": {
+    "traffic_pattern": "steady",
+    "workload": "balanced",
+    "users_at_launch": 1000000,
+    "users_12_months": 5000000,
+    "peak_concurrent_users": 200000,
+    "data_volume_gb_12_months": 1
+  },
+  "team": {
+    "has_devops": false,
+    "size": 1,
+    "experience": "beginner",
+    "languages": [
+      "javascript",
+      "html",
+      "css"
+    ]
+  },
+  "budget": {
+    "monthly_infra_usd": 0
+  },
+  "timeline": {
+    "mvp_weeks": 3
+  },
+  "infrastructure": {
+    "cloud_preference": "any",
+    "deployment_model": "managed_cloud",
+    "data_residency": "none",
+    "existing_systems": []
+  },
+  "requirements": {
+    "realtime": false,
+    "offline_support": false,
+    "full_text_search": false,
+    "file_media_storage": false,
+    "payments": false,
+    "auth": "email_password",
+    "multi_tenant": false,
+    "ml_features": "none",
+    "seo_critical": true,
+    "availability": "99.99",
+    "p95_latency_ms": null
+  },
+  "compliance": [],
+  "priorities": {
+    "cost": 5,
+    "time_to_market": 4,
+    "scalability": 1,
+    "performance": 3,
+    "maintainability": 3,
+    "security": 2
+  }
+}

@@ -1,6 +1,7 @@
 """FastAPI server: JSON API for the engine plus the single-page frontend."""
 from __future__ import annotations
 
+import json
 import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -16,11 +17,15 @@ from engine.kb import LAYERS, load_glossary, load_kb, load_presets, load_questio
 from engine.recommender import switch_reasons
 from engine.robustness import robustness
 from engine.sensitivity import next_questions, sensitivity
+from engine.standard import FIELD_HELP, FIELDS, PRIORITY_KEYS, run_text
 from engine.summary import summarize
 from engine.whatif import MAX_QUESTION_CHARS, propose_changes
 from engine.whynot import why_not
 
 STATIC = Path(__file__).resolve().parent / "static"
+# Example scenario files: the six public ones from the problem statement, then the edge cases written for the report.
+EXAMPLES = {"public": Path(__file__).resolve().parent.parent / "scenarios" / "public",
+            "edge": Path(__file__).resolve().parent.parent / "scenarios" / "edge"}
 MAX_BODY_BYTES = 256 * 1024  # the largest legitimate request is a few KB of answers
 FREE_TEXT_LISTS = {"team_skills"}  # these multiselects also accept free text, so their items are not restricted to the listed options
 
@@ -111,12 +116,68 @@ def index():
     return FileResponse(STATIC / "index.html")
 
 
+@app.get("/scenario", include_in_schema=False)
+def scenario_page():
+    """Serve the scenario-file page: the standard input schema as a form, import and export of JSON."""
+    return FileResponse(STATIC / "scenario.html")
+
+
 @app.get("/api/health", summary="Status and knowledge-base counts", tags=["data"])
 def health():
-    """Returns status ok with the version, the number of technologies per layer, the number of rules, and whether an LLM key is configured."""
+    """Returns status ok with the version, the number of technologies per layer, the number of rules, whether an LLM key is
+    configured (llm_enabled) and whether the LLM-off switch STACKSENSE_LLM=off is set (llm_switched_off)."""
     kb = load_kb()
     return {"status": "ok", "version": __version__,
-            "technologies": {l: len(kb[l]) for l in LAYERS}, "rules": len(kb["rules"]), "llm_enabled": llm.available()}
+            "technologies": {l: len(kb[l]) for l in LAYERS}, "rules": len(kb["rules"]), "llm_enabled": llm.available(),
+            "llm_switched_off": llm.switched_off()}
+
+
+@app.get("/api/scenario/fields", summary="The standard scenario schema (problem statement section 3.1)", tags=["scenario"])
+def scenario_fields():
+    """Every field of the standard input schema: path, kind, whether it is required, its default, allowed values and meaning.
+    The scenario page builds its form from this list."""
+    out = [{"path": path, "kind": kind, "required": req, "default": default, "allowed": list(allowed or []),
+            "help": FIELD_HELP.get(path, "")} for path, kind, req, default, allowed in FIELDS]
+    return out + [{"path": f"priorities.{k}", "kind": "priority", "required": False, "default": 3, "allowed": [1, 2, 3, 4, 5],
+                   "help": "1 (low) to 5 (high)"} for k in PRIORITY_KEYS]
+
+
+def _example_files() -> dict[str, tuple[str, Path]]:
+    return {f.stem: (group, f) for group, folder in EXAMPLES.items() for f in sorted(folder.glob("*.json"))}
+
+
+@app.get("/api/scenario/examples", summary="The example scenario files in scenarios/public and scenarios/edge", tags=["scenario"])
+def scenario_examples():
+    """The example scenario files by name, each with its group (public or edge) and project name. Their outputs are
+    computed when run, never stored."""
+    out = []
+    for stem, (group, f) in _example_files().items():
+        try:
+            name = (json.loads(f.read_text(encoding="utf-8")).get("project") or {}).get("name")
+        except (OSError, ValueError, AttributeError):
+            name = None
+        out.append({"name": stem, "group": group, "project": name})
+    return out
+
+
+@app.get("/api/scenario/examples/{name}", summary="One example scenario file", tags=["scenario"])
+def scenario_example(name: str):
+    """The scenario file scenarios/public/<name>.json or scenarios/edge/<name>.json as it is on disk."""
+    files = {stem: f for stem, (_group, f) in _example_files().items()}
+    if name not in files:
+        raise HTTPException(status_code=404, detail=f"No example named {name!r}")
+    return json.loads(files[name].read_text(encoding="utf-8"))
+
+
+@app.post("/api/scenario", summary="Run a scenario file in the standard schema", tags=["scenario"],
+          openapi_extra={"requestBody": {"required": True, "content": {"application/json": {"schema": {
+              "type": "object", "description": "A scenario in the standard schema (problem statement section 3.2)."}}}}})
+async def api_scenario(request: Request):
+    """Body: the scenario JSON. Returns the problem statement's section 4 output: status, summary, architecture_style, stack
+    (frontend, backend, database, hosting, supporting), estimated_monthly_cost_usd, warnings, assumptions and
+    validation_errors. Invalid input gives status invalid_input with field-level errors, not an HTTP error. No language
+    model is involved, so the result is the same with the LLM-off switch set."""
+    return run_text((await request.body()).decode("utf-8-sig", errors="replace"))
 
 
 @app.get("/api/questions", summary="The questionnaire (input schema)", tags=["data"])

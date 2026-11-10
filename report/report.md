@@ -17,7 +17,7 @@ StackSense recommends a frontend, backend, database and hosting platform from a 
 |---|---|---|
 | Agreement with an answer key written by a language model in three architect personas, blind to the engine (not human raters) | 96% of the 160 layer picks (one pick each for frontend, backend, database and hosting, over 40 briefs) are acceptable to at least 2 of 3 personas; 72% top-1 and 95% acceptable on the 10 briefs I never tuned on | Section 6.1; `python tools/bench.py` |
 | Hard constraints under attack | 0 violations of the 14 properties (hard constraints, meaning rules that remove an option before any scoring; consistency; and no return to an earlier pick as users grow) in 10,000 random projects; 0 of 1,000 growth walks returns to an earlier pick | Section 6; `python tools/fuzz.py` |
-| Tests | 921 tests pass, and every warning code the engine can raise has a test that triggers it | Section 6; `python -m pytest` |
+| Tests | 932 tests pass, and every warning code the engine can raise has a test that triggers it | Section 6; `python -m pytest` |
 
 **Where each judging criterion is answered**
 
@@ -213,8 +213,8 @@ The engine can raise 50 distinct warning codes, and `tests/test_edge_cases.py` f
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 183 |
 | Accuracy against the answer key | 9 |
-| App, packaging and documents | 71 |
-| **All** | **921** |
+| App, packaging and documents | 82 |
+| **All** | **932** |
 <!-- END validation -->
 
 The per-file list is `report/validation.md`.
