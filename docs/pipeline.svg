@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 830 700" width="830" height="700" role="img" aria-labelledby="t d">
+<title id="t">StackSense scoring pipeline</title><desc id="d">Seven stages from answers to an explained recommendation, with the formula used at the scoring stages.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4b2a63"/></marker></defs>
+<rect width="830" height="700" fill="#f6f1ea"/>
+<text x="20" y="30" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#241c2e">How answers become a recommendation</text>
+<rect x="20" y="52" width="790" height="70" rx="8" fill="#fff" stroke="#4b2a63" stroke-width="1.6"/>
+<text x="34" y="77" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#241c2e">1  Normalise</text>
+<text x="34" y="99" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">Missing answers get documented defaults (listed as assumptions); invalid values are clamped with a</text>
+<text x="34" y="116" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">warning.</text>
+<line x1="415" y1="122" x2="415" y2="136" stroke="#4b2a63" stroke-width="2" marker-end="url(#a)"/>
+<rect x="20" y="136" width="790" height="70" rx="8" fill="#fff" stroke="#4b2a63" stroke-width="1.6"/>
+<text x="34" y="161" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#241c2e">2  Derive</text>
+<text x="34" y="183" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">peak req/s = users x requests per user / 86,400 x peak factor; scale tier 0-5 = max(tier of users,</text>
+<text x="34" y="200" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">tier of peak load).</text>
+<line x1="415" y1="206" x2="415" y2="220" stroke="#4b2a63" stroke-width="2" marker-end="url(#a)"/>
+<rect x="20" y="220" width="790" height="70" rx="8" fill="#fff" stroke="#4b2a63" stroke-width="1.6"/>
+<text x="34" y="245" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#241c2e">3  Detect conflicts</text>
+<text x="34" y="267" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">Contradictory answers get a stated resolution: compliance &gt; deployment &gt; physics and team &gt; budget</text>
+<text x="34" y="284" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">and preferences.</text>
+<line x1="415" y1="290" x2="415" y2="304" stroke="#4b2a63" stroke-width="2" marker-end="url(#a)"/>
+<rect x="20" y="304" width="790" height="70" rx="8" fill="#fff" stroke="#b8872b" stroke-width="1.6"/>
+<text x="34" y="329" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#241c2e">4  Weight the criteria</text>
+<text x="34" y="351" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">weight(c) = baseline(c) + sum of contributions from specific answers; each contribution keeps the</text>
+<text x="34" y="368" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">answer that caused it.</text>
+<line x1="415" y1="374" x2="415" y2="388" stroke="#4b2a63" stroke-width="2" marker-end="url(#a)"/>
+<rect x="20" y="388" width="790" height="70" rx="8" fill="#fff" stroke="#b8872b" stroke-width="1.6"/>
+<text x="34" y="413" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#241c2e">5  Filter, then score</text>
+<text x="34" y="435" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">Hard constraints remove options first (BAA, PCI, residency, on-prem, consistency). score = sum(w*s)</text>
+<text x="34" y="452" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">/ sum(w), 0-100.</text>
+<line x1="415" y1="458" x2="415" y2="472" stroke="#4b2a63" stroke-width="2" marker-end="url(#a)"/>
+<rect x="20" y="472" width="790" height="70" rx="8" fill="#fff" stroke="#b8872b" stroke-width="1.6"/>
+<text x="34" y="497" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#241c2e">6  Search stacks</text>
+<text x="34" y="519" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">Top 5 per layer = 625 combinations; stack score = (sum of 4 layer scores + sum of rule deltas) / 4;</text>
+<text x="34" y="536" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">ties within 1 point use fixed preferences.</text>
+<line x1="415" y1="542" x2="415" y2="556" stroke="#4b2a63" stroke-width="2" marker-end="url(#a)"/>
+<rect x="20" y="556" width="790" height="70" rx="8" fill="#fff" stroke="#4b2a63" stroke-width="1.6"/>
+<text x="34" y="581" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#241c2e">7  Explain</text>
+<text x="34" y="603" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">Per-answer contributions, runner-up margin, trade-offs, risks, architecture, cost in USD and INR, up</text>
+<text x="34" y="620" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#241c2e">to 14 counterfactual re-runs.</text>
+<text x="20" y="684" font-family="Geist, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#241c2e">Gold outline = the stages that decide the pick. Scores, rules and prices come from data/ files that list their sources.</text>
+</svg>
