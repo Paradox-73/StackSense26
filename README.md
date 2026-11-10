@@ -53,13 +53,13 @@ StackSense takes a software project's parameters (scale, team and skills, budget
 ## Prerequisites
 
 - Python 3.9 or newer (3.12 recommended) from <https://www.python.org/downloads/>. On Windows, the installer's `py` launcher is enough.
-- Windows 10/11, macOS or Linux. Nothing else to install: no database, no Node.js, no Docker.
+- Windows 10/11, macOS or Linux. Nothing else to install: no database and no Node.js. Docker is optional (see Docker Compose below).
 - Internet on the first run only, to install the Python packages. After that the app runs offline.
 - No API key is needed. Every feature works without one.
 
 ## Quick start: setup and run
 
-1. Get the code: `git clone https://github.com/Paradox-73/StackSense26.git` and `cd StackSense26` (or unzip `source.zip` and open that folder).
+1. Get the code: `git clone https://github.com/Paradox-73/StackSense26.git` and `cd StackSense26` (or download the `source/` folder of the submission and open it).
 2. Start the app with one command. The first run creates `.venv/`, installs `requirements.txt`, starts <http://127.0.0.1:8000> and opens the browser. Ctrl+C stops it.
    - Windows (PowerShell or Command Prompt): `py run.py`
    - macOS / Linux: `python3 run.py`
@@ -73,6 +73,16 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt      # Windows: .venv\Scripts\python -m pip install -r requirements.txt
 .venv/bin/python run.py                                  # Windows: .venv\Scripts\python run.py
 ```
+
+Docker Compose, instead of Python (Docker Desktop on Windows or macOS, Docker Engine with the Compose plugin on Linux):
+
+```bash
+docker compose up --build      # builds the image, then serves http://localhost:8000; Ctrl+C stops it
+docker compose run --rm stacksense python cli.py --scenario scenarios/public/P2.json   # a scenario file, in the container
+```
+
+- Another host port: `STACKSENSE_PORT=8080 docker compose up --build` (PowerShell: `$env:STACKSENSE_PORT="8080"; docker compose up --build`).
+- A `.env` file next to `compose.yaml` is passed into the container, so `STACKSENSE_LLM=off` and the optional key work the same way.
 
 Setup problems: see Troubleshooting in [`docs/REFERENCE.md`](docs/REFERENCE.md#troubleshooting).
 
@@ -120,21 +130,6 @@ docs/           architecture figures and REFERENCE.md (API, configuration, scori
 cli.py, run.py  command line and one-command launcher
 ```
 
-## Run the checks
-
-- Tests (a few minutes): `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`)
-- Benchmark against the answer key: `python tools/bench.py`; random-input fuzz test: `python tools/fuzz.py`
-- Report PDF and screenshots (needs Google Chrome and `requirements-dev.txt`): `python tools/capture_screenshots.py`, then `python tools/build_report.py`
-- Submission folder: `python tools/package_submission.py`
-
-## Key results
-
-- **Tests:** 946 tests, including checks that every warning code is tested, that `outputs/` matches the engine and that the numbers in this file match the code (`tests/test_docs.py`).
-- **Benchmark** (`python tools/bench.py`): 40 project briefs scored against an answer key written before measurement. Result: 81% top-1 (128 of the 158 layer picks that have a best pick) and 96% acceptable (154 of all 160 layer picks); held-out 72% and 95%. Ten briefs were held out and not used for tuning. The key was written by a language model playing three architect personas, blind to the engine, not by human architects.
-- **LLM-only comparison** (`python tools/llm_baseline.py --show`, an offline experiment, not part of the engine): the same 40 briefs answered by a language model alone, then graded by the rules. LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 81% and 96%, but the model breaks a hard requirement in 7 of the 40 briefs; the engine's own picks break none.
-- **Random projects** (`python tools/fuzz.py --n 1000 --growth-n 100`): 1,000 seeded random projects against 15 properties (hard constraints, the same output on a repeat, renaming and reordering changing nothing, no return to an earlier pick as users grow): 0 violations.
-- **Questions:** the questionnaire has 14 ready-made scenarios (presets), and every one of its 42 questions changed a pick at least once in the question-influence study (`python tools/question_influence.py`, 8,159 re-runs).
-
 ## Credits
 
 Libraries (open source):
@@ -157,5 +152,20 @@ Sources:
 - Every technology, rule and question cites official documentation, pricing pages or vendor compliance pages. The register of 344 URLs is in [`report/sources.md`](report/sources.md).
 - Methods the design follows: [expert systems](https://en.wikipedia.org/wiki/Expert_system), the [weighted sum model](https://en.wikipedia.org/wiki/Weighted_sum_model), counterfactual explanations (Wachter, Mittelstadt and Russell, [2017](https://arxiv.org/abs/1711.00399)), and the quality attributes of [ISO/IEC 25010](https://www.iso.org/standard/78176.html) and the [AWS Well-Architected Framework](https://aws.amazon.com/architecture/well-architected/).
 - Key references: Google SRE book ([availability table](https://sre.google/sre-book/availability-table/)), Martin Fowler ([MonolithFirst](https://martinfowler.com/bliki/MonolithFirst.html)), [Team Topologies](https://teamtopologies.com/key-concepts), [HHS HIPAA cloud guidance](https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html), [PCI SSC document library](https://www.pcisecuritystandards.org/document_library/), [MeitY DPDP framework](https://www.meity.gov.in/data-protection-framework), [RBI storage of payment system data (2018)](https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244), [endoflife.date](https://endoflife.date/) and the [Microsoft lifecycle pages](https://learn.microsoft.com/lifecycle/) for end-of-life checks.
+
+## Run the checks
+
+- Tests (a few minutes): `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`)
+- Benchmark against the answer key: `python tools/bench.py`; random-input fuzz test: `python tools/fuzz.py`
+- Report PDF and screenshots (needs Google Chrome and `requirements-dev.txt`): `python tools/capture_screenshots.py`, then `python tools/build_report.py`
+- Submission folder: `python tools/package_submission.py`
+
+## Key results
+
+- **Tests:** 946 tests, including checks that every warning code is tested, that `outputs/` matches the engine and that the numbers in this file match the code (`tests/test_docs.py`).
+- **Benchmark** (`python tools/bench.py`): 40 project briefs scored against an answer key written before measurement. Result: 81% top-1 (128 of the 158 layer picks that have a best pick) and 96% acceptable (154 of all 160 layer picks); held-out 72% and 95%. Ten briefs were held out and not used for tuning. The key was written by a language model playing three architect personas, blind to the engine, not by human architects.
+- **LLM-only comparison** (`python tools/llm_baseline.py --show`, an offline experiment, not part of the engine): the same 40 briefs answered by a language model alone, then graded by the rules. LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 81% and 96%, but the model breaks a hard requirement in 7 of the 40 briefs; the engine's own picks break none.
+- **Random projects** (`python tools/fuzz.py --n 1000 --growth-n 100`): 1,000 seeded random projects against 15 properties (hard constraints, the same output on a repeat, renaming and reordering changing nothing, no return to an earlier pick as users grow): 0 violations.
+- **Questions:** the questionnaire has 14 ready-made scenarios (presets), and every one of its 42 questions changed a pick at least once in the question-influence study (`python tools/question_influence.py`, 8,159 re-runs).
 
 More detail: [`docs/REFERENCE.md`](docs/REFERENCE.md) and the report (`report/report.md`, built as the PDF in the submission folder).

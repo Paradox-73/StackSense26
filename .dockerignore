@@ -1,0 +1,11 @@
+# The image holds only what the app needs at run time: no secrets, tests or build output.
+*
+!app/
+!engine/
+!data/
+!scenarios/
+!run.py
+!cli.py
+!requirements.lock.txt
+**/__pycache__
+data/llm_cache/.usage.json

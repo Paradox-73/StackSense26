@@ -1,0 +1,9 @@
+# docker compose up --build, then open http://localhost:8000 (STACKSENSE_PORT picks another host port).
+services:
+  stacksense:
+    build: .
+    ports:
+      - "${STACKSENSE_PORT:-8000}:8000"
+    env_file:
+      - path: .env
+        required: false
