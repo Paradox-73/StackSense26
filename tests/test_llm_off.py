@@ -41,6 +41,7 @@ def _stacks():
 
 def test_stack_is_identical_with_the_model_on_and_off(fake_llm, monkeypatch):
     fake_llm(*[{"frontend": "flutter", "summary": "x"}] * 200)
+    assert llm.available() and not llm.switched_off()  # "on" really is on, whatever the shell sets
     on = _stacks()
     monkeypatch.setenv("STACKSENSE_LLM", "off")
     assert _stacks() == on

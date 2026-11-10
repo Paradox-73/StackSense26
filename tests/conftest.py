@@ -55,7 +55,8 @@ def chat_body(content):
 @pytest.fixture(autouse=True)
 def _llm_isolated(monkeypatch, tmp_path):
     from engine import llm
-    for name in ("STACKSENSE_LLM_API_KEY", "OPENROUTER_API_KEY", "STACKSENSE_LLM_MODELS", "STACKSENSE_LLM_BASE_URL", "STACKSENSE_LLM_DAILY_LIMIT"):
+    for name in ("STACKSENSE_LLM", "STACKSENSE_LLM_API_KEY", "OPENROUTER_API_KEY", "STACKSENSE_LLM_MODELS", "STACKSENSE_LLM_BASE_URL",
+                 "STACKSENSE_LLM_DAILY_LIMIT"):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setattr(llm, "DOTENV_PATH", tmp_path / "no.env")
     monkeypatch.setattr(llm, "CACHE_DIR", tmp_path / "llm_cache")
