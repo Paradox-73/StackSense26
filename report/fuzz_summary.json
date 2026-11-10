@@ -1,0 +1,23 @@
+{
+ "seed": 2026,
+ "projects": 10000,
+ "growth_projects": 1000,
+ "rules": 14,
+ "violations": {
+  "hipaa_baa": 0,
+  "pci_host": 0,
+  "residency_region": 0,
+  "on_prem": 0,
+  "mobile_frontend": 0,
+  "strong_consistency": 0,
+  "worker_host": 0,
+  "same_input_same_hash": 0,
+  "rename_invariant": 0,
+  "reorder_invariant": 0,
+  "inr_rate_invariant": 0,
+  "relaxed_warned": 0,
+  "no_exception": 0,
+  "no_flip_back": 0
+ },
+ "total_violations": 0
+}

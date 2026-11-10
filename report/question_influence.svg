@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 842" role="img" aria-label="How often one answer changes the stack" font-family="system-ui, sans-serif" font-size="12">
+<style>.t{fill:#1f2937}.m{fill:#6b7280}.p{fill:#2563eb}.s{fill:#93c5fd}@media (prefers-color-scheme: dark){.t{fill:#e5e7eb}.m{fill:#9ca3af}.p{fill:#60a5fa}.s{fill:#1e3a8a}}</style>
+<text x="12" y="20" class="t" font-size="14" font-weight="600">How often one answer changes the stack</text>
+<rect x="230" y="32" width="10" height="10" class="p"/><text x="246" y="41" class="m">changed at least one pick</text>
+<rect x="420" y="32" width="10" height="10" class="s"/><text x="436" y="41" class="m">changed only cost or warnings</text>
+<text x="222" y="67" text-anchor="end" class="t">Existing team skills</text>
+<rect x="230" y="56" width="425.5" height="14" class="p"/>
+<rect x="655.5" y="56" width="0.0" height="14" class="s"/>
+<text x="661.5" y="67" class="m">93%</text>
+<text x="222" y="89" text-anchor="end" class="t">Deployment model</text>
+<rect x="230" y="78" width="311.2" height="14" class="p"/>
+<rect x="541.2" y="78" width="0.9" height="14" class="s"/>
+<text x="548.0" y="89" class="m">68%</text>
+<text x="222" y="111" text-anchor="end" class="t">What kinds of data do you store? (</text>
+<rect x="230" y="100" width="303.3" height="14" class="p"/>
+<rect x="533.3" y="100" width="38.7" height="14" class="s"/>
+<text x="577.9" y="111" class="m">66%</text>
+<text x="222" y="133" text-anchor="end" class="t">Client platforms</text>
+<rect x="230" y="122" width="252.3" height="14" class="p"/>
+<rect x="482.3" y="122" width="34.6" height="14" class="s"/>
+<text x="522.9" y="133" class="m">55%</text>
+<text x="222" y="155" text-anchor="end" class="t">Availability target</text>
+<rect x="230" y="144" width="202.1" height="14" class="p"/>
+<rect x="432.1" y="144" width="173.3" height="14" class="s"/>
+<text x="611.4" y="155" class="m">44%</text>
+<text x="222" y="177" text-anchor="end" class="t">Engineering team size</text>
+<rect x="230" y="166" width="198.8" height="14" class="p"/>
+<rect x="428.8" y="166" width="66.1" height="14" class="s"/>
+<text x="500.9" y="177" class="m">43%</text>
+<text x="222" y="199" text-anchor="end" class="t">Application type</text>
+<rect x="230" y="188" width="173.0" height="14" class="p"/>
+<rect x="403.0" y="188" width="145.5" height="14" class="s"/>
+<text x="554.5" y="199" class="m">38%</text>
+<text x="222" y="221" text-anchor="end" class="t">Existing systems you must keep</text>
+<rect x="230" y="210" width="150.0" height="14" class="p"/>
+<rect x="380.0" y="210" width="212.0" height="14" class="s"/>
+<text x="598.0" y="221" class="m">33%</text>
+<text x="222" y="243" text-anchor="end" class="t">Search engine visibility</text>
+<rect x="230" y="232" width="145.0" height="14" class="p"/>
+<rect x="375.0" y="232" width="116.4" height="14" class="s"/>
+<text x="497.3" y="243" class="m">32%</text>
+<text x="222" y="265" text-anchor="end" class="t">Realtime needs</text>
+<rect x="230" y="254" width="137.0" height="14" class="p"/>
+<rect x="367.0" y="254" width="30.8" height="14" class="s"/>
+<text x="403.8" y="265" class="m">30%</text>
+<text x="222" y="287" text-anchor="end" class="t">Monthly infrastructure budget</text>
+<rect x="230" y="276" width="136.8" height="14" class="p"/>
+<rect x="366.8" y="276" width="175.3" height="14" class="s"/>
+<text x="548.1" y="287" class="m">30%</text>
+<text x="222" y="309" text-anchor="end" class="t">Preferred cloud</text>
+<rect x="230" y="298" width="132.6" height="14" class="p"/>
+<rect x="362.6" y="298" width="189.3" height="14" class="s"/>
+<text x="557.9" y="309" class="m">29%</text>
+<text x="222" y="331" text-anchor="end" class="t">Vendor lock-in tolerance</text>
+<rect x="230" y="320" width="119.1" height="14" class="p"/>
+<rect x="349.1" y="320" width="2.4" height="14" class="s"/>
+<text x="357.5" y="331" class="m">26%</text>
+<text x="222" y="353" text-anchor="end" class="t">Your top 3 priorities (first = mos</text>
+<rect x="230" y="342" width="118.5" height="14" class="p"/>
+<rect x="348.5" y="342" width="0.0" height="14" class="s"/>
+<text x="354.5" y="353" class="m">26%</text>
+<text x="222" y="375" text-anchor="end" class="t">Daily active users (or active devi</text>
+<rect x="230" y="364" width="111.6" height="14" class="p"/>
+<rect x="341.6" y="364" width="264.2" height="14" class="s"/>
+<text x="611.8" y="375" class="m">24%</text>
+<text x="222" y="397" text-anchor="end" class="t">How fast must the app answer? (slo</text>
+<rect x="230" y="386" width="99.2" height="14" class="p"/>
+<rect x="329.2" y="386" width="94.4" height="14" class="s"/>
+<text x="429.6" y="397" class="m">22%</text>
+<text x="222" y="419" text-anchor="end" class="t">Users connected at the same moment</text>
+<rect x="230" y="408" width="97.7" height="14" class="p"/>
+<rect x="327.7" y="408" width="163.8" height="14" class="s"/>
+<text x="497.5" y="419" class="m">21%</text>
+<text x="222" y="441" text-anchor="end" class="t">Time to MVP</text>
+<rect x="230" y="430" width="94.5" height="14" class="p"/>
+<rect x="324.5" y="430" width="41.2" height="14" class="s"/>
+<text x="371.7" y="441" class="m">21%</text>
+<text x="222" y="463" text-anchor="end" class="t">Work that runs in the background</text>
+<rect x="230" y="452" width="90.5" height="14" class="p"/>
+<rect x="320.5" y="452" width="3.9" height="14" class="s"/>
+<text x="330.4" y="463" class="m">20%</text>
+<text x="222" y="485" text-anchor="end" class="t">Do several customer organisations </text>
+<rect x="230" y="474" width="85.0" height="14" class="p"/>
+<rect x="315.0" y="474" width="0.0" height="14" class="s"/>
+<text x="321.0" y="485" class="m">18%</text>
+<text x="222" y="507" text-anchor="end" class="t">Peak requests per second (optional</text>
+<rect x="230" y="496" width="77.8" height="14" class="p"/>
+<rect x="307.8" y="496" width="236.4" height="14" class="s"/>
+<text x="550.2" y="507" class="m">17%</text>
+<text x="222" y="529" text-anchor="end" class="t">Offline support required</text>
+<rect x="230" y="518" width="77.1" height="14" class="p"/>
+<rect x="307.1" y="518" width="97.3" height="14" class="s"/>
+<text x="410.4" y="529" class="m">17%</text>
+<text x="222" y="551" text-anchor="end" class="t">If two people change the same thin</text>
+<rect x="230" y="540" width="73.4" height="14" class="p"/>
+<rect x="303.4" y="540" width="47.3" height="14" class="s"/>
+<text x="356.7" y="551" class="m">16%</text>
+<text x="222" y="573" text-anchor="end" class="t">Do people mostly look at data, or </text>
+<rect x="230" y="562" width="72.3" height="14" class="p"/>
+<rect x="302.3" y="562" width="75.9" height="14" class="s"/>
+<text x="384.2" y="573" class="m">16%</text>
+<text x="222" y="595" text-anchor="end" class="t">Compliance &amp; data residency</text>
+<rect x="230" y="584" width="71.0" height="14" class="p"/>
+<rect x="301.0" y="584" width="133.0" height="14" class="s"/>
+<text x="439.9" y="595" class="m">15%</text>
+<text x="222" y="617" text-anchor="end" class="t">Architecture preference</text>
+<rect x="230" y="606" width="59.8" height="14" class="p"/>
+<rect x="289.8" y="606" width="129.2" height="14" class="s"/>
+<text x="425.0" y="617" class="m">13%</text>
+<text x="222" y="639" text-anchor="end" class="t">Data volume at launch</text>
+<rect x="230" y="628" width="55.5" height="14" class="p"/>
+<rect x="285.5" y="628" width="154.1" height="14" class="s"/>
+<text x="445.6" y="639" class="m">12%</text>
+<text x="222" y="661" text-anchor="end" class="t">Data growth per month</text>
+<rect x="230" y="650" width="41.2" height="14" class="p"/>
+<rect x="271.2" y="650" width="112.4" height="14" class="s"/>
+<text x="389.6" y="661" class="m">9%</text>
+<text x="222" y="683" text-anchor="end" class="t">What do users do?</text>
+<rect x="230" y="672" width="23.8" height="14" class="p"/>
+<rect x="253.8" y="672" width="0.5" height="14" class="s"/>
+<text x="260.3" y="683" class="m">5%</text>
+<text x="222" y="705" text-anchor="end" class="t">Special workloads</text>
+<rect x="230" y="694" width="19.6" height="14" class="p"/>
+<rect x="249.6" y="694" width="246.3" height="14" class="s"/>
+<text x="501.9" y="705" class="m">4%</text>
+<text x="222" y="727" text-anchor="end" class="t">Traffic pattern</text>
+<rect x="230" y="716" width="12.3" height="14" class="p"/>
+<rect x="242.3" y="716" width="45.4" height="14" class="s"/>
+<text x="293.6" y="727" class="m">3%</text>
+<text x="222" y="749" text-anchor="end" class="t">How much of the traffic can be cac</text>
+<rect x="230" y="738" width="11.8" height="14" class="p"/>
+<rect x="241.8" y="738" width="34.4" height="14" class="s"/>
+<text x="282.2" y="749" class="m">3%</text>
+<text x="222" y="771" text-anchor="end" class="t">Where are your users?</text>
+<rect x="230" y="760" width="9.9" height="14" class="p"/>
+<rect x="239.9" y="760" width="141.5" height="14" class="s"/>
+<text x="387.5" y="771" class="m">2%</text>
+<text x="222" y="793" text-anchor="end" class="t">Customers sign in with their compa</text>
+<rect x="230" y="782" width="7.4" height="14" class="p"/>
+<rect x="237.4" y="782" width="13.1" height="14" class="s"/>
+<text x="256.5" y="793" class="m">2%</text>
+</svg>

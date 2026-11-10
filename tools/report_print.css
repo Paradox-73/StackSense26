@@ -1,0 +1,70 @@
+/* Print styles for report/StackSense_Report.pdf (A4). Used by tools/build_report.py. */
+@page { size: A4; margin: 18mm 16mm 20mm 16mm; @bottom-center { content: "Page " counter(page) " of " counter(pages); font: 9pt "Geist", sans-serif; color: #5b5266; } }
+@page :first { margin: 0; @bottom-center { content: none; } }
+:root { --ink: #241c2e; --muted: #5b5266; --accent: #4b2a63; --gold: #b8872b; --line: #d9d0e0; --paper: #f6f1ea; }
+html { font: 10.5pt/1.45 "Geist", "Segoe UI", Arial, sans-serif; color: var(--ink); }
+body { margin: 0; }
+h1, h2, h3, h4 { font-family: "Fraunces", Georgia, serif; font-weight: 600; color: var(--ink); line-height: 1.2; break-after: avoid; }
+h2 { font-size: 17pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1.2pt solid var(--accent); }
+h3 { font-size: 12.5pt; margin: 14pt 0 5pt; color: var(--accent); }
+h4, h5 { font-size: 11pt; margin: 10pt 0 4pt; }
+p { margin: 0 0 7pt; orphans: 3; widows: 3; }
+a { color: var(--accent); text-decoration: none; }
+code { font: 9pt "Geist Mono", Consolas, monospace; background: #f1ecf5; padding: 0 2pt; border-radius: 2pt; overflow-wrap: normal; word-break: normal; }
+pre { font: 8.5pt/1.35 "Geist Mono", Consolas, monospace; background: #f4f0f7; padding: 6pt 8pt; border-radius: 4pt; white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid; }
+pre code { background: none; padding: 0; }
+ul, ol { margin: 0 0 7pt; padding-left: 16pt; }
+li { margin: 0 0 2.5pt; }
+hr { display: none; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0 10pt; font-size: 8.8pt; line-height: 1.3; }
+th, td { border: 0.6pt solid var(--line); padding: 3pt 4.5pt; vertical-align: top; text-align: left; overflow-wrap: break-word; word-break: normal; }
+th { background: var(--paper); font-weight: 600; overflow-wrap: normal; word-break: normal; }
+tr { break-inside: avoid; }
+thead { display: table-header-group; }
+figure { margin: 6pt 0 10pt; text-align: center; break-inside: avoid; }
+figure img { max-width: 100%; max-height: 68mm; width: auto; height: auto; border: 0.5pt solid var(--line); border-radius: 3pt; }
+figure.gal img { max-height: 36mm; }
+figure.gal { margin: 4pt 0 6pt; }
+figcaption { font-size: 8.5pt; color: var(--muted); margin-top: 3pt; text-align: left; }
+figcaption .repro { display: block; font-size: 7.8pt; margin-top: 1pt; }
+figcaption code { font-size: 7.6pt; }
+em { color: var(--ink); }
+
+/* cover */
+.cover { height: 297mm; box-sizing: border-box; padding: 38mm 24mm 24mm; background: var(--paper); break-after: page; page-break-after: always; }
+.cover .kicker { font: 600 10.5pt "Geist", sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.cover-title { font: 600 54pt/1.05 "Fraunces", Georgia, serif; margin: 10mm 0 6mm; border: 0; padding: 0; }
+.cover-pitch { font: 500 17pt/1.35 "Fraunces", Georgia, serif; max-width: 150mm; color: var(--ink); margin-bottom: 22mm; }
+.cover-meta { font-size: 11pt; width: 150mm; margin: 0; }
+.cover-meta td { border: 0; border-top: 0.6pt solid var(--line); padding: 5pt 4pt; }
+.cover-meta td:first-child { width: 38mm; color: var(--muted); font-weight: 600; }
+
+/* contents */
+nav.toc { margin: 10pt 0 6pt; break-inside: avoid; }
+nav.toc .toc-h { font-size: 13pt; border: 0; margin: 8pt 0 4pt; padding: 0; }
+nav.toc ol { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 14mm; }
+nav.toc li { display: flex; align-items: baseline; gap: 4pt; font-size: 9.5pt; margin: 0 0 2pt; break-inside: avoid; }
+nav.toc .dots { flex: 1; border-bottom: 0.7pt dotted var(--muted); transform: translateY(-2pt); }
+nav.toc .pg { font-variant-numeric: tabular-nums; color: var(--muted); }
+
+/* the report starts with "At a glance" on page 2; each numbered section starts where it falls, but appendices start a page */
+h2[id^="appendix-"]:not(#appendix-a-one-recommendation-in-detail-hipaa-telehealth) { break-before: page; }
+h2#at-a-glance { margin-top: 0; }
+
+/* Appendix A: the full sample is reference material, so it is set smaller */
+.appx { font-size: 8.4pt; line-height: 1.35; }
+.appx h3 { font-size: 10.5pt; margin: 9pt 0 3pt; }
+.appx h4, .appx h5, .appx h6 { font-size: 9pt; margin: 7pt 0 2pt; }
+.appx table { font-size: 7.6pt; margin: 2pt 0 6pt; }
+.appx th, .appx td { padding: 1.5pt 3pt; }
+.appx p { margin-bottom: 4pt; }
+.appx li { margin-bottom: 1.5pt; }
+
+/* Appendix B: narrow numeric columns stay on one line */
+.appb table { font-size: 7.6pt; }
+.appb th, .appb td { padding: 1.6pt 3.5pt; }
+.appb td:nth-last-child(-n+5), .appb th:nth-last-child(-n+5) { white-space: nowrap; text-align: right; }
+.appb td:nth-child(1) { text-align: right; white-space: nowrap; }
+.appb code { font-size: 7pt; overflow-wrap: normal; }
+
+.rubric td:first-child { white-space: nowrap; font-weight: 600; }

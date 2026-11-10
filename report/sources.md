@@ -1,0 +1,337 @@
+# Source register
+
+Every URL cited by the knowledge base, compatibility rules, questionnaire and glossary (generated from `data/`).
+
+- frontend: Next.js (React): https://nextjs.org/docs
+- frontend: Next.js (React): https://react.dev
+- frontend: Next.js (React): https://survey.stackoverflow.co/2025/technology
+- frontend: Next.js (React): https://web.dev/articles/rendering-on-the-web
+- frontend: Next.js (React): https://nextjs.org/docs/app/getting-started/deploying
+- frontend: React SPA (Vite): https://vite.dev/guide/
+- frontend: React SPA (Vite): https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics
+- frontend: Nuxt (Vue): https://nuxt.com/docs
+- frontend: Nuxt (Vue): https://vuejs.org/guide/introduction.html
+- frontend: Nuxt (Vue): https://nitro.build/deploy
+- frontend: SvelteKit: https://svelte.dev/docs/kit
+- frontend: SvelteKit: https://svelte.dev/docs/kit/adapters
+- frontend: Angular: https://angular.dev/overview
+- frontend: Angular: https://angular.dev/guide/ssr
+- frontend: Angular: https://angular.dev/reference/releases
+- frontend: Astro: https://docs.astro.build/en/concepts/why-astro/
+- frontend: Astro: https://docs.astro.build/en/concepts/islands/
+- frontend: Astro: https://web.dev/articles/vitals
+- frontend: Server-rendered HTML + HTMX: https://htmx.org/docs/
+- frontend: Server-rendered HTML + HTMX: https://htmx.org/essays/hypermedia-driven-applications/
+- frontend: React Native (Expo): https://reactnative.dev/docs/getting-started
+- frontend: React Native (Expo): https://docs.expo.dev/
+- frontend: React Native (Expo): https://docs.expo.dev/eas-update/introduction/
+- frontend: Flutter: https://docs.flutter.dev/
+- frontend: Flutter: https://firebase.google.com/docs/flutter/setup
+- frontend: Native iOS + Android (Swift / Kotlin): https://developer.apple.com/swiftui/
+- frontend: Native iOS + Android (Swift / Kotlin): https://developer.android.com/compose
+- frontend: Native iOS + Android (Swift / Kotlin): https://developer.android.com/kotlin
+- frontend: Native iOS + Android (Swift / Kotlin): https://developer.apple.com/swift/
+- backend: Node.js + Express: https://expressjs.com/
+- backend: Node.js + Express: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
+- backend: Node.js + Express: https://socket.io/docs/v4/
+- backend: Node.js + NestJS: https://docs.nestjs.com/
+- backend: Node.js + NestJS: https://docs.nestjs.com/websockets/gateways
+- backend: Node.js + NestJS: https://docs.nestjs.com/microservices/basics
+- backend: Python + FastAPI: https://fastapi.tiangolo.com/
+- backend: Python + FastAPI: https://docs.pydantic.dev/latest/
+- backend: Python + FastAPI: https://fastapi.tiangolo.com/advanced/websockets/
+- backend: Python + Django: https://docs.djangoproject.com/
+- backend: Python + Django: https://docs.djangoproject.com/en/stable/ref/contrib/admin/
+- backend: Python + Django: https://channels.readthedocs.io/
+- backend: Go (net/http, chi or Gin): https://go.dev/doc/
+- backend: Go (net/http, chi or Gin): https://go.dev/doc/effective_go#concurrency
+- backend: Go (net/http, chi or Gin): https://pkg.go.dev/net/http
+- backend: Java/Kotlin + Spring Boot: https://docs.spring.io/spring-boot/index.html
+- backend: Java/Kotlin + Spring Boot: https://docs.spring.io/spring-framework/reference/data-access/transaction.html
+- backend: Java/Kotlin + Spring Boot: https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html
+- backend: C# + ASP.NET Core: https://learn.microsoft.com/aspnet/core/
+- backend: C# + ASP.NET Core: https://learn.microsoft.com/aspnet/core/signalr/introduction
+- backend: C# + ASP.NET Core: https://www.techempower.com/benchmarks/
+- backend: Ruby on Rails: https://guides.rubyonrails.org/
+- backend: Ruby on Rails: https://hotwired.dev/
+- backend: Ruby on Rails: https://guides.rubyonrails.org/action_cable_overview.html
+- backend: PHP + Laravel: https://laravel.com/docs
+- backend: PHP + Laravel: https://laravel.com/docs/reverb
+- backend: PHP + Laravel: https://laravel.com/docs/octane
+- backend: Elixir + Phoenix: https://hexdocs.pm/phoenix/overview.html
+- backend: Elixir + Phoenix: https://hexdocs.pm/phoenix/channels.html
+- backend: Elixir + Phoenix: https://phoenixframework.org/blog/the-road-to-2-million-websocket-connections
+- backend: Serverless functions (Node/Python FaaS): https://docs.aws.amazon.com/lambda/latest/dg/welcome.html
+- backend: Serverless functions (Node/Python FaaS): https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html
+- backend: Serverless functions (Node/Python FaaS): https://vercel.com/docs/functions
+- backend: Supabase (BaaS on Postgres): https://supabase.com/docs
+- backend: Supabase (BaaS on Postgres): https://supabase.com/pricing
+- backend: Supabase (BaaS on Postgres): https://supabase.com/docs/guides/security/hipaa-compliance
+- backend: Supabase (BaaS on Postgres): https://supabase.com/docs/guides/self-hosting
+- backend: Firebase (BaaS on Google Cloud): https://firebase.google.com/docs
+- backend: Firebase (BaaS on Google Cloud): https://firebase.google.com/pricing
+- backend: Firebase (BaaS on Google Cloud): https://firebase.google.com/support/privacy
+- backend: Firebase (BaaS on Google Cloud): https://cloud.google.com/security/compliance/hipaa
+- backend: Firebase (BaaS on Google Cloud): https://firebase.google.com/docs/firestore/locations
+- backend: Firebase (BaaS on Google Cloud): https://firebase.google.com/docs/projects/locations
+- backend: Firebase (BaaS on Google Cloud): https://firebase.google.com/docs/auth/admin/create-custom-tokens
+- backend: No server code (static site): https://docs.astro.build/en/guides/deploy/
+- backend: No server code (static site): https://developers.cloudflare.com/pages/
+- database: PostgreSQL: https://www.postgresql.org/docs/current/
+- database: PostgreSQL: https://github.com/pgvector/pgvector
+- database: PostgreSQL: https://www.citusdata.com/
+- database: PostgreSQL: https://www.pgbouncer.org/
+- database: PostgreSQL: https://neon.com/docs/introduction/plans
+- database: PostgreSQL: https://aiven.io/pricing/postgresql
+- database: PostgreSQL: https://supabase.com/docs/guides/platform/compute-and-disk
+- database: PostgreSQL: https://neon.com/pricing
+- database: MySQL: https://dev.mysql.com/doc/
+- database: MySQL: https://vitess.io/docs/
+- database: MySQL: https://planetscale.com/docs
+- database: MySQL: https://aiven.io/free-mysql-database
+- database: MySQL: https://aiven.io/pricing/mysql
+- database: MongoDB: https://www.mongodb.com/docs/manual/
+- database: MongoDB: https://www.mongodb.com/docs/manual/core/transactions/
+- database: MongoDB: https://www.mongodb.com/pricing
+- database: MongoDB: https://www.mongodb.com/docs/manual/core/timeseries-collections/
+- database: Amazon DynamoDB: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html
+- database: Amazon DynamoDB: https://aws.amazon.com/dynamodb/pricing/
+- database: Amazon DynamoDB: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html
+- database: Redis / Valkey: https://redis.io/docs/latest/
+- database: Redis / Valkey: https://valkey.io/docs/
+- database: Redis / Valkey: https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/
+- database: Apache Cassandra / ScyllaDB: https://cassandra.apache.org/doc/latest/
+- database: Apache Cassandra / ScyllaDB: https://docs.scylladb.com/
+- database: Apache Cassandra / ScyllaDB: https://discord.com/blog/how-discord-stores-trillions-of-messages
+- database: ClickHouse: https://clickhouse.com/docs
+- database: ClickHouse: https://clickhouse.com/docs/concepts/why-clickhouse-is-so-fast
+- database: ClickHouse: https://clickhouse.com/pricing
+- database: OpenSearch / Elasticsearch: https://opensearch.org/docs/latest/
+- database: OpenSearch / Elasticsearch: https://opensearch.org/docs/latest/im-plugin/ism/index/
+- database: OpenSearch / Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/current/near-real-time.html
+- database: OpenSearch / Elasticsearch: https://aws.amazon.com/opensearch-service/pricing/
+- database: Neo4j: https://neo4j.com/docs/
+- database: Neo4j: https://neo4j.com/pricing/
+- database: Neo4j: https://neo4j.com/docs/cypher-manual/current/
+- database: Neo4j: https://neo4j.com/customer-stories/fortune-500-financial-services-company
+- database: TimescaleDB (Postgres): https://docs.timescale.com/
+- database: TimescaleDB (Postgres): https://docs.timescale.com/use-timescale/latest/compression/
+- database: TimescaleDB (Postgres): https://docs.timescale.com/about/latest/timescaledb-editions/
+- database: TimescaleDB (Postgres): https://cloud.google.com/sql/docs/postgres/extensions
+- database: TimescaleDB (Postgres): https://www.tigerdata.com/pricing
+- database: TimescaleDB (Postgres): https://www.tigerdata.com/docs/use-timescale/latest/hypertables
+- database: SQLite (+ Litestream backups): https://www.sqlite.org/whentouse.html
+- database: SQLite (+ Litestream backups): https://litestream.io/
+- database: SQLite (+ Litestream backups): https://docs.turso.tech/
+- database: Cloud Firestore: https://firebase.google.com/docs/firestore
+- database: Cloud Firestore: https://cloud.google.com/firestore/docs/best-practices
+- database: Cloud Firestore: https://cloud.google.com/firestore/quotas
+- database: Cloud Firestore: https://firebase.google.com/docs/firestore/manage-data/enable-offline
+- database: No database (content files in git): https://docs.astro.build/en/guides/content-collections/
+- database: No database (content files in git): https://developers.cloudflare.com/pages/framework-guides/
+- database: Microsoft SQL Server / Azure SQL Database: https://learn.microsoft.com/en-us/sql/sql-server/
+- database: Microsoft SQL Server / Azure SQL Database: https://learn.microsoft.com/en-us/azure/azure-sql/database/sql-database-paas-overview
+- database: Microsoft SQL Server / Azure SQL Database: https://learn.microsoft.com/en-us/azure/azure-sql/database/free-offer
+- database: Microsoft SQL Server / Azure SQL Database: https://azure.microsoft.com/en-us/pricing/details/azure-sql-database/single/
+- database: Microsoft SQL Server / Azure SQL Database: https://aws.amazon.com/rds/sqlserver/pricing/
+- database: Microsoft SQL Server / Azure SQL Database: https://cloud.google.com/sql/docs/sqlserver
+- database: Microsoft SQL Server / Azure SQL Database: https://learn.microsoft.com/en-us/ef/core/providers/sql-server/
+- database: Google BigQuery: https://cloud.google.com/bigquery/docs/introduction
+- database: Google BigQuery: https://cloud.google.com/bigquery/pricing
+- database: Google BigQuery: https://cloud.google.com/bigquery/quotas
+- database: Google BigQuery: https://cloud.google.com/datastream/docs/overview
+- hosting: Vercel: https://vercel.com/docs
+- hosting: Vercel: https://vercel.com/pricing
+- hosting: Vercel: https://vercel.com/docs/limits/fair-use-guidelines
+- hosting: Vercel: https://vercel.com/security
+- hosting: Vercel: https://vercel.com/kb/guide/do-vercel-serverless-functions-support-websocket-connections
+- hosting: Netlify: https://docs.netlify.com/
+- hosting: Netlify: https://www.netlify.com/pricing/
+- hosting: Netlify: https://docs.netlify.com/functions/optional-configuration/
+- hosting: Cloudflare Pages + Workers: https://developers.cloudflare.com/workers/platform/pricing/
+- hosting: Cloudflare Pages + Workers: https://developers.cloudflare.com/durable-objects/
+- hosting: Cloudflare Pages + Workers: https://www.cloudflare.com/trust-hub/compliance-resources/
+- hosting: Cloudflare Pages + Workers: https://developers.cloudflare.com/data-localization/region-support/
+- hosting: Render: https://render.com/docs
+- hosting: Render: https://render.com/pricing
+- hosting: Render: https://render.com/docs/regions
+- hosting: Render: https://render.com/docs/hipaa-compliance
+- hosting: Render: https://render.com/docs/disks
+- hosting: Render: https://render.com/docs/free
+- hosting: Railway: https://docs.railway.com/
+- hosting: Railway: https://railway.com/pricing
+- hosting: Railway: https://docs.railway.com/reference/deployment-regions
+- hosting: Railway: https://docs.railway.com/guides/laravel
+- hosting: Fly.io: https://fly.io/docs/
+- hosting: Fly.io: https://docs.fly.io/about/pricing
+- hosting: Fly.io: https://fly.io/docs/reference/regions/
+- hosting: Fly.io: https://fly.io/docs/elixir/
+- hosting: Fly.io: https://fly.io/docs/laravel/
+- hosting: AWS ECS on Fargate: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html
+- hosting: AWS ECS on Fargate: https://aws.amazon.com/fargate/pricing/
+- hosting: AWS ECS on Fargate: https://aws.amazon.com/compliance/hipaa-eligible-services-reference/
+- hosting: AWS ECS on Fargate: https://aws.amazon.com/compliance/pci-dss-level-1-faqs/
+- hosting: AWS ECS on Fargate: https://aws.amazon.com/ecs/sla/
+- hosting: AWS EKS (Kubernetes): https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
+- hosting: AWS EKS (Kubernetes): https://aws.amazon.com/eks/pricing/
+- hosting: AWS EKS (Kubernetes): https://aws.amazon.com/eks/sla/
+- hosting: AWS EKS (Kubernetes): https://aws.amazon.com/compute/sla/
+- hosting: AWS Lambda + API Gateway: https://aws.amazon.com/lambda/pricing/
+- hosting: AWS Lambda + API Gateway: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html
+- hosting: AWS Lambda + API Gateway: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html
+- hosting: AWS Lambda + API Gateway: https://aws.amazon.com/lambda/sla/
+- hosting: AWS S3 + CloudFront (static): https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html
+- hosting: AWS S3 + CloudFront (static): https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
+- hosting: AWS S3 + CloudFront (static): https://aws.amazon.com/cloudfront/pricing/
+- hosting: AWS S3 + CloudFront (static): https://aws.amazon.com/s3/pricing/
+- hosting: AWS S3 + CloudFront (static): https://nextjs.org/docs/app/guides/static-exports
+- hosting: AWS S3 + CloudFront (static): https://aws.amazon.com/cloudfront/sla/
+- hosting: Google Cloud Run: https://cloud.google.com/run/docs
+- hosting: Google Cloud Run: https://cloud.google.com/run/pricing
+- hosting: Google Cloud Run: https://cloud.google.com/run/docs/triggering/websockets
+- hosting: Google Cloud Run: https://cloud.google.com/docs/buildpacks/php
+- hosting: Google Cloud Run: https://cloud.google.com/docs/buildpacks/overview
+- hosting: Google Cloud Run: https://cloud.google.com/run/sla
+- hosting: Google Cloud Run: https://cloud.google.com/run/docs/configuring/min-instances
+- hosting: Google Kubernetes Engine (Autopilot): https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview
+- hosting: Google Kubernetes Engine (Autopilot): https://cloud.google.com/kubernetes-engine/pricing
+- hosting: Google Kubernetes Engine (Autopilot): https://cloud.google.com/kubernetes-engine/sla
+- hosting: Azure App Service / Container Apps: https://learn.microsoft.com/azure/app-service/overview
+- hosting: Azure App Service / Container Apps: https://learn.microsoft.com/azure/container-apps/overview
+- hosting: Azure App Service / Container Apps: https://learn.microsoft.com/azure/compliance/offerings/offering-hipaa-us
+- hosting: Azure App Service / Container Apps: https://learn.microsoft.com/en-us/azure/app-service/quickstart-php
+- hosting: Azure App Service / Container Apps: https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services
+- hosting: DigitalOcean (App Platform + Managed DBs): https://docs.digitalocean.com/products/app-platform/
+- hosting: DigitalOcean (App Platform + Managed DBs): https://www.digitalocean.com/pricing
+- hosting: DigitalOcean (App Platform + Managed DBs): https://www.digitalocean.com/pricing/app-platform
+- hosting: DigitalOcean (App Platform + Managed DBs): https://docs.digitalocean.com/platform/regional-availability/
+- hosting: DigitalOcean (App Platform + Managed DBs): https://docs.digitalocean.com/products/app-platform/reference/buildpacks/php/
+- hosting: DigitalOcean (App Platform + Managed DBs): https://docs.digitalocean.com/products/app-platform/reference/buildpacks/python/
+- hosting: DigitalOcean (App Platform + Managed DBs): https://www.digitalocean.com/sla/app-platform
+- hosting: Hetzner Cloud / VPS (Docker, Coolify): https://docs.hetzner.com/cloud/
+- hosting: Hetzner Cloud / VPS (Docker, Coolify): https://www.hetzner.com/cloud/
+- hosting: Hetzner Cloud / VPS (Docker, Coolify): https://coolify.io/docs/
+- hosting: Hetzner Cloud / VPS (Docker, Coolify): https://www.hetzner.com/legal/cloud-server/
+- hosting: On-prem VMs + Docker Compose: https://docs.docker.com/compose/
+- hosting: On-prem VMs + Docker Compose: https://docs.docker.com/engine/security/
+- hosting: On-prem Kubernetes (k3s / RKE2 / OpenShift): https://kubernetes.io/docs/home/
+- hosting: On-prem Kubernetes (k3s / RKE2 / OpenShift): https://docs.k3s.io/
+- hosting: On-prem Kubernetes (k3s / RKE2 / OpenShift): https://docs.rke2.io/
+- rule nextjs_vercel: https://nextjs.org/docs/app/building-your-application/deploying
+- rule static_spa_frontend_paas: https://vite.dev/guide/static-deploy
+- rule supabase_postgres: https://supabase.com/docs/guides/database/overview
+- rule supabase_timescale: https://supabase.com/docs/guides/database/extensions
+- rule firestore_without_firebase_offgcp: https://cloud.google.com/firestore/docs/locations
+- rule dynamodb_lambda: https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html
+- rule frontend_paas_rdbms_pooling: https://neon.tech/docs/serverless/serverless-driver
+- rule faas_backend_no_faas_host: https://knative.dev/docs/
+- rule heavy_server_on_frontend_paas: https://vercel.com/docs/functions/runtimes
+- rule light_server_on_lambda: https://github.com/awslabs/aws-lambda-web-adapter
+- rule realtime_flyio: https://fly.io/docs/networking/
+- rule fullstack_typescript: https://www.typescriptlang.org/docs/
+- rule mobile_baas: https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native
+- rule ml_non_python: https://pytorch.org/serve/
+- rule dotnet_azure: https://learn.microsoft.com/azure/app-service/quickstart-dotnetcore
+- rule go_cloud_run: https://cloud.google.com/run/docs/tips/general
+- rule monolith_paas: https://render.com/docs/deploy-django
+- rule sqlite_ephemeral_disk: https://docs.digitalocean.com/products/app-platform/how-to/store-data/
+- rule sqlite_network_share: https://learn.microsoft.com/en-us/azure/app-service/operating-system-functionality#file-access
+- rule sqlite_flyio: https://fly.io/docs/litefs/
+- rule aws_keyspaces: https://docs.aws.amazon.com/keyspaces/latest/devguide/what-is-keyspaces.html
+- rule k8s_microservices: https://kubernetes.io/docs/concepts/overview/
+- rule redis_primary_warning: https://redis.io/docs/latest/operate/oss_and_stack/management/replication/
+- rule nextjs_cloudflare: https://opennext.js.org/cloudflare
+- rule django_orm_nosql_store: https://docs.djangoproject.com/en/5.2/ref/databases/
+- rule rails_orm_nosql_store: https://guides.rubyonrails.org/active_record_basics.html
+- rule laravel_orm_nosql_store: https://laravel.com/docs/12.x/database
+- rule phoenix_ecto_nosql_store: https://hexdocs.pm/phoenix/ecto.html
+- rule dotnet_ef_nosql_store: https://learn.microsoft.com/en-us/ef/core/providers/
+- rule static_site_on_server_host: https://cloud.google.com/storage/docs/hosting-static-website
+- rule bigquery_off_gcp: https://cloud.google.com/bigquery/docs/locations
+- hosting: Netlify (compliance maturity): https://www.netlify.com/security/
+- hosting: Render (compliance maturity): https://render.com/security
+- hosting: Fly.io (compliance maturity): https://fly.io/docs/about/healthcare/
+- hosting: Fly.io (compliance maturity): https://fly.io/pricing
+- hosting: AWS ECS on Fargate (compliance maturity): https://aws.amazon.com/compliance/programs/
+- hosting: AWS ECS on Fargate (compliance maturity): https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html
+- hosting: AWS ECS on Fargate (compliance maturity): https://aws.amazon.com/ec2/dedicated-hosts/
+- hosting: Google Cloud Run (compliance maturity): https://cloud.google.com/security/compliance/offerings
+- hosting: Google Cloud Run (compliance maturity): https://cloud.google.com/logging/docs/audit
+- hosting: Google Cloud Run (compliance maturity): https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes
+- hosting: Azure App Service / Container Apps (compliance maturity): https://learn.microsoft.com/azure/compliance/
+- hosting: Azure App Service / Container Apps (compliance maturity): https://learn.microsoft.com/azure/azure-monitor/essentials/activity-log
+- hosting: Azure App Service / Container Apps (compliance maturity): https://learn.microsoft.com/azure/virtual-machines/dedicated-hosts
+- hosting: DigitalOcean (App Platform + Managed DBs) (compliance maturity): https://www.digitalocean.com/trust
+- hosting: DigitalOcean (App Platform + Managed DBs) (compliance maturity): https://www.digitalocean.com/trust/hipaa-at-do
+- hosting: Hetzner Cloud / VPS (Docker, Coolify) (compliance maturity): https://www.hetzner.com/unternehmen/zertifizierung/
+- hosting: On-prem Kubernetes (k3s / RKE2 / OpenShift) (compliance maturity): https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/
+- criterion: compliance maturity for regulated data at scale: https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html
+- criterion: compliance maturity for regulated data at scale: https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html
+- criterion: compliance maturity for regulated data at scale: https://www.pcisecuritystandards.org/document_library/
+- input: app_type: https://learn.microsoft.com/azure/architecture/guide/
+- input: app_type: https://aws.amazon.com/architecture/well-architected/
+- input: special_workloads: https://docs.livekit.io/home/
+- input: special_workloads: https://developers.cloudflare.com/stream/pricing/
+- input: special_workloads: https://developers.google.com/maps/billing-and-pricing/pricing
+- input: special_workloads: https://www.twilio.com/en-us/verify/pricing
+- input: special_workloads: https://gvisor.dev/docs/
+- input: background_work: https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
+- input: background_work: https://vercel.com/docs/functions/limitations
+- input: background_work: https://docs.netlify.com/build/functions/background-functions/
+- input: background_work: https://docs.cloud.google.com/run/docs/configuring/services/gpu
+- input: background_work: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-tasks-services.html
+- input: tenancy: https://www.postgresql.org/docs/current/ddl-rowsecurity.html
+- input: tenancy: https://learn.microsoft.com/en-us/sql/relational-databases/security/row-level-security
+- input: tenancy: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html
+- input: tenancy: https://docs.aws.amazon.com/wellarchitected/latest/saas-lens/silo-pool-and-bridge-models.html
+- input: dau: https://sre.google/sre-book/handling-overload/
+- input: peak_rps: https://en.wikipedia.org/wiki/Little%27s_law
+- input: peak_rps: https://sre.google/sre-book/addressing-cascading-failures/
+- input: traffic_pattern: https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/design-your-workload-service-architecture.html
+- input: cacheable_share: https://developers.cloudflare.com/cache/concepts/default-cache-behavior/
+- input: read_write: https://www.postgresql.org/docs/current/high-availability.html
+- input: read_write: https://cassandra.apache.org/doc/latest/cassandra/architecture/storage-engine.html
+- input: data_shapes: https://www.mongodb.com/resources/basics/databases/nosql-explained
+- input: data_shapes: https://neo4j.com/docs/getting-started/graph-database/
+- input: consistency: https://jepsen.io/consistency
+- input: consistency: https://www.postgresql.org/docs/current/transaction-iso.html
+- input: realtime: https://developer.mozilla.org/docs/Web/API/WebSockets_API
+- input: realtime: https://vercel.com/guides/do-vercel-serverless-functions-support-websocket-connections
+- input: latency_target_ms: https://www.nngroup.com/articles/response-times-3-important-limits/
+- input: latency_target_ms: https://web.dev/articles/rail
+- input: offline: https://web.dev/learn/pwa/offline-data
+- input: availability: https://sre.google/sre-book/availability-table/
+- input: availability: https://sre.google/sre-book/embracing-risk/
+- input: regions: https://aws.amazon.com/about-aws/global-infrastructure/regions_az/
+- input: regions: https://cloud.google.com/about/locations
+- input: team_size: https://martinfowler.com/bliki/MonolithFirst.html
+- input: team_size: https://teamtopologies.com/key-concepts
+- input: team_size: https://martinfowler.com/bliki/ConwaysLaw.html
+- input: team_skills: https://dora.dev/research/
+- input: architecture: https://martinfowler.com/articles/microservice-trade-offs.html
+- input: budget_monthly: https://aws.amazon.com/free/
+- input: budget_monthly: https://cloud.google.com/free
+- input: lock_in_tolerance: https://martinfowler.com/articles/oss-lockin.html
+- input: compliance: https://www.meity.gov.in/data-protection-framework
+- input: compliance: https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244
+- input: compliance: https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/nov/doc20251117695301.pdf
+- input: compliance: https://gdpr-info.eu/art-44-gdpr/
+- input: enterprise_sso: https://firebase.google.com/docs/auth/web/saml
+- input: enterprise_sso: https://cloud.google.com/identity-platform/pricing
+- input: enterprise_sso: https://www.keycloak.org/docs/latest/server_admin/
+- input: existing_systems: https://martinfowler.com/articles/evodb.html
+- glossary: HIPAA: https://www.hhs.gov/hipaa/for-professionals/index.html
+- glossary: BAA (Business Associate Agreement): https://www.hhs.gov/hipaa/for-professionals/covered-entities/sample-business-associate-agreement-provisions/index.html
+- glossary: GDPR: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- glossary: PCI-DSS: https://www.pcisecuritystandards.org/standards/pci-dss/
+- glossary: SOC 2: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+- glossary: LSM tree: https://www.scylladb.com/glossary/log-structured-merge-tree/
+- glossary: OLAP: https://clickhouse.com/docs/en/concepts/why-clickhouse-is-so-fast
+- glossary: OLTP: https://www.postgresql.org/docs/current/tutorial-transactions.html
+- glossary: LCP (Largest Contentful Paint): https://web.dev/articles/lcp
+- glossary: Multi-AZ: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html
+- glossary: Sharding: https://www.mongodb.com/docs/manual/sharding/
+- glossary: Connection pooling: https://www.postgresql.org/docs/current/runtime-config-connection.html
+- glossary: RPO and RTO: https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html
+- glossary: Edge computing: https://developers.cloudflare.com/workers/platform/limits/
+- glossary: ORM: https://docs.djangoproject.com/en/stable/topics/db/queries/
