@@ -1,0 +1,5 @@
+# Build-time tools only (report PDF and screenshots). The app and the tests do not need these.
+# Install into any Python 3.10+: pip install -r requirements-dev.txt
+markdown-it-py>=3,<5
+pypdf>=5,<7
+playwright>=1.45,<2
