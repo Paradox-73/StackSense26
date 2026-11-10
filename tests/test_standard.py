@@ -1,6 +1,5 @@
-"""The Synergy '26 scenario format: schema of the output, hard constraints on the public scenarios, validation,
-determinism and the LLM-off switch (problem statement sections 3-8)."""
-import copy
+"""The Synergy '26 scenario format: schema of the output, hard constraints on the public scenarios, validation and
+determinism (problem statement sections 3-8). The LLM-off switch is tested in tests/test_llm_off.py."""
 import json
 import re
 from pathlib import Path
@@ -98,9 +97,18 @@ def test_zero_budget_portfolio_starts_free(outputs):
     assert "content files in git" in outputs["P1"]["stack"]["database"]["justification"]
 
 
-def test_same_input_gives_identical_output():
-    doc = load("P3")
-    assert json.dumps(run(doc), sort_keys=True) == json.dumps(run(copy.deepcopy(doc)), sort_keys=True)
+def test_same_input_gives_identical_output_in_every_process():
+    """FR9. Python salts string hashing per process (PYTHONHASHSEED), so any set order that reached the output would
+    differ between two runs; compare every scenario file's output, key order included, across two seeds."""
+    import os
+    import subprocess
+    import sys
+    script = ("import json; from pathlib import Path; from engine.standard import run; print(json.dumps("
+              "[run(json.loads(p.read_text(encoding='utf-8'))) for p in sorted(Path('scenarios').glob('*/*.json'))]))")
+    env = {k: v for k, v in os.environ.items() if not k.startswith(("STACKSENSE_LLM", "OPENROUTER"))}
+    outs = [subprocess.run([sys.executable, "-c", script], cwd=ROOT, env=dict(env, PYTHONHASHSEED=seed), capture_output=True,
+                           text=True, check=True, timeout=300).stdout for seed in ("1", "2")]
+    assert len(json.loads(outs[0])) == 15 and outs[0] == outs[1]
 
 
 @pytest.mark.parametrize("path,value", [
