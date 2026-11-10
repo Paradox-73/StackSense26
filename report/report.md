@@ -252,7 +252,7 @@ Top-1 is scored on 158 of the 160 picks, because for 2 layer picks (backend and 
 
 ## 7. Limitations
 
-- Scores, cost bands and compliance flags are curated from public vendor documentation as of October 2026. Prices and compliance programmes change; verify them with each vendor before committing.
+- Scores, cost bands and compliance flags are curated from public vendor documentation. Prices and compliance programmes change; verify them with each vendor before committing.
 - Scores are judgements anchored to a rubric, not measurements. I did not re-score the whole knowledge base against the rubric, and a different curator would give different scores.
 - The benchmark labels were written by a language model in three architect personas, not by people, so the agreement figures measure fit to a model-written key. The benchmark has 40 briefs. Held-out accuracy on 10 of them is 72% top-1 and 95% acceptable, so one brief moves it by ten points.
 - Growth stability is measured, not proved: 0 of 1,000 random growth walks returns to an earlier pick, but other answers can still produce a return.
@@ -418,7 +418,7 @@ Why each group of questions is asked, with its sources, is in the app (the Why w
 
 **Libraries and licences.** Run time: [FastAPI](https://fastapi.tiangolo.com/) (MIT), [Starlette](https://starlette.dev/) (BSD-3), [Pydantic](https://docs.pydantic.dev/) (MIT) and [Uvicorn](https://uvicorn.dev/) (BSD-3); the browser code uses no third-party JavaScript. Tests and this report only: pytest (MIT), HTTPX (BSD-3), markdown-it-py (MIT), pypdf (BSD-3), Playwright for Python (Apache-2.0) and Google Chrome. Fonts bundled in `app/static/fonts/` (SIL Open Font License 1.1): Fraunces, Geist and Geist Mono. The optional language-model client (`engine/llm.py`) uses only the Python standard library and calls an OpenAI-compatible chat API, by default Google's Gemini free tier; no model is bundled. The README's Credits section lists every library, font and technique with its link.
 
-**Datasets and sources.** StackSense ships no third-party dataset. Hiring-pool scores use the [Stack Overflow Developer Survey 2024](https://survey.stackoverflow.co/2024/technology) as a proxy, and the exchange rate is the FBIL reference rate of September 2026. Every technology, rule, question and glossary entry cites official documentation; the register of 344 URLs is in `report/sources.md`, not printed in this PDF.
+**Datasets and sources.** StackSense ships no third-party dataset. Hiring-pool scores use the [Stack Overflow Developer Survey 2024](https://survey.stackoverflow.co/2024/technology) as a proxy, and INR is converted at a fixed planning rate of 96 INR to 1 USD. Every technology, rule, question and glossary entry cites official documentation; the register of 344 URLs is in `report/sources.md`, not printed in this PDF.
 
 **How to reproduce.** From the repository root: `python run.py` starts the app; `python -m pytest` runs the tests; `python tools/bench.py`, `python tools/fuzz.py` and `python tools/question_influence.py` rerun the benchmark, the random-project test and the question-influence study; `python tools/capture_screenshots.py` retakes the screenshots; `python tools/build_assets.py` then `python tools/build_report.py` regenerate the tables and this PDF. The README lists every command with its options.
 

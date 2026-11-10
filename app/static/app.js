@@ -15,7 +15,7 @@ const S = {
 };
 const DEBOUNCE = 250;
 const LAYERS = ["frontend", "backend", "database", "hosting"];
-const FX = 96; /* the engine's fixed planning rate, INR per USD (FBIL, Sep 2026) */
+const FX = 96; /* the engine's fixed planning rate, INR per USD (engine/profile.py INR_PER_USD) */
 
 const $ = (sel, el = document) => el.querySelector(sel);
 const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];

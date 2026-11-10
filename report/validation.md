@@ -17,7 +17,7 @@
 | `test_split_hosting.py` (Scoring, constraints and cost) | 7 | Split hosting: a server-framework API on a frontend platform gets its own long-running host |
 | `test_services_lint.py` (Scoring, constraints and cost) | 7 | Supporting services must not contradict the hard inputs: no cloud-only service on-premises, no |
 | `test_runs_here.py` (Scoring, constraints and cost) | 6 | Each host says what runs on it; a mobile-only app on a BaaS has no host of its own to pay for. |
-| `test_kb_facts.py` (Scoring, constraints and cost) | 12 | Hard-filter facts checked against vendor pages in October 2026 (each changed KB entry carries facts_as_of). |
+| `test_kb_facts.py` (Scoring, constraints and cost) | 12 | Hard-filter facts from the vendors' own pages (each entry whose facts were corrected cites the page it rests on). |
 | `test_requirements_bind.py` (Scoring, constraints and cost) | 7 | A requested monolith binds, availability rules out single-node databases, and small teams or |
 | `test_hosting_limits.py` (Scoring, constraints and cost) | 18 | What a host or a database file can physically do: a file database pins the app to one instance, |
 | `test_budget_search.py` (Scoring, constraints and cost) | 6 | The budget guard looks past the top 5 options per layer and may change the database or backend. |
@@ -37,7 +37,7 @@
 | `test_system_of_record.py` (Scoring, constraints and cost) | 7 | Specialist stores (KB field system_of_record: in-memory, graph, search index) are the primary database only for the |
 | `test_tenancy_sso.py` (Scoring, constraints and cost) | 9 | Customer organisations sharing the app (tenancy) and enterprise single sign-on: both default to no effect; a shared |
 | `test_vendor_sla.py` (Scoring, constraints and cost) | 9 | Vendor SLAs (hosting KB field sla, each with the provider's SLA page) bound the availability a host can be |
-| `test_research_refresh.py` (Scoring, constraints and cost) | 9 | Facts refreshed against the vendors' and regulators' pages on 2026-10-09. |
+| `test_research_refresh.py` (Scoring, constraints and cost) | 9 | Facts refreshed against the vendors' and regulators' own pages. |
 | `test_cloud_skill_tie.py` (Scoring, constraints and cost) | 2 | A team that lists a cloud as a skill wins ties for that cloud before the hiring pool decides, and a pick that |
 | `test_data_estimate.py` (Scoring, constraints and cost) | 6 | An unanswered data volume is estimated from the daily users given, is not raised by users connected at once, |
 | `test_side_store_cost.py` (Scoring, constraints and cost) | 1 | A side store of records beside an analytics primary is priced by the records it holds (the traffic's tier), |

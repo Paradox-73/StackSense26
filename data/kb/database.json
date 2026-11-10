@@ -1,6 +1,5 @@
 {
   "layer": "database",
-  "curated_on": "2026-10-01",
   "cost_note": "cost_usd = typical managed-service monthly cost per data/scale tier (<1k, 1k-10k, 10k-100k, 100k-1M, 1M-10M, >10M DAU). Self-hosting can be cheaper but adds ops work. entry_plans = vendor free and small fixed-price plans, each with the largest scale tier (0 = <1k DAU) and data size (GB within 12 months) it holds; the cheapest plan that holds the project sets the floor, and a $0 floor with no plan that holds the project becomes the next tier's floor. Each plan names its vendor; the cost estimate uses a plan only when the stack's managed offering on its host is that vendor's, and under HIPAA only a plan marked baa (the vendor signs a Business Associate Agreement for it). host_plans = the smallest plan of a host's own managed database, used only by the cost estimate on that host.",
   "model_note": "models = fit (1-5) for each data shape (search = full-text or log search is the main way the data is read). consistency = strongest guarantee available for multi-record transactions.",
   "items": [

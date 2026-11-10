@@ -1,6 +1,5 @@
 {
   "description": "Plain-English definitions for every technical term in the questionnaire. Rendered as info popovers in the UI. Each entry: term, short definition, who it applies to, and an official or primary source.",
-  "curated_on": "2026-10-01",
   "terms": {
     "hipaa": {
       "term": "HIPAA",

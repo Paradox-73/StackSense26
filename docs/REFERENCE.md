@@ -161,7 +161,7 @@ The questionnaire is defined in `data/questions.json`. That file also drives def
 
 ## Knowledge base
 
-`data/kb/*.json` was curated on 2026-10-01. It holds 10 frontends, 14 backends, 15 databases and 17 hosting platforms (56 technologies) and 61 compatibility rules. Each entry has:
+`data/kb/*.json` holds 10 frontends, 14 backends, 15 databases and 17 hosting platforms (56 technologies) and 61 compatibility rules. Each entry has:
 
 - 1-5 scores per criterion
 - compliance maturity 1-5 with a note and sources (hosting and BaaS only)

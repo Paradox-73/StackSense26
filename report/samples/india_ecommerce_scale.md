@@ -34,7 +34,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 ## Inputs used
 
 - Scale tier: Very large (1M-10M daily users) (peak ~25,000 req/s, provided); database tier: Large (1-10 TB of data) (~1,520 GB in 12 months)
-- Budget: ~$26,042/month (INR converted at a fixed planning rate of 96 INR = 1 USD (FBIL reference rate, Sep 2026).)
+- Budget: ~$26,042/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Assumption: compliance = dpdp: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies.
 - Defaults used (2): What do users do? = read, sign_in, post; Special workloads = none
 

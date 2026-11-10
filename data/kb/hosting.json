@@ -1,6 +1,5 @@
 {
   "layer": "hosting",
-  "curated_on": "2026-10-01",
   "cost_note": "cost_usd = approximate compute/bandwidth monthly cost for the app tier (database excluded) per scale tier (<1k, 1k-10k, 10k-100k, 100k-1M, 1M-10M, >10M DAU). Compliance flags reflect vendors' published programmes on the curation date; verify before signing.",
   "items": [
     {
@@ -104,8 +103,7 @@
         "https://vercel.com/security",
         "https://vercel.com/kb/guide/do-vercel-serverless-functions-support-websocket-connections"
       ],
-      "seat_usd": 20,
-      "facts_as_of": "2026-10-03"
+      "seat_usd": 20
     },
     {
       "id": "netlify",
@@ -229,8 +227,7 @@
           2000
         ]
       ],
-      "static_cost_note": "Free plan covers a static site up to its monthly bandwidth/credit allowance",
-      "facts_as_of": "2026-10-03"
+      "static_cost_note": "Free plan covers a static site up to its monthly bandwidth/credit allowance"
     },
     {
       "id": "cloudflare",
@@ -361,8 +358,7 @@
       ],
       "static_cost_note": "Pages: static sites are free with unlimited bandwidth (500 builds/month on the free plan)",
       "residency_regions": [],
-      "residency_note": "Keeping data and TLS termination inside India or the EU needs the Data Localization Suite, an Enterprise add-on; treated as not meeting a residency rule.",
-      "facts_as_of": "2026-10-03"
+      "residency_note": "Keeping data and TLS termination inside India or the EU needs the Data Localization Suite, an Enterprise add-on; treated as not meeting a residency rule."
     },
     {
       "id": "render",
@@ -464,8 +460,7 @@
         "https://render.com/docs/free"
       ],
       "local_file_disk_min_usd": 7,
-      "local_file_disk_note": "free instances have an ephemeral filesystem; a persistent disk attaches only to a paid instance (from $7/month) and is billed per GB",
-      "facts_as_of": "2026-10-03"
+      "local_file_disk_note": "free instances have an ephemeral filesystem; a persistent disk attaches only to a paid instance (from $7/month) and is billed per GB"
     },
     {
       "id": "railway",
@@ -664,8 +659,7 @@
         "https://fly.io/docs/reference/regions/",
         "https://fly.io/docs/elixir/",
         "https://fly.io/docs/laravel/"
-      ],
-      "facts_as_of": "2026-10-05"
+      ]
     },
     {
       "id": "aws_ecs",
@@ -1094,8 +1088,7 @@
         "https://aws.amazon.com/cloudfront/sla/"
       ],
       "sla": {"percent": 99.9, "scope": "CloudFront distribution", "source": "https://aws.amazon.com/cloudfront/sla/"},
-      "static_only": true,
-      "facts_as_of": "2026-10-04"
+      "static_only": true
     },
     {
       "id": "gcp_cloud_run",
@@ -1519,8 +1512,7 @@
         "https://docs.digitalocean.com/products/app-platform/reference/buildpacks/python/",
         "https://www.digitalocean.com/sla/app-platform"
       ],
-      "sla": {"percent": 99.95, "scope": "each App Platform component", "source": "https://www.digitalocean.com/sla/app-platform"},
-      "facts_as_of": "2026-10-03"
+      "sla": {"percent": 99.95, "scope": "each App Platform component", "source": "https://www.digitalocean.com/sla/app-platform"}
     },
     {
       "id": "hetzner",

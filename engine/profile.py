@@ -10,9 +10,9 @@ from copy import deepcopy
 
 from .kb import field_specs, load_kb
 
-INR_PER_USD = 96.0  # fixed planning rate: FBIL reference rate 95.89 on 25 Sep 2026, rounded
+INR_PER_USD = 96.0  # a fixed planning rate, not a live one; FBIL publishes the reference rate (https://www.fbil.org.in/)
 USD_PER_INR = 1 / INR_PER_USD
-FX_NOTE = "INR converted at a fixed planning rate of 96 INR = 1 USD (FBIL reference rate, Sep 2026)."
+FX_NOTE = "INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value)."
 
 # Requests per active user per day and peak-to-average factor, by app archetype.
 # Used only when peak RPS is not supplied. Values are planning heuristics. IoT counts devices, at one

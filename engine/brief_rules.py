@@ -267,7 +267,7 @@ def usd_note(amount: float, currency: str) -> str | None:
     """A note giving the dollar equivalent of a rupee budget, at the engine's fixed planning rate."""
     if currency != "INR" or not amount:
         return None
-    return f"about ${amount / INR_PER_USD:,.0f} a month at the engine's fixed rate of {INR_PER_USD:.0f} INR = 1 USD (FBIL, Sep 2026)"
+    return f"about ${amount / INR_PER_USD:,.0f} a month at the engine's fixed planning rate of {INR_PER_USD:.0f} INR = 1 USD"
 
 
 # ------------------------------------------------------------------ skills

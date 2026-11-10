@@ -33,7 +33,7 @@ Availability approach: Multi-AZ everywhere + multi-region failover drills, 24x7 
 ## Inputs used
 
 - Scale tier: Hyperscale (>10M daily users) (peak ~34,722 req/s, max(provided, derived)); database tier: Hyperscale (>10M daily users) (~11,000 GB in 12 months)
-- Budget: ~$0/month (INR converted at a fixed planning rate of 96 INR = 1 USD (FBIL reference rate, Sep 2026).)
+- Budget: ~$0/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Defaults used (2): What do users do? = read, sign_in, post; Special workloads = none
 
 ## Warnings and how they were resolved

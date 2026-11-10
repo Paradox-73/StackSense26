@@ -33,7 +33,7 @@ Availability approach: Firebase runs the backend on a paid plan; turn on point-i
 ## Inputs used
 
 - Scale tier: Large (100k-1M daily users) (peak ~1,389 req/s, derived); database tier: Medium (100 GB-1 TB of data) (~290 GB in 12 months)
-- Budget: ~$833/month (INR converted at a fixed planning rate of 96 INR = 1 USD (FBIL reference rate, Sep 2026).)
+- Budget: ~$833/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Assumption: compliance = dpdp: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies.
 - Defaults used (1): Special workloads = none
 

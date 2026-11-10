@@ -54,7 +54,7 @@ def test_extreme_dau_is_clamped():
 
 
 def test_inr_budget_converted():
-    p, d, a, w = profile_of({"budget_monthly": 9600, "currency": "INR"})  # 96 INR = 1 USD (FBIL, Sep 2026)
+    p, d, a, w = profile_of({"budget_monthly": 9600, "currency": "INR"})  # 96 INR = 1 USD, the engine's planning rate
     assert d["budget_usd"] == pytest.approx(100, rel=1e-6)
 
 
@@ -134,7 +134,7 @@ def test_hipaa_excludes_non_baa_vendors():
 
 def test_india_residency_requires_india_region():
     ex = _excluded("hosting", {"compliance": ["data_residency_india"]})
-    # Fly.io lists no Indian region; Cloudflare keeps data in India only with an Enterprise add-on (KB facts, Oct 2026).
+    # Fly.io lists no Indian region; Cloudflare keeps data in India only with an Enterprise add-on (knowledge-base facts).
     assert {"render", "railway", "hetzner", "netlify", "flyio", "cloudflare"} <= ex
     assert not {"aws_ecs", "digitalocean", "gcp_cloud_run"} & ex
 

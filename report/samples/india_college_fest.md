@@ -33,7 +33,7 @@ Availability approach: The platform runs the functions across zones, with no ins
 ## Inputs used
 
 - Scale tier: Small (1k-10k daily users) (peak ~2.2 req/s, derived); database tier: Small (10-100 GB of data) (~14 GB in 12 months)
-- Budget: ~$21/month (INR converted at a fixed planning rate of 96 INR = 1 USD (FBIL reference rate, Sep 2026).)
+- Budget: ~$21/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Assumption: compliance = dpdp: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies.
 
 ## Per-layer reasoning

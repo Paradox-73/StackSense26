@@ -1,5 +1,4 @@
 # Upper bounds stop a future release from changing behaviour during judging (Nov 2026).
-# Verified 2-3 Oct 2026 on Python 3.9-3.14 (Linux) and 3.12 (Windows 11): all tests pass.
 fastapi>=0.110,<0.143
 starlette<1.8
 pydantic>=2.7,<3

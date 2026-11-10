@@ -33,7 +33,7 @@ Availability approach: Single server + nightly backups copied off the machine
 ## Inputs used
 
 - Scale tier: Hobby (<1k daily users) (peak ~1.7 req/s, derived); database tier: Hobby (<1k daily users) (~3.4 GB in 12 months)
-- Budget: ~$0/month (INR converted at a fixed planning rate of 96 INR = 1 USD (FBIL reference rate, Sep 2026).)
+- Budget: ~$0/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Defaults used (2): What do users do? = read, sign_in, post; Special workloads = none
 
 ## Per-layer reasoning

@@ -56,7 +56,7 @@ python3 -m venv .venv
 
 ## How it decides
 
-- **Knowledge base:** 60 technologies (11 frontends, 14 backends, 15 databases, 20 hosting platforms) and 62 compatibility rules, curated on 2026-10-01 from official documentation. Each technology has 1-5 scores for 19 criteria.
+- **Knowledge base:** 60 technologies (11 frontends, 14 backends, 15 databases, 20 hosting platforms) and 62 compatibility rules, curated from official documentation. Each technology has 1-5 scores for 19 criteria.
 - **Weights:** each criterion's weight starts at a baseline and is raised or lowered by specific answers (for example, "SEO critical" adds +4 to the SEO weight). Each change is stored with the answer that caused it.
 - **Hard constraints first:** an option that breaks a requirement (HIPAA agreement, data residency, deployment model, scale ceiling and others) is removed before scoring. Compliance is never relaxed.
 - **Score:** weighted average of the criterion scores, rescaled to 0-100, plus small adjustments with stated reasons (near the scale limit, over the budget share).
@@ -88,7 +88,7 @@ python3 -m venv .venv
 
 ## Limitations
 
-- Scores, cost bands and compliance flags are curated estimates from public documentation as of October 2026. Verify prices and compliance with each vendor before committing.
+- Scores, cost bands and compliance flags are curated estimates from public documentation. Verify prices and compliance with each vendor before committing.
 - The cost model uses price bands per scale tier, not an itemised bill. Egress, support plans and third-party SaaS are excluded.
 - The knowledge base has 60 technologies. Niche options (CockroachDB, Oracle, Rust-specific frameworks and others) are not included.
 - The answer key was written by a language model, not human architects.
@@ -127,7 +127,7 @@ The licence text is in [`app/static/fonts/OFL.txt`](app/static/fonts/OFL.txt). `
 - Counterfactual explanations: Wachter, Mittelstadt and Russell, [Counterfactual Explanations without Opening the Black Box](https://arxiv.org/abs/1711.00399) (2017)
 - Quality attributes used to choose the questions: [ISO/IEC 25010](https://www.iso.org/standard/78176.html), [AWS Well-Architected Framework](https://aws.amazon.com/architecture/well-architected/), [ATAM](https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/)
 
-**Datasets:** none is shipped. The Stack Overflow Developer Survey 2024 is cited as a proxy for hiring pools, and the exchange rate is the FBIL reference rate of September 2026.
+**Datasets:** none is shipped. The Stack Overflow Developer Survey 2024 is cited as a proxy for hiring pools, and INR is converted at a fixed planning rate of 96 INR to 1 USD.
 
 **Data sources:**
 

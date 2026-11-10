@@ -1,4 +1,4 @@
-# Exact versions from a fresh install of requirements.txt on Python 3.12 (Windows 11), 3 Oct 2026.
+# Exact versions from a fresh install of requirements.txt on Python 3.12 (Windows 11); the tests pass with them.
 # All tests pass with these. Install with: python -m pip install -r requirements.lock.txt
 annotated-doc==0.0.5
 annotated-types==0.8.0

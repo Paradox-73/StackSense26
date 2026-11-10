@@ -1,4 +1,4 @@
-"""Facts refreshed against the vendors' and regulators' pages on 2026-10-09."""
+"""Facts refreshed against the vendors' and regulators' own pages."""
 import json
 from pathlib import Path
 

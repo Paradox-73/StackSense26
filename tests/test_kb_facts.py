@@ -1,4 +1,4 @@
-"""Hard-filter facts checked against vendor pages in October 2026 (each changed KB entry carries facts_as_of)."""
+"""Hard-filter facts from the vendors' own pages (each entry whose facts were corrected cites the page it rests on)."""
 import json
 from pathlib import Path
 
@@ -48,10 +48,11 @@ def test_residency_caveat_applies_to_india_too():
         assert any("Authentication runs only in US" in x for x in r["stack"]["backend"]["explanation"]["risks"])
 
 
-def test_changed_facts_carry_a_date():
+def test_corrected_facts_cite_their_pages():
     kb = load_kb()
     for iid in ("flyio", "cloudflare", "vercel", "render", "netlify", "digitalocean", "firebase", "supabase"):
-        assert kb["index"][iid].get("facts_as_of"), iid
+        sources = kb["index"][iid].get("sources") or []
+        assert sources and all(u.startswith("https://") for u in sources), iid
 
 
 def test_compliance_floors():

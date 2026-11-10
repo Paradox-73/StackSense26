@@ -1,6 +1,5 @@
 {
   "layer": "backend",
-  "curated_on": "2026-10-01",
   "cost_note": "Self-hosted frameworks cost nothing themselves; compute is counted under hosting. BaaS products bill directly (cost_usd per scale tier: <1k, 1k-10k, 10k-100k, 100k-1M, 1M-10M, >10M DAU).",
   "items": [
     {
@@ -926,8 +925,7 @@
         "storage_usd_per_gb": 0.125,
         "note": "Pro plan includes 8 GB of database disk; more disk is billed per GB-month.",
         "source": "https://supabase.com/pricing"
-      },
-      "facts_as_of": "2026-10-03"
+      }
     },
     {
       "id": "firebase",
@@ -1054,8 +1052,7 @@
         "southeast_asia"
       ],
       "residency_note": "Cloud Firestore, Cloud Storage and Cloud Functions can be pinned to a location (EU multi-region eur3, single regions such as europe-west3 Frankfurt, asia-south1 Mumbai and asia-south2 Delhi), but Firebase Authentication runs only in US data centres.",
-      "residency_caveat": "Firebase Authentication runs only in US data centres: keep sign-in details (e-mail, phone) in an identity provider inside the region and sign users into Firebase with custom tokens that carry only an opaque user ID, and pin Firestore, Storage and Functions to an in-region location",
-      "facts_as_of": "2026-10-04"
+      "residency_caveat": "Firebase Authentication runs only in US data centres: keep sign-in details (e-mail, phone) in an identity provider inside the region and sign users into Firebase with custom tokens that carry only an opaque user ID, and pin Firestore, Storage and Functions to an in-region location"
     },
     {
       "id": "no_custom_backend",
