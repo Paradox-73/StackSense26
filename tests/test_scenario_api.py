@@ -39,12 +39,20 @@ def test_post_returns_the_engine_output():
     assert r.status_code == 200 and r.json() == run(doc)
 
 
-@pytest.mark.parametrize("body", ['{"scenario_id": ', "[1, 2]", '"text"', "", "null", "[" * 3000])
+@pytest.mark.parametrize("body", ['{"scenario_id": ', "[]", '"text"', "", "null", "[" * 3000, "[" + ", ".join(["{}"] * 101) + "]"])
 def test_bodies_that_are_not_scenarios_are_invalid_input_not_errors(body):
     r = client.post("/api/scenario", content=body, headers={"Content-Type": "application/json"})
     assert r.status_code == 200
     out = r.json()
     assert out["status"] == "invalid_input" and out["stack"] is None and out["validation_errors"]
+
+
+def test_an_array_of_scenarios_returns_an_array_of_outputs():
+    """The organisers share the public scenarios as one JSON array; each element is run on its own."""
+    docs = [json.loads(p.read_text(encoding="utf-8")) for p in sorted((ROOT / "scenarios" / "public").glob("P*.json"))]
+    r = client.post("/api/scenario", json=docs + [1])
+    assert r.status_code == 200 and r.json() == [run(d) for d in docs] + [run(1)]
+    assert [o["scenario_id"] for o in r.json()] == ["P1", "P2", "P3", "P4", "P5", "P6", None]
 
 
 def test_page_is_served_and_health_reports_the_switch(monkeypatch):

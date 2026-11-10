@@ -395,3 +395,11 @@ def test_a_relaxed_preference_is_named_in_assumptions():
                    infrastructure={"cloud_preference": "none", "data_residency": "eu"}))
     relaxed = [w for w in out["warnings"] if w["code"] == "RELAXED_CONSTRAINT"]
     assert all(any(a.startswith("Relaxed or flagged (RELAXED_CONSTRAINT)") for a in out["assumptions"]) for _ in relaxed)
+
+
+def test_a_long_description_is_accepted_and_moves_nothing(outputs):
+    """Table 3.1 sets no maximum length for project.description (the request body limit bounds the size), and the
+    description is never parsed for a scenario file."""
+    out = run(edit("P2", project={"description": "Customers book electricians and plumbers. " * 500}))
+    assert out["status"] == outputs["P2"]["status"] and not out["validation_errors"]
+    assert core(out) == core(outputs["P2"])

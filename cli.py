@@ -7,6 +7,7 @@
     python cli.py --preset hipaa_telehealth --adr   # one decision record per layer
     python cli.py --scenario scenarios/public/P2.json                    # standard scenario file -> output JSON
     python cli.py --scenario scenarios/public --out outputs --no-llm     # every file in a folder -> outputs/<id>_output.json
+    python cli.py --scenario all.json --out outputs                      # a JSON array of scenarios -> one file per element
 """
 from __future__ import annotations
 
@@ -30,8 +31,8 @@ def main(argv=None) -> int:
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--adr", action="store_true", help="print architecture decision records instead of the report")
-    ap.add_argument("--scenario", help="a scenario file in the standard schema (problem statement section 3.2), or a "
-                                       "folder of them")
+    ap.add_argument("--scenario", help="a scenario file in the standard schema (problem statement section 3.2), a file "
+                                       "holding a JSON array of scenarios, or a folder of such files")
     ap.add_argument("--out", help="with --scenario: an output file, or a folder for <scenario_id>_output.json files; "
                                   "without it the output JSON is printed")
     ap.add_argument("--no-llm", action="store_true", help="switch every language-model feature off (STACKSENSE_LLM=off)")
@@ -98,17 +99,24 @@ def run_scenarios(src: Path, out: str | None) -> int:
             continue
         text = json.dumps(result, indent=2, ensure_ascii=False) + "\n"
         if not out:
-            sys.stdout.write(text)
+            sys.stdout.write(text)  # a file holding an array of scenarios prints an array of outputs
             continue
-        sid = re.sub(r"[^A-Za-z0-9_.-]", "_", str(result.get("scenario_id") or f.stem))
-        if sid in written:  # two files with one scenario_id must not overwrite each other's output
-            sid = f"{sid}_{re.sub(r'[^A-Za-z0-9_.-]', '_', f.stem)}"
-        written.add(sid)
-        dest = Path(out) / f"{sid}_output.json" if folder else Path(out)
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(text, encoding="utf-8")
-        picks = " | ".join(result["stack"][l]["choice"] for l in LAYERS) if result.get("stack") else "no stack"
-        print(f"{sid:10} {result['status']:17} {picks}  -> {dest}")
+        if not folder:
+            Path(out).parent.mkdir(parents=True, exist_ok=True)
+            Path(out).write_text(text, encoding="utf-8")
+        results = result if isinstance(result, list) else [result]
+        for i, one in enumerate(results, 1):
+            stem = re.sub(r"[^A-Za-z0-9_.-]", "_", f.stem if len(results) == 1 else f"{f.stem}_{i}")
+            sid = re.sub(r"[^A-Za-z0-9_.-]", "_", str(one.get("scenario_id") or stem))
+            if sid in written:  # two scenarios with one scenario_id must not overwrite each other's output
+                sid = f"{sid}_{stem}"
+            written.add(sid)
+            dest = Path(out) / f"{sid}_output.json" if folder else Path(out)
+            if folder:
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_text(json.dumps(one, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            picks = " | ".join(one["stack"][l]["choice"] for l in LAYERS) if one.get("stack") else "no stack"
+            print(f"{sid:10} {one['status']:17} {picks}  -> {dest}")
     return 1 if failed else 0
 
 

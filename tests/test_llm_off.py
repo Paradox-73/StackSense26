@@ -57,6 +57,25 @@ def test_cli_writes_one_output_file_per_scenario(tmp_path, capsys, monkeypatch):
     assert "P4" in capsys.readouterr().out
 
 
+def test_cli_runs_each_scenario_of_an_array_file(tmp_path, capsys):
+    """The organisers share the public scenarios as one JSON array: each element gets its own output file, or the
+    printed output is a JSON array."""
+    docs = [json.loads(p.read_text(encoding="utf-8")) for p in PUBLIC]
+    del docs[1]["scenario_id"]
+    src = tmp_path / "public_scenarios.json"
+    src.write_text(json.dumps(docs), encoding="utf-8")
+    assert cli.main(["--scenario", str(src), "--out", str(tmp_path / "out")]) == 0
+    names = sorted(f.name for f in (tmp_path / "out").iterdir())
+    assert names == ["P1_output.json", "P3_output.json", "P4_output.json", "P5_output.json", "P6_output.json",
+                     "public_scenarios_2_output.json"], names
+    assert json.loads((tmp_path / "out" / "P4_output.json").read_text(encoding="utf-8")) == run(docs[3])
+    capsys.readouterr()
+    assert cli.main(["--scenario", str(src)]) == 0
+    assert json.loads(capsys.readouterr().out) == [run(d) for d in docs]
+    assert cli.main(["--scenario", str(src), "--out", str(tmp_path / "all.json")]) == 0
+    assert json.loads((tmp_path / "all.json").read_text(encoding="utf-8")) == [run(d) for d in docs]
+
+
 def test_cli_reports_a_file_that_is_not_json_as_invalid_input(tmp_path, capsys):
     bad = tmp_path / "bad.json"
     bad.write_text('{"scenario_id": "x", ', encoding="utf-8")

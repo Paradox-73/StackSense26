@@ -126,6 +126,7 @@ UI_POINTER = re.compile(r"; see the '[^']+' scenario under 'What would change'\.
 # DRIVERS_SCORED), then at most DRIVERS_RULED fields whose hard constraints ruled rival options out.
 DRIVER_MIN_POINTS = 1.0
 MAX_NUMBER = 1e12  # larger counts, gigabytes or dollars are typing mistakes, and overflow float arithmetic
+MAX_SCENARIOS_PER_FILE = 100  # an array file runs each element; this bounds the work one request can ask for
 DRIVERS_SCORED = 4
 DRIVERS_RULED = 3
 # What happens when an optional field with no fixed default is absent (the others use the default in FIELDS).
@@ -311,8 +312,6 @@ def validate(doc) -> tuple[dict, list[dict], list[str], list[str]]:
             errors.append({"field": path, "message": err})
         elif path == "project.platforms" and not value:
             errors.append({"field": path, "message": "must list at least one platform"})
-        elif path == "project.description" and len(value) > 5000:
-            errors.append({"field": path, "message": "must be at most 5,000 characters"})
         else:
             fields[path] = value
     prio = doc.get("priorities") if isinstance(doc.get("priorities"), dict) else {}
@@ -751,16 +750,25 @@ def _summary(result: dict, stack: dict, style: str, cost: dict) -> str:
     return f"{first} About {money} a month. {why.split('. ')[0].rstrip('.')}."
 
 
-def run_text(text: str) -> dict:
-    """run() on the text of a scenario file; text that is not JSON is an invalid_input result, not an exception."""
+def run_text(text: str) -> dict | list[dict]:
+    """run() on the text of a scenario file. A JSON array holds several scenarios (the organisers share the public ones
+    that way), and gives a list with one output per element. Text that is not JSON is one invalid_input result, not
+    an exception."""
     try:
         doc = json.loads(text)
     except (ValueError, RecursionError) as e:  # RecursionError: arrays or objects nested past Python's limit
-        out = run(None)
-        out["validation_errors"] = [{"field": "(file)", "message": f"not valid JSON: {e}" if isinstance(e, ValueError)
-                                     else "nested too deeply to be a scenario file"}]
-        return out
+        return _file_error(f"not valid JSON: {e}" if isinstance(e, ValueError) else "nested too deeply to be a scenario file")
+    if isinstance(doc, list) and doc:
+        if len(doc) > MAX_SCENARIOS_PER_FILE:
+            return _file_error(f"holds {len(doc):,} scenarios; one file runs at most {MAX_SCENARIOS_PER_FILE}")
+        return [run(x) for x in doc]
     return run(doc)
+
+
+def _file_error(message: str) -> dict:
+    out = run(None)
+    out["validation_errors"] = [{"field": "(file)", "message": message}]
+    return out
 
 
 def run(doc) -> dict:

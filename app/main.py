@@ -172,12 +172,14 @@ def scenario_example(name: str):
 
 @app.post("/api/scenario", summary="Run a scenario file in the standard schema", tags=["scenario"],
           openapi_extra={"requestBody": {"required": True, "content": {"application/json": {"schema": {
-              "type": "object", "description": "A scenario in the standard schema (problem statement section 3.2)."}}}}})
+              "type": ["object", "array"], "description": "A scenario in the standard schema (problem statement section 3.2), "
+                                                         "or a JSON array of scenarios."}}}}})
 async def api_scenario(request: Request):
     """Body: the scenario JSON. Returns the problem statement's section 4 output: status, summary, architecture_style, stack
     (frontend, backend, database, hosting, supporting), estimated_monthly_cost_usd, warnings, assumptions and
-    validation_errors. Invalid input gives status invalid_input with field-level errors, not an HTTP error. No language
-    model is involved, so the result is the same with the LLM-off switch set."""
+    validation_errors. A JSON array of scenarios returns an array with one output per element. Invalid input gives
+    status invalid_input with field-level errors, not an HTTP error. No language model is involved, so the result is
+    the same with the LLM-off switch set."""
     text = (await request.body()).decode("utf-8-sig", errors="replace")
     return await run_in_threadpool(run_text, text)  # the engine is CPU work: keep it off the event loop
 
