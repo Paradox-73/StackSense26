@@ -48,3 +48,4 @@
 .sc details { margin-top: 14px; font-size: 14px; }
 .sc summary { cursor: pointer; font-weight: 600; }
 @media (max-width: 860px) { .sc { grid-template-columns: 1fr; } }
+.sc-btn:has(+ input:focus-visible) { outline: 2px solid var(--gold); outline-offset: 2px; } /* the file input is visually hidden; its label shows the focus */

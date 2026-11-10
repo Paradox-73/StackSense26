@@ -1,10 +1,10 @@
 /* Scenario-file page: a form for every field of the standard input schema (GET /api/scenario/fields), import of a
-   scenario JSON, a run through POST /api/scenario, and export of the input and the output as JSON. The loaded file is
+   scenario JSON (or one element of an array of them), a run through POST /api/scenario, and export of the input and the output as JSON. The loaded file is
    kept as it is (unknown or invalid values included) and only fields the user edits are changed in it. */
 "use strict";
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const S = { fields: [], doc: { scenario_id: "my_scenario" }, out: null, name: "my_scenario" };
+const S = { fields: [], doc: { scenario_id: "my_scenario" }, out: null, outFor: null, run: 0, name: "my_scenario" };
 const SECTION_NAMES = { project: "Project", scale: "Scale", team: "Team", budget: "Budget", timeline: "Timeline",
   infrastructure: "Infrastructure", requirements: "Requirements", compliance: "Compliance", priorities: "Priorities (1 to 5)" };
 const CORE = ["frontend", "backend", "database", "hosting"];
@@ -72,7 +72,9 @@ function readControl(el) {
   const f = S.fields.find((x) => x.path === el.dataset.path);
   if (f.kind === "enums") return [...el.querySelectorAll("input:checked")].map((x) => x.value);
   const raw = el.value.trim();
-  if (raw === "") return undefined;
+  /* An emptied list is the empty list and an emptied latency is null (both allowed by the schema); an emptied scalar is
+     removed so that it takes its default. */
+  if (raw === "") return f.kind === "texts" ? [] : f.kind === "latency" ? null : undefined;
   if (f.kind === "bool") return raw === "true";
   if (f.kind === "texts") return raw.split(f.path === "team.languages" ? /\n|,/ : /\n/).map((x) => x.trim()).filter(Boolean);
   if (f.kind === "text" || f.kind === "enum") return raw;
@@ -90,9 +92,17 @@ function component(layer, c) {
     ${c.tradeoffs.length ? `<div class="sc-k">Trade-offs</div><ul>${c.tradeoffs.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}</article>`;
 }
 
+/* The output can be downloaded only while it belongs to the form as it stands: outFor is the input text it was run on. */
+const outCurrent = () => !!S.out && S.outFor === JSON.stringify(S.doc);
+
+function syncOut() {
+  $("#sc-dl-out").disabled = !outCurrent();
+  if (S.out && !outCurrent()) say("The form changed after this run; run it again to download the output for it.");
+}
+
 function renderOut() {
   const o = S.out, box = $("#sc-out");
-  $("#sc-dl-out").disabled = !o;
+  syncOut();
   if (!o) { box.innerHTML = `<p class="muted">Load a scenario file, or pick a public example, then run it.</p>`; return; }
   const list = (items, fn) => `<ul class="sc-list">${items.map(fn).join("")}</ul>`;
   let h = `<div class="sc-head"><span class="sc-status ${esc(o.status)}">${esc(o.status)}</span>${
@@ -126,31 +136,53 @@ function download(name, data) {
 const say = (t) => { $("#sc-msg").textContent = t; };
 
 async function runScenario() {
+  const sent = JSON.stringify(S.doc), run = ++S.run;
   say("Running...");
-  try {
-    S.out = await api("/api/scenario", S.doc);
-    say(`Done: ${S.out.status}.`);
-  } catch (e) { S.out = null; say(`Could not run the scenario: ${e.message}.`); }
+  let out = null, err = null;
+  try { out = await api("/api/scenario", S.doc); } catch (e) { err = e; }
+  if (run !== S.run) return;  /* a later run or load replaced this one */
+  S.out = out; S.outFor = sent;
+  say(err ? `Could not run the scenario: ${err.message}.` : `Done: ${out.status}.`);
   renderOut();
 }
 
 function load(doc, name) {
   S.doc = doc;  /* kept as loaded, even when it is not an object: the engine then reports invalid_input */
   S.name = String((S.doc && S.doc.scenario_id) ?? name ?? "scenario").replace(/[^A-Za-z0-9_.-]/g, "_");
-  S.out = null;
+  S.out = null; S.outFor = null;
   for (const b of document.querySelectorAll("#sc-ex button")) b.setAttribute("aria-pressed", String(b.dataset.name === name));
   renderForm(); renderOut();
   return runScenario();
 }
 
-async function loadFile(file) {
+function loadText(text, fileName) {
   let doc;
-  try { doc = JSON.parse(await file.text()); } catch (e) {
-    say(`${file.name} is not valid JSON (${e.message}); nothing was loaded.`);
+  try { doc = JSON.parse(text); } catch (e) {
+    say(`${fileName} is not valid JSON (${e.message}); nothing was loaded.`);
     return;
   }
-  say(`Loaded ${file.name}.`);
-  return load(doc, file.name.replace(/\.json$/i, ""));
+  const name = fileName.replace(/\.json$/i, "");
+  if (Array.isArray(doc) && doc.length) return offerChoice(doc, name);
+  say(`Loaded ${fileName}.`);
+  return load(doc, name);
+}
+
+/* An array file (such as the organisers' file of all public scenarios): the user picks the element to load. */
+function offerChoice(list, name) {
+  const label = (x, i) => {
+    const o = x && typeof x === "object" && !Array.isArray(x) ? x : {};
+    return `${show(o.scenario_id) || `#${i + 1}`}${o.project && o.project.name ? `: ${show(o.project.name)}` : ""}`;
+  };
+  say(`${name}.json holds ${list.length} scenarios; pick one.`);
+  $("#sc-out").innerHTML = `<p class="muted">Which of the ${list.length} scenarios in the file?</p><div class="sc-bar">${
+    list.map((x, i) => `<button type="button" class="sc-btn" data-i="${i}">${esc(label(x, i))}</button>`).join("")}</div>`;
+  $("#sc-out").onclick = (e) => {
+    const b = e.target.closest("button[data-i]");
+    if (!b) return;
+    $("#sc-out").onclick = null;
+    say(`Loaded ${label(list[b.dataset.i], Number(b.dataset.i))} from ${name}.json.`);
+    load(list[b.dataset.i], name);
+  };
 }
 
 async function init() {
@@ -165,15 +197,16 @@ async function init() {
     if (!el) return;
     if (!S.doc || typeof S.doc !== "object" || Array.isArray(S.doc)) S.doc = {};
     setPath(S.doc, el.dataset.path, readControl(el));
+    syncOut();
   });
   $("#sc-ex").addEventListener("click", async (e) => {
     const b = e.target.closest("button[data-name]");
     if (b) load(await api(`/api/scenario/examples/${encodeURIComponent(b.dataset.name)}`), b.dataset.name);
   });
-  $("#sc-file").addEventListener("change", (e) => { if (e.target.files[0]) loadFile(e.target.files[0]); e.target.value = ""; });
+  $("#sc-file").addEventListener("change", async (e) => { const f = e.target.files[0]; e.target.value = ""; if (f) loadText(await f.text(), f.name); });
   $("#sc-run").addEventListener("click", runScenario);
   $("#sc-dl-in").addEventListener("click", () => download(`${S.name}.json`, S.doc));
-  $("#sc-dl-out").addEventListener("click", () => S.out && download(`${S.name}_output.json`, S.out));
+  $("#sc-dl-out").addEventListener("click", () => outCurrent() && download(`${S.name}_output.json`, S.out));
   const want = new URLSearchParams(location.search).get("example");
   if (want && ex.some((x) => x.name === want)) load(await api(`/api/scenario/examples/${encodeURIComponent(want)}`), want);
 }
