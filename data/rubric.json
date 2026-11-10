@@ -1,0 +1,17 @@
+{
+  "scale": "Every technology score is an integer from 1 (poor) to 5 (excellent) for that criterion. Scores are curated by hand from the vendor documents listed on each technology; they are judgements anchored to the definitions below, not measurements.",
+  "criteria": {
+    "ease": {"meaning": "How gentle the learning curve and first setup are", "1": "Weeks of study before a first working feature", "3": "A few days with the official tutorial", "5": "A working app in an afternoon from a quickstart"},
+    "ops": {"meaning": "How little operational work the team does (patching, scaling, backups)", "1": "The team runs servers, upgrades and backups itself", "3": "Managed service, but the team tunes capacity and configuration", "5": "Fully managed; nothing to patch or scale by hand"},
+    "maturity": {"meaning": "Years in production use, stability of the API, size of the ecosystem", "1": "Under 2 years old or breaking changes every release", "3": "3 to 7 years, stable core, smaller ecosystem", "5": "10+ years, long-term support releases, very large ecosystem"},
+    "performance": {"meaning": "Typical speed and resource use under load for this layer", "1": "Noticeably slower or heavier than peers in public benchmarks", "3": "Average for its category", "5": "Among the fastest in its category in public benchmarks"},
+    "scalability": {"meaning": "How far it grows before a redesign is needed", "1": "Single machine or tens of requests per second", "3": "Thousands of requests per second with standard tuning", "5": "Documented use at hundreds of thousands of requests per second or more"},
+    "realtime": {"meaning": "Support for long-lived connections and live updates", "1": "No persistent connections; polling only", "3": "Possible with an add-on service or beta feature", "5": "Built in and documented for production use"},
+    "seo": {"meaning": "Whether crawlers receive finished HTML", "1": "Client-side rendering only", "3": "Server rendering available but not the default or needs extra setup", "5": "Server or static rendering by default"},
+    "velocity": {"meaning": "How quickly a small team ships features", "1": "Much boilerplate; every feature is custom work", "3": "Good libraries for common needs, some glue code", "5": "Batteries included: auth, data access and admin come ready"},
+    "hiring": {"meaning": "Size of the pool of developers who already know it", "1": "Fewer than 1 in 50 developers in public surveys", "3": "About 1 in 10 developers", "5": "More than 1 in 4 developers"},
+    "structure": {"meaning": "Support for keeping a large codebase organised", "1": "No conventions; structure is up to each developer", "3": "Conventions exist but are optional", "5": "Opinionated structure enforced by the framework"},
+    "interactivity": {"meaning": "Fit for rich, stateful user interfaces", "1": "Page-at-a-time rendering only", "3": "Sprinkled interactivity with some client state", "5": "Component model built for complex client state"},
+    "offline": {"meaning": "Support for working without a network connection", "1": "Needs a connection at all times", "3": "Can cache data; sync is hand-written", "5": "Built-in local storage and sync"}
+  }
+}
