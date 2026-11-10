@@ -1,0 +1,354 @@
+{
+  "about": "Fixed sentence templates for the justification paragraph at the top of each layer. A sentence is used when its 'when' conditions hold and every {placeholder} it names has a value; the first matching sentence marked 'open' starts the paragraph, then the layer sentences in order, then the shared closing sentences, up to 5 sentences. A sentence marked 'filler' is added only when the paragraph would otherwise have fewer than 3 sentences. When hosting is provided by the BaaS, only the sentences with 'provided' are used. Placeholders are filled from the project's answers, the derived numbers and the knowledge-base fields of the pick (each knowledge-base item lists its sources). Conditions: kind (the pick's kind), provided (hosting is provided by the BaaS), plus the knowledge-base line conditions (stack_any, stack_none, app_type, realtime, compliance_any, cloud_preference, india, eu, multi_region) and seo, consistency, read_write (answer values).",
+  "max_sentences": 5,
+  "layers": {
+    "frontend": [
+      {
+        "open": true,
+        "when": {
+          "kind": [
+            "mobile"
+          ]
+        },
+        "text": "{name} is the app for {app_phrase} with about {users} {user_noun} (~{peak} requests/s at peak), built by {team_phrase} in {weeks} weeks."
+      },
+      {
+        "open": true,
+        "text": "{name} is the frontend for {app_phrase} with about {users} {user_noun} (~{peak} requests/s at peak), built by {team_phrase} in {weeks} weeks."
+      },
+      {
+        "when": {
+          "seo": [
+            "important",
+            "critical"
+          ],
+          "kind": [
+            "web"
+          ]
+        },
+        "min": {
+          "seo_s": 4
+        },
+        "text": "Search visibility is marked {seo_label}, and it serves full HTML from the server or the build (SEO {seo_s}/5), so crawlers read the content without running JavaScript."
+      },
+      {
+        "when": {
+          "seo": [
+            "none",
+            "low"
+          ],
+          "kind": [
+            "web"
+          ]
+        },
+        "min": {
+          "inter_s": 4
+        },
+        "text": "Search visibility is marked {seo_label}, so rendering in the browser is acceptable, and it scores {inter_s}/5 for rich, app-like interaction."
+      },
+      {
+        "when": {
+          "realtime": [
+            "core"
+          ]
+        },
+        "min": {
+          "rt_s": 4
+        },
+        "text": "Realtime is core to the product, and it scores {rt_s}/5 on realtime fit (live updates without page reloads)."
+      },
+      {
+        "when": {
+          "stack_any": [
+            "react_native",
+            "flutter"
+          ]
+        },
+        "text": "One codebase builds both the iOS and the Android app, which halves the work for {team_phrase}."
+      },
+      {
+        "when": {
+          "stack_any": [
+            "native_mobile"
+          ]
+        },
+        "text": "Native Swift and Kotlin apps give full platform APIs and the best performance, at the cost of two codebases."
+      },
+      {
+        "filler": true,
+        "text": "Its strongest weighted criterion for your answers is {lead_crit}: {lead_s}/5 at weight {lead_w}, the largest share of its score."
+      }
+    ],
+    "backend": [
+      {
+        "open": true,
+        "when": {
+          "kind": [
+            "none"
+          ]
+        },
+        "text": "The site serves about {users} daily users read-only, so the pages are built once and served as files: there is no API server to run, patch or pay for."
+      },
+      {
+        "open": true,
+        "text": "{name} serves the API at about {peak} requests/s at peak ({tier}) for {team_phrase}."
+      },
+      {
+        "when": {
+          "kind": [
+            "baas"
+          ]
+        },
+        "text": "As a hosted backend it supplies sign-in, the database API and file storage, so {team_phrase} only needs to write the business rules in the {weeks} weeks available."
+      },
+      {
+        "when": {
+          "kind": [
+            "server"
+          ],
+          "functions": 0,
+          "services": 0
+        },
+        "text": "It runs as a long-running {lang} service, so background jobs, WebSockets and database connection pools live in one deployable process."
+      },
+      {
+        "when": {
+          "kind": [
+            "server"
+          ],
+          "functions": 0,
+          "services": 1
+        },
+        "text": "It runs as a few long-running {lang} services, one per team, each deployed on its own with its own background jobs, WebSockets and database connection pool."
+      },
+      {
+        "when": {
+          "kind": [
+            "server"
+          ],
+          "functions": 1
+        },
+        "text": "On {host} it runs as serverless functions, one short invocation per request, so background jobs go to a queue that calls the functions, live updates to a managed realtime service, and database connections through a pooler."
+      },
+      {
+        "when": {
+          "kind": [
+            "faas"
+          ]
+        },
+        "text": "Functions scale per request and cost nothing while idle, which suits ~{peak} requests/s of uneven traffic."
+      },
+      {
+        "when": {
+          "compliance_any": [
+            "hipaa"
+          ],
+          "kind": [
+            "baas"
+          ]
+        },
+        "text": "For HIPAA: {hipaa_note}."
+      },
+      {
+        "when": {
+          "realtime": [
+            "core"
+          ]
+        },
+        "min": {
+          "rt_s": 4
+        },
+        "text": "Realtime is core, and it scores {rt_s}/5 on realtime fit."
+      },
+      {
+        "filler": true,
+        "text": "Its strongest weighted criterion for your answers is {lead_crit}: {lead_s}/5 at weight {lead_w}, the largest share of its score."
+      }
+    ],
+    "database": [
+      {
+        "open": true,
+        "when": {
+          "kind": [
+            "static"
+          ]
+        },
+        "text": "The content is about {data_gb} GB of files kept in git, so there is no database server to run, back up or pay for."
+      },
+      {
+        "open": true,
+        "text": "Your data is mainly {shape} and reaches about {data_gb} GB within 12 months; {name} fits {shape} data {fit}/5."
+      },
+      {
+        "when": {
+          "consistency": [
+            "strong"
+          ]
+        },
+        "min": {
+          "strong": 1
+        },
+        "text": "You need strong consistency, and {name} gives it: a read after a write always sees that write."
+      },
+      {
+        "when": {
+          "read_write": [
+            "write_heavy"
+          ]
+        },
+        "text": "The workload is write-heavy, and its write scaling scores {write_s}/5."
+      },
+      {
+        "when": {
+          "realtime": [
+            "core"
+          ]
+        },
+        "min": {
+          "rt_s": 4
+        },
+        "text": "Realtime is core, and it can push changes to clients (realtime fit {rt_s}/5)."
+      },
+      {
+        "filler": true,
+        "text": "Its strongest weighted criterion for your answers is {lead_crit}: {lead_s}/5 at weight {lead_w}, the largest share of its score."
+      }
+    ],
+    "hosting": [
+      {
+        "open": true,
+        "when": {
+          "provided": true
+        },
+        "text": "With about {users} daily users on iOS and Android, nothing of yours needs separate hosting: {baas} runs the backend and the app stores ship the app."
+      },
+      {
+        "when": {
+          "provided": true
+        },
+        "text": "If you add a web landing page, {optional_host} can serve it; it is optional."
+      },
+      {
+        "when": {
+          "provided": true
+        },
+        "text": "The backend's estimated bill, {backend_cost} a month against a total budget of {budget} a month, covers what would otherwise be hosting."
+      },
+      {
+        "open": true,
+        "text": "{name} hosts the stack for {regions_txt} at a {availability}% availability target."
+      },
+      {
+        "when": {
+          "kind": [
+            "frontend_paas"
+          ]
+        },
+        "text": "It serves the pages from a global CDN and runs server code as functions, which covers ~{peak} requests/s at peak without servers to manage."
+      },
+      {
+        "when": {
+          "kind": [
+            "static_cdn"
+          ]
+        },
+        "text": "It serves pre-built files from a bucket through a global CDN, which covers ~{peak} requests/s at peak; it runs no server code."
+      },
+      {
+        "when": {
+          "kind": [
+            "containers",
+            "kubernetes",
+            "paas",
+            "vps",
+            "onprem"
+          ],
+          "functions": 0
+        },
+        "min": {
+          "long_running": 1
+        },
+        "text": "It runs the {backend} API as long-running processes{ws_phrase}, sized for ~{peak} requests/s at peak."
+      },
+      {
+        "when": {
+          "kind": [
+            "faas"
+          ]
+        },
+        "text": "It runs the API as functions behind a managed gateway, scaling per request up to ~{peak} requests/s at peak."
+      },
+      {
+        "when": {
+          "compliance_any": [
+            "hipaa"
+          ]
+        },
+        "min": {
+          "hipaa": 1
+        },
+        "text": "Under HIPAA it can sign a Business Associate Agreement{hipaa_min}."
+      },
+      {
+        "when": {
+          "compliance_any": [
+            "pci_dss"
+          ]
+        },
+        "min": {
+          "pci": 1
+        },
+        "text": "For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it."
+      },
+      {
+        "when": {
+          "compliance_any": [
+            "data_residency_india"
+          ],
+          "kind": [
+            "frontend_paas",
+            "paas",
+            "containers",
+            "kubernetes",
+            "faas",
+            "static_cdn",
+            "vps"
+          ]
+        },
+        "text": "It has a region in India, so data can stay in the country."
+      },
+      {
+        "when": {
+          "compliance_any": [
+            "data_residency_india"
+          ],
+          "kind": [
+            "onprem"
+          ]
+        },
+        "text": "It runs in your own data centre, so the data stays in India as long as your servers are there."
+      },
+      {
+        "filler": true,
+        "text": "Its strongest weighted criterion for your answers is {lead_crit}: {lead_s}/5 at weight {lead_w}, the largest share of its score."
+      }
+    ],
+    "closing": [
+      {
+        "text": "Its share of the estimated bill is {cost} a month, against a total budget of {budget} a month."
+      },
+      {
+        "when": {
+          "tie": false
+        },
+        "text": "It leads the runner-up, {runner}, by {margin} (points of the overall stack score, the average of the four layer scores)."
+      },
+      {
+        "when": {
+          "tie": true
+        },
+        "text": "{runner} is within {margin}, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note)."
+      }
+    ]
+  }
+}
