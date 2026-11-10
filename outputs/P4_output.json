@@ -2,7 +2,7 @@
   "scenario_id": "P4",
   "engine_version": "1.0.0",
   "status": "ok",
-  "summary": "A modular monolith build: React SPA on the frontend, Java/Kotlin + Spring Boot for the backend, PostgreSQL for data, hosted on AWS ECS on Fargate. About $1,945-7,310 a month. With 8 engineer(s), one deployable with strict internal module boundaries is the fastest and cheapest to run; modules can be extracted into services later.",
+  "summary": "A modular monolith build: React SPA on the frontend, Java/Kotlin + Spring Boot for the backend, PostgreSQL for data, hosted on AWS ECS on Fargate. About $1,960-7,240 a month. With 8 engineer(s), one deployable with strict internal module boundaries is the fastest and cheapest to run; modules can be extracted into services later.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -299,8 +299,8 @@
     ]
   },
   "estimated_monthly_cost_usd": {
-    "min": 1945,
-    "max": 7310,
+    "min": 1960,
+    "max": 7240,
     "assumptions": [
       "Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
       "Scale tier: Large (5,000-50,000 users online at once)",
@@ -310,7 +310,7 @@
       "Media delivery: $90-810 (~9,000 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)",
       "Phone login (SMS OTP): $180-450 (~90,000 SMS a month (one login every ~20 days per active user) at $0.002-0.005 each)",
       "Static frontend: AWS S3 + CloudFront (static): $15-200 (Large (5,000-50,000 users online at once) price band (the app's scale))",
-      "Model serving: CPU endpoint: $60-250 (one or two always-on small CPU instances behind a real-time endpoint (about $0.10-0.17 an hour each, https://aws.amazon.com/sagemaker/pricing/))"
+      "Model serving: CPU endpoint: $75-180 (one or two always-on CPU instances behind a real-time endpoint: one ml.c5.large at $0.102 an hour to two ml.m5.large at $0.115-0.121 (US East, Mumbai), https://aws.amazon.com/sagemaker/pricing/)"
     ]
   },
   "warnings": [],

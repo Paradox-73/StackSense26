@@ -2,7 +2,7 @@
   "scenario_id": "P5",
   "engine_version": "1.0.0",
   "status": "ok",
-  "summary": "A modular monolith build: Server-rendered HTML + HTMX on the frontend, C# + ASP.NET Core for the backend, Microsoft SQL Server / Azure SQL Database for data, hosted on Azure App Service / Container Apps. About $44-375 a month. With 2 engineer(s), one deployable with strict internal module boundaries is the fastest and cheapest to run; modules can be extracted into services later.",
+  "summary": "A modular monolith build: Server-rendered HTML + HTMX on the frontend, C# + ASP.NET Core for the backend, Microsoft SQL Server for data, hosted on Azure App Service / Container Apps. About $44-375 a month. With 2 engineer(s), one deployable with strict internal module boundaries is the fastest and cheapest to run; modules can be extracted into services later.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -76,8 +76,8 @@
       ]
     },
     "database": {
-      "choice": "Microsoft SQL Server / Azure SQL Database: Azure SQL Database (General Purpose, serverless or provisioned)",
-      "justification": "Your data is mainly relational and reaches about 20 GB within 12 months; Microsoft SQL Server / Azure SQL Database fits relational data 5/5. You need strong consistency, and Microsoft SQL Server / Azure SQL Database gives it: a read after a write always sees that write. Its share of the estimated bill is $22-$225 a month, against a total budget of $300 a month. It leads the runner-up, PostgreSQL, by 2.2 stack points.",
+      "choice": "Microsoft SQL Server: Azure SQL Database (General Purpose, serverless or provisioned)",
+      "justification": "Your data is mainly relational and reaches about 20 GB within 12 months; Microsoft SQL Server fits relational data 5/5. You need strong consistency, and Microsoft SQL Server gives it: a read after a write always sees that write. Its share of the estimated bill is $22-$225 a month, against a total budget of $300 a month. It leads the runner-up, PostgreSQL, by 2.2 stack points.",
       "driven_by": [
         "infrastructure.existing_systems",
         "team.languages",
@@ -97,7 +97,7 @@
         },
         {
           "choice": "MongoDB",
-          "why_not": "Swapping it in lowers the stack score by 12.1 points. Microsoft SQL Server / Azure SQL Database is stronger on data-model fit (5.0 vs 2.0), consistency fit (5.0 vs 3.5); MongoDB is stronger on scalability (5.0 vs 4.0), cost at your scale (4.7 vs 4.4); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data."
+          "why_not": "Swapping it in lowers the stack score by 12.1 points. Microsoft SQL Server is stronger on data-model fit (5.0 vs 2.0), consistency fit (5.0 vs 3.5); MongoDB is stronger on scalability (5.0 vs 4.0), cost at your scale (4.7 vs 4.4); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data."
         },
         {
           "choice": "Amazon DynamoDB",
@@ -231,7 +231,7 @@
       "Scale tier: Small (50-500 users online at once)",
       "Budget check: $300/month stated, status 'stretch'",
       "Hosting: Azure App Service / Container Apps: $22-150 (Small (50-500 users online at once) price band; x1.5 for 99.9% availability (redundant instances))",
-      "Database: Microsoft SQL Server / Azure SQL Database: $22-225 (Small (10-100 GB of data) database tier (~20 GB in 12 months); x1.5 for 99.9% availability (standby/replicas))"
+      "Database: Microsoft SQL Server: $22-225 (Small (10-100 GB of data) database tier (~20 GB in 12 months); x1.5 for 99.9% availability (standby/replicas))"
     ]
   },
   "warnings": [
@@ -251,7 +251,7 @@
     "Priorities rated 4 or 5 raise their criteria's weights, strongest first: time_to_market (5), maintainability (5), security (4)",
     "Priorities rated 1 or 2 (scalability, performance) keep their criteria at the baseline weight",
     "Existing identity provider Microsoft Entra ID: sign-in reuses it through OpenID Connect or SAML instead of a new user store",
-    "Existing database 'On-prem SQL Server 2019': Microsoft SQL Server / Azure SQL Database is weighed with a bonus for keeping it; if it stays the pick, move its data to the recommended offering with the vendor's migration tool, or reach it over a private link (site-to-site VPN) while it stays where it is",
+    "Existing database 'On-prem SQL Server 2019': Microsoft SQL Server is weighed with a bonus for keeping it; if it stays the pick, move its data to the recommended offering with the vendor's migration tool, or reach it over a private link (site-to-site VPN) while it stays where it is",
     "Existing system 'Microsoft 365': integrated through Microsoft Graph API (mail, calendar and Teams notifications, files); it stays the system of record for its own data",
     "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",
     "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",

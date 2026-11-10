@@ -74,7 +74,7 @@
     },
     "database": {
       "choice": "PostgreSQL: Fly Managed Postgres",
-      "justification": "Your data is mainly relational and reaches about 200 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $600-$1,200 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server / Azure SQL Database, by 2.1 stack points.",
+      "justification": "Your data is mainly relational and reaches about 200 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $600-$1,200 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server, by 2.1 stack points.",
       "driven_by": [
         "priorities.scalability",
         "priorities.performance",
@@ -86,7 +86,7 @@
       ],
       "alternatives": [
         {
-          "choice": "Microsoft SQL Server / Azure SQL Database",
+          "choice": "Microsoft SQL Server",
           "why_not": "Swapping it in lowers the stack score by 2.1 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0), portability (low lock-in) (5.0 vs 3.0)."
         },
         {

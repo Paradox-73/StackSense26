@@ -22,7 +22,7 @@
         },
         {
           "choice": "Server-rendered HTML + HTMX",
-          "why_not": "Swapping it in lowers the stack score by 4.5 points. Astro is stronger on performance / latency (5.0 vs 4.0), structure for large teams (3.0 vs 2.0); Server-rendered HTML + HTMX is stronger on learning curve (5.0 vs 4.0), team skill match (4.5 vs 4.0)."
+          "why_not": "Swapping it in lowers the stack score by 12.0 points. Astro is stronger on performance / latency (5.0 vs 4.0), structure for large teams (3.0 vs 2.0); Server-rendered HTML + HTMX is stronger on learning curve (5.0 vs 4.0), team skill match (4.5 vs 4.0)."
         },
         {
           "choice": "Next.js (React)",
@@ -58,7 +58,7 @@
         },
         {
           "choice": "Python + Django",
-          "why_not": "Swapping it in lowers the stack score by 16.5 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), low ops burden (5.0 vs 4.0); Python + Django is stronger on structure for large teams (4.0 vs 3.0), realtime fit (2.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn."
+          "why_not": "Swapping it in lowers the stack score by 41.5 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), low ops burden (5.0 vs 4.0); Python + Django is stronger on structure for large teams (4.0 vs 3.0), realtime fit (2.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn."
         }
       ],
       "tradeoffs": [
