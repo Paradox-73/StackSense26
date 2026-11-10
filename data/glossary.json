@@ -1,0 +1,408 @@
+{
+  "description": "Plain-English definitions for every technical term in the questionnaire. Rendered as info popovers in the UI. Each entry: term, short definition, who it applies to, and an official or primary source.",
+  "curated_on": "2026-10-01",
+  "terms": {
+    "hipaa": {
+      "term": "HIPAA",
+      "definition": "A US law that protects health information (called PHI). Any cloud vendor that stores or processes PHI for you must sign a Business Associate Agreement (BAA) promising to protect it.",
+      "applies": "US healthcare providers, insurers and clearing-houses, and every company that handles patient data on their behalf.",
+      "source": "https://www.hhs.gov/hipaa/for-professionals/index.html",
+      "source_name": "US Dept. of Health & Human Services (hhs.gov)"
+    },
+    "baa": {
+      "term": "BAA (Business Associate Agreement)",
+      "definition": "A contract under HIPAA in which a vendor promises to safeguard the health data you give it. Without a signed BAA you may not put PHI on that vendor.",
+      "applies": "Any vendor that touches US patient data for a HIPAA-covered organisation.",
+      "source": "https://www.hhs.gov/hipaa/for-professionals/covered-entities/sample-business-associate-agreement-provisions/index.html",
+      "source_name": "hhs.gov"
+    },
+    "gdpr": {
+      "term": "GDPR",
+      "definition": "The EU's General Data Protection Regulation: rules on collecting, storing and transferring personal data, with consent, deletion and breach-notice duties. Transfers outside the EU need a legal basis.",
+      "applies": "Any organisation that offers goods or services to people in the EU or monitors them, wherever the organisation is based.",
+      "source": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+      "source_name": "EUR-Lex (official EU law)"
+    },
+    "dpdp": {
+      "term": "India DPDP Act 2023",
+      "definition": "India's Digital Personal Data Protection Act: consent, purpose limits and breach notification for personal data of people in India. Cross-border transfer is allowed except to countries the government blocks. The DPDP Rules 2025, notified in November 2025, phase the duties in over 18 months.",
+      "applies": "Organisations that process digital personal data inside India, or outside India when offering goods or services to people in India.",
+      "source": "https://www.meity.gov.in/data-protection-framework",
+      "source_name": "Ministry of Electronics & IT (meity.gov.in)"
+    },
+    "pci_dss": {
+      "term": "PCI-DSS",
+      "definition": "The Payment Card Industry Data Security Standard: security rules for anyone who stores, processes or transmits card numbers. Using a payment gateway's hosted checkout keeps most of your system out of scope.",
+      "applies": "Every merchant and service provider that handles Visa, Mastercard, RuPay or other card data.",
+      "source": "https://www.pcisecuritystandards.org/standards/pci-dss/",
+      "source_name": "PCI Security Standards Council"
+    },
+    "soc2": {
+      "term": "SOC 2",
+      "definition": "An independent audit report on a vendor's security, availability and confidentiality controls. Enterprise customers often ask for one, and you need your vendors' reports to pass your own.",
+      "applies": "B2B software companies whose customers ask for security evidence; not a law.",
+      "source": "https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2",
+      "source_name": "AICPA & CIMA"
+    },
+    "data_residency": {
+      "term": "Data residency",
+      "definition": "A rule that data must be stored in a particular country or region. It removes every vendor without a data centre there.",
+      "applies": "Regulated sectors, e.g. the payment data of Indian payment system providers (RBI 2018 circular) or contracts that require EU-only storage.",
+      "source": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244",
+      "source_name": "Reserve Bank of India"
+    },
+    "dau": {
+      "term": "DAU (daily active users)",
+      "definition": "How many different people use the product on a typical day. StackSense uses it to estimate traffic and pick a scale tier.",
+      "applies": "Every product. For IoT, count active devices instead of people.",
+      "source": "https://sre.google/sre-book/handling-overload/",
+      "source_name": "Google SRE book"
+    },
+    "peak_rps": {
+      "term": "Peak req/s (requests per second)",
+      "definition": "The highest number of requests your servers receive in one second, usually at the busiest hour. Servers are sized for the peak, not the average.",
+      "applies": "Every product with a backend. Leave it blank and StackSense estimates it from users and app type.",
+      "source": "https://sre.google/sre-book/addressing-cascading-failures/",
+      "source_name": "Google SRE book"
+    },
+    "latency": {
+      "term": "Latency (p95)",
+      "definition": "How long a request takes to answer. 'p95' means 95 out of 100 requests are at least this fast. Around 100 ms feels instant; around 1 s keeps the user's flow of thought.",
+      "applies": "Interactive apps, games, trading and anything a user waits on.",
+      "source": "https://www.nngroup.com/articles/response-times-3-important-limits/",
+      "source_name": "Nielsen Norman Group"
+    },
+    "consistency": {
+      "term": "Consistency (strong vs eventual)",
+      "definition": "Strong: every read sees the latest write, so balances and stock counts are always right. Eventual: different copies may disagree for a moment, which is fine for likes or feeds.",
+      "applies": "Money, inventory and health records need strong consistency; social feeds and telemetry usually do not.",
+      "source": "https://jepsen.io/consistency",
+      "source_name": "Jepsen"
+    },
+    "availability": {
+      "term": "Availability (99.9% etc.)",
+      "definition": "The share of time the service works. 99.9% allows about 43 minutes of downtime a month; each extra 9 cuts that by ten times and needs more redundancy and someone on call.",
+      "applies": "Every product; most new products are fine at 99.9%.",
+      "source": "https://sre.google/sre-book/availability-table/",
+      "source_name": "Google SRE book"
+    },
+    "baas": {
+      "term": "BaaS (backend-as-a-service)",
+      "definition": "A hosted backend (e.g. Supabase, Firebase) that gives you database, login, file storage and realtime through an API, so you write little or no server code.",
+      "applies": "Small teams and MVPs that want to ship fast; less suited to complex domain logic or very large teams.",
+      "source": "https://supabase.com/docs",
+      "source_name": "Supabase docs"
+    },
+    "serverless": {
+      "term": "Serverless",
+      "definition": "You upload functions and the cloud runs them on demand, billing per request. No servers to manage, but functions can start slowly ('cold starts') and cannot hold long connections.",
+      "applies": "Spiky or low traffic, event processing, teams that want zero server maintenance.",
+      "source": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+      "source_name": "AWS Lambda docs"
+    },
+    "lock_in": {
+      "term": "Vendor lock-in",
+      "definition": "How hard it would be to move to another provider later. Proprietary APIs (e.g. DynamoDB, Firestore) mean a rewrite; open standards (PostgreSQL, containers) move easily.",
+      "applies": "Everyone; it matters most for long-lived products and hybrid or regulated deployments.",
+      "source": "https://martinfowler.com/articles/oss-lockin.html",
+      "source_name": "Gregor Hohpe on martinfowler.com: Don't get locked up into avoiding lock-in"
+    },
+    "realtime": {
+      "term": "Realtime",
+      "definition": "The server pushes updates to the user instantly (chat messages, live cursors, scores) over a connection that stays open, usually a WebSocket.",
+      "applies": "Chat, collaboration, multiplayer games, live tracking. 'Some' = notifications and live counters.",
+      "source": "https://developer.mozilla.org/docs/Web/API/WebSockets_API",
+      "source_name": "MDN Web Docs"
+    },
+    "seo": {
+      "term": "SEO (search engine optimisation)",
+      "definition": "Making pages easy for Google to find and rank. Pages rendered as HTML on the server are indexed faster than pages built by JavaScript in the browser.",
+      "applies": "Content sites, shops and landing pages; not apps that sit behind a login.",
+      "source": "https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics",
+      "source_name": "Google Search Central"
+    },
+    "offline": {
+      "term": "Offline support",
+      "definition": "The app keeps working without internet and syncs changes when the connection returns.",
+      "applies": "Field apps, rural users, mobile-first markets.",
+      "source": "https://web.dev/learn/pwa/offline-data",
+      "source_name": "web.dev (Google)"
+    },
+    "read_write": {
+      "term": "Read / write mix",
+      "definition": "Whether users mostly look at data (reads, e.g. a catalogue) or mostly create it (writes, e.g. sensor readings or chat). Writes are the harder part to scale.",
+      "applies": "Every product; pick 'balanced' if unsure.",
+      "source": "https://www.postgresql.org/docs/current/high-availability.html",
+      "source_name": "PostgreSQL docs"
+    },
+    "data_shape": {
+      "term": "Data shape",
+      "definition": "How your data is organised: tables with relations, flexible documents, key-value pairs, time-stamped metrics, graphs of connections, analytics aggregates or vector embeddings for AI search.",
+      "applies": "Every product; most business apps are 'relational'.",
+      "source": "https://www.mongodb.com/resources/basics/databases/nosql-explained",
+      "source_name": "MongoDB"
+    },
+    "vector": {
+      "term": "Vector embeddings",
+      "definition": "Lists of numbers that represent the meaning of text or images, so you can search by similarity. Used for AI features like RAG (answering from your own documents).",
+      "applies": "AI search, chatbots over your documents, recommendations.",
+      "source": "https://github.com/pgvector/pgvector",
+      "source_name": "pgvector (open source)"
+    },
+    "deployment": {
+      "term": "Deployment model (cloud / hybrid / on-prem)",
+      "definition": "Public cloud: rented servers and managed services. On-premises: your own data centre, so managed-only services are impossible. Hybrid: both, so everything must stay portable.",
+      "applies": "Banks, government and hospitals often require on-premises or hybrid.",
+      "source": "https://kubernetes.io/docs/concepts/overview/",
+      "source_name": "Kubernetes docs"
+    },
+    "microservices": {
+      "term": "Monolith vs microservices",
+      "definition": "A monolith is one deployable application; microservices split it into many small services that deploy separately. Microservices pay off only with several teams.",
+      "applies": "Small teams should almost always start with a (modular) monolith.",
+      "source": "https://martinfowler.com/bliki/MonolithFirst.html",
+      "source_name": "Martin Fowler"
+    },
+    "mvp": {
+      "term": "MVP (minimum viable product)",
+      "definition": "The first version real users can use. A short time to MVP favours tools the team already knows.",
+      "applies": "Every new product.",
+      "source": "https://dora.dev/research/",
+      "source_name": "DORA research"
+    },
+    "budget": {
+      "term": "Infrastructure budget",
+      "definition": "Monthly cloud spend only: hosting, database, bandwidth and managed services. Salaries and SaaS tools are not included.",
+      "applies": "Everyone. $0 means free tiers only, which some vendors forbid for commercial use.",
+      "source": "https://aws.amazon.com/free/",
+      "source_name": "AWS Free Tier"
+    },
+    "cloud_preference": {
+      "term": "Preferred cloud",
+      "definition": "AWS, Google Cloud or Azure accounts, credits or skills you already have. Used as a strong nudge, never a hard filter.",
+      "applies": "Teams with startup credits, an enterprise contract or certified engineers.",
+      "source": "https://aws.amazon.com/architecture/well-architected/",
+      "source_name": "AWS Well-Architected"
+    },
+    "regions": {
+      "term": "User regions",
+      "definition": "Where your users are. A server far from users adds round-trip delay (Singapore to Mumbai is about 60 ms).",
+      "applies": "Every product; choose 'Global' only if you really serve several continents.",
+      "source": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+      "source_name": "AWS global infrastructure"
+    },
+    "data_volume": {
+      "term": "Data volume",
+      "definition": "Size of the main database, not counting images or videos (those live in cheaper object storage). A typical SaaS starts under 10 GB.",
+      "applies": "Every product; large volumes (TB+) favour analytics or horizontally scaling databases.",
+      "source": "https://clickhouse.com/docs/concepts/why-clickhouse-is-so-fast",
+      "source_name": "ClickHouse docs"
+    },
+    "team_skills": {
+      "term": "Team skills",
+      "definition": "Languages and tools your engineers already know well. Familiar tools ship faster with fewer defects.",
+      "applies": "Every team; leave empty if you will hire for the stack.",
+      "source": "https://survey.stackoverflow.co/2025/technology",
+      "source_name": "Stack Overflow Developer Survey 2025"
+    },
+    "platforms": {
+      "term": "Client platforms",
+      "definition": "Where users run your product: in a web browser, or as an installed iOS or Android app.",
+      "applies": "Choosing iOS/Android switches the frontend to a mobile toolkit (React Native, Flutter).",
+      "source": "https://reactnative.dev/docs/getting-started",
+      "source_name": "React Native docs"
+    },
+    "lsm": {
+      "term": "LSM tree",
+      "definition": "A way a database stores data on disk: new writes go to memory and are flushed in sorted files that are merged later. Writes are very fast; reads may check several files.",
+      "applies": "Write-heavy databases such as Cassandra, ScyllaDB and RocksDB.",
+      "source": "https://www.scylladb.com/glossary/log-structured-merge-tree/",
+      "source_name": "ScyllaDB glossary"
+    },
+    "olap": {
+      "term": "OLAP",
+      "definition": "Online analytical processing: queries that scan and add up millions of rows (totals, trends, reports) instead of reading or changing one record.",
+      "applies": "Dashboards and reports, served best by column stores such as ClickHouse.",
+      "source": "https://clickhouse.com/docs/en/concepts/why-clickhouse-is-so-fast",
+      "source_name": "ClickHouse docs"
+    },
+    "oltp": {
+      "term": "OLTP",
+      "definition": "Online transaction processing: many small reads and writes of single records (an order, a login). This is what most app databases do.",
+      "applies": "Shops, SaaS apps and banking ledgers on PostgreSQL or MySQL.",
+      "source": "https://www.postgresql.org/docs/current/tutorial-transactions.html",
+      "source_name": "PostgreSQL docs"
+    },
+    "acid": {
+      "term": "ACID",
+      "definition": "Four promises of a database transaction: it happens fully or not at all (atomic), keeps rules true (consistent), does not see half-finished work of others (isolated) and survives a crash (durable).",
+      "applies": "Money, stock and health records.",
+      "source": "https://www.postgresql.org/docs/current/tutorial-transactions.html",
+      "source_name": "PostgreSQL docs"
+    },
+    "cap": {
+      "term": "CAP theorem",
+      "definition": "When the network between database copies breaks, a system must choose: answer with possibly stale data (stay available) or refuse until the copies agree (stay consistent).",
+      "applies": "Choosing between strongly consistent and eventually consistent stores.",
+      "source": "https://jepsen.io/consistency",
+      "source_name": "Jepsen"
+    },
+    "lcp": {
+      "term": "LCP (Largest Contentful Paint)",
+      "definition": "The time until the biggest visible element of a page, usually the main image or headline, is drawn. Google rates under 2.5 seconds as good.",
+      "applies": "Web frontends where speed and search ranking matter.",
+      "source": "https://web.dev/articles/lcp",
+      "source_name": "web.dev"
+    },
+    "multi_az": {
+      "term": "Multi-AZ",
+      "definition": "Running copies of the service in two or more availability zones, which are separate data centres in one cloud region, so one building failing does not stop the app.",
+      "applies": "Availability targets of 99.9% and higher.",
+      "source": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html",
+      "source_name": "AWS docs"
+    },
+    "cdn": {
+      "term": "CDN",
+      "definition": "A content delivery network keeps copies of your pages and files on servers around the world and serves each visitor from a nearby one, so your own servers see far fewer requests.",
+      "applies": "Sites where many visitors see the same content.",
+      "source": "https://developers.cloudflare.com/cache/concepts/default-cache-behavior/",
+      "source_name": "Cloudflare docs"
+    },
+    "sharding": {
+      "term": "Sharding",
+      "definition": "Splitting one large database into several smaller ones, each holding part of the rows (for example users A to M), so no single machine has to hold or serve everything.",
+      "applies": "Databases beyond what one machine can handle.",
+      "source": "https://www.mongodb.com/docs/manual/sharding/",
+      "source_name": "MongoDB docs"
+    },
+    "connection_pooling": {
+      "term": "Connection pooling",
+      "definition": "Reusing a small set of open database connections instead of opening one per request. Databases handle only a few hundred connections, and serverless functions can open thousands.",
+      "applies": "Serverless backends on PostgreSQL or MySQL.",
+      "source": "https://www.postgresql.org/docs/current/runtime-config-connection.html",
+      "source_name": "PostgreSQL docs"
+    },
+    "rpo_rto": {
+      "term": "RPO and RTO",
+      "definition": "Recovery point objective: how much recent data you can afford to lose. Recovery time objective: how long you can be down before the service must be back.",
+      "applies": "Backup and disaster recovery planning.",
+      "source": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html",
+      "source_name": "AWS whitepaper"
+    },
+    "edge": {
+      "term": "Edge computing",
+      "definition": "Running code in many small locations close to users (for example Cloudflare Workers) instead of in one data centre, which cuts round-trip time but limits what the code can do.",
+      "applies": "Latency-sensitive APIs and global audiences.",
+      "source": "https://developers.cloudflare.com/workers/platform/limits/",
+      "source_name": "Cloudflare docs"
+    },
+    "orm": {
+      "term": "ORM",
+      "definition": "Object-relational mapper: a library that lets code read and write database rows as ordinary objects, so you write less SQL by hand.",
+      "applies": "Backend frameworks such as Django, Rails and Spring.",
+      "source": "https://docs.djangoproject.com/en/stable/topics/db/queries/",
+      "source_name": "Django docs"
+    }
+  },
+  "field_terms": {
+    "app_type": [],
+    "platforms": [
+      "platforms"
+    ],
+    "dau": [
+      "dau"
+    ],
+    "peak_rps": [
+      "peak_rps"
+    ],
+    "data_volume_gb": [
+      "data_volume"
+    ],
+    "data_growth_gb_month": [
+      "data_volume"
+    ],
+    "read_write": [
+      "read_write"
+    ],
+    "data_shapes": [
+      "data_shape",
+      "vector"
+    ],
+    "consistency": [
+      "consistency",
+      "acid",
+      "cap"
+    ],
+    "realtime": [
+      "realtime"
+    ],
+    "latency_target_ms": [
+      "latency"
+    ],
+    "seo": [
+      "seo"
+    ],
+    "offline": [
+      "offline"
+    ],
+    "availability": [
+      "availability",
+      "multi_az"
+    ],
+    "regions": [
+      "regions"
+    ],
+    "team_size": [],
+    "team_skills": [
+      "team_skills"
+    ],
+    "timeline_weeks": [
+      "mvp"
+    ],
+    "architecture": [
+      "microservices",
+      "serverless"
+    ],
+    "budget_monthly": [
+      "budget"
+    ],
+    "deployment": [
+      "deployment"
+    ],
+    "cloud_preference": [
+      "cloud_preference"
+    ],
+    "lock_in_tolerance": [
+      "lock_in"
+    ],
+    "compliance": [
+      "gdpr",
+      "dpdp",
+      "hipaa",
+      "pci_dss",
+      "soc2",
+      "data_residency"
+    ],
+    "cacheable_share": [
+      "cdn"
+    ]
+  },
+  "option_terms": {
+    "compliance": {
+      "gdpr": "gdpr",
+      "dpdp": "dpdp",
+      "hipaa": "hipaa",
+      "pci_dss": "pci_dss",
+      "soc2": "soc2",
+      "data_residency_india": "data_residency",
+      "data_residency_eu": "data_residency"
+    },
+    "architecture": {
+      "serverless": "serverless",
+      "microservices": "microservices"
+    },
+    "data_shapes": {
+      "vector": "vector"
+    }
+  }
+}

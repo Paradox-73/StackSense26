@@ -1,0 +1,1807 @@
+{
+  "layer": "hosting",
+  "curated_on": "2026-10-01",
+  "cost_note": "cost_usd = approximate compute/bandwidth monthly cost for the app tier (database excluded) per scale tier (<1k, 1k-10k, 10k-100k, 100k-1M, 1M-10M, >10M DAU). Compliance flags reflect vendors' published programmes on the curation date; verify before signing.",
+  "items": [
+    {
+      "id": "vercel",
+      "name": "Vercel",
+      "provider": "vercel",
+      "kind": "frontend_paas",
+      "summary": "Frontend cloud: global CDN, SSR and serverless/edge functions; made by the Next.js team.",
+      "scores": {
+        "scalability": 5,
+        "ease": 5,
+        "ops": 5,
+        "maturity": 4,
+        "realtime": 2,
+        "performance": 5
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": true,
+        "long_running": false,
+        "websockets": false,
+        "containers": false,
+        "gpu": false
+      },
+      "gpu_source": "https://vercel.com/docs/functions/limitations",
+      "skills": [
+        "vercel"
+      ],
+      "related_skills": [
+        "nextjs",
+        "javascript",
+        "typescript",
+        "react"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 3,
+      "on_prem": false,
+      "commercial_min_usd": 20,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 350,
+        "hipaa_note": "BAA only on paid plans (add-on / Enterprise); verify",
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 3,
+        "maturity_note": "SOC 2 Type 2, ISO 27001 and PCI DSS; HIPAA BAA only on paid plans; audit logs and dedicated (Secure Compute) networking are Enterprise features; no HITRUST or FedRAMP.",
+        "maturity_sources": [
+          "https://vercel.com/security"
+        ]
+      },
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          20,
+          40
+        ],
+        [
+          40,
+          300
+        ],
+        [
+          300,
+          2000
+        ],
+        [
+          2000,
+          12000
+        ],
+        [
+          12000,
+          60000
+        ]
+      ],
+      "strengths": [
+        {"text": "Zero-config Next.js deploys, preview URLs per pull request", "when": {"stack_any": ["nextjs"]}},
+        {"text": "Zero-config deploys for most frontend frameworks, preview URLs per pull request", "when": {"stack_none": ["nextjs"]}},
+        "Global edge network gives fast TTFB everywhere"
+      ],
+      "weaknesses": [
+        "Hobby tier is non-commercial; bandwidth/function overages get expensive at scale",
+        "WebSockets on Functions are in public beta: a connection pins to one instance, so fan-out needs a shared pub/sub"
+      ],
+      "sources": [
+        "https://vercel.com/docs",
+        "https://vercel.com/pricing",
+        "https://vercel.com/docs/limits/fair-use-guidelines",
+        "https://vercel.com/security",
+        "https://vercel.com/kb/guide/do-vercel-serverless-functions-support-websocket-connections"
+      ],
+      "seat_usd": 20,
+      "facts_as_of": "2026-10-03"
+    },
+    {
+      "id": "netlify",
+      "name": "Netlify",
+      "provider": "netlify",
+      "kind": "frontend_paas",
+      "summary": "Jamstack platform: CDN hosting, serverless/edge functions, forms, deploy previews.",
+      "scores": {
+        "scalability": 5,
+        "ease": 5,
+        "ops": 5,
+        "maturity": 4,
+        "realtime": 1,
+        "performance": 5
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": true,
+        "long_running": false,
+        "websockets": false,
+        "containers": false,
+        "gpu": false
+      },
+      "gpu_source": "https://docs.netlify.com/build/functions/configuration/",
+      "skills": [
+        "netlify"
+      ],
+      "related_skills": [
+        "javascript",
+        "typescript",
+        "astro",
+        "nuxt",
+        "sveltekit"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 3,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": false,
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 2,
+        "maturity_note": "SOC 2 Type 2, ISO 27001 and a PCI DSS v4.0 Report on Compliance; a BAA only on Enterprise plans (treated as not eligible); audit log on Enterprise plans only.",
+        "maturity_sources": [
+          "https://www.netlify.com/security/"
+        ]
+      },
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          20,
+          40
+        ],
+        [
+          40,
+          300
+        ],
+        [
+          300,
+          2000
+        ],
+        [
+          2000,
+          10000
+        ],
+        [
+          10000,
+          50000
+        ]
+      ],
+      "strengths": [
+        "Excellent for static/content sites (Astro, Nuxt, SvelteKit)",
+        "Built-in forms, redirects, split testing"
+      ],
+      "weaknesses": [
+        "Paid plans bill in credits (Personal $9/month with 1,000 credits, Pro $20/month for unlimited members with 3,000, no per-seat charge) spent on deploys, bandwidth and requests, so the bill follows usage once the credits run out",
+        {"text": "Function regions are limited (no India region by default)", "when": {"india": true}},
+        "No long-running servers"
+      ],
+      "sources": [
+        "https://docs.netlify.com/",
+        "https://www.netlify.com/pricing/",
+        "https://docs.netlify.com/functions/optional-configuration/"
+      ],
+      "static_cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          20
+        ],
+        [
+          20,
+          200
+        ],
+        [
+          200,
+          2000
+        ]
+      ],
+      "static_cost_note": "Free plan covers a static site up to its monthly bandwidth/credit allowance",
+      "facts_as_of": "2026-10-03"
+    },
+    {
+      "id": "cloudflare",
+      "name": "Cloudflare Pages + Workers",
+      "provider": "cloudflare",
+      "kind": "frontend_paas",
+      "summary": "Edge platform: static hosting with unmetered bandwidth, Workers (V8 isolates) at 300+ locations, Durable Objects for stateful/WebSocket workloads.",
+      "scores": {
+        "scalability": 5,
+        "ease": 4,
+        "ops": 5,
+        "maturity": 4,
+        "realtime": 3,
+        "performance": 5
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": true,
+        "long_running": false,
+        "websockets": true,
+        "containers": false,
+        "gpu": false
+      },
+      "gpu_source": "https://developers.cloudflare.com/workers/platform/limits/",
+      "skills": [
+        "cloudflare"
+      ],
+      "related_skills": [
+        "javascript",
+        "typescript",
+        "astro",
+        "sveltekit",
+        "react"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 3,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": false,
+        "hipaa_note": "BAA only under Enterprise agreements; treated as not eligible",
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 3,
+        "maturity_note": "Broad programme (SOC 2, ISO 27001, PCI DSS, FedRAMP for some services) but a BAA only under Enterprise agreements.",
+        "maturity_sources": [
+          "https://www.cloudflare.com/trust-hub/compliance-resources/"
+        ]
+      },
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          5,
+          25
+        ],
+        [
+          25,
+          200
+        ],
+        [
+          200,
+          2000
+        ],
+        [
+          2000,
+          15000
+        ]
+      ],
+      "strengths": [
+        "Static assets with no bandwidth charges: cheapest way to serve high-traffic content",
+        {"text": "Edge compute close to users everywhere, including Indian PoPs", "when": {"india": true}},
+        {"text": "Edge compute close to users everywhere", "when": {"india": false}},
+        "Durable Objects give WebSockets/stateful coordination at the edge"
+      ],
+      "weaknesses": [
+        "Workers runtime is not full Node.js (some npm packages need polyfills)",
+        {"text": "Next.js needs the OpenNext adapter; not every feature is supported", "when": {"stack_any": ["nextjs"]}}
+      ],
+      "sources": [
+        "https://developers.cloudflare.com/pages/",
+        "https://developers.cloudflare.com/workers/platform/pricing/",
+        "https://developers.cloudflare.com/durable-objects/",
+        "https://www.cloudflare.com/trust-hub/compliance-resources/",
+        "https://developers.cloudflare.com/data-localization/region-support/"
+      ],
+      "static_cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "static_cost_note": "Pages: static sites are free with unlimited bandwidth (500 builds/month on the free plan)",
+      "residency_regions": [],
+      "residency_note": "Keeping data and TLS termination inside India or the EU needs the Data Localization Suite, an Enterprise add-on; treated as not meeting a residency rule.",
+      "facts_as_of": "2026-10-03"
+    },
+    {
+      "id": "render",
+      "name": "Render",
+      "provider": "render",
+      "kind": "paas",
+      "summary": "Heroku-style PaaS: web services, workers, cron, managed Postgres and Key Value, deploy from Git or Docker.",
+      "scores": {
+        "scalability": 4,
+        "ease": 5,
+        "ops": 5,
+        "maturity": 3,
+        "realtime": 4,
+        "performance": 3
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": false,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": false
+      },
+      "gpu_source": "https://render.com/pricing",
+      "skills": [
+        "render",
+        "docker"
+      ],
+      "related_skills": [
+        "heroku",
+        "python",
+        "ruby",
+        "node"
+      ],
+      "scale_ceiling": 4,
+      "team_min": 1,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "southeast_asia"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 499,
+        "hipaa_note": "HIPAA-enabled workspaces need the Scale plan ($499/month) or Enterprise, plus a 20% surcharge on usage",
+        "pci": false,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 2,
+        "maturity_note": "SOC 2 Type 2; HIPAA-enabled workspaces on higher tiers; no PCI attestation or single-tenant option.",
+        "maturity_sources": [
+          "https://render.com/security"
+        ]
+      },
+      "cost_usd": [
+        [
+          0,
+          7
+        ],
+        [
+          7,
+          50
+        ],
+        [
+          50,
+          300
+        ],
+        [
+          300,
+          1500
+        ],
+        [
+          1500,
+          8000
+        ],
+        [
+          8000,
+          40000
+        ]
+      ],
+      "strengths": [
+        "Git-push deploys for any backend (Django, Rails, Node, Go, Docker)",
+        "Managed Postgres/Key Value alongside services"
+      ],
+      "weaknesses": [
+        {"text": "No India region (Singapore is closest)", "when": {"india": true}},
+        "Fewer knobs than AWS/GCP at very large scale"
+      ],
+      "sources": [
+        "https://render.com/docs",
+        "https://render.com/pricing",
+        "https://render.com/docs/regions",
+        "https://render.com/docs/hipaa-compliance",
+        "https://render.com/docs/disks",
+        "https://render.com/docs/free"
+      ],
+      "local_file_disk_min_usd": 7,
+      "local_file_disk_note": "free instances have an ephemeral filesystem; a persistent disk attaches only to a paid instance (from $7/month) and is billed per GB",
+      "facts_as_of": "2026-10-03"
+    },
+    {
+      "id": "railway",
+      "name": "Railway",
+      "provider": "railway",
+      "kind": "paas",
+      "summary": "Usage-billed PaaS with one-click databases and a visual project canvas.",
+      "scores": {
+        "scalability": 3,
+        "ease": 5,
+        "ops": 5,
+        "maturity": 3,
+        "realtime": 4,
+        "performance": 3
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": false,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": false
+      },
+      "gpu_source": "https://railway.com/pricing",
+      "skills": [
+        "railway",
+        "docker"
+      ],
+      "related_skills": [
+        "node",
+        "python",
+        "php",
+        "laravel"
+      ],
+      "scale_ceiling": 3,
+      "team_min": 1,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "southeast_asia"
+      ],
+      "compliance": {
+        "hipaa": false,
+        "pci": false,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 1,
+        "maturity_note": "SOC 2 only; no BAA, no PCI attestation, no dedicated tenancy.",
+        "maturity_sources": [
+          "https://docs.railway.com/"
+        ]
+      },
+      "cost_usd": [
+        [
+          5,
+          5
+        ],
+        [
+          5,
+          40
+        ],
+        [
+          40,
+          300
+        ],
+        [
+          300,
+          1500
+        ],
+        [
+          1500,
+          8000
+        ],
+        [
+          8000,
+          40000
+        ]
+      ],
+      "strengths": [
+        "Fastest path from repo to running app + database",
+        "Pay per resource used"
+      ],
+      "weaknesses": [
+        "Younger platform; fewer compliance attestations",
+        {"text": "No India region", "when": {"india": true}}
+      ],
+      "sources": [
+        "https://docs.railway.com/",
+        "https://railway.com/pricing",
+        "https://docs.railway.com/reference/deployment-regions",
+        "https://docs.railway.com/guides/laravel"
+      ]
+    },
+    {
+      "id": "flyio",
+      "name": "Fly.io",
+      "provider": "flyio",
+      "kind": "paas",
+      "summary": "Runs Docker images as Firecracker micro-VMs close to users in many regions, with Anycast networking.",
+      "scores": {
+        "scalability": 4,
+        "ease": 3,
+        "ops": 4,
+        "maturity": 3,
+        "realtime": 5,
+        "performance": 5
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": false,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": false
+      },
+      "gpu_source": "https://fly.io/blog/wrong-about-gpu/",
+      "skills": [
+        "flyio",
+        "docker"
+      ],
+      "related_skills": [
+        "elixir",
+        "go",
+        "linux",
+        "php",
+        "laravel"
+      ],
+      "scale_ceiling": 4,
+      "team_min": 1,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 99,
+        "hipaa_note": "HIPAA package at $99/month on any paid plan, with the BAA pre-signed (fly.io/pricing)",
+        "pci": false,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 2,
+        "maturity_note": "SOC 2 Type 2 and a BAA via a compliance add-on; no PCI attestation; isolation is per-VM, not per-tenant hardware.",
+        "maturity_sources": [
+          "https://fly.io/docs/about/healthcare/",
+          "https://fly.io/pricing"
+        ]
+      },
+      "cost_usd": [
+        [
+          2,
+          5
+        ],
+        [
+          5,
+          30
+        ],
+        [
+          30,
+          250
+        ],
+        [
+          250,
+          1200
+        ],
+        [
+          1200,
+          6000
+        ],
+        [
+          6000,
+          30000
+        ]
+      ],
+      "strengths": [
+        "Multi-region deploys with one command; great for realtime/websockets",
+        {"text": "Strong Elixir/Phoenix clustering support", "when": {"stack_any": ["phoenix"]}}
+      ],
+      "weaknesses": [
+        {"text": "No India region (Singapore is closest); the region list has none in India", "when": {"india": true}},
+        "More hands-on than Render/Railway",
+        "No free plan for new organizations (a trial of 2 machine-hours or 7 days); the smallest always-on machine costs about $2.19 a month"
+      ],
+      "sources": [
+        "https://fly.io/docs/",
+        "https://docs.fly.io/about/pricing",
+        "https://fly.io/docs/reference/regions/",
+        "https://fly.io/docs/elixir/",
+        "https://fly.io/docs/laravel/"
+      ],
+      "facts_as_of": "2026-10-05"
+    },
+    {
+      "id": "aws_ecs",
+      "name": "AWS ECS on Fargate",
+      "provider": "aws",
+      "kind": "containers",
+      "summary": "Serverless containers on AWS: no nodes to manage, integrates with ALB, RDS, IAM, CloudWatch.",
+      "scores": {
+        "scalability": 5,
+        "ease": 3,
+        "ops": 3,
+        "maturity": 5,
+        "realtime": 4,
+        "performance": 4
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": false,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": false
+      },
+      "gpu_source": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-tasks-services.html",
+      "skills": [
+        "aws",
+        "docker"
+      ],
+      "related_skills": [
+        "terraform",
+        "devops"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 2,
+      "lock_in": 3,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 0,
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 5,
+        "maturity_note": "AWS: HIPAA-eligible services list, PCI DSS Level 1 service provider, HITRUST CSF and FedRAMP High; CloudTrail records every API call; Dedicated Hosts/Instances give single-tenant hardware; reports via AWS Artifact.",
+        "maturity_sources": [
+          "https://aws.amazon.com/compliance/programs/",
+          "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+          "https://aws.amazon.com/ec2/dedicated-hosts/"
+        ]
+      },
+      "cost_usd": [
+        [
+          20,
+          50
+        ],
+        [
+          50,
+          120
+        ],
+        [
+          120,
+          400
+        ],
+        [
+          400,
+          2000
+        ],
+        [
+          2000,
+          10000
+        ],
+        [
+          10000,
+          60000
+        ]
+      ],
+      "strengths": [
+        {"text": "HIPAA-eligible: AWS signs a BAA", "when": {"compliance_any": ["hipaa"]}},
+        {"text": "PCI DSS Level 1 service provider", "when": {"compliance_any": ["pci_dss"]}},
+        {"text": "Mumbai + Hyderabad regions", "when": {"india": true}},
+        "Containers without Kubernetes complexity"
+      ],
+      "weaknesses": [
+        "AWS networking/IAM learning curve",
+        "ALB + NAT gateway base costs even when idle"
+      ],
+      "sources": [
+        "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html",
+        "https://aws.amazon.com/fargate/pricing/",
+        "https://aws.amazon.com/compliance/hipaa-eligible-services-reference/",
+        "https://aws.amazon.com/compliance/pci-dss-level-1-faqs/",
+        "https://aws.amazon.com/ecs/sla/"
+      ],
+      "sla": {"percent": 99.99, "scope": "tasks spread over two or more Availability Zones (Amazon ECS / Fargate multi-AZ commitment)", "source": "https://aws.amazon.com/ecs/sla/"}
+    },
+    {
+      "id": "aws_eks",
+      "name": "AWS EKS (Kubernetes)",
+      "provider": "aws",
+      "kind": "kubernetes",
+      "summary": "Managed Kubernetes control plane on AWS.",
+      "scores": {
+        "scalability": 5,
+        "ease": 1,
+        "ops": 1,
+        "maturity": 5,
+        "realtime": 4,
+        "performance": 4
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": false,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": true
+      },
+      "gpu_source": "https://docs.aws.amazon.com/eks/latest/userguide/ml-eks-optimized-ami.html",
+      "skills": [
+        "kubernetes",
+        "aws"
+      ],
+      "related_skills": [
+        "docker",
+        "terraform",
+        "devops",
+        "helm"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 4,
+      "needs_platform_skills": true,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 0,
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 5,
+        "maturity_note": "AWS: HIPAA-eligible services list, PCI DSS Level 1 service provider, HITRUST CSF and FedRAMP High; CloudTrail records every API call; Dedicated Hosts/Instances give single-tenant hardware; reports via AWS Artifact.",
+        "maturity_sources": [
+          "https://aws.amazon.com/compliance/programs/",
+          "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+          "https://aws.amazon.com/ec2/dedicated-hosts/"
+        ]
+      },
+      "cost_usd": [
+        [
+          100,
+          200
+        ],
+        [
+          150,
+          300
+        ],
+        [
+          300,
+          700
+        ],
+        [
+          700,
+          2500
+        ],
+        [
+          2500,
+          12000
+        ],
+        [
+          12000,
+          70000
+        ]
+      ],
+      "strengths": [
+        "Portable Kubernetes workloads with the AWS ecosystem",
+        "Fine-grained autoscaling for many services"
+      ],
+      "weaknesses": [
+        "Control-plane fee (~$73/mo) plus nodes",
+        "Needs dedicated platform/DevOps skills"
+      ],
+      "sources": [
+        "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html",
+        "https://aws.amazon.com/eks/pricing/",
+        "https://aws.amazon.com/eks/sla/",
+        "https://aws.amazon.com/compute/sla/"
+      ],
+      "sla": {"percent": 99.99, "scope": "a Provisioned Control Plane (99.99%; the standard control plane is 99.95%) with worker nodes on EC2 across two or more Availability Zones (Amazon Compute region-level SLA, 99.99%: https://aws.amazon.com/compute/sla/)", "source": "https://aws.amazon.com/eks/sla/"}
+    },
+    {
+      "id": "aws_lambda",
+      "name": "AWS Lambda + API Gateway",
+      "provider": "aws",
+      "kind": "faas",
+      "summary": "Event-driven functions with per-request billing; API Gateway or function URLs in front.",
+      "scores": {
+        "scalability": 5,
+        "ease": 3,
+        "ops": 5,
+        "maturity": 5,
+        "realtime": 2,
+        "performance": 3
+      },
+      "runs": {
+        "static": false,
+        "ssr": true,
+        "functions": true,
+        "long_running": false,
+        "websockets": false,
+        "containers": true,
+        "gpu": false
+      },
+      "gpu_source": "https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html",
+      "skills": [
+        "aws",
+        "serverless",
+        "lambda"
+      ],
+      "related_skills": [
+        "javascript",
+        "python",
+        "typescript"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 4,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 0,
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 5,
+        "maturity_note": "AWS: HIPAA-eligible services list, PCI DSS Level 1 service provider, HITRUST CSF and FedRAMP High; CloudTrail records every API call; Dedicated Hosts/Instances give single-tenant hardware; reports via AWS Artifact.",
+        "maturity_sources": [
+          "https://aws.amazon.com/compliance/programs/",
+          "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+          "https://aws.amazon.com/ec2/dedicated-hosts/"
+        ]
+      },
+      "cost_usd": [
+        [
+          0,
+          5
+        ],
+        [
+          0,
+          40
+        ],
+        [
+          30,
+          400
+        ],
+        [
+          300,
+          4000
+        ],
+        [
+          4000,
+          30000
+        ],
+        [
+          30000,
+          200000
+        ]
+      ],
+      "strengths": [
+        "Scale-to-zero billing with a permanent free tier (1M requests/month)",
+        {"text": "HIPAA-eligible: AWS signs a BAA", "when": {"compliance_any": ["hipaa"]}},
+        {"text": "PCI DSS compliant service", "when": {"compliance_any": ["pci_dss"]}}
+      ],
+      "weaknesses": [
+        "Cold starts; 15-minute execution limit",
+        "Relational DB connections need RDS Proxy",
+        "Cost overtakes containers at sustained high RPS"
+      ],
+      "sources": [
+        "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+        "https://aws.amazon.com/lambda/pricing/",
+        "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html",
+        "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html",
+        "https://aws.amazon.com/lambda/sla/"
+      ],
+      "sla": {"percent": 99.95, "scope": "per region", "source": "https://aws.amazon.com/lambda/sla/"}
+    },
+    {
+      "id": "aws_s3_cloudfront",
+      "name": "AWS S3 + CloudFront (static)",
+      "provider": "aws",
+      "kind": "static_cdn",
+      "summary": "Pre-built pages in an S3 bucket served through the CloudFront CDN: files only, no server code.",
+      "scores": {
+        "scalability": 5,
+        "ease": 3,
+        "ops": 5,
+        "maturity": 5,
+        "realtime": 1,
+        "performance": 5
+      },
+      "runs": {
+        "static": true,
+        "ssr": false,
+        "functions": false,
+        "long_running": false,
+        "websockets": false,
+        "containers": false,
+        "gpu": false
+      },
+      "skills": [
+        "aws"
+      ],
+      "related_skills": [
+        "terraform",
+        "devops",
+        "javascript",
+        "typescript"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 0,
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 5,
+        "maturity_note": "AWS: S3 and CloudFront are on the HIPAA-eligible services list and in scope for PCI DSS Level 1 and SOC reports; CloudTrail records every API call; reports via AWS Artifact.",
+        "maturity_sources": [
+          "https://aws.amazon.com/compliance/hipaa-eligible-services-reference/",
+          "https://aws.amazon.com/compliance/programs/"
+        ]
+      },
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          15
+        ],
+        [
+          15,
+          200
+        ],
+        [
+          200,
+          1000
+        ],
+        [
+          1000,
+          5000
+        ]
+      ],
+      "static_cost_note": "CloudFront flat-rate plans: Free $0 (1M requests, 100 GB), Pro $15, Business $200, Premium $1,000 a month, with no overage charges; S3 storage for a site's files is cents a month.",
+      "strengths": [
+        "Plain files in a bucket: the cheapest and most portable way to serve a static site on AWS",
+        {
+          "text": "S3 buckets in Mumbai and Hyderabad; CloudFront edge locations in India",
+          "when": {
+            "india": true
+          }
+        },
+        "CloudFront flat-rate plans with no overage charges"
+      ],
+      "weaknesses": [
+        "Serves files only: no server rendering, API routes or functions",
+        "Manual setup: bucket policy with Origin Access Control, a TLS certificate and a cache invalidation on each deploy",
+        {
+          "text": "Next.js must use static export (output: 'export'): no ISR, middleware or on-demand image optimisation",
+          "when": {
+            "stack_any": [
+              "nextjs"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        "https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html",
+        "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html",
+        "https://aws.amazon.com/cloudfront/pricing/",
+        "https://aws.amazon.com/s3/pricing/",
+        "https://nextjs.org/docs/app/guides/static-exports",
+        "https://aws.amazon.com/compliance/hipaa-eligible-services-reference/",
+        "https://aws.amazon.com/cloudfront/sla/"
+      ],
+      "sla": {"percent": 99.9, "scope": "CloudFront distribution", "source": "https://aws.amazon.com/cloudfront/sla/"},
+      "static_only": true,
+      "facts_as_of": "2026-10-04"
+    },
+    {
+      "id": "gcp_cloud_run",
+      "name": "Google Cloud Run",
+      "provider": "gcp",
+      "kind": "containers",
+      "summary": "Serverless containers: any Docker image, request-based autoscaling to zero, WebSockets supported.",
+      "scores": {
+        "scalability": 5,
+        "ease": 4,
+        "ops": 5,
+        "maturity": 4,
+        "realtime": 3,
+        "performance": 4
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": true,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": true
+      },
+      "gpu_source": "https://docs.cloud.google.com/run/docs/configuring/services/gpu",
+      "skills": [
+        "gcp",
+        "docker"
+      ],
+      "related_skills": [
+        "go",
+        "python",
+        "kubernetes",
+        "php",
+        "laravel",
+        "node",
+        "java",
+        "ruby",
+        "dotnet"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 0,
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 5,
+        "maturity_note": "Google Cloud: BAA covering listed services, PCI DSS, HITRUST CSF, FedRAMP High; Cloud Audit Logs are on by default for admin activity; sole-tenant nodes give dedicated hardware.",
+        "maturity_sources": [
+          "https://cloud.google.com/security/compliance/offerings",
+          "https://cloud.google.com/logging/docs/audit",
+          "https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes"
+        ]
+      },
+      "cost_usd": [
+        [
+          0,
+          10
+        ],
+        [
+          10,
+          60
+        ],
+        [
+          60,
+          400
+        ],
+        [
+          400,
+          2000
+        ],
+        [
+          2000,
+          10000
+        ],
+        [
+          10000,
+          60000
+        ]
+      ],
+      "strengths": [
+        "Container portability with serverless billing",
+        {"text": "Mumbai and Delhi regions", "when": {"india": true}},
+        {"text": "HIPAA BAA available", "when": {"compliance_any": ["hipaa"]}},
+        "No cluster to operate"
+      ],
+      "weaknesses": [
+        "Request timeout (max 60 min) limits very long-lived connections",
+        "Cold starts when scaled to zero"
+      ],
+      "sources": [
+        "https://cloud.google.com/run/docs",
+        "https://cloud.google.com/run/pricing",
+        "https://cloud.google.com/run/docs/triggering/websockets",
+        "https://cloud.google.com/security/compliance/hipaa",
+        "https://cloud.google.com/docs/buildpacks/php",
+        "https://cloud.google.com/docs/buildpacks/overview",
+        "https://cloud.google.com/run/sla",
+        "https://cloud.google.com/run/docs/configuring/min-instances"
+      ],
+      "sla": {"percent": 99.95, "scope": "Cloud Run services in most regions", "source": "https://cloud.google.com/run/sla"},
+      "scale_to_zero": {"why": "Scales to zero by default; minimum instances avoid cold starts and are billed while idle", "source": "https://cloud.google.com/run/docs/configuring/min-instances"}
+    },
+    {
+      "id": "gcp_gke",
+      "name": "Google Kubernetes Engine (Autopilot)",
+      "provider": "gcp",
+      "kind": "kubernetes",
+      "summary": "Managed Kubernetes; Autopilot mode manages nodes for you.",
+      "scores": {
+        "scalability": 5,
+        "ease": 2,
+        "ops": 2,
+        "maturity": 5,
+        "realtime": 4,
+        "performance": 4
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": false,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": true
+      },
+      "gpu_source": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/autopilot-gpus",
+      "skills": [
+        "kubernetes",
+        "gcp"
+      ],
+      "related_skills": [
+        "docker",
+        "helm",
+        "devops"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 3,
+      "needs_platform_skills": true,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 0,
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 5,
+        "maturity_note": "Google Cloud: BAA covering listed services, PCI DSS, HITRUST CSF, FedRAMP High; Cloud Audit Logs are on by default for admin activity; sole-tenant nodes give dedicated hardware.",
+        "maturity_sources": [
+          "https://cloud.google.com/security/compliance/offerings",
+          "https://cloud.google.com/logging/docs/audit",
+          "https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes"
+        ]
+      },
+      "cost_usd": [
+        [
+          75,
+          150
+        ],
+        [
+          150,
+          300
+        ],
+        [
+          300,
+          700
+        ],
+        [
+          700,
+          2500
+        ],
+        [
+          2500,
+          12000
+        ],
+        [
+          12000,
+          70000
+        ]
+      ],
+      "strengths": [
+        "Most mature managed Kubernetes; Autopilot reduces node ops",
+        "Good fit for many services / ML workloads with GPUs"
+      ],
+      "weaknesses": [
+        "Kubernetes expertise still required",
+        "Cluster management fee"
+      ],
+      "sources": [
+        "https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview",
+        "https://cloud.google.com/kubernetes-engine/pricing",
+        "https://cloud.google.com/kubernetes-engine/sla"
+      ],
+      "sla": {"percent": 99.9, "scope": "Autopilot Pods in multiple zones (the control plane is 99.95%)", "source": "https://cloud.google.com/kubernetes-engine/sla"}
+    },
+    {
+      "id": "azure_apps",
+      "name": "Azure App Service / Container Apps",
+      "provider": "azure",
+      "kind": "containers",
+      "summary": "Microsoft's managed web hosting and serverless containers, integrated with Entra ID and Azure SQL/Postgres.",
+      "scores": {
+        "scalability": 5,
+        "ease": 4,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 4,
+        "performance": 4
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": true,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": true
+      },
+      "gpu_source": "https://learn.microsoft.com/en-us/azure/container-apps/gpu-serverless-overview",
+      "skills": [
+        "azure"
+      ],
+      "related_skills": [
+        "csharp",
+        "dotnet",
+        "docker",
+        "php",
+        "laravel"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 3,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 0,
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 5,
+        "maturity_note": "Azure: HIPAA BAA in the product terms, PCI DSS Level 1, HITRUST, FedRAMP High; Activity Log audits every control-plane change; Azure Dedicated Host gives single-tenant servers.",
+        "maturity_sources": [
+          "https://learn.microsoft.com/azure/compliance/",
+          "https://learn.microsoft.com/azure/azure-monitor/essentials/activity-log",
+          "https://learn.microsoft.com/azure/virtual-machines/dedicated-hosts"
+        ]
+      },
+      "cost_usd": [
+        [
+          0,
+          15
+        ],
+        [
+          15,
+          100
+        ],
+        [
+          100,
+          500
+        ],
+        [
+          500,
+          2500
+        ],
+        [
+          2500,
+          12000
+        ],
+        [
+          12000,
+          70000
+        ]
+      ],
+      "strengths": [
+        "Natural home for .NET and Microsoft-centric enterprises",
+        {"text": "Three India regions", "when": {"india": true}},
+        "Broad compliance portfolio"
+      ],
+      "weaknesses": [
+        "Portal/config complexity; pricing tiers are confusing"
+      ],
+      "sources": [
+        "https://learn.microsoft.com/azure/app-service/overview",
+        "https://learn.microsoft.com/azure/container-apps/overview",
+        "https://learn.microsoft.com/azure/compliance/offerings/offering-hipaa-us",
+        "https://learn.microsoft.com/en-us/azure/app-service/quickstart-php",
+        "https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services"
+      ],
+      "sla": {"percent": 99.99, "scope": "App Service apps deployed across two or more Availability Zones (zone-redundant Premium v2-v4 plans); 99.95% without zones, and Azure Container Apps 99.95%", "source": "https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services"}
+    },
+    {
+      "id": "digitalocean",
+      "name": "DigitalOcean (App Platform + Managed DBs)",
+      "provider": "digitalocean",
+      "kind": "paas",
+      "summary": "Developer-friendly cloud: App Platform PaaS, Droplets, managed Postgres/MySQL/Valkey, Bangalore region.",
+      "scores": {
+        "scalability": 4,
+        "ease": 4,
+        "ops": 5,
+        "maturity": 4,
+        "realtime": 4,
+        "performance": 3
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": true,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": false
+      },
+      "gpu_source": "https://www.digitalocean.com/products/app-platform",
+      "skills": [
+        "digitalocean",
+        "docker"
+      ],
+      "related_skills": [
+        "linux",
+        "php",
+        "laravel",
+        "python",
+        "node",
+        "go",
+        "ruby"
+      ],
+      "scale_ceiling": 4,
+      "team_min": 1,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia"
+      ],
+      "compliance": {
+        "hipaa": false,
+        "pci": false,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 2,
+        "maturity_note": "SOC 2 Type II; for PCI DSS it validates only SAQ-A (it keeps no card data itself), so it is not attested as a service provider for systems that store card data. DigitalOcean signs a HIPAA BAA only for listed products (Droplets, Kubernetes, Spaces, Volumes and others); App Platform and Managed Databases, which this option uses, are not on the list.",
+        "maturity_sources": [
+          "https://www.digitalocean.com/trust",
+          "https://www.digitalocean.com/trust/hipaa-at-do"
+        ]
+      },
+      "cost_usd": [
+        [
+          5,
+          12
+        ],
+        [
+          12,
+          50
+        ],
+        [
+          50,
+          250
+        ],
+        [
+          250,
+          1200
+        ],
+        [
+          1200,
+          6000
+        ],
+        [
+          6000,
+          30000
+        ]
+      ],
+      "strengths": [
+        "Predictable, low pricing",
+        {"text": "Bangalore (BLR1) region for Indian users / data residency", "when": {"india": true}}
+      ],
+      "weaknesses": [
+        "Fewer managed services than hyperscalers",
+        {"text": "Its HIPAA BAA does not cover App Platform or Managed Databases (only Droplets, Kubernetes and other listed products)", "when": {"compliance_any": ["hipaa"]}}
+      ],
+      "static_cost_usd": [[0, 0], [12, 50], [50, 250], [250, 1200], [1200, 6000], [6000, 30000]],
+      "sources": [
+        "https://docs.digitalocean.com/products/app-platform/",
+        "https://www.digitalocean.com/pricing",
+        "https://www.digitalocean.com/pricing/app-platform",
+        "https://docs.digitalocean.com/platform/regional-availability/",
+        "https://docs.digitalocean.com/products/app-platform/reference/buildpacks/php/",
+        "https://docs.digitalocean.com/products/app-platform/reference/buildpacks/python/",
+        "https://www.digitalocean.com/sla/app-platform"
+      ],
+      "sla": {"percent": 99.95, "scope": "each App Platform component", "source": "https://www.digitalocean.com/sla/app-platform"},
+      "facts_as_of": "2026-10-03"
+    },
+    {
+      "id": "hetzner",
+      "name": "Hetzner Cloud / VPS (Docker, Coolify)",
+      "provider": "hetzner",
+      "kind": "vps",
+      "summary": "Low-cost VMs in Germany, Finland, US and Singapore; you run Docker/Compose or a self-hosted PaaS like Coolify.",
+      "scores": {
+        "scalability": 3,
+        "ease": 2,
+        "ops": 2,
+        "maturity": 4,
+        "realtime": 5,
+        "performance": 4
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": false,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": false
+      },
+      "gpu_source": "https://www.hetzner.com/cloud",
+      "skills": [
+        "linux",
+        "docker",
+        "devops"
+      ],
+      "related_skills": [
+        "hetzner",
+        "kubernetes"
+      ],
+      "scale_ceiling": 4,
+      "team_min": 1,
+      "needs_platform_skills": true,
+      "lock_in": 1,
+      "on_prem": false,
+      "regions": [
+        "europe",
+        "north_america",
+        "southeast_asia"
+      ],
+      "compliance": {
+        "hipaa": false,
+        "pci": false,
+        "soc2": false,
+        "gdpr_dpa": true,
+        "maturity": 1,
+        "maturity_note": "ISO 27001 data centres only; no SOC 2 report, BAA or PCI attestation.",
+        "maturity_sources": [
+          "https://www.hetzner.com/unternehmen/zertifizierung/"
+        ]
+      },
+      "cost_usd": [
+        [
+          5,
+          10
+        ],
+        [
+          10,
+          40
+        ],
+        [
+          40,
+          150
+        ],
+        [
+          100,
+          500
+        ],
+        [
+          500,
+          2500
+        ],
+        [
+          2500,
+          12000
+        ]
+      ],
+      "strengths": [
+        "3-10x cheaper compute than hyperscalers",
+        {"text": "EU company: straightforward GDPR posture", "when": {"eu": true}}
+      ],
+      "weaknesses": [
+        "You own patching, backups, failover and monitoring",
+        {"text": "No India region", "when": {"india": true}}
+      ],
+      "sources": [
+        "https://docs.hetzner.com/cloud/",
+        "https://www.hetzner.com/cloud/",
+        "https://coolify.io/docs/",
+        "https://www.hetzner.com/legal/cloud-server/"
+      ],
+      "sla": {"percent": 99.9, "scope": "each Cloud Server", "source": "https://www.hetzner.com/legal/cloud-server/"}
+    },
+    {
+      "id": "onprem_docker",
+      "name": "On-prem VMs + Docker Compose",
+      "provider": "onprem",
+      "kind": "onprem",
+      "summary": "Your own servers or private data centre running containers with Compose/systemd and a reverse proxy.",
+      "scores": {
+        "scalability": 2,
+        "ease": 3,
+        "ops": 2,
+        "maturity": 4,
+        "realtime": 4,
+        "performance": 4
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": false,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": true
+      },
+      "gpu_source": "https://docs.docker.com/engine/containers/resource_constraints/#gpu",
+      "skills": [
+        "linux",
+        "docker"
+      ],
+      "related_skills": [
+        "devops",
+        "nginx"
+      ],
+      "scale_ceiling": 3,
+      "team_min": 1,
+      "lock_in": 1,
+      "on_prem": true,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 0,
+        "hipaa_note": "Compliance is your organisation's responsibility",
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 2,
+        "maturity_note": "Every control (audit logging, access review, encryption, physical security) is yours to build and evidence; a single Docker host has no built-in audit trail.",
+        "maturity_sources": [
+          "https://docs.docker.com/engine/security/"
+        ]
+      },
+      "cost_usd": [
+        [
+          0,
+          150
+        ],
+        [
+          50,
+          300
+        ],
+        [
+          300,
+          1000
+        ],
+        [
+          1000,
+          4000
+        ],
+        [
+          4000,
+          15000
+        ],
+        [
+          15000,
+          60000
+        ]
+      ],
+      "strengths": [
+        "Full data control; simplest on-prem option for small teams",
+        "Easy to move to Kubernetes later (same images)"
+      ],
+      "weaknesses": [
+        "Manual scaling and failover",
+        "Hardware capex + sysadmin time"
+      ],
+      "sources": [
+        "https://docs.docker.com/compose/",
+        "https://docs.docker.com/engine/security/"
+      ],
+      "single_host": true,
+      "single_host_note": "Docker Compose runs an app's containers on one Docker host and restarts them only on that host; placing and moving containers across several hosts is what Swarm or Kubernetes add",
+      "single_host_sources": [
+        "https://docs.docker.com/compose/how-tos/production/",
+        "https://docs.docker.com/engine/swarm/stack-deploy/"
+      ]
+    },
+    {
+      "id": "onprem_k8s",
+      "name": "On-prem Kubernetes (k3s / RKE2 / OpenShift)",
+      "provider": "onprem",
+      "kind": "onprem",
+      "summary": "Self-operated Kubernetes in your own data centre.",
+      "scores": {
+        "scalability": 4,
+        "ease": 1,
+        "ops": 1,
+        "maturity": 4,
+        "realtime": 4,
+        "performance": 4
+      },
+      "runs": {
+        "static": true,
+        "ssr": true,
+        "functions": false,
+        "long_running": true,
+        "websockets": true,
+        "containers": true,
+        "gpu": true
+      },
+      "gpu_source": "https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/",
+      "skills": [
+        "kubernetes",
+        "devops"
+      ],
+      "related_skills": [
+        "docker",
+        "linux",
+        "helm"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 5,
+      "needs_platform_skills": true,
+      "lock_in": 1,
+      "on_prem": true,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 0,
+        "hipaa_note": "Compliance is your organisation's responsibility",
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 3,
+        "maturity_note": "Every control is yours to evidence, but Kubernetes has built-in API audit logging and RBAC.",
+        "maturity_sources": [
+          "https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/"
+        ]
+      },
+      "cost_usd": [
+        [
+          300,
+          800
+        ],
+        [
+          500,
+          1200
+        ],
+        [
+          800,
+          2500
+        ],
+        [
+          2500,
+          8000
+        ],
+        [
+          8000,
+          30000
+        ],
+        [
+          30000,
+          120000
+        ]
+      ],
+      "strengths": [
+        "Data sovereignty + cloud-like orchestration",
+        "No per-request vendor bills"
+      ],
+      "weaknesses": [
+        "Requires a platform team (upgrades, storage, networking, security)",
+        "Capex and long hardware lead times"
+      ],
+      "sources": [
+        "https://kubernetes.io/docs/home/",
+        "https://docs.k3s.io/",
+        "https://docs.rke2.io/"
+      ]
+    }
+  ]
+}

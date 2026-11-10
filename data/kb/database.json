@@ -1,0 +1,1559 @@
+{
+  "layer": "database",
+  "curated_on": "2026-10-01",
+  "cost_note": "cost_usd = typical managed-service monthly cost per data/scale tier (<1k, 1k-10k, 10k-100k, 100k-1M, 1M-10M, >10M DAU). Self-hosting can be cheaper but adds ops work. entry_plans = vendor free and small fixed-price plans, each with the largest scale tier (0 = <1k DAU) and data size (GB within 12 months) it holds; the cheapest plan that holds the project sets the floor, and a $0 floor with no plan that holds the project becomes the next tier's floor. Each plan names its vendor; the cost estimate uses a plan only when the stack's managed offering on its host is that vendor's, and under HIPAA only a plan marked baa (the vendor signs a Business Associate Agreement for it). host_plans = the smallest plan of a host's own managed database, used only by the cost estimate on that host.",
+  "model_note": "models = fit (1-5) for each data shape (search = full-text or log search is the main way the data is read). consistency = strongest guarantee available for multi-record transactions.",
+  "items": [
+    {
+      "id": "postgres",
+      "tenant_isolation": {
+        "in_database": true,
+        "how": "row-level security policies filter every query by tenant",
+        "source": "https://www.postgresql.org/docs/current/ddl-rowsecurity.html"
+      },
+      "name": "PostgreSQL",
+      "summary": "Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).",
+      "models": {
+        "relational": 5,
+        "document": 4,
+        "graph": 2,
+        "time_series": 3,
+        "key_value": 3,
+        "analytical": 3,
+        "vector": 4,
+        "search": 3
+      },
+      "consistency": "strong",
+      "write_scale": 3,
+      "scores": {
+        "scalability": 4,
+        "ease": 4,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 3,
+        "performance": 4,
+        "hiring": 5,
+        "offline": 1
+      },
+      "skills": [
+        "postgres",
+        "sql"
+      ],
+      "related_skills": [
+        "mysql",
+        "supabase"
+      ],
+      "scale_ceiling": 4,
+      "team_min": 1,
+      "lock_in": 1,
+      "managed_only": false,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          15,
+          50
+        ],
+        [
+          50,
+          400
+        ],
+        [
+          400,
+          3000
+        ],
+        [
+          3000,
+          15000
+        ],
+        [
+          15000,
+          60000
+        ]
+      ],
+      "managed_offerings": {
+        "aws": "Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)",
+        "gcp": "Cloud SQL / AlloyDB for PostgreSQL",
+        "azure": "Azure Database for PostgreSQL Flexible Server",
+        "vercel": "Neon or Supabase Postgres via Vercel Marketplace",
+        "netlify": "Neon / Supabase Postgres",
+        "render": "Render Postgres",
+        "railway": "Railway Postgres",
+        "flyio": "Fly Managed Postgres",
+        "digitalocean": "DigitalOcean Managed PostgreSQL",
+        "hetzner": "Self-managed Postgres (Docker + automated backups) or a managed provider",
+        "onprem": "Self-managed with Patroni or CloudNativePG operator",
+        "cloudflare": "Neon / Supabase Postgres connected through Hyperdrive"
+      },
+      "strengths": [
+        "Default choice for relational data: constraints, joins, transactions",
+        "Extensions cover JSON, search, geo, time-series and vectors",
+        "Every cloud offers it managed; zero vendor lock-in"
+      ],
+      "weaknesses": [
+        "Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless",
+        "Connection-per-process model needs PgBouncer/RDS Proxy under serverless"
+      ],
+      "sources": [
+        "https://www.postgresql.org/docs/current/",
+        "https://github.com/pgvector/pgvector",
+        "https://www.citusdata.com/",
+        "https://www.pgbouncer.org/",
+        "https://supabase.com/pricing",
+        "https://neon.com/docs/introduction/plans",
+        "https://aiven.io/pricing/postgresql",
+        "https://supabase.com/docs/guides/platform/compute-and-disk",
+        "https://neon.com/pricing"
+      ],
+      "entry_plans": [
+        {"name": "Supabase Free", "vendor": "Supabase", "usd": 0, "max_tier": 1, "max_data_gb": 0.5,
+         "limits": "500 MB database on shared compute, paused after 1 week without activity, 2 active projects",
+         "source": "https://supabase.com/pricing"},
+        {"name": "Neon Free", "vendor": "Neon", "usd": 0, "max_tier": 0, "max_compute_tier": 0, "max_data_gb": 1,
+         "limits": "1 GB per project and 100 compute-hours a month (about 400 hours at the smallest size), so the database must scale to zero when idle; compute is suspended when the hours run out",
+         "source": "https://neon.com/docs/introduction/plans"},
+        {"name": "Aiven for PostgreSQL Developer", "vendor": "Aiven", "usd": 5, "max_tier": 1, "max_data_gb": 8,
+         "limits": "8 GB on one node (no standby, no connection pooling), in a limited set of regions",
+         "source": "https://aiven.io/pricing/postgresql"},
+        {"name": "Supabase Pro (Micro compute)", "vendor": "Supabase", "usd": 25, "max_tier": 1, "max_data_gb": 10, "included_gb": 8, "usd_per_gb": 0.125,
+         "limits": "Micro compute (shared CPU, 1 GB RAM, 60 direct connections, about 10 GB recommended) covered by the plan's $10 compute credit; 8 GB of disk included, then $0.125 per GB; one instance, no standby",
+         "source": "https://supabase.com/docs/guides/platform/compute-and-disk"},
+        {"name": "Supabase Pro + Small compute", "vendor": "Supabase", "usd": 30, "max_tier": 2, "max_data_gb": 50, "included_gb": 8, "usd_per_gb": 0.125,
+         "limits": "Small compute (shared CPU, 2 GB RAM, 90 direct connections, about 50 GB recommended): the $25 plan, whose $10 compute credit pays part of Small's ~$15 a month; 8 GB of disk included, then $0.125 per GB; one instance, no standby",
+         "source": "https://supabase.com/docs/guides/platform/compute-and-disk"},
+        {"name": "Supabase Pro + Medium compute", "vendor": "Supabase", "usd": 75, "max_tier": 2, "max_data_gb": 100, "included_gb": 8, "usd_per_gb": 0.125,
+         "limits": "Medium compute (shared CPU, 4 GB RAM, 120 direct connections, about 100 GB recommended): the $25 plan, whose $10 compute credit pays part of Medium's ~$60 a month; 8 GB of disk included, then $0.125 per GB; one instance, no standby",
+         "source": "https://supabase.com/docs/guides/platform/compute-and-disk"},
+        {"name": "Neon Launch (0.5 CU always on)", "vendor": "Neon", "usd": 39, "max_tier": 2, "max_data_gb": 50, "included_gb": 0, "usd_per_gb": 0.35,
+         "limits": "pay as you go with no monthly minimum: 0.5 compute unit (about 2 GB RAM) running all month at $0.106 per CU-hour, plus $0.35 per GB-month of storage; less when the database scales to zero while idle",
+         "source": "https://neon.com/pricing"},
+        {"name": "Aiven for PostgreSQL Startup", "vendor": "Aiven", "usd": 75, "max_tier": 2, "max_data_gb": 80,
+         "limits": "one node with 4 GB RAM and 80 GB of storage (no standby: Business plans from $180 a month add one)",
+         "source": "https://aiven.io/pricing/postgresql"}
+      ],
+      "host_plans": [
+        {"name": "DigitalOcean Managed PostgreSQL (1 GiB RAM, 1 vCPU)", "vendor": "DigitalOcean", "usd": 15.15, "max_tier": 1, "max_data_gb": 30,
+         "included_gb": 10, "usd_per_gb": 0.215,
+         "limits": "one node with 1 GiB RAM and 1 vCPU, 10 GiB of disk included, then $0.215 per GiB a month; no standby",
+         "source": "https://www.digitalocean.com/pricing/managed-databases"},
+        {"name": "Railway Postgres (usage-billed, ~0.5 GB RAM)", "vendor": "Railway", "usd": 7, "max_tier": 1, "max_data_gb": 50,
+         "included_gb": 0, "usd_per_gb": 0.15,
+         "limits": "billed per second of use: about 0.5 GB of RAM (~$10 per GB a month) and a light CPU share (~$20 per vCPU a month), plus volume storage at ~$0.15 per GB a month; one instance, no standby",
+         "source": "https://railway.com/pricing"}
+      ]
+    },
+    {
+      "id": "mysql",
+      "tenant_isolation": {
+        "in_database": false,
+        "how": "privileges stop at table and column level, so the tenant filter lives in every application query",
+        "source": "https://dev.mysql.com/doc/refman/8.4/en/privileges-provided.html"
+      },
+      "name": "MySQL",
+      "summary": "Widely deployed relational database; horizontally shardable with Vitess.",
+      "models": {
+        "relational": 5,
+        "document": 3,
+        "graph": 1,
+        "time_series": 2,
+        "key_value": 3,
+        "analytical": 2,
+        "vector": 2,
+        "search": 2
+      },
+      "consistency": "strong",
+      "write_scale": 3,
+      "scores": {
+        "scalability": 4,
+        "ease": 4,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 2,
+        "performance": 4,
+        "hiring": 5,
+        "offline": 1
+      },
+      "skills": [
+        "mysql",
+        "sql"
+      ],
+      "related_skills": [
+        "postgres",
+        "php",
+        "laravel"
+      ],
+      "scale_ceiling": 4,
+      "team_min": 1,
+      "lock_in": 1,
+      "managed_only": false,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          15,
+          50
+        ],
+        [
+          50,
+          400
+        ],
+        [
+          400,
+          3000
+        ],
+        [
+          3000,
+          15000
+        ],
+        [
+          15000,
+          60000
+        ]
+      ],
+      "managed_offerings": {
+        "aws": "Amazon RDS / Aurora MySQL",
+        "gcp": "Cloud SQL for MySQL",
+        "azure": "Azure Database for MySQL",
+        "vercel": "PlanetScale / TiDB Cloud",
+        "netlify": "PlanetScale / TiDB Cloud",
+        "render": "Self-managed MySQL on a private service",
+        "railway": "Railway MySQL",
+        "flyio": "MySQL on Fly Machines (self-managed)",
+        "digitalocean": "DigitalOcean Managed MySQL",
+        "hetzner": "Self-managed MySQL",
+        "onprem": "Self-managed MySQL (InnoDB Cluster) or Vitess operator",
+        "cloudflare": "PlanetScale connected through Hyperdrive"
+      },
+      "strengths": [
+        "Huge talent pool and hosting availability (default for PHP/Laravel)",
+        "Vitess path to sharding proven at YouTube/Slack scale",
+        "Read replicas are simple"
+      ],
+      "weaknesses": [
+        "Fewer advanced types and extensions than Postgres",
+        "Weaker JSON and analytical query support"
+      ],
+      "sources": [
+        "https://dev.mysql.com/doc/",
+        "https://vitess.io/docs/",
+        "https://planetscale.com/docs",
+        "https://aiven.io/free-mysql-database",
+        "https://aiven.io/pricing/mysql"
+      ],
+      "entry_plans": [
+        {"name": "Aiven for MySQL Free", "vendor": "Aiven", "usd": 0, "max_tier": 1, "max_data_gb": 1,
+         "limits": "1 GB on one node with 1 GB of RAM, powered off after a period of inactivity, in a limited set of regions",
+         "source": "https://aiven.io/free-mysql-database"},
+        {"name": "Aiven for MySQL Developer", "vendor": "Aiven", "usd": 5, "max_tier": 1, "max_data_gb": 8,
+         "limits": "8 GB on one node (no standby), in a limited set of regions",
+         "source": "https://aiven.io/pricing/mysql"},
+        {"name": "Aiven for MySQL Startup", "vendor": "Aiven", "usd": 75, "max_tier": 2, "max_data_gb": 80,
+         "limits": "one node with 4 GB RAM and 80 GB of storage (no standby: Business plans from $180 a month add one)",
+         "source": "https://aiven.io/pricing/mysql"}
+      ],
+      "host_plans": [
+        {"name": "DigitalOcean Managed MySQL (1 GiB RAM, 1 vCPU)", "vendor": "DigitalOcean", "usd": 15.15, "max_tier": 1, "max_data_gb": 30,
+         "included_gb": 10, "usd_per_gb": 0.215,
+         "limits": "one node with 1 GiB RAM and 1 vCPU, 10 GiB of disk included, then $0.215 per GiB a month; no standby",
+         "source": "https://www.digitalocean.com/pricing/managed-databases"},
+        {"name": "Railway MySQL (usage-billed, ~0.5 GB RAM)", "vendor": "Railway", "usd": 7, "max_tier": 1, "max_data_gb": 50,
+         "included_gb": 0, "usd_per_gb": 0.15,
+         "limits": "billed per second of use: about 0.5 GB of RAM (~$10 per GB a month) and a light CPU share (~$20 per vCPU a month), plus volume storage at ~$0.15 per GB a month; one instance, no standby",
+         "source": "https://railway.com/pricing"}
+      ]
+    },
+    {
+      "id": "mongodb",
+      "tenant_isolation": {
+        "in_database": false,
+        "how": "roles grant access per database and collection, so the tenant filter lives in every application query",
+        "source": "https://www.mongodb.com/docs/manual/core/authorization/"
+      },
+      "name": "MongoDB",
+      "summary": "Document database with flexible schemas, multi-document transactions, change streams and built-in sharding.",
+      "models": {
+        "relational": 2,
+        "document": 5,
+        "graph": 2,
+        "time_series": 4,
+        "key_value": 4,
+        "analytical": 2,
+        "vector": 4,
+        "search": 3
+      },
+      "consistency": "tunable",
+      "write_scale": 4,
+      "scores": {
+        "scalability": 5,
+        "ease": 4,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 4,
+        "performance": 4,
+        "hiring": 4,
+        "offline": 2
+      },
+      "skills": [
+        "mongodb"
+      ],
+      "related_skills": [
+        "javascript",
+        "node",
+        "typescript"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 2,
+      "managed_only": false,
+      "compliance": {
+        "hipaa": true,
+        "hipaa_note": "Atlas BAA on dedicated (M10+) clusters",
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true
+      },
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          8,
+          60
+        ],
+        [
+          60,
+          500
+        ],
+        [
+          500,
+          4000
+        ],
+        [
+          4000,
+          20000
+        ],
+        [
+          20000,
+          80000
+        ]
+      ],
+      "managed_offerings": {
+        "any": "MongoDB Atlas (runs on AWS, GCP or Azure in the same region as your compute)",
+        "onprem": "MongoDB Community/Enterprise replica set or the Kubernetes operator"
+      },
+      "strengths": [
+        "Flexible schema for catalogues, user-generated content, varied payloads",
+        "Native horizontal sharding and time-series collections",
+        "Change streams for realtime feeds"
+      ],
+      "weaknesses": [
+        "Joins and cross-entity reporting are weaker than SQL",
+        "Schema discipline moves into application code"
+      ],
+      "sources": [
+        "https://www.mongodb.com/docs/manual/",
+        "https://www.mongodb.com/docs/manual/core/transactions/",
+        "https://www.mongodb.com/pricing",
+        "https://www.mongodb.com/docs/manual/core/timeseries-collections/"
+      ],
+      "entry_plans": [
+        {"name": "MongoDB Atlas Free (M0)", "vendor": "MongoDB Atlas", "usd": 0, "max_tier": 1, "max_data_gb": 0.5,
+         "limits": "512 MB of storage on shared compute, up to 100 operations a second",
+         "source": "https://www.mongodb.com/pricing"},
+        {"name": "MongoDB Atlas Flex", "vendor": "MongoDB Atlas", "usd": 8, "max_tier": 1, "max_data_gb": 5,
+         "limits": "5 GB on shared compute, $0.011 an hour (about $8 a month) capped at $30 a month",
+         "source": "https://www.mongodb.com/pricing"},
+        {"name": "MongoDB Atlas M10", "vendor": "MongoDB Atlas", "baa": true, "usd": 57, "max_tier": 2, "max_data_gb": 10,
+         "limits": "dedicated three-node replica set with 2 GB RAM and 2 vCPUs, 10 GB of storage at this price (more at extra cost), $0.08 an hour",
+         "source": "https://www.mongodb.com/pricing"},
+        {"name": "MongoDB Atlas M20", "vendor": "MongoDB Atlas", "baa": true, "usd": 144, "max_tier": 2, "max_data_gb": 20,
+         "limits": "dedicated three-node replica set with 4 GB RAM and 2 vCPUs, 20 GB of storage at this price (more at extra cost), $0.20 an hour",
+         "source": "https://www.mongodb.com/pricing"},
+        {"name": "MongoDB Atlas M30", "vendor": "MongoDB Atlas", "baa": true, "usd": 388, "max_tier": 2, "max_data_gb": 40,
+         "limits": "dedicated three-node replica set with 8 GB RAM and 2 vCPUs, 40 GB of storage at this price (more at extra cost), $0.54 an hour",
+         "source": "https://www.mongodb.com/pricing"}
+      ]
+    },
+    {
+      "id": "dynamodb",
+      "tenant_isolation": {
+        "in_database": true,
+        "how": "IAM conditions on the partition key (dynamodb:LeadingKeys) limit each caller to its own items",
+        "source": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html"
+      },
+      "name": "Amazon DynamoDB",
+      "summary": "Fully managed serverless key-value/document store with single-digit-millisecond latency at any scale.",
+      "models": {
+        "relational": 1,
+        "document": 3,
+        "graph": 1,
+        "time_series": 3,
+        "key_value": 5,
+        "analytical": 1,
+        "vector": 1,
+        "search": 1
+      },
+      "consistency": "tunable",
+      "write_scale": 5,
+      "scores": {
+        "scalability": 5,
+        "ease": 2,
+        "ops": 5,
+        "maturity": 5,
+        "realtime": 3,
+        "performance": 5,
+        "hiring": 3,
+        "offline": 1
+      },
+      "skills": [
+        "dynamodb"
+      ],
+      "related_skills": [
+        "aws",
+        "serverless",
+        "nosql"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 5,
+      "managed_only": true,
+      "cloud": "aws",
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true
+      },
+      "cost_usd": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          25
+        ],
+        [
+          25,
+          300
+        ],
+        [
+          300,
+          3000
+        ],
+        [
+          3000,
+          20000
+        ],
+        [
+          20000,
+          100000
+        ]
+      ],
+      "managed_offerings": {
+        "aws": "DynamoDB on-demand (switch to provisioned + auto scaling when traffic is predictable)"
+      },
+      "strengths": [
+        "Zero-ops, effectively unlimited write throughput",
+        {"text": "Pairs naturally with Lambda (no connection pooling problem)", "when": {"stack_any": ["aws_lambda", "serverless_functions"]}},
+        {"text": "Global tables for multi-region active-active", "when": {"multi_region": true}}
+      ],
+      "weaknesses": [
+        "Access patterns must be designed up front (single-table design)",
+        "AWS-only, so the highest lock-in",
+        "Ad-hoc queries and analytics need exports"
+      ],
+      "sources": [
+        "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html",
+        "https://aws.amazon.com/dynamodb/pricing/",
+        "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html"
+      ]
+    },
+    {
+      "id": "redis",
+      "name": "Redis / Valkey",
+      "summary": "In-memory key-value store: caching, sessions, rate limits, leaderboards, pub/sub, streams.",
+      "models": {
+        "relational": 1,
+        "document": 2,
+        "graph": 1,
+        "time_series": 2,
+        "key_value": 5,
+        "analytical": 1,
+        "vector": 3,
+        "search": 2
+      },
+      "consistency": "eventual",
+      "write_scale": 5,
+      "scores": {
+        "scalability": 4,
+        "ease": 4,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 5,
+        "performance": 5,
+        "hiring": 4,
+        "offline": 1
+      },
+      "skills": [
+        "redis"
+      ],
+      "related_skills": [
+        "valkey",
+        "memcached"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "managed_only": false,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          5,
+          30
+        ],
+        [
+          30,
+          200
+        ],
+        [
+          200,
+          1500
+        ],
+        [
+          1500,
+          8000
+        ],
+        [
+          8000,
+          30000
+        ]
+      ],
+      "managed_offerings": {
+        "aws": "ElastiCache (Valkey)",
+        "gcp": "Memorystore",
+        "azure": "Azure Cache for Redis",
+        "vercel": "Upstash Redis",
+        "netlify": "Upstash Redis",
+        "render": "Render Key Value",
+        "railway": "Railway Redis",
+        "flyio": "Upstash Redis on Fly",
+        "digitalocean": "DigitalOcean Managed Caching (Valkey)",
+        "hetzner": "Self-managed Valkey",
+        "onprem": "Self-managed Valkey / Redis Sentinel",
+        "cloudflare": "Workers KV for simple caching, or Upstash Redis"
+      },
+      "strengths": [
+        "Sub-millisecond reads; ideal cache and realtime pub/sub layer",
+        "Sorted sets for leaderboards/matchmaking"
+      ],
+      "weaknesses": [
+        "Memory-bound and asynchronously replicated: not a system of record for money or health data"
+      ],
+      "sources": [
+        "https://redis.io/docs/latest/",
+        "https://valkey.io/docs/",
+        "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/"
+      ],
+      "memory_bound": true,
+      "system_of_record": {
+        "shapes": ["key_value"],
+        "regulated": false,
+        "why": "In-memory store: with the default append-only-file setting (fsync every second) a crash loses up to the last second of writes, and snapshots alone lose minutes; it holds key-value data but not tables of records",
+        "source": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/"
+      }
+    },
+    {
+      "id": "cassandra",
+      "tenant_isolation": {
+        "in_database": false,
+        "how": "permissions apply per keyspace and table, so the tenant filter lives in every application query",
+        "source": "https://cassandra.apache.org/doc/latest/cassandra/developing/cql/security.html"
+      },
+      "name": "Apache Cassandra / ScyllaDB",
+      "summary": "Masterless wide-column stores built for very high write throughput and multi-datacenter replication.",
+      "models": {
+        "relational": 1,
+        "document": 2,
+        "graph": 1,
+        "time_series": 4,
+        "key_value": 4,
+        "analytical": 1,
+        "vector": 2,
+        "search": 1
+      },
+      "consistency": "eventual",
+      "write_scale": 5,
+      "scores": {
+        "scalability": 5,
+        "ease": 2,
+        "ops": 2,
+        "maturity": 4,
+        "realtime": 2,
+        "performance": 5,
+        "hiring": 2,
+        "offline": 1
+      },
+      "skills": [
+        "cassandra",
+        "scylladb"
+      ],
+      "related_skills": [
+        "java",
+        "nosql",
+        "kubernetes"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 3,
+      "lock_in": 1,
+      "managed_only": false,
+      "cost_usd": [
+        [
+          0,
+          25
+        ],
+        [
+          25,
+          100
+        ],
+        [
+          200,
+          800
+        ],
+        [
+          800,
+          4000
+        ],
+        [
+          4000,
+          15000
+        ],
+        [
+          15000,
+          60000
+        ]
+      ],
+      "managed_offerings": {
+        "aws": "Amazon Keyspaces or ScyllaDB Cloud",
+        "gcp": "ScyllaDB Cloud / DataStax Astra",
+        "azure": "Azure Managed Instance for Apache Cassandra",
+        "any": "ScyllaDB Cloud / DataStax Astra DB",
+        "onprem": "Self-managed ScyllaDB/Cassandra cluster (K8ssandra / Scylla Operator)"
+      },
+      "strengths": [
+        "Linear write scalability; multi-region active-active",
+        "Predictable low latency at millions of writes/sec (Discord moved to ScyllaDB)"
+      ],
+      "weaknesses": [
+        "Query-first data modelling; no joins, no multi-partition ACID",
+        "Operationally heavy when self-managed"
+      ],
+      "sources": [
+        "https://cassandra.apache.org/doc/latest/",
+        "https://docs.scylladb.com/",
+        "https://discord.com/blog/how-discord-stores-trillions-of-messages"
+      ]
+    },
+    {
+      "id": "clickhouse",
+      "tenant_isolation": {
+        "in_database": true,
+        "how": "row policies filter the rows each user can read",
+        "source": "https://clickhouse.com/docs/sql-reference/statements/create/row-policy"
+      },
+      "name": "ClickHouse",
+      "summary": "Columnar OLAP database for real-time analytics over billions of rows.",
+      "models": {
+        "relational": 2,
+        "document": 1,
+        "graph": 1,
+        "time_series": 4,
+        "key_value": 1,
+        "analytical": 5,
+        "vector": 2,
+        "search": 3
+      },
+      "consistency": "eventual",
+      "write_scale": 4,
+      "scores": {
+        "scalability": 5,
+        "ease": 3,
+        "ops": 3,
+        "maturity": 4,
+        "realtime": 2,
+        "performance": 5,
+        "hiring": 2,
+        "offline": 1
+      },
+      "skills": [
+        "clickhouse",
+        "sql"
+      ],
+      "related_skills": [
+        "postgres",
+        "data_engineering"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "managed_only": false,
+      "cost_usd": [
+        [
+          0,
+          20
+        ],
+        [
+          20,
+          70
+        ],
+        [
+          70,
+          500
+        ],
+        [
+          500,
+          3000
+        ],
+        [
+          3000,
+          15000
+        ],
+        [
+          15000,
+          60000
+        ]
+      ],
+      "managed_offerings": {
+        "any": "ClickHouse Cloud (AWS/GCP/Azure)",
+        "onprem": "Self-managed ClickHouse (Altinity operator)"
+      },
+      "strengths": [
+        "Aggregations over billions of rows in sub-second time",
+        "High compression for event/log/telemetry data"
+      ],
+      "weaknesses": [
+        "Not for transactional row updates or point lookups with strict consistency"
+      ],
+      "sources": [
+        "https://clickhouse.com/docs",
+        "https://clickhouse.com/docs/concepts/why-clickhouse-is-so-fast",
+        "https://clickhouse.com/pricing"
+      ]
+    },
+    {
+      "id": "opensearch",
+      "name": "OpenSearch / Elasticsearch",
+      "summary": "Distributed search engine on Lucene inverted indexes: full-text search with relevance ranking, log search and aggregations over JSON documents.",
+      "models": {
+        "relational": 1,
+        "document": 4,
+        "graph": 1,
+        "time_series": 4,
+        "key_value": 2,
+        "analytical": 3,
+        "vector": 4,
+        "search": 5
+      },
+      "consistency": "eventual",
+      "write_scale": 4,
+      "scores": {
+        "scalability": 5,
+        "ease": 2,
+        "ops": 2,
+        "maturity": 5,
+        "realtime": 2,
+        "performance": 4,
+        "hiring": 4,
+        "offline": 1
+      },
+      "skills": [
+        "opensearch",
+        "elasticsearch",
+        "elk",
+        "kibana"
+      ],
+      "related_skills": [
+        "lucene",
+        "solr",
+        "logstash"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "managed_only": false,
+      "cost_usd": [
+        [
+          25,
+          30
+        ],
+        [
+          30,
+          150
+        ],
+        [
+          150,
+          800
+        ],
+        [
+          800,
+          5000
+        ],
+        [
+          5000,
+          25000
+        ],
+        [
+          25000,
+          100000
+        ]
+      ],
+      "managed_offerings": {
+        "aws": "Amazon OpenSearch Service",
+        "gcp": "Elastic Cloud on Google Cloud",
+        "azure": "Elastic Cloud on Azure (Azure Native ISV Service)",
+        "any": "Elastic Cloud or Aiven for OpenSearch",
+        "onprem": "Self-managed OpenSearch cluster (OpenSearch Kubernetes operator)"
+      },
+      "strengths": [
+        "Full-text search with relevance ranking, highlighting, facets and typo tolerance",
+        "Log and event search over terabytes with index lifecycle policies (hot, warm, delete)"
+      ],
+      "weaknesses": [
+        "Not a transactional store: no multi-document transactions, and new writes become searchable after a refresh (about 1 s)",
+        "Cluster sizing (shards, replicas, JVM heap) and upgrades take real operations work"
+      ],
+      "sources": [
+        "https://opensearch.org/docs/latest/",
+        "https://opensearch.org/docs/latest/im-plugin/ism/index/",
+        "https://www.elastic.co/guide/en/elasticsearch/reference/current/near-real-time.html",
+        "https://aws.amazon.com/opensearch-service/pricing/"
+      ],
+      "system_of_record": {
+        "shapes": ["time_series"],
+        "why": "Search index: no multi-document transactions, and a write becomes searchable only after the next refresh, so it keeps append-only events (logs) but records that are updated belong in a transactional store it indexes from",
+        "source": "https://www.elastic.co/guide/en/elasticsearch/reference/current/near-real-time.html"
+      }
+    },
+    {
+      "id": "neo4j",
+      "name": "Neo4j",
+      "summary": "Native graph database queried with Cypher; built for relationship-heavy traversals.",
+      "models": {
+        "relational": 2,
+        "document": 2,
+        "graph": 5,
+        "time_series": 1,
+        "key_value": 1,
+        "analytical": 2,
+        "vector": 3,
+        "search": 2
+      },
+      "consistency": "strong",
+      "write_scale": 2,
+      "scores": {
+        "scalability": 3,
+        "ease": 3,
+        "ops": 3,
+        "maturity": 4,
+        "realtime": 1,
+        "performance": 4,
+        "hiring": 2,
+        "offline": 1
+      },
+      "skills": [
+        "neo4j",
+        "cypher"
+      ],
+      "related_skills": [
+        "sql",
+        "java"
+      ],
+      "scale_ceiling": 3,
+      "team_min": 1,
+      "lock_in": 3,
+      "managed_only": false,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          65,
+          130
+        ],
+        [
+          130,
+          700
+        ],
+        [
+          700,
+          4000
+        ],
+        [
+          4000,
+          15000
+        ],
+        [
+          15000,
+          60000
+        ]
+      ],
+      "managed_offerings": {
+        "any": "Neo4j AuraDB",
+        "onprem": "Neo4j Community/Enterprise"
+      },
+      "strengths": [
+        "Multi-hop traversals (friends-of-friends, fraud rings, recommendations) in milliseconds",
+        "Graph data science library"
+      ],
+      "weaknesses": [
+        "Write scale-out is limited compared with distributed stores",
+        "Usually a secondary store alongside a relational system of record"
+      ],
+      "sources": [
+        "https://neo4j.com/docs/",
+        "https://neo4j.com/pricing/",
+        "https://neo4j.com/docs/cypher-manual/current/",
+        "https://neo4j.com/customer-stories/fortune-500-financial-services-company"
+      ],
+      "system_of_record": {
+        "shapes": ["graph"],
+        "why": "Graph store: built for relationship traversals, and fits tables of records 2/5; graph deployments typically sit beside the relational system of record (Neo4j's own financial-services case kept SQL Server for customer history and added the graph for link analysis)",
+        "source": "https://neo4j.com/customer-stories/fortune-500-financial-services-company"
+      }
+    },
+    {
+      "id": "timescaledb",
+      "tenant_isolation": {
+        "in_database": true,
+        "how": "PostgreSQL row-level security policies filter every query by tenant",
+        "source": "https://www.postgresql.org/docs/current/ddl-rowsecurity.html"
+      },
+      "name": "TimescaleDB (Postgres)",
+      "summary": "Postgres extension adding hypertables, compression and continuous aggregates for time-series.",
+      "models": {
+        "relational": 4,
+        "document": 3,
+        "graph": 1,
+        "time_series": 5,
+        "key_value": 2,
+        "analytical": 4,
+        "vector": 4,
+        "search": 3
+      },
+      "consistency": "strong",
+      "write_scale": 4,
+      "without_shape": {
+        "shape": "time_series",
+        "models": {"analytical": 3},
+        "write_scale": 3,
+        "why": "Hypertables partition data by time; compression, continuous aggregates and fast ingest work on them, so without time-series data TimescaleDB is PostgreSQL plus an extension",
+        "source": "https://www.tigerdata.com/docs/use-timescale/latest/hypertables"
+      },
+      "scores": {
+        "scalability": 4,
+        "ease": 4,
+        "ops": 4,
+        "maturity": 4,
+        "realtime": 2,
+        "performance": 4,
+        "hiring": 4,
+        "offline": 1
+      },
+      "skills": [
+        "timescaledb",
+        "postgres",
+        "sql"
+      ],
+      "related_skills": [
+        "mysql"
+      ],
+      "scale_ceiling": 4,
+      "team_min": 1,
+      "lock_in": 2,
+      "managed_only": false,
+      "cost_usd": [
+        [
+          30,
+          30
+        ],
+        [
+          30,
+          80
+        ],
+        [
+          80,
+          500
+        ],
+        [
+          500,
+          3000
+        ],
+        [
+          3000,
+          15000
+        ],
+        [
+          15000,
+          60000
+        ]
+      ],
+      "managed_offerings": {
+        "any": "Timescale Cloud (Tiger Data) on AWS",
+        "azure": "Azure Database for PostgreSQL with TimescaleDB extension (Apache-licensed features only)",
+        "gcp": "Self-managed Postgres + TimescaleDB extension on Compute Engine or GKE in the same region (Cloud SQL does not offer the extension)",
+        "onprem": "Self-managed Postgres + TimescaleDB extension"
+      },
+      "self_managed_on": {"gcp": "https://cloud.google.com/sql/docs/postgres/extensions"},
+      "strengths": [
+        "Full SQL + joins with relational data on the same database",
+        "90%+ compression and automatic rollups for telemetry",
+        "Postgres tooling and skills carry over"
+      ],
+      "weaknesses": [
+        "Some features use the Timescale License (not on every managed Postgres)",
+        "Very high-cardinality firehoses may need ClickHouse instead"
+      ],
+      "sources": [
+        "https://docs.timescale.com/",
+        "https://docs.timescale.com/use-timescale/latest/compression/",
+        "https://docs.timescale.com/about/latest/timescaledb-editions/",
+        "https://cloud.google.com/sql/docs/postgres/extensions",
+        "https://www.tigerdata.com/pricing",
+        "https://www.tigerdata.com/docs/use-timescale/latest/hypertables"
+      ]
+    },
+    {
+      "id": "sqlite",
+      "tenant_isolation": {
+        "in_database": false,
+        "how": "no users or access policies: the tenant filter lives in every application query",
+        "source": "https://www.sqlite.org/whentouse.html"
+      },
+      "name": "SQLite (+ Litestream backups)",
+      "summary": "Embedded, serverless SQL database in a single file; replicate with Litestream or use Turso/libSQL.",
+      "models": {
+        "relational": 4,
+        "document": 3,
+        "graph": 1,
+        "time_series": 2,
+        "key_value": 3,
+        "analytical": 2,
+        "vector": 2,
+        "search": 3
+      },
+      "consistency": "strong",
+      "write_scale": 1,
+      "scores": {
+        "scalability": 1,
+        "ease": 5,
+        "ops": 5,
+        "maturity": 5,
+        "realtime": 1,
+        "performance": 5,
+        "hiring": 4,
+        "offline": 5
+      },
+      "skills": [
+        "sqlite",
+        "sql"
+      ],
+      "related_skills": [
+        "postgres",
+        "mysql"
+      ],
+      "scale_ceiling": 2,
+      "team_min": 1,
+      "lock_in": 1,
+      "managed_only": false,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          0,
+          30
+        ],
+        [
+          30,
+          150
+        ],
+        [
+          150,
+          600
+        ],
+        [
+          600,
+          2000
+        ]
+      ],
+      "managed_offerings": {
+        "any": "Turso (libSQL) or SQLite file + Litestream backups to object storage",
+        "flyio": "SQLite on a Fly volume with LiteFS / Litestream",
+        "onprem": "SQLite file on local disk with Litestream backups",
+        "cloudflare": "Cloudflare D1 (SQLite at the edge)"
+      },
+      "strengths": [
+        "Zero cost, zero ops; perfect for prototypes, single-server apps and on-device storage",
+        "In-process reads are extremely fast"
+      ],
+      "weaknesses": [
+        "Single writer; does not suit multi-instance or serverless deployments without Turso/LiteFS",
+        "No built-in network access control"
+      ],
+      "sources": [
+        "https://www.sqlite.org/whentouse.html",
+        "https://litestream.io/",
+        "https://docs.turso.tech/"
+      ],
+      "single_node": true,
+      "single_writer": true
+    },
+    {
+      "id": "firestore",
+      "tenant_isolation": {
+        "in_database": true,
+        "how": "security rules check the signed-in user on every client read and write",
+        "source": "https://firebase.google.com/docs/firestore/security/rules-conditions"
+      },
+      "name": "Cloud Firestore",
+      "summary": "Google's serverless document database with realtime listeners and offline client caching.",
+      "models": {
+        "relational": 1,
+        "document": 5,
+        "graph": 1,
+        "time_series": 2,
+        "key_value": 4,
+        "analytical": 1,
+        "vector": 2,
+        "search": 1
+      },
+      "consistency": "strong",
+      "write_scale": 2,
+      "scores": {
+        "scalability": 5,
+        "ease": 5,
+        "ops": 5,
+        "maturity": 4,
+        "realtime": 5,
+        "performance": 4,
+        "hiring": 3,
+        "offline": 5
+      },
+      "skills": [
+        "firestore",
+        "firebase"
+      ],
+      "related_skills": [
+        "javascript",
+        "typescript",
+        "dart",
+        "gcp"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 5,
+      "managed_only": true,
+      "cloud": "gcp",
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true
+      },
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          25
+        ],
+        [
+          25,
+          300
+        ],
+        [
+          300,
+          3000
+        ],
+        [
+          3000,
+          20000
+        ],
+        [
+          20000,
+          100000
+        ]
+      ],
+      "managed_offerings": {
+        "gcp": "Cloud Firestore (Native mode)",
+        "any": "Cloud Firestore (Google Cloud only)"
+      },
+      "strengths": [
+        "Realtime listeners + offline persistence out of the box",
+        "Zero ops; scales automatically"
+      ],
+      "weaknesses": [
+        "Limited querying (no joins, restricted aggregations)",
+        "Per-document read billing; Google advises against high write rates to a single document (the sustainable rate depends on the workload), so hot counters need sharding",
+        "Write rate grows only gradually: Google's 500/50/5 rule starts new traffic at 500 operations a second and adds 50% every 5 minutes, and an indexed field with sequential values (such as a message timestamp) caps a collection at 500 writes a second",
+        "Google Cloud lock-in"
+      ],
+      "sources": [
+        "https://firebase.google.com/docs/firestore",
+        "https://cloud.google.com/firestore/docs/best-practices",
+        "https://cloud.google.com/firestore/quotas",
+        "https://firebase.google.com/docs/firestore/manage-data/enable-offline"
+      ],
+      "usage": {
+        "storage_included_gb": 1,
+        "storage_usd_per_gb": 0.18,
+        "doc_read_usd_per_100k": 0.06,
+        "doc_write_usd_per_100k": 0.18,
+        "note": "Firestore bills per document read and write (free quota of 50,000 reads and 20,000 writes a day) plus stored GB.",
+        "source": "https://firebase.google.com/pricing",
+        "free_ops_per_day": 50000
+      }
+    },
+    {
+      "id": "none_static",
+      "name": "No database (content files in git)",
+      "summary": "No database server: pages and posts are Markdown or JSON files in the repository, built into static HTML at deploy time.",
+      "models": {
+        "relational": 1,
+        "document": 4,
+        "graph": 1,
+        "time_series": 1,
+        "key_value": 2,
+        "analytical": 1,
+        "vector": 1,
+        "search": 2
+      },
+      "consistency": "strong",
+      "write_scale": 1,
+      "scores": {
+        "scalability": 5,
+        "ease": 5,
+        "ops": 5,
+        "maturity": 5,
+        "realtime": 1,
+        "performance": 5,
+        "hiring": 5,
+        "offline": 5
+      },
+      "skills": [
+        "markdown",
+        "git"
+      ],
+      "related_skills": [
+        "html",
+        "javascript",
+        "typescript",
+        "react"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "managed_only": false,
+      "static_only": true,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "managed_offerings": {
+        "any": "Content files in the git repository, built into static pages at deploy time (no database to run)"
+      },
+      "strengths": [
+        "Nothing to run, back up or pay for: content is versioned and reviewed in git like code",
+        "Pages are pre-built, so the CDN serves every read with no database round trip"
+      ],
+      "weaknesses": [
+        "Only for content the team publishes: as soon as users sign in, post or pay, add a real database",
+        "Every content change needs a rebuild and deploy (seconds to minutes)"
+      ],
+      "sources": [
+        "https://docs.astro.build/en/guides/content-collections/",
+        "https://developers.cloudflare.com/pages/framework-guides/"
+      ]
+    },
+    {
+      "id": "sqlserver",
+      "tenant_isolation": {
+        "in_database": true,
+        "how": "row-level security (CREATE SECURITY POLICY) filters every query by tenant",
+        "source": "https://learn.microsoft.com/en-us/sql/relational-databases/security/row-level-security"
+      },
+      "name": "Microsoft SQL Server / Azure SQL Database",
+      "summary": "Microsoft's relational database: SQL Server on any server, or Azure SQL Database as the managed service, with T-SQL, columnstore indexes, JSON and full-text search.",
+      "models": {
+        "relational": 5,
+        "document": 3,
+        "graph": 2,
+        "time_series": 3,
+        "key_value": 3,
+        "analytical": 3,
+        "vector": 3,
+        "search": 3
+      },
+      "consistency": "strong",
+      "write_scale": 3,
+      "scores": {
+        "scalability": 4,
+        "ease": 3,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 2,
+        "performance": 4,
+        "hiring": 4,
+        "offline": 1
+      },
+      "skills": [
+        "sqlserver",
+        "sql"
+      ],
+      "related_skills": [
+        "csharp",
+        "azure",
+        "postgres",
+        "mysql"
+      ],
+      "scale_ceiling": 4,
+      "team_min": 1,
+      "lock_in": 3,
+      "managed_only": false,
+      "cost_usd": [
+        [
+          5,
+          15
+        ],
+        [
+          15,
+          150
+        ],
+        [
+          150,
+          800
+        ],
+        [
+          800,
+          5000
+        ],
+        [
+          5000,
+          25000
+        ],
+        [
+          25000,
+          100000
+        ]
+      ],
+      "managed_offerings": {
+        "azure": "Azure SQL Database (General Purpose, serverless or provisioned)",
+        "aws": "Amazon RDS for SQL Server",
+        "gcp": "Cloud SQL for SQL Server",
+        "onprem": "SQL Server on Windows or Linux with Always On availability groups",
+        "any": "Azure SQL Database, or SQL Server on your cloud's managed SQL Server service"
+      },
+      "strengths": [
+        "Keeps an existing SQL Server estate: no data or T-SQL migration",
+        "Entity Framework Core's first-party provider and the .NET tooling are built around it",
+        "Managed on all three hyperscalers (Azure SQL Database, Amazon RDS, Cloud SQL)",
+        "Azure SQL Database has a free offer for trying it: 100,000 vCore-seconds of serverless compute and 32 GB a month per database, paused when the allowance runs out (about 55 hours of activity at the smallest size, so not a home for an app used every day)"
+      ],
+      "weaknesses": [
+        "Commercial licence: managed instances cost more than PostgreSQL or MySQL of the same size",
+        "T-SQL and its features are specific to SQL Server, so moving off it is a migration"
+      ],
+      "sources": [
+        "https://learn.microsoft.com/en-us/sql/sql-server/",
+        "https://learn.microsoft.com/en-us/azure/azure-sql/database/sql-database-paas-overview",
+        "https://learn.microsoft.com/en-us/azure/azure-sql/database/free-offer",
+        "https://azure.microsoft.com/en-us/pricing/details/azure-sql-database/single/",
+        "https://aws.amazon.com/rds/sqlserver/pricing/",
+        "https://cloud.google.com/sql/docs/sqlserver",
+        "https://learn.microsoft.com/en-us/ef/core/providers/sql-server/"
+      ],
+      "self_managed_licence": {
+        "edition": "Standard",
+        "usd_per_core_month": 73,
+        "min_cores": 4,
+        "high_cores": 8,
+        "note": "Standard edition on a pay-as-you-go subscription at $73 per core a month, at least 4 cores per server; a passive replica kept only for failover needs no licence of its own",
+        "source": "https://www.microsoft.com/en-us/sql-server/sql-server-2022-pricing",
+        "free_edition": "Express",
+        "free_max_gb": 10,
+        "free_note": "Express edition is free but holds at most 10 GB per database and has no availability groups or failover clustering",
+        "free_source": "https://learn.microsoft.com/en-us/sql/sql-server/editions-and-components-of-sql-server-2022"
+      }
+    },
+    {
+      "id": "bigquery",
+      "name": "Google BigQuery",
+      "summary": "Google Cloud's serverless analytics warehouse: SQL over terabytes to petabytes of columnar storage, billed per byte scanned (or per slot) and per GB stored.",
+      "models": {
+        "relational": 2,
+        "document": 2,
+        "graph": 1,
+        "time_series": 3,
+        "key_value": 1,
+        "analytical": 5,
+        "vector": 3,
+        "search": 3
+      },
+      "consistency": "eventual",
+      "write_scale": 4,
+      "scores": {
+        "scalability": 5,
+        "ease": 4,
+        "ops": 5,
+        "maturity": 5,
+        "realtime": 2,
+        "performance": 4,
+        "hiring": 4,
+        "offline": 1
+      },
+      "skills": [
+        "bigquery",
+        "sql"
+      ],
+      "related_skills": [
+        "gcp",
+        "python",
+        "postgres"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 4,
+      "managed_only": true,
+      "cloud": "gcp",
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "pci": true,
+        "soc2": true,
+        "gdpr_dpa": true
+      },
+      "cost_usd": [
+        [
+          0,
+          5
+        ],
+        [
+          5,
+          50
+        ],
+        [
+          50,
+          500
+        ],
+        [
+          250,
+          2500
+        ],
+        [
+          2500,
+          15000
+        ],
+        [
+          15000,
+          80000
+        ]
+      ],
+      "managed_offerings": {
+        "gcp": "on-demand or capacity (Editions) pricing in your Google Cloud project",
+        "any": "BigQuery (Google Cloud only)"
+      },
+      "strengths": [
+        "No servers or clusters: storage and query capacity scale on their own",
+        "SQL over terabytes in seconds; on-demand queries cost $6.25 per TiB scanned after the first free TiB each month",
+        {
+          "text": "Native to Google Cloud: change streams from Cloud SQL or Spanner land in it through Datastream",
+          "when": {
+            "cloud_preference": [
+              "gcp"
+            ]
+          }
+        }
+      ],
+      "weaknesses": [
+        "An analytics warehouse, not a transactional store: row updates are quota-limited DML statements and a query takes about a second, so it is never the system of record for ACID data (the knowledge base marks it eventual for that reason)",
+        "Google Cloud only; a badly filtered query over a large table bills every byte it scans"
+      ],
+      "sources": [
+        "https://cloud.google.com/bigquery/docs/introduction",
+        "https://cloud.google.com/bigquery/pricing",
+        "https://cloud.google.com/bigquery/quotas",
+        "https://cloud.google.com/datastream/docs/overview",
+        "https://cloud.google.com/security/compliance/hipaa"
+      ],
+      "entry_plans": [
+        {
+          "name": "BigQuery free tier",
+          "vendor": "BigQuery",
+          "usd": 0,
+          "max_tier": 1,
+          "max_data_gb": 10,
+          "limits": "10 GB of storage and 1 TiB of queries a month free; past that $0.02 per GB-month of active storage and $6.25 per TiB scanned",
+          "source": "https://cloud.google.com/bigquery/pricing"
+        }
+      ]
+    }
+  ]
+}

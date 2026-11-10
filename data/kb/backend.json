@@ -1,0 +1,1129 @@
+{
+  "layer": "backend",
+  "curated_on": "2026-10-01",
+  "cost_note": "Self-hosted frameworks cost nothing themselves; compute is counted under hosting. BaaS products bill directly (cost_usd per scale tier: <1k, 1k-10k, 10k-100k, 100k-1M, 1M-10M, >10M DAU).",
+  "items": [
+    {
+      "id": "express",
+      "name": "Node.js + Express",
+      "kind": "server",
+      "language": "node",
+      "summary": "Minimal, unopinionated HTTP framework on Node.js.",
+      "scores": {
+        "scalability": 4,
+        "ease": 5,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 4,
+        "performance": 3,
+        "velocity": 4,
+        "hiring": 5,
+        "structure": 1
+      },
+      "skills": [
+        "javascript",
+        "typescript",
+        "node"
+      ],
+      "related_skills": [
+        "react",
+        "nextjs",
+        "vue"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        {"text": "Same language as the frontend (full-stack TypeScript)", "when": {"stack_any": ["nextjs", "react_spa", "nuxt", "sveltekit", "angular", "astro", "react_native"]}},
+        "Largest npm ecosystem; Socket.IO for realtime",
+        "Runs anywhere: containers, PaaS, functions"
+      ],
+      "weaknesses": [
+        "No structure: large codebases drift without conventions",
+        "CPU-heavy work blocks the event loop"
+      ],
+      "sources": [
+        "https://expressjs.com/",
+        "https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop",
+        "https://socket.io/docs/v4/"
+      ]
+    },
+    {
+      "id": "nestjs",
+      "name": "Node.js + NestJS",
+      "kind": "server",
+      "language": "node",
+      "summary": "Opinionated TypeScript framework (modules, DI, decorators) on top of Express/Fastify.",
+      "scores": {
+        "scalability": 4,
+        "ease": 3,
+        "ops": 4,
+        "maturity": 4,
+        "realtime": 4,
+        "performance": 3,
+        "velocity": 4,
+        "hiring": 4,
+        "structure": 5
+      },
+      "skills": [
+        "typescript",
+        "node",
+        "nestjs"
+      ],
+      "related_skills": [
+        "javascript",
+        "angular",
+        "java",
+        "csharp"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        "Enforced module boundaries suit growing teams and modular monoliths",
+        "First-class WebSockets, queues, microservice transports",
+        {"text": "Full-stack TypeScript", "when": {"stack_any": ["nextjs", "react_spa", "nuxt", "sveltekit", "angular", "astro", "react_native"]}}
+      ],
+      "weaknesses": [
+        "More boilerplate than Express/FastAPI",
+        "Decorator/DI concepts slow down beginners"
+      ],
+      "sources": [
+        "https://docs.nestjs.com/",
+        "https://docs.nestjs.com/websockets/gateways",
+        "https://docs.nestjs.com/microservices/basics"
+      ]
+    },
+    {
+      "id": "fastapi",
+      "name": "Python + FastAPI",
+      "kind": "server",
+      "language": "python",
+      "summary": "Async Python API framework with type-hint validation (Pydantic) and automatic OpenAPI docs.",
+      "scores": {
+        "scalability": 4,
+        "ease": 5,
+        "ops": 4,
+        "maturity": 4,
+        "realtime": 3,
+        "performance": 4,
+        "velocity": 5,
+        "hiring": 4,
+        "structure": 2
+      },
+      "skills": [
+        "python",
+        "fastapi"
+      ],
+      "related_skills": [
+        "django",
+        "flask"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        {"text": "Direct access to the Python ML/data ecosystem (PyTorch, scikit-learn, pandas)", "when": {"app_type": ["ml_product", "analytics_dashboard", "iot_telemetry"]}},
+        "Auto-generated OpenAPI docs and request validation",
+        "Async I/O for model-serving and API gateways"
+      ],
+      "weaknesses": [
+        "No built-in admin/ORM/auth (bring SQLAlchemy, etc.)",
+        "Python is slower than Go/.NET for CPU-bound request handling"
+      ],
+      "sources": [
+        "https://fastapi.tiangolo.com/",
+        "https://docs.pydantic.dev/latest/",
+        "https://fastapi.tiangolo.com/advanced/websockets/"
+      ]
+    },
+    {
+      "id": "django",
+      "view_layer": {
+        "name": "Django templates",
+        "source": "https://docs.djangoproject.com/en/5.2/topics/templates/",
+        "interactive": false
+      },
+      "name": "Python + Django",
+      "kind": "server",
+      "language": "python",
+      "summary": "Batteries-included Python web framework: ORM, migrations, admin, auth, forms, templates.",
+      "scores": {
+        "scalability": 4,
+        "ease": 4,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 2,
+        "performance": 3,
+        "velocity": 5,
+        "hiring": 4,
+        "structure": 4
+      },
+      "skills": [
+        "python",
+        "django"
+      ],
+      "related_skills": [
+        "fastapi",
+        "flask"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        "Auto-generated admin UI: an internal tool in days",
+        "Mature security defaults (CSRF, SQL injection, XSS protection)",
+        "Proven at very large scale (Instagram)"
+      ],
+      "weaknesses": [
+        {"text": "Realtime needs Django Channels + Redis", "when": {"realtime": ["some", "core"]}},
+        "Sync-first ORM; async support is partial"
+      ],
+      "sources": [
+        "https://docs.djangoproject.com/",
+        "https://docs.djangoproject.com/en/stable/ref/contrib/admin/",
+        "https://channels.readthedocs.io/"
+      ],
+      "admin_scaffolding": true
+    },
+    {
+      "id": "go",
+      "name": "Go (net/http, chi or Gin)",
+      "kind": "server",
+      "language": "go",
+      "summary": "Compiled, statically typed language with built-in concurrency; ships as a single static binary.",
+      "scores": {
+        "scalability": 5,
+        "ease": 3,
+        "ops": 5,
+        "maturity": 4,
+        "realtime": 4,
+        "performance": 5,
+        "velocity": 3,
+        "hiring": 3,
+        "structure": 2
+      },
+      "skills": [
+        "go"
+      ],
+      "related_skills": [
+        "java",
+        "csharp",
+        "rust",
+        "c++"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        "High throughput per core and low memory means fewer servers",
+        "Goroutines handle many concurrent connections (telemetry, websockets)",
+        "Single binary, tiny container images, fast cold starts"
+      ],
+      "weaknesses": [
+        "More code for CRUD than Rails/Django",
+        "Smaller web-framework ecosystem"
+      ],
+      "sources": [
+        "https://go.dev/doc/",
+        "https://go.dev/doc/effective_go#concurrency",
+        "https://pkg.go.dev/net/http"
+      ]
+    },
+    {
+      "id": "spring_boot",
+      "view_layer": {
+        "name": "Thymeleaf templates on Spring MVC",
+        "source": "https://docs.spring.io/spring-boot/reference/web/servlet.html",
+        "interactive": false
+      },
+      "name": "Java/Kotlin + Spring Boot",
+      "kind": "server",
+      "language": "jvm",
+      "summary": "Enterprise JVM framework: DI, Spring Data, Spring Security, transactions, observability.",
+      "scores": {
+        "scalability": 5,
+        "ease": 2,
+        "ops": 3,
+        "maturity": 5,
+        "realtime": 3,
+        "performance": 4,
+        "velocity": 3,
+        "hiring": 5,
+        "structure": 5
+      },
+      "skills": [
+        "java",
+        "kotlin",
+        "spring"
+      ],
+      "related_skills": [
+        "csharp",
+        "scala"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        {"text": "Declarative transactions and Spring Security suit fintech/banking", "when": [{"app_type": ["fintech"]}, {"compliance_any": ["pci_dss"]}]},
+        {"text": "Largest enterprise hiring pool (very strong in India)", "when": {"india": true}},
+        {"text": "Largest enterprise hiring pool", "when": {"india": false}},
+        "Mature observability and resilience libraries"
+      ],
+      "weaknesses": [
+        "Higher memory footprint, slow JVM cold starts (mitigated by GraalVM/SnapStart)",
+        "Verbose for small MVPs"
+      ],
+      "sources": [
+        "https://docs.spring.io/spring-boot/index.html",
+        "https://docs.spring.io/spring-framework/reference/data-access/transaction.html",
+        "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html"
+      ]
+    },
+    {
+      "id": "dotnet",
+      "view_layer": {
+        "name": "Razor Pages and Blazor components",
+        "source": "https://learn.microsoft.com/en-us/aspnet/core/razor-pages/",
+        "interactive": true,
+        "interactive_source": "https://learn.microsoft.com/en-us/aspnet/core/blazor/"
+      },
+      "name": "C# + ASP.NET Core",
+      "kind": "server",
+      "language": "dotnet",
+      "summary": "Microsoft's cross-platform web framework with Entity Framework Core and SignalR.",
+      "scores": {
+        "scalability": 5,
+        "ease": 3,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 4,
+        "performance": 5,
+        "velocity": 4,
+        "hiring": 4,
+        "structure": 5
+      },
+      "skills": [
+        "csharp",
+        "dotnet"
+      ],
+      "related_skills": [
+        "azure"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        "Top-tier raw performance (TechEmpower benchmarks)",
+        "SignalR gives realtime with automatic transport fallback",
+        {"text": "First-class on Azure, with enterprise identity (Entra ID)", "when": [{"stack_any": ["azure_apps"]}, {"cloud_preference": ["azure"]}]}
+      ],
+      "weaknesses": [
+        "Ecosystem is centred on Microsoft tooling",
+        "Smaller startup community than Node/Python"
+      ],
+      "sources": [
+        "https://learn.microsoft.com/aspnet/core/",
+        "https://learn.microsoft.com/aspnet/core/signalr/introduction",
+        "https://www.techempower.com/benchmarks/"
+      ]
+    },
+    {
+      "id": "rails",
+      "view_layer": {
+        "name": "Action View templates with Hotwire (Turbo, Stimulus)",
+        "source": "https://guides.rubyonrails.org/action_view_overview.html",
+        "interactive": true,
+        "interactive_source": "https://turbo.hotwired.dev/handbook/introduction"
+      },
+      "name": "Ruby on Rails",
+      "kind": "server",
+      "language": "ruby",
+      "summary": "Convention-over-configuration full-stack framework (ActiveRecord, Hotwire, ActionCable).",
+      "scores": {
+        "scalability": 3,
+        "ease": 4,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 3,
+        "performance": 2,
+        "velocity": 5,
+        "hiring": 2,
+        "structure": 5
+      },
+      "skills": [
+        "ruby",
+        "rails"
+      ],
+      "related_skills": [
+        "python",
+        "elixir"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        "Fastest CRUD/SaaS MVP velocity; generators, conventions",
+        "Hotwire gives SPA-like UX without a JS framework",
+        "Proven at scale (Shopify, GitHub)"
+      ],
+      "weaknesses": [
+        "Lower per-request performance means more servers at scale",
+        {"text": "Shrinking hiring pool, especially in India", "when": {"india": true}},
+        {"text": "Shrinking hiring pool", "when": {"india": false}}
+      ],
+      "sources": [
+        "https://guides.rubyonrails.org/",
+        "https://hotwired.dev/",
+        "https://guides.rubyonrails.org/action_cable_overview.html"
+      ],
+      "admin_scaffolding": true
+    },
+    {
+      "id": "laravel",
+      "view_layer": {
+        "name": "Blade templates with Livewire components",
+        "source": "https://laravel.com/docs/blade",
+        "interactive": true,
+        "interactive_source": "https://livewire.laravel.com/docs/quickstart"
+      },
+      "name": "PHP + Laravel",
+      "kind": "server",
+      "language": "php",
+      "summary": "Full-featured PHP framework (Eloquent ORM, queues, auth, Reverb websockets).",
+      "scores": {
+        "scalability": 3,
+        "ease": 4,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 3,
+        "performance": 3,
+        "velocity": 5,
+        "hiring": 4,
+        "structure": 5
+      },
+      "skills": [
+        "php",
+        "laravel"
+      ],
+      "related_skills": [
+        "javascript",
+        "python"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        {"text": "Very fast for e-commerce/CRUD; large agency talent pool in India", "when": {"india": true}},
+        {"text": "Very fast for e-commerce/CRUD; large agency talent pool", "when": {"india": false}},
+        "Built-in queues, scheduling, auth scaffolding",
+        "Cheap to host anywhere"
+      ],
+      "weaknesses": [
+        "Per-request bootstrap model; needs Octane for high throughput",
+        "Less suited to ML or heavy realtime"
+      ],
+      "sources": [
+        "https://laravel.com/docs",
+        "https://laravel.com/docs/reverb",
+        "https://laravel.com/docs/octane"
+      ],
+      "admin_scaffolding": true
+    },
+    {
+      "id": "phoenix",
+      "view_layer": {
+        "name": "HEEx templates and LiveView",
+        "source": "https://hexdocs.pm/phoenix/components.html",
+        "interactive": true,
+        "interactive_source": "https://hexdocs.pm/phoenix_live_view/welcome.html"
+      },
+      "name": "Elixir + Phoenix",
+      "kind": "server",
+      "language": "elixir",
+      "summary": "Phoenix on the Erlang VM (BEAM): Channels, Presence and LiveView for massive concurrent realtime.",
+      "scores": {
+        "scalability": 5,
+        "ease": 2,
+        "ops": 4,
+        "maturity": 3,
+        "realtime": 5,
+        "performance": 5,
+        "velocity": 4,
+        "hiring": 1,
+        "structure": 4
+      },
+      "skills": [
+        "elixir",
+        "phoenix",
+        "erlang"
+      ],
+      "related_skills": [
+        "ruby",
+        "functional"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        "Millions of concurrent websocket connections per cluster (Channels)",
+        "Fault-tolerant supervision trees; built-in Presence and PubSub",
+        "LiveView: realtime UI without a separate SPA"
+      ],
+      "weaknesses": [
+        "Smallest hiring pool in this list",
+        "Functional paradigm is a learning investment"
+      ],
+      "sources": [
+        "https://hexdocs.pm/phoenix/overview.html",
+        "https://hexdocs.pm/phoenix/channels.html",
+        "https://phoenixframework.org/blog/the-road-to-2-million-websocket-connections"
+      ]
+    },
+    {
+      "id": "serverless_functions",
+      "name": "Serverless functions (Node/Python FaaS)",
+      "kind": "faas",
+      "language": "node",
+      "summary": "Request-scoped functions (AWS Lambda, Vercel/Netlify Functions, Cloud Run functions, Azure Functions).",
+      "scores": {
+        "scalability": 5,
+        "ease": 4,
+        "ops": 5,
+        "maturity": 4,
+        "realtime": 1,
+        "performance": 3,
+        "velocity": 4,
+        "hiring": 4,
+        "structure": 1
+      },
+      "skills": [
+        "serverless",
+        "lambda"
+      ],
+      "related_skills": [
+        "javascript",
+        "typescript",
+        "python",
+        "node",
+        "aws",
+        "gcp",
+        "azure"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 3,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        "Scale to zero: pay nothing when idle",
+        "No servers to patch; automatic horizontal scaling",
+        "Natural fit for event-driven and spiky workloads"
+      ],
+      "weaknesses": [
+        "Cold starts hurt tight latency targets",
+        "No persistent connections (websockets) and execution time limits",
+        "Database connection exhaustion without a pooler"
+      ],
+      "sources": [
+        "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+        "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html",
+        "https://vercel.com/docs/functions"
+      ]
+    },
+    {
+      "id": "supabase",
+      "sso": {
+        "min_usd": 25,
+        "free_mau": 50,
+        "usd_per_mau": 0.015,
+        "name": "Supabase Auth SAML 2.0 single sign-on (Pro plan or higher)",
+        "source": "https://supabase.com/pricing"
+      },
+      "name": "Supabase (BaaS on Postgres)",
+      "kind": "baas",
+      "language": "sql",
+      "bundled_database": "postgres",
+      "summary": "Open-source backend-as-a-service: Postgres, auth, row-level security, storage, realtime, edge functions.",
+      "scores": {
+        "scalability": 4,
+        "ease": 5,
+        "ops": 5,
+        "maturity": 4,
+        "realtime": 4,
+        "performance": 4,
+        "velocity": 5,
+        "hiring": 3,
+        "structure": 2
+      },
+      "skills": [
+        "supabase"
+      ],
+      "related_skills": [
+        "sql",
+        "postgres",
+        "javascript",
+        "typescript",
+        "react",
+        "nextjs",
+        "flutter",
+        "react_native"
+      ],
+      "scale_ceiling": 4,
+      "team_min": 1,
+      "lock_in": 2,
+      "self_hostable": true,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 599,
+        "hipaa_note": "BAA requires Team plan or above plus HIPAA add-on (verify current pricing)",
+        "pci": false,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 3,
+        "maturity_note": "SOC 2 Type 2 and a HIPAA add-on, but no PCI attestation, HITRUST or FedRAMP; adds a second data processor (and BAA) in the PHI path.",
+        "maturity_sources": [
+          "https://supabase.com/docs/guides/security/hipaa-compliance"
+        ],
+        "soc2_min_usd": 599,
+        "soc2_note": "The SOC 2 report is available from the Team plan ($599/month)"
+      },
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          25,
+          25
+        ],
+        [
+          25,
+          150
+        ],
+        [
+          150,
+          1200
+        ],
+        [
+          1200,
+          8000
+        ],
+        [
+          8000,
+          30000
+        ]
+      ],
+      "strengths": [
+        "Auth + DB + storage + realtime in one service; MVP in days",
+        "It is plain Postgres: no data lock-in, can self-host or migrate",
+        "Row-level security pushes authorization into the database"
+      ],
+      "weaknesses": [
+        "Complex business logic ends up in SQL/edge functions",
+        "Free projects pause after inactivity"
+      ],
+      "sources": [
+        "https://supabase.com/docs",
+        "https://supabase.com/pricing",
+        "https://supabase.com/docs/guides/security/hipaa-compliance",
+        "https://supabase.com/docs/guides/self-hosting"
+      ],
+      "usage": {
+        "storage_included_gb": 8,
+        "storage_usd_per_gb": 0.125,
+        "note": "Pro plan includes 8 GB of database disk; more disk is billed per GB-month.",
+        "source": "https://supabase.com/pricing"
+      },
+      "facts_as_of": "2026-10-03"
+    },
+    {
+      "id": "firebase",
+      "sso": {
+        "min_usd": 0,
+        "free_mau": 50,
+        "usd_per_mau": 0.015,
+        "name": "Firebase Authentication with Identity Platform (SAML / OIDC providers)",
+        "source": "https://cloud.google.com/identity-platform/pricing"
+      },
+      "name": "Firebase (BaaS on Google Cloud)",
+      "kind": "baas",
+      "language": "javascript",
+      "bundled_database": "firestore",
+      "summary": "Google's mobile/web BaaS: Firestore, Auth, Cloud Functions, FCM push, Crashlytics, Remote Config.",
+      "scores": {
+        "scalability": 5,
+        "ease": 5,
+        "ops": 5,
+        "maturity": 5,
+        "realtime": 5,
+        "performance": 4,
+        "velocity": 5,
+        "hiring": 4,
+        "structure": 1
+      },
+      "skills": [
+        "firebase"
+      ],
+      "related_skills": [
+        "javascript",
+        "typescript",
+        "dart",
+        "flutter",
+        "react",
+        "react_native",
+        "gcp",
+        "kotlin",
+        "swift"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 5,
+      "self_hostable": false,
+      "regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia",
+        "global"
+      ],
+      "compliance": {
+        "hipaa": false,
+        "hipaa_note": "Only some Firebase services fall under the Google Cloud BAA; treated as not eligible here",
+        "pci": false,
+        "soc2": true,
+        "gdpr_dpa": true,
+        "maturity": 2,
+        "maturity_note": "Covered only partly by the Google Cloud BAA; no PCI attestation for card data.",
+        "maturity_sources": [
+          "https://firebase.google.com/support/privacy"
+        ]
+      },
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          25
+        ],
+        [
+          25,
+          300
+        ],
+        [
+          300,
+          3000
+        ],
+        [
+          3000,
+          25000
+        ],
+        [
+          25000,
+          100000
+        ]
+      ],
+      "strengths": [
+        "Realtime sync and offline persistence in client SDKs",
+        "Push notifications, analytics and crash reporting for mobile",
+        "Generous Spark (free) tier"
+      ],
+      "weaknesses": [
+        "Proprietary APIs: highest vendor lock-in",
+        "Per-read billing can surprise at scale",
+        "Not suited to relational queries or reporting"
+      ],
+      "sources": [
+        "https://firebase.google.com/docs",
+        "https://firebase.google.com/pricing",
+        "https://firebase.google.com/support/privacy",
+        "https://cloud.google.com/security/compliance/hipaa",
+        "https://firebase.google.com/docs/firestore/locations",
+        "https://firebase.google.com/docs/projects/locations",
+        "https://firebase.google.com/docs/auth/admin/create-custom-tokens"
+      ],
+      "usage": {
+        "storage_included_gb": 1,
+        "storage_usd_per_gb": 0.18,
+        "doc_read_usd_per_100k": 0.06,
+        "doc_write_usd_per_100k": 0.18,
+        "note": "Firestore bills per document read and write (free quota of 50,000 reads and 20,000 writes a day) plus stored GB.",
+        "source": "https://firebase.google.com/pricing",
+        "free_ops_per_day": 50000
+      },
+      "residency_regions": [
+        "north_america",
+        "europe",
+        "india",
+        "southeast_asia"
+      ],
+      "residency_note": "Cloud Firestore, Cloud Storage and Cloud Functions can be pinned to a location (EU multi-region eur3, single regions such as europe-west3 Frankfurt, asia-south1 Mumbai and asia-south2 Delhi), but Firebase Authentication runs only in US data centres.",
+      "residency_caveat": "Firebase Authentication runs only in US data centres: keep sign-in details (e-mail, phone) in an identity provider inside the region and sign users into Firebase with custom tokens that carry only an opaque user ID, and pin Firestore, Storage and Functions to an in-region location",
+      "facts_as_of": "2026-10-04"
+    },
+    {
+      "id": "no_custom_backend",
+      "name": "No server code (static site)",
+      "kind": "none",
+      "language": "none",
+      "summary": "No API server: the frontend is pre-built into static files at deploy time and served from a CDN.",
+      "scores": {
+        "scalability": 5,
+        "ease": 5,
+        "ops": 5,
+        "maturity": 5,
+        "realtime": 1,
+        "performance": 5,
+        "velocity": 5,
+        "hiring": 5,
+        "structure": 3
+      },
+      "skills": [
+        "html",
+        "markdown"
+      ],
+      "related_skills": [
+        "javascript",
+        "typescript",
+        "react",
+        "css",
+        "git"
+      ],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 1,
+      "static_only": true,
+      "cost_usd": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "strengths": [
+        "No server to patch, scale or secure: the attack surface is a set of static files",
+        "Free static hosting tiers cover read-only sites well past 100k daily users"
+      ],
+      "weaknesses": [
+        "No sign-in, posting, payments or per-user pages: add server code or a BaaS when those arrive",
+        "Contact forms and comments need a third-party service or one serverless function"
+      ],
+      "sources": [
+        "https://docs.astro.build/en/guides/deploy/",
+        "https://developers.cloudflare.com/pages/"
+      ]
+    }
+  ]
+}

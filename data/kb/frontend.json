@@ -1,0 +1,521 @@
+{
+  "layer": "frontend",
+  "curated_on": "2026-10-01",
+  "score_scale": "1 (poor) to 5 (excellent); 'ease' = gentle learning curve, 'ops' = low operational burden",
+  "items": [
+    {
+      "id": "nextjs",
+      "name": "Next.js (React)",
+      "kind": "web",
+      "platforms": [
+        "web"
+      ],
+      "summary": "React meta-framework with server rendering, static generation, React Server Components and file-based routing.",
+      "scores": {
+        "ease": 3,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 3,
+        "performance": 4,
+        "seo": 5,
+        "velocity": 5,
+        "hiring": 5,
+        "offline": 3,
+        "structure": 3,
+        "interactivity": 5
+      },
+      "skills": [
+        "react",
+        "nextjs"
+      ],
+      "related_skills": [
+        "typescript",
+        "javascript",
+        "vue",
+        "svelte",
+        "angular",
+        "react_native"
+      ],
+      "team_min": 1,
+      "lock_in": 2,
+      "strengths": [
+        "SSR/SSG/ISR give crawlers full HTML (strong SEO, fast LCP)",
+        "Largest React ecosystem and hiring pool",
+        "Same codebase can host API routes / server actions for small apps"
+      ],
+      "weaknesses": [
+        "App Router + Server Components add conceptual load",
+        "Some features (ISR, image optimisation, middleware) are smoothest on Vercel",
+        {"text": "No search visibility needed: server rendering brings a Node.js server and the server/client component split for pages a client-rendered React app would ship as static files", "when": {"seo": ["none"]}}
+      ],
+      "server_rendering": {
+        "own_skills": ["nextjs"],
+        "client_alternative": "react_spa",
+        "why": "Server rendering sends finished HTML so crawlers and first-time visitors from search see content without running JavaScript; its cost is a server runtime for every page request (or a static export that drops server features) and the server/client component boundary. With no search visibility asked for, the same React components render in the browser from static files.",
+        "source": "https://web.dev/articles/rendering-on-the-web"
+      },
+      "sources": [
+        "https://nextjs.org/docs",
+        "https://react.dev",
+        "https://survey.stackoverflow.co/2025/technology",
+        "https://web.dev/articles/rendering-on-the-web",
+        "https://nextjs.org/docs/app/getting-started/deploying"
+      ]
+    },
+    {
+      "id": "react_spa",
+      "name": "React SPA (Vite)",
+      "kind": "web",
+      "platforms": [
+        "web"
+      ],
+      "summary": "Client-rendered single-page React app built with Vite; deploys as static files to any CDN.",
+      "scores": {
+        "ease": 4,
+        "ops": 5,
+        "maturity": 5,
+        "realtime": 3,
+        "performance": 3,
+        "seo": 2,
+        "velocity": 4,
+        "hiring": 5,
+        "offline": 3,
+        "structure": 2,
+        "interactivity": 5
+      },
+      "skills": [
+        "react"
+      ],
+      "related_skills": [
+        "typescript",
+        "javascript",
+        "vue",
+        "svelte",
+        "angular",
+        "nextjs"
+      ],
+      "team_min": 1,
+      "lock_in": 1,
+      "strengths": [
+        "Static build: cheapest and simplest hosting",
+        "Huge component ecosystem (dashboards, charts, admin UIs)",
+        "No server to operate for the UI"
+      ],
+      "weaknesses": [
+        "Client-side rendering hurts SEO and first paint on slow phones",
+        "Routing, data fetching and state are your own architecture decisions"
+      ],
+      "sources": [
+        "https://react.dev",
+        "https://vite.dev/guide/",
+        "https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics"
+      ]
+    },
+    {
+      "id": "nuxt",
+      "name": "Nuxt (Vue)",
+      "kind": "web",
+      "platforms": [
+        "web"
+      ],
+      "summary": "Vue meta-framework with SSR/SSG, auto-imports and the Nitro server engine (deploys to many targets).",
+      "scores": {
+        "ease": 4,
+        "ops": 4,
+        "maturity": 4,
+        "realtime": 3,
+        "performance": 4,
+        "seo": 5,
+        "velocity": 4,
+        "hiring": 3,
+        "offline": 3,
+        "structure": 3,
+        "interactivity": 5
+      },
+      "skills": [
+        "vue",
+        "nuxt"
+      ],
+      "related_skills": [
+        "javascript",
+        "typescript",
+        "svelte"
+      ],
+      "team_min": 1,
+      "lock_in": 1,
+      "strengths": [
+        "Gentle learning curve (Vue templates)",
+        "SSR/SSG for SEO",
+        "Nitro deploys to Node, serverless and edge with presets"
+      ],
+      "weaknesses": [
+        "Smaller hiring pool than React",
+        "Fewer enterprise component libraries than React/Angular"
+      ],
+      "sources": [
+        "https://nuxt.com/docs",
+        "https://vuejs.org/guide/introduction.html",
+        "https://nitro.build/deploy",
+        "https://web.dev/articles/rendering-on-the-web"
+      ],
+      "server_rendering": {
+        "own_skills": ["vue", "nuxt"],
+        "client_alternative": "react_spa",
+        "why": "Server rendering sends finished HTML so crawlers and first-time visitors from search see content without running JavaScript; its cost is a server runtime for page requests (or a static build that drops server features). With no search visibility asked for, a client-rendered app served as static files does the same job.",
+        "source": "https://web.dev/articles/rendering-on-the-web"
+      }
+    },
+    {
+      "id": "sveltekit",
+      "name": "SvelteKit",
+      "kind": "web",
+      "platforms": [
+        "web"
+      ],
+      "summary": "Svelte's application framework: compiled components, SSR/SSG, adapters for Node, static and serverless targets.",
+      "scores": {
+        "ease": 4,
+        "ops": 4,
+        "maturity": 3,
+        "realtime": 3,
+        "performance": 5,
+        "seo": 5,
+        "velocity": 4,
+        "hiring": 3,
+        "offline": 3,
+        "structure": 3,
+        "interactivity": 5
+      },
+      "skills": [
+        "svelte",
+        "sveltekit"
+      ],
+      "related_skills": [
+        "javascript",
+        "typescript",
+        "vue"
+      ],
+      "team_min": 1,
+      "lock_in": 1,
+      "strengths": [
+        "Smallest JS bundles in this list, best runtime performance",
+        "SSR + progressive enhancement by default",
+        "Adapters avoid platform lock-in"
+      ],
+      "weaknesses": [
+        "Smaller hiring pool and ecosystem than React, Vue or Angular",
+        "Fewer battle-tested enterprise UI kits"
+      ],
+      "sources": [
+        "https://svelte.dev/docs/kit",
+        "https://svelte.dev/docs/kit/adapters",
+        "https://web.dev/articles/rendering-on-the-web"
+      ],
+      "server_rendering": {
+        "own_skills": ["svelte", "sveltekit"],
+        "client_alternative": "react_spa",
+        "why": "Server rendering sends finished HTML so crawlers and first-time visitors from search see content without running JavaScript; its cost is a server runtime for page requests (or a static build that drops server features). With no search visibility asked for, a client-rendered app served as static files does the same job.",
+        "source": "https://web.dev/articles/rendering-on-the-web"
+      }
+    },
+    {
+      "id": "angular",
+      "name": "Angular",
+      "kind": "web",
+      "platforms": [
+        "web"
+      ],
+      "summary": "Google's batteries-included TypeScript framework (DI, router, forms, HTTP, SSR) aimed at large codebases.",
+      "scores": {
+        "ease": 2,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 3,
+        "performance": 3,
+        "seo": 4,
+        "velocity": 3,
+        "hiring": 4,
+        "offline": 3,
+        "structure": 5,
+        "interactivity": 5
+      },
+      "skills": [
+        "angular"
+      ],
+      "related_skills": [
+        "typescript",
+        "javascript",
+        "java",
+        "csharp",
+        "react"
+      ],
+      "team_min": 1,
+      "lock_in": 2,
+      "strengths": [
+        "Opinionated structure keeps large teams consistent",
+        "Everything first-party (router, forms, HTTP, i18n)",
+        "Long-term support releases suit enterprises"
+      ],
+      "weaknesses": [
+        "Steepest learning curve (RxJS, DI, modules/signals)",
+        "Heavier for small marketing/content sites"
+      ],
+      "sources": [
+        "https://angular.dev/overview",
+        "https://angular.dev/guide/ssr",
+        "https://angular.dev/reference/releases"
+      ]
+    },
+    {
+      "id": "astro",
+      "name": "Astro",
+      "kind": "web",
+      "platforms": [
+        "web"
+      ],
+      "summary": "Content-first framework that ships zero JS by default and hydrates interactive 'islands' only where needed.",
+      "scores": {
+        "ease": 4,
+        "ops": 5,
+        "maturity": 3,
+        "realtime": 1,
+        "performance": 5,
+        "seo": 5,
+        "velocity": 4,
+        "hiring": 2,
+        "offline": 2,
+        "structure": 3,
+        "interactivity": 2
+      },
+      "skills": [
+        "astro"
+      ],
+      "related_skills": [
+        "javascript",
+        "typescript",
+        "react",
+        "vue",
+        "svelte",
+        "html"
+      ],
+      "team_min": 1,
+      "lock_in": 1,
+      "strengths": [
+        "Best Core Web Vitals for content/blog/docs/marketing sites",
+        "Use React/Vue/Svelte components inside islands",
+        "Static output hosts anywhere for ~free"
+      ],
+      "weaknesses": [
+        "Not designed for highly interactive app-like UIs",
+        "Smaller hiring pool"
+      ],
+      "sources": [
+        "https://docs.astro.build/en/concepts/why-astro/",
+        "https://docs.astro.build/en/concepts/islands/",
+        "https://web.dev/articles/vitals"
+      ]
+    },
+    {
+      "id": "htmx",
+      "rendered_by_backend": true,
+      "name": "Server-rendered HTML + HTMX",
+      "kind": "web",
+      "platforms": [
+        "web"
+      ],
+      "summary": "HTML rendered by the backend (Django/Rails/Phoenix/Go templates) with HTMX attributes for partial page updates; no SPA build step.",
+      "scores": {
+        "ease": 5,
+        "ops": 5,
+        "maturity": 3,
+        "realtime": 2,
+        "performance": 4,
+        "seo": 5,
+        "velocity": 4,
+        "hiring": 3,
+        "offline": 1,
+        "structure": 2,
+        "interactivity": 2
+      },
+      "skills": [
+        "htmx",
+        "html"
+      ],
+      "related_skills": [
+        "django",
+        "flask",
+        "rails",
+        "laravel",
+        "phoenix",
+        "spring",
+        "dotnet"
+      ],
+      "team_min": 1,
+      "lock_in": 1,
+      "strengths": [
+        "One codebase, one language; no JS build pipeline",
+        "Excellent for CRUD internal tools and admin panels",
+        "Pages are real HTML, so SEO is free"
+      ],
+      "weaknesses": [
+        "Rich client interactions (drag-drop editors, offline) get awkward",
+        "Requires a server-rendering backend; does not pair with BaaS"
+      ],
+      "sources": [
+        "https://htmx.org/docs/",
+        "https://htmx.org/essays/hypermedia-driven-applications/"
+      ]
+    },
+    {
+      "id": "react_native",
+      "name": "React Native (Expo)",
+      "kind": "mobile",
+      "platforms": [
+        "ios",
+        "android",
+        "web"
+      ],
+      "summary": "Cross-platform native mobile apps in React/TypeScript; Expo provides builds, OTA updates and native modules.",
+      "scores": {
+        "ease": 3,
+        "ops": 4,
+        "maturity": 4,
+        "realtime": 3,
+        "performance": 3,
+        "seo": 1,
+        "velocity": 4,
+        "hiring": 4,
+        "offline": 4,
+        "structure": 3,
+        "interactivity": 5
+      },
+      "skills": [
+        "react_native",
+        "react",
+        "typescript",
+        "javascript"
+      ],
+      "related_skills": [
+        "nextjs",
+        "vue"
+      ],
+      "team_min": 1,
+      "lock_in": 2,
+      "strengths": [
+        "One codebase for iOS + Android (+ web via react-native-web)",
+        "Reuses React skills and TypeScript types from the web app",
+        "Expo EAS handles builds and over-the-air updates"
+      ],
+      "weaknesses": [
+        "Heavy animations / complex native integrations need native modules",
+        "App-store review cycle still applies to native changes"
+      ],
+      "sources": [
+        "https://reactnative.dev/docs/getting-started",
+        "https://docs.expo.dev/",
+        "https://docs.expo.dev/eas-update/introduction/"
+      ]
+    },
+    {
+      "id": "flutter",
+      "name": "Flutter",
+      "kind": "mobile",
+      "platforms": [
+        "ios",
+        "android",
+        "web"
+      ],
+      "summary": "Google's cross-platform UI toolkit in Dart with its own rendering engine for consistent, fast UIs.",
+      "scores": {
+        "ease": 3,
+        "ops": 4,
+        "maturity": 4,
+        "realtime": 3,
+        "performance": 4,
+        "seo": 1,
+        "velocity": 4,
+        "hiring": 3,
+        "offline": 4,
+        "structure": 3,
+        "interactivity": 5
+      },
+      "skills": [
+        "flutter",
+        "dart"
+      ],
+      "related_skills": [
+        "kotlin",
+        "swift",
+        "java"
+      ],
+      "team_min": 1,
+      "lock_in": 2,
+      "strengths": [
+        "Pixel-consistent UI on iOS and Android",
+        "Smooth 60/120fps rendering",
+        {"text": "First-party Firebase plugins", "when": {"stack_any": ["firebase", "firestore"]}}
+      ],
+      "weaknesses": [
+        "Dart is a new language for most web teams",
+        "Flutter Web output is poor for SEO"
+      ],
+      "sources": [
+        "https://docs.flutter.dev/",
+        "https://firebase.google.com/docs/flutter/setup"
+      ]
+    },
+    {
+      "id": "native_mobile",
+      "name": "Native iOS + Android (Swift / Kotlin)",
+      "kind": "mobile",
+      "platforms": [
+        "ios",
+        "android"
+      ],
+      "summary": "Two native codebases using SwiftUI and Jetpack Compose.",
+      "scores": {
+        "ease": 2,
+        "ops": 3,
+        "maturity": 5,
+        "realtime": 4,
+        "performance": 5,
+        "seo": 1,
+        "velocity": 2,
+        "hiring": 4,
+        "offline": 5,
+        "structure": 4,
+        "interactivity": 5
+      },
+      "skills": [
+        "swift",
+        "kotlin"
+      ],
+      "related_skills": [
+        "java",
+        "dart"
+      ],
+      "team_min": 2,
+      "lock_in": 1,
+      "strengths": [
+        "Best performance, platform APIs and offline/background capabilities",
+        "Day-one access to new OS features"
+      ],
+      "weaknesses": [
+        "Two codebases, roughly double the effort",
+        "Needs at least one specialist per platform"
+      ],
+      "sources": [
+        "https://developer.apple.com/swiftui/",
+        "https://developer.android.com/compose",
+        "https://developer.android.com/kotlin",
+        "https://developer.apple.com/swift/"
+      ],
+      "platform_languages": {
+        "ios": "swift",
+        "android": "kotlin",
+        "why": "One app per platform, each in its own language (Swift for iOS, Kotlin for Android)",
+        "sources": ["https://developer.apple.com/swift/", "https://developer.android.com/kotlin"]
+      }
+    }
+  ]
+}

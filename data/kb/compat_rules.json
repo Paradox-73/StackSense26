@@ -1,0 +1,1164 @@
+{
+  "description": "Combination rules applied to whole stacks. 'when' keys: frontend, backend, database, hosting, backend_kind, hosting_kind, hosting_provider (all listed keys must match). 'not' excludes matches. 'input' filters on project inputs ('skills_any': applies unless the team lists skills and none of these; 'skills_none': does not apply when the team lists any of these). delta is added to the stack score (in layer points: the stack score is (sum of the four layer scores + sum of deltas) / 4).",
+  "rules": [
+    {
+      "id": "nextjs_vercel",
+      "kind": "synergy",
+      "delta": 5,
+      "when": {
+        "frontend": [
+          "nextjs"
+        ],
+        "hosting": [
+          "vercel"
+        ]
+      },
+      "note": "Vercel builds Next.js: ISR, image optimisation, middleware and preview deploys work with zero configuration.",
+      "source": "https://nextjs.org/docs/app/building-your-application/deploying"
+    },
+    {
+      "id": "meta_fw_frontend_paas",
+      "kind": "synergy",
+      "delta": 6,
+      "when": {
+        "frontend": [
+          "nuxt",
+          "sveltekit",
+          "astro"
+        ],
+        "hosting_kind": [
+          "frontend_paas"
+        ]
+      },
+      "note": "Official adapters/presets deploy this framework to the CDN + functions platform with no server to manage.",
+      "source": "https://svelte.dev/docs/kit/adapters"
+    },
+    {
+      "id": "static_spa_frontend_paas",
+      "kind": "synergy",
+      "delta": 4,
+      "when": {
+        "frontend": [
+          "react_spa"
+        ],
+        "hosting_kind": [
+          "frontend_paas",
+          "static_cdn"
+        ]
+      },
+      "note": "Static build output is served directly from a global CDN.",
+      "source": "https://vite.dev/guide/static-deploy"
+    },
+    {
+      "id": "supabase_postgres",
+      "kind": "synergy",
+      "delta": 4,
+      "when": {
+        "backend": [
+          "supabase"
+        ],
+        "database": [
+          "postgres"
+        ]
+      },
+      "note": "Supabase is a managed Postgres: auth, row-level security, storage and realtime come with the database.",
+      "source": "https://supabase.com/docs/guides/database/overview"
+    },
+    {
+      "id": "supabase_other_db",
+      "kind": "conflict",
+      "delta": -50,
+      "when": {
+        "backend": [
+          "supabase"
+        ]
+      },
+      "not": {
+        "database": [
+          "postgres",
+          "timescaledb"
+        ]
+      },
+      "note": "Supabase's value comes from its bundled Postgres; a different primary database removes most of its benefits.",
+      "source": "https://supabase.com/docs"
+    },
+    {
+      "id": "supabase_timescale",
+      "kind": "caveat",
+      "delta": -8,
+      "when": {
+        "backend": [
+          "supabase"
+        ],
+        "database": [
+          "timescaledb"
+        ]
+      },
+      "note": "Supabase deprecated the TimescaleDB extension on Postgres 17 projects; use native partitioning or a separate Timescale service.",
+      "source": "https://supabase.com/docs/guides/database/extensions"
+    },
+    {
+      "id": "firebase_firestore",
+      "kind": "synergy",
+      "delta": 4,
+      "when": {
+        "backend": [
+          "firebase"
+        ],
+        "database": [
+          "firestore"
+        ]
+      },
+      "note": "Firebase SDKs give Firestore realtime listeners, offline cache and security rules end-to-end.",
+      "source": "https://firebase.google.com/docs/firestore"
+    },
+    {
+      "id": "firebase_other_db",
+      "kind": "conflict",
+      "delta": -50,
+      "when": {
+        "backend": [
+          "firebase"
+        ]
+      },
+      "not": {
+        "database": [
+          "firestore"
+        ]
+      },
+      "note": "Firebase is designed around Firestore/Realtime Database; pairing it with another primary DB needs a separate server tier.",
+      "source": "https://firebase.google.com/docs"
+    },
+    {
+      "id": "firestore_without_firebase_offgcp",
+      "kind": "conflict",
+      "delta": -12,
+      "when": {
+        "database": [
+          "firestore"
+        ]
+      },
+      "not": {
+        "backend": [
+          "firebase"
+        ],
+        "hosting_provider": [
+          "gcp"
+        ]
+      },
+      "note": "Firestore outside Google Cloud adds cross-cloud latency and egress costs.",
+      "source": "https://cloud.google.com/firestore/docs/locations"
+    },
+    {
+      "id": "dynamodb_off_aws",
+      "kind": "conflict",
+      "delta": -20,
+      "when": {
+        "database": [
+          "dynamodb"
+        ]
+      },
+      "not": {
+        "hosting_provider": [
+          "aws"
+        ]
+      },
+      "note": "DynamoDB is AWS-only; calling it from another cloud adds latency, egress fees and IAM key management.",
+      "source": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+    },
+    {
+      "id": "dynamodb_lambda",
+      "kind": "synergy",
+      "delta": 8,
+      "when": {
+        "database": [
+          "dynamodb"
+        ],
+        "hosting": [
+          "aws_lambda"
+        ]
+      },
+      "note": "DynamoDB uses HTTP, not long-lived connections, so Lambda concurrency cannot exhaust a connection pool.",
+      "source": "https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html"
+    },
+    {
+      "id": "lambda_rdbms_pooling",
+      "kind": "caveat",
+      "delta": -4,
+      "when": {
+        "hosting": [
+          "aws_lambda"
+        ],
+        "database": [
+          "postgres",
+          "mysql",
+          "timescaledb",
+          "sqlserver"
+        ]
+      },
+      "not": {
+        "backend": [
+          "supabase"
+        ]
+      },
+      "note": "Each Lambda instance opens its own DB connection; put RDS Proxy (or PgBouncer/Neon pooler) in front to avoid connection exhaustion.",
+      "source": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html"
+    },
+    {
+      "id": "frontend_paas_rdbms_pooling",
+      "kind": "caveat",
+      "delta": -2,
+      "when": {
+        "hosting_kind": [
+          "frontend_paas"
+        ],
+        "database": [
+          "postgres",
+          "mysql",
+          "sqlserver"
+        ]
+      },
+      "not": {
+        "backend": [
+          "supabase"
+        ]
+      },
+      "note": "Serverless functions need a pooled/HTTP driver (Neon serverless driver, Supabase pooler, PlanetScale) to avoid connection exhaustion.",
+      "source": "https://neon.tech/docs/serverless/serverless-driver"
+    },
+    {
+      "id": "faas_backend_on_faas_host",
+      "kind": "synergy",
+      "delta": 4,
+      "when": {
+        "backend": [
+          "serverless_functions"
+        ],
+        "hosting": [
+          "aws_lambda",
+          "vercel",
+          "netlify",
+          "gcp_cloud_run",
+          "azure_apps",
+          "digitalocean",
+          "cloudflare"
+        ]
+      },
+      "note": "Functions deploy natively on this platform's function runtime.",
+      "source": "https://vercel.com/docs/functions"
+    },
+    {
+      "id": "faas_backend_no_faas_host",
+      "kind": "conflict",
+      "delta": -30,
+      "when": {
+        "backend": [
+          "serverless_functions"
+        ],
+        "hosting": [
+          "render",
+          "railway",
+          "flyio",
+          "hetzner",
+          "onprem_docker",
+          "onprem_k8s",
+          "aws_ecs",
+          "aws_eks",
+          "gcp_gke"
+        ]
+      },
+      "note": "This host has no managed function runtime; you would need Knative/OpenFaaS or to rewrite as a server.",
+      "source": "https://knative.dev/docs/"
+    },
+    {
+      "id": "heavy_server_on_frontend_paas",
+      "kind": "conflict",
+      "delta": -24,
+      "when": {
+        "backend": [
+          "spring_boot",
+          "dotnet",
+          "rails",
+          "phoenix",
+          "django",
+          "laravel"
+        ],
+        "hosting_kind": [
+          "frontend_paas"
+        ]
+      },
+      "note": "Frontend platforms run code only as short-lived functions; this framework expects a long-running server. Host the API on a container/PaaS service instead.",
+      "source": "https://vercel.com/docs/functions/runtimes"
+    },
+    {
+      "id": "light_server_on_frontend_paas",
+      "kind": "caveat",
+      "delta": -10,
+      "when": {
+        "backend": [
+          "express",
+          "nestjs",
+          "fastapi",
+          "go"
+        ],
+        "hosting_kind": [
+          "frontend_paas"
+        ]
+      },
+      "note": "This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets.",
+      "source": "https://vercel.com/docs/functions/runtimes"
+    },
+    {
+      "id": "monolith_on_frontend_paas",
+      "kind": "caveat",
+      "delta": -10,
+      "when": {
+        "backend": [
+          "express",
+          "nestjs",
+          "fastapi",
+          "go",
+          "spring_boot",
+          "dotnet",
+          "rails",
+          "phoenix",
+          "django",
+          "laravel"
+        ],
+        "hosting_kind": [
+          "frontend_paas"
+        ]
+      },
+      "input": {
+        "architecture": [
+          "monolith"
+        ]
+      },
+      "note": "You asked for one deployable monolith; a frontend platform runs pages and short functions, not a long-running server process, so the server would have to be split off or rewritten as functions.",
+      "source": "https://vercel.com/docs/functions/runtimes"
+    },
+    {
+      "id": "heavy_server_on_lambda",
+      "kind": "caveat",
+      "delta": -14,
+      "when": {
+        "backend": [
+          "spring_boot",
+          "dotnet",
+          "rails",
+          "phoenix",
+          "django",
+          "laravel"
+        ],
+        "hosting": [
+          "aws_lambda"
+        ]
+      },
+      "note": "Large frameworks suffer cold starts on Lambda (SnapStart helps Java); containers on ECS/Cloud Run fit better.",
+      "source": "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html"
+    },
+    {
+      "id": "light_server_on_lambda",
+      "kind": "caveat",
+      "delta": -4,
+      "when": {
+        "backend": [
+          "express",
+          "nestjs",
+          "fastapi",
+          "go"
+        ],
+        "hosting": [
+          "aws_lambda"
+        ]
+      },
+      "note": "Runs via an adapter (Lambda Web Adapter / Mangum); keep handlers stateless.",
+      "source": "https://github.com/awslabs/aws-lambda-web-adapter"
+    },
+    {
+      "id": "realtime_on_functions",
+      "kind": "conflict",
+      "delta": -20,
+      "when": {
+        "hosting": [
+          "netlify",
+          "aws_lambda"
+        ]
+      },
+      "not": {
+        "backend": [
+          "supabase",
+          "firebase"
+        ]
+      },
+      "input": {
+        "realtime": [
+          "core"
+        ]
+      },
+      "note": "No persistent WebSocket connections on this platform; you would need a managed realtime service (Ably, Pusher, API Gateway WebSockets).",
+      "source": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html"
+    },
+    {
+      "id": "realtime_vercel_beta",
+      "kind": "caveat",
+      "delta": -6,
+      "when": {
+        "hosting": [
+          "vercel"
+        ]
+      },
+      "not": {
+        "backend": [
+          "supabase",
+          "firebase"
+        ]
+      },
+      "input": {
+        "realtime": [
+          "core"
+        ]
+      },
+      "note": "Vercel Functions serve WebSockets in public beta: each connection pins to one instance, so broadcasting to many users needs a shared pub/sub (e.g. Redis) and reconnect handling.",
+      "source": "https://vercel.com/kb/guide/do-vercel-serverless-functions-support-websocket-connections"
+    },
+    {
+      "id": "many_connections_on_functions",
+      "kind": "conflict",
+      "delta": -12,
+      "when": {
+        "hosting": [
+          "vercel",
+          "netlify",
+          "aws_lambda"
+        ]
+      },
+      "not": {
+        "backend": [
+          "supabase",
+          "firebase"
+        ]
+      },
+      "input": {
+        "realtime": [
+          "some",
+          "core"
+        ],
+        "concurrent_min": 1000
+      },
+      "note": "Thousands of users connected at once need processes that keep their connections open. Request-scoped functions either cannot hold a WebSocket (Lambda behind a function URL, Netlify) or hold each one as a running function pinned to one instance (Vercel beta), so broadcasting to all of them needs a separate pub/sub or realtime service.",
+      "source": "https://vercel.com/kb/guide/do-vercel-serverless-functions-support-websocket-connections"
+    },
+    {
+      "id": "realtime_faas_backend",
+      "kind": "conflict",
+      "delta": -16,
+      "when": {
+        "backend": [
+          "serverless_functions"
+        ]
+      },
+      "input": {
+        "realtime": [
+          "core"
+        ]
+      },
+      "note": "Request-scoped functions cannot hold realtime connections.",
+      "source": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html"
+    },
+    {
+      "id": "realtime_phoenix",
+      "kind": "synergy",
+      "delta": 6,
+      "when": {
+        "backend": [
+          "phoenix"
+        ]
+      },
+      "input": {
+        "realtime": [
+          "core"
+        ]
+      },
+      "note": "Phoenix Channels/Presence were built for millions of concurrent connections.",
+      "source": "https://phoenixframework.org/blog/the-road-to-2-million-websocket-connections"
+    },
+    {
+      "id": "realtime_flyio",
+      "kind": "synergy",
+      "delta": 4,
+      "when": {
+        "hosting": [
+          "flyio"
+        ]
+      },
+      "input": {
+        "realtime": [
+          "core"
+        ]
+      },
+      "note": "Anycast + multi-region VMs keep websocket round-trips short for global users.",
+      "source": "https://fly.io/docs/networking/"
+    },
+    {
+      "id": "phoenix_flyio",
+      "kind": "synergy",
+      "delta": 4,
+      "when": {
+        "backend": [
+          "phoenix"
+        ],
+        "hosting": [
+          "flyio"
+        ]
+      },
+      "note": "Fly.io has first-class Elixir docs and automatic BEAM clustering across regions.",
+      "source": "https://fly.io/docs/elixir/"
+    },
+    {
+      "id": "htmx_server_backend",
+      "kind": "synergy",
+      "delta": 5,
+      "when": {
+        "frontend": [
+          "htmx"
+        ],
+        "backend": [
+          "django",
+          "rails",
+          "phoenix",
+          "go",
+          "fastapi",
+          "express",
+          "dotnet",
+          "spring_boot",
+          "laravel"
+        ]
+      },
+      "note": "The backend renders HTML fragments directly: one codebase, no API layer or SPA build.",
+      "source": "https://htmx.org/essays/hypermedia-driven-applications/"
+    },
+    {
+      "id": "htmx_needs_server",
+      "kind": "conflict",
+      "delta": -30,
+      "when": {
+        "frontend": [
+          "htmx"
+        ],
+        "backend": [
+          "supabase",
+          "firebase",
+          "serverless_functions"
+        ]
+      },
+      "note": "HTMX needs a server that renders HTML; BaaS/function backends return JSON.",
+      "source": "https://htmx.org/docs/"
+    },
+    {
+      "id": "htmx_static_host",
+      "kind": "conflict",
+      "delta": -16,
+      "when": {
+        "frontend": [
+          "htmx"
+        ],
+        "hosting_kind": [
+          "frontend_paas",
+          "static_cdn"
+        ]
+      },
+      "note": "Server-rendered HTML needs a long-running app server, not a static/CDN host.",
+      "source": "https://htmx.org/docs/"
+    },
+    {
+      "id": "fullstack_typescript",
+      "kind": "synergy",
+      "delta": 6,
+      "when": {
+        "frontend": [
+          "nextjs",
+          "react_spa",
+          "nuxt",
+          "sveltekit",
+          "angular",
+          "astro",
+          "react_native"
+        ],
+        "backend": [
+          "express",
+          "nestjs",
+          "serverless_functions"
+        ]
+      },
+      "input": {
+        "team_size_max": 6,
+        "skills_any": [
+          "javascript",
+          "typescript",
+          "node",
+          "react",
+          "nextjs",
+          "vue",
+          "angular",
+          "svelte",
+          "react_native",
+          "nestjs"
+        ],
+        "skills_none": [
+          "python",
+          "django",
+          "fastapi",
+          "flask",
+          "java",
+          "kotlin",
+          "spring",
+          "go",
+          "csharp",
+          "dotnet",
+          "ruby",
+          "rails",
+          "php",
+          "laravel",
+          "elixir",
+          "phoenix"
+        ]
+      },
+      "note": "One language across the stack: shared types, shared validation, any developer can work on any layer.",
+      "source": "https://www.typescriptlang.org/docs/"
+    },
+    {
+      "id": "angular_structured_backend",
+      "kind": "synergy",
+      "delta": 4,
+      "when": {
+        "frontend": [
+          "angular"
+        ],
+        "backend": [
+          "nestjs",
+          "spring_boot",
+          "dotnet"
+        ]
+      },
+      "note": "Same architectural style (modules, DI) on both sides; common in enterprise teams.",
+      "source": "https://docs.nestjs.com/"
+    },
+    {
+      "id": "flutter_firebase",
+      "kind": "synergy",
+      "delta": 8,
+      "when": {
+        "frontend": [
+          "flutter"
+        ],
+        "backend": [
+          "firebase"
+        ]
+      },
+      "note": "FlutterFire is maintained by Google, giving first-party auth, Firestore offline sync and push notifications.",
+      "source": "https://firebase.google.com/docs/flutter/setup"
+    },
+    {
+      "id": "mobile_baas",
+      "kind": "synergy",
+      "delta": 4,
+      "when": {
+        "frontend": [
+          "react_native",
+          "native_mobile"
+        ],
+        "backend": [
+          "firebase",
+          "supabase"
+        ]
+      },
+      "note": "Mobile SDKs handle auth, storage and push without a custom API.",
+      "source": "https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native"
+    },
+    {
+      "id": "mobile_needs_api_host",
+      "kind": "caveat",
+      "delta": -6,
+      "when": {
+        "frontend": [
+          "react_native",
+          "flutter",
+          "native_mobile"
+        ],
+        "hosting_kind": [
+          "frontend_paas"
+        ]
+      },
+      "not": {
+        "backend": [
+          "supabase",
+          "firebase",
+          "serverless_functions"
+        ]
+      },
+      "note": "Mobile apps don't need a web CDN host; the API is what has to be hosted.",
+      "source": "https://docs.expo.dev/"
+    },
+    {
+      "id": "python_ml",
+      "kind": "synergy",
+      "delta": 12,
+      "when": {
+        "backend": [
+          "fastapi",
+          "django"
+        ]
+      },
+      "input": {
+        "app_type": [
+          "ml_product"
+        ]
+      },
+      "note": "Model inference and pipelines stay in Python (PyTorch, Hugging Face, scikit-learn), so no second runtime is needed.",
+      "source": "https://fastapi.tiangolo.com/"
+    },
+    {
+      "id": "ml_non_python",
+      "kind": "caveat",
+      "delta": -6,
+      "when": {
+        "backend": [
+          "rails",
+          "laravel",
+          "phoenix",
+          "firebase",
+          "supabase"
+        ]
+      },
+      "input": {
+        "app_type": [
+          "ml_product"
+        ]
+      },
+      "note": "Model serving will need a separate Python service.",
+      "source": "https://pytorch.org/serve/"
+    },
+    {
+      "id": "dotnet_azure",
+      "kind": "synergy",
+      "delta": 8,
+      "when": {
+        "backend": [
+          "dotnet"
+        ],
+        "hosting_provider": [
+          "azure"
+        ]
+      },
+      "input": {
+        "skills_match": [
+          "csharp",
+          "dotnet",
+          "azure"
+        ]
+      },
+      "note": "First-party tooling (Visual Studio publish, Entra ID, Application Insights).",
+      "source": "https://learn.microsoft.com/azure/app-service/quickstart-dotnetcore"
+    },
+    {
+      "id": "go_cloud_run",
+      "kind": "synergy",
+      "delta": 4,
+      "when": {
+        "backend": [
+          "go"
+        ],
+        "hosting": [
+          "gcp_cloud_run",
+          "aws_lambda",
+          "flyio"
+        ]
+      },
+      "note": "Tiny static binaries give near-instant cold starts on scale-to-zero platforms.",
+      "source": "https://cloud.google.com/run/docs/tips/general"
+    },
+    {
+      "id": "monolith_paas",
+      "kind": "synergy",
+      "delta": 4,
+      "when": {
+        "backend": [
+          "rails",
+          "django",
+          "laravel",
+          "fastapi",
+          "express",
+          "nestjs"
+        ],
+        "hosting": [
+          "render",
+          "railway",
+          "digitalocean"
+        ]
+      },
+      "note": "Git-push deploys with managed database add-ons are the shortest path to production for a monolith.",
+      "source": "https://render.com/docs/deploy-django"
+    },
+    {
+      "id": "sqlite_multi_instance",
+      "kind": "conflict",
+      "delta": -24,
+      "when": {
+        "database": [
+          "sqlite"
+        ],
+        "hosting": [
+          "aws_lambda",
+          "vercel",
+          "netlify",
+          "aws_eks",
+          "gcp_gke",
+          "onprem_k8s",
+          "gcp_cloud_run",
+          "aws_ecs",
+          "cloudflare"
+        ]
+      },
+      "note": "SQLite is a single local file; ephemeral or multi-instance platforms lose or fork it. Use a hosted SQLite service (Turso, Cloudflare D1) or a server database.",
+      "source": "https://www.sqlite.org/whentouse.html"
+    },
+    {
+      "id": "sqlite_ephemeral_disk",
+      "kind": "conflict",
+      "delta": -24,
+      "when": {
+        "database": [
+          "sqlite"
+        ],
+        "hosting": [
+          "digitalocean"
+        ]
+      },
+      "note": "App Platform has no volumes: the local filesystem is wiped on every deploy and container replacement, so a SQLite file there is lost. Use a managed database or a hosted SQLite service (Turso).",
+      "source": "https://docs.digitalocean.com/products/app-platform/how-to/store-data/"
+    },
+    {
+      "id": "sqlite_network_share",
+      "kind": "conflict",
+      "delta": -24,
+      "when": {
+        "database": [
+          "sqlite"
+        ],
+        "hosting": [
+          "azure_apps"
+        ]
+      },
+      "note": "App Service keeps files under /home on a network share (Azure Storage) used by every instance, and SQLite's file locking is unreliable over a network filesystem; Container Apps' container storage is ephemeral. Use a managed database (Azure Database for PostgreSQL / MySQL) or a hosted SQLite service.",
+      "source": "https://learn.microsoft.com/en-us/azure/app-service/operating-system-functionality#file-access"
+    },
+    {
+      "id": "static_host_runs_no_server",
+      "kind": "conflict",
+      "delta": -30,
+      "when": {
+        "hosting_kind": [
+          "static_cdn"
+        ]
+      },
+      "not": {
+        "backend_kind": [
+          "none",
+          "baas"
+        ]
+      },
+      "note": "An object-storage bucket behind a CDN serves files only; it cannot run server code, so the API would need a second host.",
+      "source": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html"
+    },
+    {
+      "id": "sqlite_flyio",
+      "kind": "synergy",
+      "delta": 6,
+      "when": {
+        "database": [
+          "sqlite"
+        ],
+        "hosting": [
+          "flyio",
+          "hetzner",
+          "onprem_docker"
+        ]
+      },
+      "note": "A persistent volume plus Litestream/LiteFS gives backups and replicas for SQLite.",
+      "source": "https://fly.io/docs/litefs/"
+    },
+    {
+      "id": "sqlite_write_heavy",
+      "kind": "caveat",
+      "delta": -10,
+      "when": {
+        "database": [
+          "sqlite"
+        ]
+      },
+      "input": {
+        "read_write": [
+          "write_heavy"
+        ]
+      },
+      "note": "SQLite allows one writer at a time, so a write-heavy workload with many clients queues on the database lock.",
+      "source": "https://www.sqlite.org/whentouse.html"
+    },
+    {
+      "id": "cassandra_small_host",
+      "kind": "conflict",
+      "delta": -12,
+      "when": {
+        "database": [
+          "cassandra"
+        ],
+        "hosting": [
+          "vercel",
+          "netlify",
+          "render",
+          "railway"
+        ]
+      },
+      "note": "Wide-column clusters need dedicated nodes or a managed service (Astra/Keyspaces/Scylla Cloud) close to compute.",
+      "source": "https://docs.scylladb.com/"
+    },
+    {
+      "id": "aws_keyspaces",
+      "kind": "synergy",
+      "delta": 4,
+      "when": {
+        "database": [
+          "cassandra"
+        ],
+        "hosting_provider": [
+          "aws"
+        ]
+      },
+      "note": "Amazon Keyspaces offers serverless Cassandra-compatible tables in the same VPC.",
+      "source": "https://docs.aws.amazon.com/keyspaces/latest/devguide/what-is-keyspaces.html"
+    },
+    {
+      "id": "k8s_microservices",
+      "kind": "synergy",
+      "delta": 6,
+      "when": {
+        "hosting_kind": [
+          "kubernetes"
+        ]
+      },
+      "input": {
+        "architecture": [
+          "microservices"
+        ]
+      },
+      "note": "Kubernetes earns its complexity when running many independently deployed services.",
+      "source": "https://kubernetes.io/docs/concepts/overview/"
+    },
+    {
+      "id": "redis_primary_warning",
+      "kind": "caveat",
+      "delta": -8,
+      "when": {
+        "database": [
+          "redis"
+        ]
+      },
+      "input": {
+        "consistency": [
+          "strong"
+        ]
+      },
+      "note": "Redis replication is asynchronous; acknowledged writes can be lost on failover.",
+      "source": "https://redis.io/docs/latest/operate/oss_and_stack/management/replication/"
+    },
+    {
+      "id": "nextjs_cloudflare",
+      "kind": "caveat",
+      "delta": -4,
+      "when": {
+        "frontend": [
+          "nextjs"
+        ],
+        "hosting": [
+          "cloudflare"
+        ]
+      },
+      "note": "Next.js runs on Cloudflare through the OpenNext adapter; some features (e.g. certain ISR/image paths) differ from Vercel.",
+      "source": "https://opennext.js.org/cloudflare"
+    },
+    {
+      "id": "faas_sustained_ingest",
+      "kind": "caveat",
+      "delta": -10,
+      "when": {
+        "hosting": [
+          "aws_lambda"
+        ]
+      },
+      "input": {
+        "app_type": [
+          "iot_telemetry"
+        ]
+      },
+      "note": "Sustained high-rate ingestion costs more per request on Lambda than on always-on containers; batch through Kinesis/SQS if you keep Lambda.",
+      "source": "https://aws.amazon.com/lambda/pricing/"
+    },
+    {
+      "id": "static_site_no_database_server",
+      "kind": "conflict",
+      "delta": -20,
+      "when": {
+        "backend": [
+          "no_custom_backend"
+        ]
+      },
+      "not": {
+        "database": [
+          "none_static"
+        ]
+      },
+      "note": "With no server code, nothing can query a database at request time; a static site reads content files at build time.",
+      "source": "https://docs.astro.build/en/guides/content-collections/"
+    },
+    {
+      "id": "content_files_need_no_server",
+      "kind": "conflict",
+      "delta": -10,
+      "when": {
+        "database": [
+          "none_static"
+        ]
+      },
+      "not": {
+        "backend": [
+          "no_custom_backend",
+          "serverless_functions"
+        ]
+      },
+      "note": "Content files built into static pages need no API server; running one only adds cost and ops.",
+      "source": "https://docs.astro.build/en/guides/deploy/"
+    },
+    {
+      "id": "django_orm_nosql_store",
+      "kind": "conflict",
+      "delta": -10,
+      "when": {
+        "backend": [
+          "django"
+        ],
+        "database": [
+          "firestore",
+          "dynamodb"
+        ]
+      },
+      "note": "Django's ORM, and the admin, auth and migrations built on it, supports only SQL databases (PostgreSQL, MariaDB, MySQL, Oracle, SQLite); with this store the team writes its data layer by hand on the vendor SDK.",
+      "source": "https://docs.djangoproject.com/en/5.2/ref/databases/"
+    },
+    {
+      "id": "rails_orm_nosql_store",
+      "kind": "conflict",
+      "delta": -10,
+      "when": {
+        "backend": [
+          "rails"
+        ],
+        "database": [
+          "firestore",
+          "dynamodb"
+        ]
+      },
+      "note": "Rails models, migrations and generators are built on Active Record, which maps classes to tables in a relational database; with this store the team writes its data layer by hand on the vendor SDK.",
+      "source": "https://guides.rubyonrails.org/active_record_basics.html"
+    },
+    {
+      "id": "laravel_orm_nosql_store",
+      "kind": "conflict",
+      "delta": -10,
+      "when": {
+        "backend": [
+          "laravel"
+        ],
+        "database": [
+          "firestore",
+          "dynamodb"
+        ]
+      },
+      "note": "Laravel's Eloquent ORM, migrations and auth scaffolding support MariaDB, MySQL, PostgreSQL, SQLite and SQL Server; with this store the team writes its data layer by hand on the vendor SDK.",
+      "source": "https://laravel.com/docs/12.x/database"
+    },
+    {
+      "id": "phoenix_ecto_nosql_store",
+      "kind": "conflict",
+      "delta": -10,
+      "when": {
+        "backend": [
+          "phoenix"
+        ],
+        "database": [
+          "firestore",
+          "dynamodb",
+          "mongodb"
+        ]
+      },
+      "note": "Phoenix generators and contexts are built on Ecto, whose maintained adapters are for PostgreSQL, MySQL, SQL Server and SQLite; with this store the team writes its data layer by hand.",
+      "source": "https://hexdocs.pm/phoenix/ecto.html"
+    },
+    {
+      "id": "dotnet_ef_nosql_store",
+      "kind": "conflict",
+      "delta": -10,
+      "when": {
+        "backend": [
+          "dotnet"
+        ],
+        "database": [
+          "firestore",
+          "dynamodb"
+        ]
+      },
+      "note": "ASP.NET Core's standard data layer is Entity Framework Core (also the default store for ASP.NET Core Identity), and EF Core has no provider for this store; the team writes its data layer by hand on the vendor SDK.",
+      "source": "https://learn.microsoft.com/en-us/ef/core/providers/"
+    },
+    {
+      "id": "static_site_on_server_host",
+      "kind": "caveat",
+      "delta": -8,
+      "when": {
+        "backend": [
+          "no_custom_backend"
+        ],
+        "hosting": [
+          "aws_ecs",
+          "aws_eks",
+          "aws_lambda",
+          "gcp_cloud_run",
+          "gcp_gke",
+          "azure_apps",
+          "railway",
+          "flyio",
+          "hetzner"
+        ]
+      },
+      "note": "Pre-built pages need only a static file host and its CDN; serving them from containers, functions or a server means building and patching a web-server image and paying for instances to hand out files.",
+      "source": "https://cloud.google.com/storage/docs/hosting-static-website"
+    },
+    {
+      "id": "bigquery_off_gcp",
+      "kind": "conflict",
+      "delta": -12,
+      "when": {
+        "database": [
+          "bigquery"
+        ]
+      },
+      "not": {
+        "hosting_provider": [
+          "gcp"
+        ]
+      },
+      "note": "BigQuery runs only on Google Cloud: an app hosted elsewhere pays cross-cloud latency and egress on every query.",
+      "source": "https://cloud.google.com/bigquery/docs/locations"
+    }
+  ]
+}
