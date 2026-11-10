@@ -39,6 +39,7 @@ from .scoring import (
     EXISTING_SYSTEM_BONUS,
     KEPT_DATABASES,
     build_weights,
+    hard_constraints,
     net_cost,
     score_layer,
     skill_fit,
@@ -239,11 +240,6 @@ def _core(raw: dict, kb: dict | None = None, light: bool = False) -> dict:
     w = build_weights(p, d)
 
     layer_scored, layer_excluded, relaxed = _score_layers(kb, p, d, w, light=light)
-    for layer, level in relaxed.items():
-        what = "lock-in preference" if level == 1 else "lock-in preference, scale-ceiling, capacity and vendor-SLA limits"
-        warnings.append(_warn("RELAXED_CONSTRAINT", "warning", f"No {layer} option met every constraint",
-                              f"All {layer} options were excluded by hard constraints.",
-                              f"Relaxed the {what} (compliance and deployment are never relaxed).", [layer]))
 
     infeasible = [l for l in LAYERS if not layer_scored[l]]
     if infeasible:
@@ -263,6 +259,14 @@ def _core(raw: dict, kb: dict | None = None, light: bool = False) -> dict:
                          wide=None if k in nowide else _wider(kb, p, d, layer_scored), hold=holds[k])
     combos[:] = [c for c in combos if c is not best]
     combos.insert(0, best)
+    for layer in relaxed:  # the statement asks for exactly which constraints were relaxed: the pick's own waived limits
+        item = best["picks"][layer]["item"]
+        waived = [r for r in hard_constraints(layer, item, p, d) if r[2]]
+        warnings.append(_warn("RELAXED_CONSTRAINT", "warning", f"No {layer} option met every constraint",
+                              f"All {layer} options were excluded by hard constraints, so {item['name']} is kept with "
+                              f"these limits relaxed: {'; '.join(r[0] for r in waived)}.",
+                              "Compliance, residency, cloud and deployment rules are never relaxed.",
+                              list(dict.fromkeys(r[1] for r in waived))))
     pref_warning = _cloud_pref_warning(p, combos, layer_excluded["hosting"])
     if pref_warning:
         warnings.append(pref_warning)

@@ -401,10 +401,17 @@ def test_existing_system_patterns_match_whole_names():
 
 
 def test_a_relaxed_preference_is_named_in_assumptions():
+    """HIPAA, PCI DSS, EU residency and no AWS, Google Cloud or Azure leave no host whose SLA backs P4's 99.95%: the
+    output must say that exactly this limit was relaxed, for which host, and point at the field (statement section 4)."""
     out = run(edit("P4", project={"type": "healthtech", "platforms": ["web"]}, compliance=["hipaa", "gdpr", "pci_dss"],
                    infrastructure={"cloud_preference": "none", "data_residency": "eu"}))
     relaxed = [w for w in out["warnings"] if w["code"] == "RELAXED_CONSTRAINT"]
-    assert all(any(a.startswith("Relaxed or flagged (RELAXED_CONSTRAINT)") for a in out["assumptions"]) for _ in relaxed)
+    assert len(relaxed) == 1, codes(out)
+    host = out["stack"]["hosting"]["choice"].split(",")[0]
+    assert relaxed[0]["fields"] == ["requirements.availability"], relaxed[0]
+    assert f"so {host} is kept with these limits relaxed: " in relaxed[0]["message"] and "SLA" in relaxed[0]["message"]
+    assert "99.95%" in relaxed[0]["message"] and "lock-in" not in relaxed[0]["message"]
+    assert f"Relaxed or flagged (RELAXED_CONSTRAINT): {relaxed[0]['message']}" in out["assumptions"]
 
 
 def test_a_long_description_is_accepted_and_moves_nothing(outputs):
