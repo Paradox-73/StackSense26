@@ -690,11 +690,6 @@ details.sub > summary { cursor: pointer; color: var(--plum-2); font-weight: 500;
 .sum-badge svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .sum-badge.ok { background: rgba(45, 106, 79, 0.12); color: var(--pos); }
 .sum-badge.fb { background: var(--warn-soft); color: var(--warn); }
-.so-t { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 0 0 8px; }
-.so-t th, .so-t td { text-align: left; padding: 4px 8px 4px 0; border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.1)); }
-.so-t thead th { font-weight: 600; font-size: 12px; }
-.so-t .so-bad td:last-child { color: var(--warn); font-weight: 600; }
-.so-v { margin: 0 0 8px; padding-left: 18px; font-size: 13.5px; line-height: 1.5; }
 .sum-all { margin: 0 0 8px; font-size: 14.5px; line-height: 1.5; }
 .sum-l { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0 0 8px; font-size: 13.5px; }
 .sum-l dt { font-weight: 600; }

@@ -137,7 +137,7 @@ def test_every_scripted_screenshot_exists_and_is_listed(facts):
     import capture_screenshots as cs
     for name, *_ in cs.SHOTS:
         assert (ROOT / "report" / "screenshots" / f"{name}.png").exists(), name
-    assert len(cs.SHOTS) == 20
+    assert len(cs.SHOTS) == 19
 
 
 def test_architecture_figures_quote_the_right_counts(facts):

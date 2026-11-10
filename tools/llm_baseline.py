@@ -14,7 +14,7 @@ in it are skipped, so an interrupted or rate-limited run continues where it stop
 data/llm_cache/, so a repeated run costs no requests. Needs STACKSENSE_LLM_API_KEY or OPENROUTER_API_KEY (see README).
 
 Agreement with the key is not the only measure. Each saved stack is also graded by the rule engine (offline, with
-engine.second_opinion.grade_stack): hard requirements the stack breaks, minimum monthly cost against the engine's,
+baseline_grading.grade_stack): hard requirements the stack breaks, minimum monthly cost against the engine's,
 over-budget (INR budgets converted at the engine's own rate), and the engine's score gap. The engine's own stack is
 graded the same way as a self-check. --repeat measures how often the model gives the same stack twice.
 """
@@ -32,8 +32,8 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 import bench  # noqa: E402
 from engine import llm  # noqa: E402
 from engine.kb import LAYERS  # noqa: E402
-from engine.second_opinion import (SYSTEM_PROMPT, allowed_options, build_messages, engine_pick_ids,  # noqa: E402,F401
-                                   grade_stack, read_picks)
+from baseline_grading import (SYSTEM_PROMPT, allowed_options, build_messages, engine_pick_ids,  # noqa: E402,F401
+                              grade_stack, read_picks)
 
 OUT_PATH = os.path.join(ROOT, "benchmark", "llm_baseline.json")
 REPEAT_PATH = os.path.join(ROOT, "benchmark", "llm_baseline_repeat.json")

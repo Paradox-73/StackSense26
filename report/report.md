@@ -17,7 +17,7 @@ StackSense recommends a frontend, backend, database and hosting platform from a 
 |---|---|---|
 | Agreement with an answer key written by a language model in three architect personas, blind to the engine (not human raters) | 96% of the 160 layer picks (one pick each for frontend, backend, database and hosting, over 40 briefs) are acceptable to at least 2 of 3 personas; 72% top-1 and 95% acceptable on the 10 briefs I never tuned on | Section 6.1; `python tools/bench.py` |
 | Hard constraints under attack | 0 violations of the 14 properties (hard constraints, meaning rules that remove an option before any scoring; consistency; and no return to an earlier pick as users grow) in 10,000 random projects; 0 of 1,000 growth walks returns to an earlier pick | Section 6; `python tools/fuzz.py` |
-| Tests | 917 tests pass, and every warning code the engine can raise has a test that triggers it | Section 6; `python -m pytest` |
+| Tests | 910 tests pass, and every warning code the engine can raise has a test that triggers it | Section 6; `python -m pytest` |
 
 **Where each judging criterion is answered**
 
@@ -39,7 +39,7 @@ StackSense recommends a frontend, backend, database and hosting platform from a 
 A language model can name a plausible stack, but on its own it cannot show a score trace that can be re-run, may answer the same question differently twice, and has no notion of a hard constraint. A pure rule engine has the opposite weakness: it needs the user to fill in a form. I split the work so that each part does what it is good at:
 
 - **The rule engine decides.** Every score, exclusion, pick, cost and "what would change it" comes from the rule engine and the JSON knowledge base. The model never adds, removes or reorders a recommendation.
-- **The model works at the edges.** It reads a free-text project description into questionnaire answers, and it re-words the engine's own facts as a short plain-English summary. It also maps a "what if..." question to an input change that the engine re-runs, and, on request, proposes its own stack as a second opinion that the engine grades (Section 6.2 shows why the engine grades it instead of trusting it).
+- **The model works at the edges.** It reads a free-text project description into questionnaire answers, and it re-words the engine's own facts as a short plain-English summary. It also maps a "what if..." question to an input change that the engine re-runs.
 - **Code checks everything the model returns,** before anything is shown (table below).
 
 | Where | What the model does | What the code checks | With no key or a failed call |
@@ -47,7 +47,6 @@ A language model can name a plausible stack, but on its own it cannot show a sco
 | Describe your project (`engine/brief.py`) | Reads a paragraph into answers, only for questions the pattern reader left open | The value must be one the questionnaire accepts, and must come with a quote that occurs in the user's text; otherwise it is dropped | The pattern reader (`engine/brief_rules.py`: numbers, money, skills, regions, compliance words, app-type keywords) still fills what it can |
 | Plain-English summary (`engine/summary.py`) | Re-words the engine's facts as one short paragraph per layer plus an overall one | Every technology name and every number must appear in the engine's facts. One retry shows the model its errors; a second failure falls back | The engine's template explanation, badged "template fallback" instead of "checked against engine facts" |
 | What if... in words (`engine/whatif.py`) | Maps "what if we had ten times the users?" to answer changes | Same schema and quote rule as the brief reader; the engine then re-runs on the changed answers | Numbers and clear phrases ("team of 8", "budget $0") still work through the pattern reader |
-| Second opinion (`engine/second_opinion.py`) | Chooses its own stack for the user's answers, from the knowledge base's technology ids | The engine grades that stack with `why_not`: hard-requirement breaks, score gap and cost difference against its own pick. The model's stack is never the recommendation | The button is disabled with a note; nothing else changes |
 
 ![The Describe-your-project box after one press of the button: six answers, each with its source and the words it came from](screenshots/f09-describe-project.png)
 
@@ -143,9 +142,6 @@ Every pick answers four questions: why this one, why not the runner-up, what wou
 
 ![The plain-English summary for the HIPAA example, badged as checked against the engine's facts](screenshots/f10-plain-summary.png)
 
-![The second opinion for the HIPAA example: the model's own stack, graded by the rules](screenshots/f11-second-opinion.png)
-
-In the second opinion the model proposes a mobile toolkit for the front end, which the rules rule out because the project targets the web, and a different back end that the engine ranks below its own pick. The engine's recommendation does not change.
 
 ![The Why panel for hosting in the HIPAA telehealth example](screenshots/f02-why-hosting.png)
 
@@ -212,13 +208,13 @@ The engine can raise 50 distinct warning codes, and `tests/test_edge_cases.py` f
 | What is checked | Tests |
 |---|---|
 | Scoring, constraints and cost | 316 |
-| Explanations match the engine | 123 |
+| Explanations match the engine | 116 |
 | Inputs, edge cases and warnings | 150 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 172 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 71 |
-| **All** | **917** |
+| **All** | **910** |
 <!-- END validation -->
 
 The per-file list is `report/validation.md`.
@@ -444,7 +440,7 @@ Each technology carries 1-to-5 scores for twelve criteria against a published ru
 
 ### H.3 API
 
-The app serves JSON endpoints for the recommendation, the "Not sure" analysis, the next question to ask, why a pick changed, why-not comparisons, pick stability, Markdown and decision-record export, and the four language-model features (brief, summary, what-if, second opinion). `POST /api/recommend` takes any subset of answers and returns the full explained recommendation. Every endpoint, with its inputs and outputs, is listed in `docs/REFERENCE.md`, and interactive docs are served at `/docs`.
+The app serves JSON endpoints for the recommendation, the "Not sure" analysis, the next question to ask, why a pick changed, why-not comparisons, pick stability, Markdown and decision-record export, and the three language-model features (brief, summary, what-if). `POST /api/recommend` takes any subset of answers and returns the full explained recommendation. Every endpoint, with its inputs and outputs, is listed in `docs/REFERENCE.md`, and interactive docs are served at `/docs`.
 
 ### H.4 How this differs from the usual sources
 

@@ -357,8 +357,8 @@ def _llm_baseline() -> str:
                   f"which the engine cannot do (grading the engine's own picks the same way finds {ec['breaks']}), and it gives no costs, reasons or sources. "
                   f"{m['llm_over_budget']} of {graded} model stacks are over the stated budget, but the engine's own stack is over budget on {ec['over_budget']} of the same briefs, "
                   f"so those budgets are below the cheapest stack the engine can build; on {m['llm_over_budget_engine_fits']} briefs the model overspends where the engine fits. "
-                  "StackSense therefore uses the model as a reader, an explainer and a second opinion, and lets the rules decide: "
-                  "the Second opinion button shows the model's stack beside the engine's, graded."]
+                  "StackSense therefore uses the model only as a reader of free text and an explainer, and lets the rules "
+                  "decide; this comparison is an offline experiment (tools/llm_baseline.py), not part of the engine."]
     return "\n".join(lines)
 
 

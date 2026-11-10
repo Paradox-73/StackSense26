@@ -55,7 +55,6 @@ stacksense/
     brief_rules.py       the pattern reader for the same job (numbers, money, skills, regions, compliance, app type)
     summary.py           facts from the engine result, LLM summary, technology and number validator, template fallback
     whatif.py            plain-English what-if question -> answer changes
-    second_opinion.py    the model's own stack for the same answers, graded by the engine (never the recommendation)
     parallel.py          worker processes that spread the many engine re-runs of /api/next (no model involved)
   data/
     kb/frontend.json backend.json database.json hosting.json compat_rules.json
@@ -196,7 +195,6 @@ The questionnaire is defined in `data/questions.json`. That file also drives def
 | GET | `/api/glossary` | definitions, "who it applies to" and official sources for every technical term |
 | POST | `/api/brief` | body = `{"text": "..."}`, returns the answers read from the description (value, source `rule` or `llm`, quote) and the questions still unknown; works without a key (pattern reader only) |
 | POST | `/api/summary` | body = answers, returns a plain-English summary per layer and overall, `source` (`llm` or `template`) and `checked`; the template explanation is returned without a key or when the model's text fails the check |
-| POST | `/api/second-opinion` | body = answers, returns the model's stack and the engine's side by side, per-layer agreement, the hard requirements the model's stack breaks, score gap, cost difference and verdict lines; `ok` is false with a `note` without a key |
 | POST | `/api/whatif` | body = `{"answers": {...}, "question": "what if ..."}`, returns the answer changes the question implies (with quotes and previous values) |
 | POST | `/api/export/markdown` | same input, returns a Markdown report |
 | POST | `/api/export/adr` | same input, returns one architecture decision record per layer (context, decision, alternatives considered, consequences, revisit when) |

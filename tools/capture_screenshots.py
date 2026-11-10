@@ -9,7 +9,7 @@ in the installed Chrome through Playwright (build-time only, see requirements-de
 text that must appear on the page, computed from the engine's own output for the same answers. A shot
 whose page lacks that text is a mismatch. Set CHROME to a browser path if Chrome is not found.
 
-Three shots (f09, f10, f11) show the language-model features, so they need an API key in `.env` or the environment
+Two shots (f09, f10) show the language-model features, so they need an API key in `.env` or the environment
 (they send real requests; replies are cached in data/llm_cache/). Without a key they are skipped with a printed note and
 the other 17 are taken as usual. With a key set, the shots that do not click a model button are taken the same way.
 """
@@ -103,11 +103,6 @@ def _act_summary(page) -> None:
     page.wait_for_selector("#summary .sum-badge", timeout=90000)
 
 
-def _act_second(page) -> None:
-    page.locator("#second-go").click()
-    page.wait_for_selector("#second .so-t", timeout=90000)
-
-
 SHOTS += [
     ("f09-describe-project", "#", ".brief",
      "Describe your project: the answers read from a description, each with its source and the words it came from.",
@@ -115,13 +110,10 @@ SHOTS += [
     ("f10-plain-summary", "#preset=hipaa_telehealth", "#summary",
      "The plain-English summary for the HIPAA example, badged as checked against the engine's facts.",
      lambda: ["checked against engine facts"]),
-    ("f11-second-opinion", "#preset=hipaa_telehealth", "#second",
-     "Second opinion: a language model's own stack graded by the rules; it disagrees on two layers and one of its picks is ruled out.",
-     lambda: ["Second opinion", "ruled out"]),
 ]
 # Shots that leave out panels which are empty until a model button is pressed (they would show only a button).
-HIDE = {"f01-result-hipaa": ["#summary", "#second"]}
-ACTS = {"f09-describe-project": _act_brief, "f10-plain-summary": _act_summary, "f11-second-opinion": _act_second}
+HIDE = {"f01-result-hipaa": ["#summary"]}
+ACTS = {"f09-describe-project": _act_brief, "f10-plain-summary": _act_summary}
 
 CAPTIONS = {n: c for n, _l, _s, c, _e in SHOTS}
 LINKS = {n: l for n, l, *_ in SHOTS}

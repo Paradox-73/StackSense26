@@ -16,7 +16,6 @@ from engine.kb import LAYERS, load_glossary, load_kb, load_presets, load_questio
 from engine.recommender import switch_reasons
 from engine.robustness import robustness
 from engine.sensitivity import next_questions, sensitivity
-from engine.second_opinion import second_opinion
 from engine.summary import summarize
 from engine.whatif import MAX_QUESTION_CHARS, propose_changes
 from engine.whynot import why_not
@@ -255,12 +254,3 @@ def api_whatif(payload: dict = wrapped_body(
     answers = payload.get("answers") if isinstance(payload.get("answers"), dict) else {}
     return propose_changes(_text_field(payload, "question", MAX_QUESTION_CHARS), answers)
 
-
-@app.post("/api/second-opinion", summary="A language model's own stack, graded by the rules", tags=["llm"])
-def api_second_opinion(payload: dict = answers_body()):
-    """Body: answers (same as /api/recommend). Asks a language model (only when an API key is set) to choose its own stack for these
-    answers, from the knowledge base's technology ids, then grades that stack with the rule engine. Returns both stacks, per layer
-    whether they agree, the hard requirements the model's stack breaks (with the engine's reasons), the score gap, the cost difference,
-    and one plain-English verdict line per layer. The rules still decide the recommendation; this is only a comparison.
-    Without a key, or when the model does not answer, "ok" is false and "note" says why."""
-    return second_opinion(payload)

@@ -767,7 +767,6 @@ function renderResults(prev, change) {
       <div id="res-head"></div><div id="res-warn"></div><ol class="picks" id="picks"></ol>
       <p class="run-error" id="run-error" role="alert" hidden></p>
       <div id="summary"></div>
-      <div id="second"></div>
       <div id="depends"></div>
       <p class="trace"><span>${ICON.lock} Same answers → same stack. Scores follow a published 1–5 rubric.</span>
         <button type="button" class="link-btn" data-open="why">Show the trace</button></p>
@@ -795,7 +794,6 @@ function renderResults(prev, change) {
   renderPicks(prev, change);
   renderDepends();
   renderSummary();
-  renderSecond();
   renderWhatIf();
   renderWhatIfText();
   S.growth = null;
@@ -1190,50 +1188,6 @@ async function loadSummary() {
     return;
   }
   renderSummary();
-}
-
-/* ------------------------------------------------------------------ second opinion */
-const secondKey = () => JSON.stringify(sent());
-const SECOND_INTRO = "A language model picks its own stack for these answers; the rules then grade it (hard requirements, score, cost). The recommendation above is not changed.";
-
-function renderSecond() {
-  const box = $("#second");
-  if (!box) return;
-  const on = !!(S.health && S.health.llm_enabled);
-  const x = S.second && S.second.key === secondKey() ? S.second.data : null;
-  if (!x || !x.ok) {
-    const note = !on ? "Needs a language-model API key, which is not set, so this is off."
-      : x ? esc(x.note) : esc(SECOND_INTRO);
-    box.innerHTML = `<div class="sum"><div class="sum-h"><h3>Second opinion</h3>
-      <button type="button" class="link-btn" id="second-go"${on ? "" : " disabled"}>${x ? "Try again" : "Ask for a second opinion"}</button></div>
-      <p class="muted small">${note}</p></div>`;
-    return;
-  }
-  const usd = (v) => `$${fmt(Math.abs(v))}`;
-  const rows = LAYERS.map((l) => {
-    const y = x.layers[l];
-    const bad = y.ruled_out.length;
-    return `<tr class="${y.agree ? "so-same" : bad ? "so-bad" : ""}"><th scope="row">${esc(LAYER_NAME[l])}</th><td>${esc(y.model || "no valid answer")}</td><td>${esc(y.engine)}</td>
-      <td>${y.agree ? "agree" : bad ? "model's pick ruled out" : "differ"}</td></tr>`;
-  }).join("");
-  box.innerHTML = `<div class="sum"><div class="sum-h"><h3>Second opinion</h3>
-      <span class="sum-badge ${x.breaks.length ? "fb" : "ok"}">${x.breaks.length ? `model breaks ${x.breaks.length} hard requirement${x.breaks.length > 1 ? "s" : ""}` : "no hard requirement broken"}</span>
-      <button type="button" class="link-btn" id="second-go">Ask again</button></div>
-    <p class="sum-all">${esc(x.summary)}</p>
-    <table class="so-t"><thead><tr><th></th><th>Model</th><th>Engine</th><th></th></tr></thead><tbody>${rows}</tbody></table>
-    <ul class="so-v">${x.verdicts.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
-    <p class="muted small">The model (${esc(x.model)}) gives no costs, reasons or sources; the grades and costs come from the rules, so the engine's pick stays the recommendation.</p></div>`;
-}
-
-async function loadSecond() {
-  const key = secondKey(), btn = $("#second-go");
-  if (btn) { btn.disabled = true; btn.textContent = "Asking..."; }
-  try {
-    S.second = { key, data: await api("/api/second-opinion", sent()) };
-  } catch (e) {
-    S.second = { key, data: { ok: false, note: `Could not get a second opinion. ${e.message}` } };
-  }
-  renderSecond();
 }
 
 /* ------------------------------------------------------------------ "What if..." in words */
@@ -1767,7 +1721,6 @@ async function settled() { /* deep links: wait for the debounce, the live run an
     $("#n-tech").textContent = Object.values(h.technologies).reduce((a, b) => a + b, 0);
     $("#n-rules").textContent = h.rules;
     setLlmNote({ enabled: !!h.llm_enabled });
-    renderSecond();
   }).catch(() => {});
   renderExamples(); renderQuick(); bindRefine();
 
@@ -1800,7 +1753,6 @@ async function settled() { /* deep links: wait for the debounce, the live run an
     if (op) { openPanel(op.dataset.open, { layer: op.dataset.layer || null, focus: !op.classList.contains("drawer-b") }); return; }
     if (e.target.closest("#rob-go")) { runRobustness(); return; }
     if (e.target.closest("#sum-go")) { loadSummary(); return; }
-    if (e.target.closest("#second-go")) { loadSecond(); return; }
     const wn = e.target.closest("[data-whynot]");
     if (wn) { runWhyNot(wn.dataset.whynot); return; }
     const wl = e.target.closest("[data-why-layer]");

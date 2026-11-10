@@ -37,7 +37,7 @@ python3 -m venv .venv
 
 ## Run the checks
 
-- Tests (917 tests, a few minutes): `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`)
+- Tests (910 tests, a few minutes): `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`)
 - Benchmark against the answer key: `python tools/bench.py` (add `--briefs` for one line per brief)
 - Random-input fuzz test: `python tools/fuzz.py` (exits 1 on any violation)
 - Report build and screenshots (needs Chrome and `requirements-dev.txt`): `python tools/build_report.py`
@@ -51,7 +51,7 @@ python3 -m venv .venv
 | Browser | `app/static/` | One page of plain HTML, CSS and JavaScript; no build step, no third-party script. The form is built from `data/questions.json`. |
 | API | `app/main.py` | FastAPI routes (FastAPI is a Python web framework): recommend, "Not sure" analysis, next question, why a pick changed, why not X, export. |
 | Engine | `engine/` | Pure Python, no dependencies: clean inputs, derive numbers, find conflicts, weight, filter, score, search stacks, explain. |
-| Language-model layer | `engine/llm.py`, `brief.py`, `summary.py`, `whatif.py`, `second_opinion.py` | Optional. Reads text and words summaries; each output is checked, and each feature has a rule-based fallback. |
+| Language-model layer | `engine/llm.py`, `brief.py`, `summary.py`, `whatif.py` | Optional. Reads text and words summaries; each output is checked, and each feature has a rule-based fallback. |
 | Data | `data/` | Technologies, compatibility rules, sources, questionnaire, glossary, presets, score rubric. |
 
 ## How it decides
@@ -72,7 +72,6 @@ python3 -m venv .venv
 |---|---|---|
 | Describe your project (`engine/brief.py`) | Reads a paragraph into questionnaire answers | Each value must be allowed by the questionnaire and come with a quote found in your text |
 | Plain-English summary (`engine/summary.py`) | Rewords the engine's own facts | Every technology name and number must appear in the facts; otherwise a template summary is shown |
-| Second opinion (`engine/second_opinion.py`) | Picks its own stack for your answers | The engine grades it; it is shown beside the engine's stack and never used as the pick |
 | What if, in words (`engine/whatif.py`) | Maps "what if we had 10x users?" to answer changes | Same checks as the description reader; the engine then re-runs |
 
 - **Reproducible:** model answers are cached as JSON in `data/llm_cache/`, and the model runs at temperature 0 (no randomness).
@@ -85,7 +84,7 @@ python3 -m venv .venv
 - **Who wrote the key:** a language model playing three architect personas, blind to the engine. They are not human raters, and the Krippendorff alpha of 0.91 (an agreement score; 1 is perfect) describes agreement between those personas only. The key's SHA-256 is in `tests/benchmark/answer_key.sha256`.
 - **Fuzz test** (`python tools/fuzz.py`): 10,000 seeded random projects against 14 must-hold rules (hard constraints, same output on repeat, rename and reorder invariance, no flip-back as users grow). 0 violations. In 1,000 growth walks, 0 have a layer that returns to an earlier pick, down from 296 before the stability rules.
 - **LLM-only comparison** (`python tools/llm_baseline.py --show`): the same 40 briefs answered by a language model alone with no rule engine, then graded by the rule engine. Method and numbers are in section 6.2 of `report/report.md`. The model alone scores about the same as the engine against the key (LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 81% and 96%) but breaks a hard requirement in 7 of the 40 briefs; the engine's own picks break none.
-- **Tests:** 917 tests, including a check that the numbers in this file match the code (`tests/test_docs.py`).
+- **Tests:** 910 tests, including a check that the numbers in this file match the code (`tests/test_docs.py`).
 
 ## Limitations
 

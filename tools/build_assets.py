@@ -90,7 +90,7 @@ CATEGORIES = {
                                       "test_system_of_record", "test_tenancy_sso", "test_vendor_sla", "test_research_refresh",
                                       "test_cloud_skill_tie", "test_data_estimate", "test_side_store_cost", "test_zero_budget"],
     "Explanations match the engine": ["test_explanations", "test_reasoning_text", "test_switch_reasons", "test_whynot", "test_adr",
-                                      "test_faithfulness", "test_robustness", "test_wording", "test_second_opinion", "test_redteam_cost",
+                                      "test_faithfulness", "test_robustness", "test_wording", "test_baseline_grading", "test_redteam_cost",
                                       "test_redteam_text", "test_paragraph_wording"],
     "Inputs, edge cases and warnings": ["test_standard", "test_edge_cases", "test_input_validation", "test_input_questions", "test_questions", "test_next",
                                         "test_sensitivity", "test_defaults_used", "test_scale_warnings", "test_question_influence", "test_question_wording"],
