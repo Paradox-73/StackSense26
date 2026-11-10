@@ -770,8 +770,11 @@ def hard_constraints(layer: str, item: dict, p: dict, d: dict) -> list[tuple[str
         if "iso27001" in p["compliance"] and not comp.get("iso27001"):
             out.append(("No ISO/IEC 27001 certification published", "compliance", 0))
         regions = item.get("residency_regions", item.get("regions"))
+        note = item.get("residency_note")
+        if layer == "hosting" and "static_regions" in item and static_site(p):
+            # A static site's data is its files and their logs: where the host stores those, not where functions run.
+            regions, note = item["static_regions"], item.get("static_residency_note")
         if regions is not None:
-            note = item.get("residency_note")
             for rule, region in RESIDENCY_RULES.items():
                 if rule in p["compliance"] and region not in regions:
                     out.append((note or RESIDENCY_TEXT[rule], "compliance", 0))

@@ -549,10 +549,11 @@
         "backend": [
           "supabase",
           "firebase",
-          "serverless_functions"
+          "serverless_functions",
+          "no_custom_backend"
         ]
       },
-      "note": "HTMX needs a server that renders HTML; BaaS/function backends return JSON.",
+      "note": "HTMX needs a server that renders HTML; BaaS/function backends return JSON, and a static site runs no server code at all.",
       "source": "https://htmx.org/docs/"
     },
     {

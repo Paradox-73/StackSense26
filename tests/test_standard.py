@@ -441,3 +441,27 @@ def test_a_long_description_is_accepted_and_moves_nothing(outputs):
     out = run(edit("P2", project={"description": "Customers book electricians and plumbers. " * 500}))
     assert out["status"] == outputs["P2"]["status"] and not out["validation_errors"]
     assert core(out) == core(outputs["P2"])
+
+
+@pytest.mark.parametrize("cloud,host", [("aws", "AWS S3 + CloudFront"), ("gcp", "Firebase Hosting"),
+                                        ("azure", "Azure Static Web Apps")])
+def test_a_static_site_on_a_named_cloud_gets_that_clouds_static_host(cloud, host):
+    """Statement 5.3: an explicit cloud is a hard constraint, and P1 is a free static portfolio on any of them."""
+    out = edited("P1", infrastructure={"cloud_preference": cloud})
+    stack = out["stack"]
+    assert out["architecture_style"] == "static" and stack["hosting"]["choice"].startswith(host), stack["hosting"]["choice"]
+    assert stack["backend"]["choice"] == stack["database"]["choice"] == "None" and stack["frontend"]["choice"] == "Astro"
+
+
+@pytest.mark.parametrize("cloud,residency,host,region", [
+    ("any", "eu", "AWS S3 + CloudFront", "eu-central-1"), ("any", "us", "Netlify", "US ("),
+    ("none", "india", "DigitalOcean", "BLR1"), ("none", "eu", "DigitalOcean", "FRA1"),
+    ("gcp", "eu", "Google Cloud Storage + Cloud CDN", "europe-west3"),
+    ("azure", "india", "Azure Blob Storage + Front Door", "Central India")])
+def test_a_static_site_under_a_residency_rule_names_where_its_files_stay(cloud, residency, host, region):
+    """A static site's data is its files and their logs: the host must keep them in the region, and say where. A CDN
+    that cannot pin them (Vercel, Firebase Hosting, Static Web Apps, Netlify outside the US) does not count."""
+    out = edited("P1", infrastructure={"cloud_preference": cloud, "data_residency": residency})
+    choice = out["stack"]["hosting"]["choice"]
+    assert out["architecture_style"] == "static" and choice.startswith(host) and region in choice, choice
+    assert "for functions" not in choice and not out["stack"]["frontend"]["choice"].startswith("Server-rendered")

@@ -202,6 +202,7 @@ REGION = {  # where the data stays under a residency rule, per cloud
     ("railway", "eu"): "EU West (Amsterdam)", ("railway", "us"): "US East (Virginia)",
     ("hetzner", "eu"): "Falkenstein, Nuremberg or Helsinki", ("hetzner", "us"): "Ashburn or Hillsboro",
     ("cloudflare", "eu"): "Data Localization Suite with the EU region",
+    ("netlify", "us"): "US (deploys, storage and logs stay with Netlify's US providers)",
 }
 STYLE = [("Static site", "static"), ("BaaS-first, self-hosted", "other"), ("BaaS-first", "serverless"),
          ("Serverless", "serverless"), ("Service-oriented", "service_oriented"), ("Modular monolith", "modular_monolith"),

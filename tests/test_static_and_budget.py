@@ -97,4 +97,5 @@ def test_read_only_site_stays_static_for_a_team_with_server_skills():
                            "budget_monthly": 50, "dau": dau}, with_counterfactuals=False)
             assert r["stack"]["backend"]["pick"]["id"] == "no_custom_backend", (skills, dau)
             assert r["stack"]["database"]["pick"]["id"] == "none_static", (skills, dau)
-            assert r["stack"]["hosting"]["pick"]["id"] in ("vercel", "netlify", "cloudflare", "aws_s3_cloudfront", "render", "digitalocean"), (skills, dau)
+            assert r["stack"]["hosting"]["pick"]["id"] in ("vercel", "netlify", "cloudflare", "aws_s3_cloudfront", "firebase_hosting",
+                                                              "azure_static_web_apps", "render", "digitalocean"), (skills, dau)

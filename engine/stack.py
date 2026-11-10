@@ -121,7 +121,10 @@ def _tb_value(combo: dict, attr: str) -> float:
         elif attr == "cloud_skill":
             tot += (c["item"].get("cloud") or c["item"].get("provider")) in combo.get("cloud_skills", ())
         elif attr == "cloud_pref":
-            tot += any(a["input"] == "cloud_preference" and a["delta"] > 0 for a in c.get("adjustments", []))
+            # A layer the stack does without (no server code, no database) puts nothing off the preferred cloud,
+            # so a static site is not out-voted by a stack that adds a database on that cloud.
+            absent = c["item"].get("kind") == "none" or (c["item"].get("static_only") and not c["item"].get("provider"))
+            tot += absent or any(a["input"] == "cloud_preference" and a["delta"] > 0 for a in c.get("adjustments", []))
         elif attr == "arch_pref":
             tot += any(a["input"] == "architecture" and a["delta"] > 0 for a in c.get("adjustments", []))
         else:

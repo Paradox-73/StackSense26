@@ -47,6 +47,8 @@
         "southeast_asia",
         "global"
       ],
+      "static_regions": [],
+      "static_residency_note": "Vercel caches a static site's files on its CDN worldwide, with no region to pin them to, and may move data to the US and wherever its providers work; a data-residency rule is treated as not met for a static site",
       "compliance": {
         "hipaa": true,
         "hipaa_min_usd": 350,
@@ -101,7 +103,9 @@
         "https://vercel.com/pricing",
         "https://vercel.com/docs/limits/fair-use-guidelines",
         "https://vercel.com/security",
-        "https://vercel.com/kb/guide/do-vercel-serverless-functions-support-websocket-connections"
+        "https://vercel.com/kb/guide/do-vercel-serverless-functions-support-websocket-connections",
+        "https://vercel.com/docs/functions/configuring-functions/region",
+        "https://vercel.com/docs/security/compliance"
       ],
       "seat_usd": 20
     },
@@ -149,6 +153,8 @@
         "southeast_asia",
         "global"
       ],
+      "static_regions": ["north_america"],
+      "static_residency_note": "Netlify serves a static site's files from its global edge and keeps hosting, storage and logs with US providers; a function region moves only where functions run, so only a US residency rule is met for a static site",
       "compliance": {
         "hipaa": false,
         "pci": true,
@@ -199,7 +205,9 @@
       "sources": [
         "https://docs.netlify.com/",
         "https://www.netlify.com/pricing/",
-        "https://docs.netlify.com/functions/optional-configuration/"
+        "https://docs.netlify.com/functions/optional-configuration/",
+        "https://docs.netlify.com/build/caching/caching-overview/",
+        "https://www.netlify.com/legal/subprocessors/"
       ],
       "static_cost_usd": [
         [
@@ -1091,6 +1099,194 @@
       "static_only": true
     },
     {
+      "id": "firebase_hosting",
+      "name": "Firebase Hosting (static)",
+      "provider": "gcp",
+      "kind": "static_cdn",
+      "summary": "Google's static hosting: pre-built pages cached at CDN edges worldwide, deployed with the Firebase CLI; files only, no server code.",
+      "scores": {"scalability": 5, "ease": 5, "ops": 5, "maturity": 5, "realtime": 1, "performance": 5},
+      "runs": {"static": true, "ssr": false, "functions": false, "long_running": false, "websockets": false, "containers": false, "gpu": false},
+      "skills": ["gcp", "firebase"],
+      "related_skills": ["javascript", "typescript"],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": ["north_america", "europe", "india", "southeast_asia", "global"],
+      "static_regions": [],
+      "static_residency_note": "Firebase Hosting is a global service: its files sit at CDN edges worldwide and their location cannot be chosen, so a data-residency rule is treated as not met",
+      "compliance": {
+        "hipaa": false,
+        "pci": true,
+        "soc2": true,
+        "iso27001": true,
+        "gdpr_dpa": true,
+        "maturity": 4,
+        "maturity_note": "ISO 27001 and SOC 1, 2 and 3; in Google Cloud's PCI DSS scope; not among the products Google Cloud's HIPAA BAA covers.",
+        "maturity_sources": ["https://firebase.google.com/support/privacy", "https://cloud.google.com/security/compliance/pci-dss", "https://cloud.google.com/security/compliance/hipaa"]
+      },
+      "cost_usd": [[0, 3], [3, 45], [45, 450], [450, 4500], [4500, 45000], [45000, 150000]],
+      "static_cost_note": "Spark (no-cost) plan: 10 GB stored and 360 MB a day of transfer; on the Blaze plan $0.026 per GB stored and $0.15 per GB transferred past those.",
+      "strengths": [
+        "One command (firebase deploy) publishes the site with a free certificate on your custom domain",
+        "The Spark plan costs nothing up to 10 GB stored and 360 MB a day of transfer"
+      ],
+      "weaknesses": [
+        "Serves files only: no server rendering, API routes or functions",
+        "Transfer past the free 360 MB a day costs $0.15 per GB, more than a flat-rate CDN at high traffic",
+        "The location of the files cannot be chosen, so it meets no data-residency rule"
+      ],
+      "sources": [
+        "https://firebase.google.com/docs/hosting",
+        "https://firebase.google.com/pricing",
+        "https://firebase.google.com/support/privacy",
+        "https://firebase.google.com/terms/service-level-agreement"
+      ],
+      "sla": {"percent": 99.95, "scope": "Firebase Hosting (service credits are a share of fees paid)", "source": "https://firebase.google.com/terms/service-level-agreement"},
+      "static_only": true
+    },
+    {
+      "id": "gcp_storage_cdn",
+      "name": "Google Cloud Storage + Cloud CDN (static)",
+      "provider": "gcp",
+      "kind": "static_cdn",
+      "summary": "Pre-built pages in a Cloud Storage bucket in your region, behind an external Application Load Balancer with Cloud CDN: files only, no server code.",
+      "scores": {"scalability": 5, "ease": 2, "ops": 5, "maturity": 5, "realtime": 1, "performance": 5},
+      "runs": {"static": true, "ssr": false, "functions": false, "long_running": false, "websockets": false, "containers": false, "gpu": false},
+      "skills": ["gcp"],
+      "related_skills": ["terraform", "devops", "javascript", "typescript"],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": ["north_america", "europe", "india", "southeast_asia", "global"],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 0,
+        "pci": true,
+        "soc2": true,
+        "iso27001": true,
+        "gdpr_dpa": true,
+        "maturity": 5,
+        "maturity_note": "Cloud Storage, Cloud CDN and Cloud Load Balancing are among the products Google Cloud's HIPAA BAA covers (do not cache PHI) and in its PCI DSS scope; Cloud Audit Logs record admin activity.",
+        "maturity_sources": ["https://cloud.google.com/security/compliance/hipaa", "https://cloud.google.com/security/compliance/pci-dss"]
+      },
+      "cost_usd": [[18, 21], [21, 45], [45, 290], [290, 2700], [2700, 25000], [25000, 100000]],
+      "static_cost_note": "The load balancer that gives the bucket HTTPS on your domain costs $0.025 an hour (about $18 a month) with no traffic; Cloud CDN cache egress is $0.08 per GB to North America and Europe ($0.09 in Asia Pacific) for the first 10 TiB.",
+      "strengths": [
+        "The bucket sits in the region you choose (asia-south1 Mumbai, europe-west3 Frankfurt, us-central1 Iowa), so the files stay there",
+        "Covered by Google Cloud's HIPAA BAA, with a 99.95% Cloud CDN SLA"
+      ],
+      "weaknesses": [
+        "About $18 a month for the load balancer even with no traffic: Cloud Storage alone serves no HTTPS on a custom domain",
+        "Manual setup: bucket, backend bucket, load balancer, certificate and cache policy"
+      ],
+      "sources": [
+        "https://cloud.google.com/storage/docs/hosting-static-website",
+        "https://cloud.google.com/vpc/network-pricing",
+        "https://cloud.google.com/cdn/pricing",
+        "https://cloud.google.com/storage/docs/locations",
+        "https://cloud.google.com/storage/sla",
+        "https://cloud.google.com/cdn/sla",
+        "https://cloud.google.com/security/compliance/hipaa"
+      ],
+      "sla": {"percent": 99.9, "scope": "Cloud Storage Standard class in one region (Cloud CDN: 99.95%)", "source": "https://cloud.google.com/storage/sla"},
+      "static_only": true
+    },
+    {
+      "id": "azure_static_web_apps",
+      "name": "Azure Static Web Apps",
+      "provider": "azure",
+      "kind": "static_cdn",
+      "summary": "Azure's static hosting: pre-built pages distributed globally, deployed from GitHub Actions or Azure DevOps; files only here, no server code.",
+      "scores": {"scalability": 4, "ease": 5, "ops": 5, "maturity": 4, "realtime": 1, "performance": 4},
+      "runs": {"static": true, "ssr": false, "functions": false, "long_running": false, "websockets": false, "containers": false, "gpu": false},
+      "skills": ["azure"],
+      "related_skills": ["javascript", "typescript", "csharp", "dotnet"],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": ["north_america", "europe", "india", "southeast_asia", "global"],
+      "static_regions": [],
+      "static_residency_note": "Static Web Apps is a global service: its files are distributed worldwide and the region you pick places only the managed Functions API, so a data-residency rule is treated as not met",
+      "compliance": {
+        "hipaa": false,
+        "pci": false,
+        "soc2": false,
+        "iso27001": false,
+        "gdpr_dpa": true,
+        "maturity": 2,
+        "maturity_note": "Its audit scope is published only in a Service Trust Portal document that needs a sign-in, so it is treated as holding no HIPAA, PCI DSS, SOC 2 or ISO 27001 attestation until checked.",
+        "maturity_sources": ["https://learn.microsoft.com/en-us/azure/compliance/offerings/cloud-services-in-audit-scope"]
+      },
+      "cost_usd": [[0, 0], [0, 50], [50, 600], [600, 6000], [6000, 60000], [60000, 200000]],
+      "static_cost_note": "Free plan: 100 GB of bandwidth a month per subscription and 0.5 GB of storage, with no SLA (a site over its quota is not served); Standard plan: $9 per app a month, then $0.20 per GB past 100 GB.",
+      "strengths": [
+        "The Free plan costs nothing for a small site, with free certificates on two custom domains",
+        "Builds and deploys from GitHub Actions or Azure DevOps on every push, with preview environments for pull requests"
+      ],
+      "weaknesses": [
+        "Serves files only here: no server rendering; its API is a separate managed Functions app",
+        "The Free plan has no SLA and stops serving a site that exceeds its quota",
+        "The files are distributed globally with no region to pin, so it meets no data-residency rule"
+      ],
+      "sources": [
+        "https://learn.microsoft.com/en-us/azure/static-web-apps/overview",
+        "https://learn.microsoft.com/en-us/azure/static-web-apps/plans",
+        "https://azure.microsoft.com/en-us/pricing/details/app-service/static/",
+        "https://learn.microsoft.com/en-us/azure/static-web-apps/faq"
+      ],
+      "sla": {"percent": 99.95, "scope": "Standard plan (the Free plan has none)", "source": "https://learn.microsoft.com/en-us/azure/static-web-apps/plans"},
+      "static_only": true
+    },
+    {
+      "id": "azure_blob_frontdoor",
+      "name": "Azure Blob Storage + Front Door (static)",
+      "provider": "azure",
+      "kind": "static_cdn",
+      "summary": "Pre-built pages in a Blob Storage static website in your region, behind Azure Front Door Standard: files only, no server code.",
+      "scores": {"scalability": 5, "ease": 2, "ops": 5, "maturity": 5, "realtime": 1, "performance": 5},
+      "runs": {"static": true, "ssr": false, "functions": false, "long_running": false, "websockets": false, "containers": false, "gpu": false},
+      "skills": ["azure"],
+      "related_skills": ["terraform", "devops", "javascript", "typescript"],
+      "scale_ceiling": 5,
+      "team_min": 1,
+      "lock_in": 2,
+      "on_prem": false,
+      "regions": ["north_america", "europe", "india", "southeast_asia", "global"],
+      "compliance": {
+        "hipaa": true,
+        "hipaa_min_usd": 0,
+        "pci": true,
+        "soc2": true,
+        "iso27001": true,
+        "gdpr_dpa": true,
+        "maturity": 5,
+        "maturity_note": "Azure: HIPAA BAA in the product terms, PCI DSS Level 1, SOC 2 and ISO 27001 cover Azure Storage and Front Door; the Activity Log audits every control-plane change.",
+        "maturity_sources": ["https://learn.microsoft.com/azure/compliance/", "https://learn.microsoft.com/azure/compliance/offerings/offering-hipaa-us"]
+      },
+      "cost_usd": [[35, 38], [38, 60], [60, 290], [290, 2400], [2400, 12000], [12000, 40000]],
+      "static_cost_note": "Front Door Standard costs $35 a month plus $0.0825 per GB out to North America and Europe for the first 10 TB; Blob storage for a site's files is cents a month.",
+      "strengths": [
+        "The storage account sits in the region you choose (Central India, Germany West Central, East US), so the files stay there",
+        "Front Door Standard carries a 99.99% SLA"
+      ],
+      "weaknesses": [
+        "$35 a month for Front Door even with no traffic; Azure CDN (classic) takes no new profiles and retires on 30 September 2027",
+        "Manual setup: storage account, static website, Front Door profile, custom domain and certificate"
+      ],
+      "sources": [
+        "https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-static-website",
+        "https://azure.microsoft.com/en-us/pricing/details/frontdoor/",
+        "https://learn.microsoft.com/en-us/azure/cdn/classic-cdn-retirement-faq",
+        "https://learn.microsoft.com/azure/compliance/offerings/offering-hipaa-us",
+        "https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services"
+      ],
+      "sla": {"percent": 99.99, "scope": "Azure Front Door Standard", "source": "https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services"},
+      "static_only": true
+    },
+    {
       "id": "gcp_cloud_run",
       "name": "Google Cloud Run",
       "provider": "gcp",
@@ -1500,11 +1696,14 @@
       ],
       "weaknesses": [
         "Fewer managed services than hyperscalers",
-        {"text": "Its HIPAA BAA does not cover App Platform or Managed Databases (only Droplets, Kubernetes and other listed products)", "when": {"compliance_any": ["hipaa"]}}
+        {"text": "Its HIPAA BAA does not cover App Platform or Managed Databases (only Droplets, Kubernetes and other listed products)", "when": {"compliance_any": ["hipaa"]}},
+        {"text": "Static sites in BLR1 (Bangalore) have limited availability: they are served through the Cloudflare CDN only", "when": {"india": true}}
       ],
-      "static_cost_usd": [[0, 0], [12, 50], [50, 250], [250, 1200], [1200, 6000], [6000, 30000]],
+      "static_cost_usd": [[0, 0], [1, 6], [6, 60], [60, 600], [600, 6000], [6000, 30000]],
+      "static_cost_note": "Three static-site apps are free with 1 GiB of transfer each a month; more transfer is $0.02 per GiB, and static-only apps past three are $3 a month each.",
       "sources": [
         "https://docs.digitalocean.com/products/app-platform/",
+        "https://docs.digitalocean.com/products/app-platform/details/availability/",
         "https://www.digitalocean.com/pricing",
         "https://www.digitalocean.com/pricing/app-platform",
         "https://docs.digitalocean.com/platform/regional-availability/",
