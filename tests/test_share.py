@@ -51,3 +51,20 @@ console.log(JSON.stringify({
 def test_page_loads_share_script_before_the_app():
     html = (ROOT / "app/static/index.html").read_text(encoding="utf-8")
     assert html.index("/static/share.js") < html.index("/static/app.js")
+
+
+def test_a_standard_scenario_file_is_told_apart_from_answers():
+    """A file in the statement's scenario schema (or an array of them) is not an answers file: the page sends it to /scenario."""
+    r = node("""
+const isKey = (k) => ["dau", "platforms", "compliance", "existing_systems"].includes(k);
+const scenario = {scenario_id: "P2", project: {name: "FixIt Now", platforms: ["web"]}, team: {size: 3}, compliance: ["dpdp"]};
+console.log(JSON.stringify({
+  one: Share.fromFile(JSON.stringify(scenario), isKey),
+  many: Share.fromFile(JSON.stringify([scenario, scenario]), isKey),
+  few: Share.fromFile(JSON.stringify({scenario_id: "E1", project: {name: "x"}}), isKey),
+  answers: Share.fromFile(JSON.stringify({platforms: ["web"], compliance: ["gdpr"], existing_systems: []}), isKey),
+  list: Share.fromFile("[1, 2]", isKey),
+}));""")
+    assert r["one"] == r["many"] == r["few"] == {"scenario": True}
+    assert r["answers"] == {"answers": {"platforms": ["web"], "compliance": ["gdpr"], "existing_systems": []}, "unknown": [], "ignored": []}
+    assert r["list"] is None

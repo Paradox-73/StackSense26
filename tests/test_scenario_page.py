@@ -151,3 +151,27 @@ def test_the_load_file_control_shows_keyboard_focus(page, base_url):
     style, width = page.evaluate("""() => { const s = getComputedStyle(document.querySelector('label[for=sc-file]'));
         return [s.outlineStyle, s.outlineWidth]; }""")
     assert style != "none" and width != "0px", "the visible control must show the focus ring"
+
+
+def test_the_home_page_links_to_the_scenario_page_and_hands_scenario_files_to_it(page, base_url):
+    page.goto(f"{base_url}/")
+    page.wait_for_selector("#out .pick-b")
+    assert page.get_attribute("nav a.nav-b", "href") == "/scenario"
+    page.set_input_files("#share-file", str(ROOT / "scenarios" / "public" / "P2.json"))
+    page.wait_for_url(f"{base_url}/scenario", timeout=5000)
+    assert _result(page) == "ok_with_warnings" and page.input_value("#f-project-name") == "FixIt Now"
+    assert page.evaluate("S.doc") == json.loads((ROOT / "scenarios" / "public" / "P2.json").read_text(encoding="utf-8"))
+    assert page.evaluate("sessionStorage.getItem('ss-scenario')") is None, "the hand-over is read once"
+
+
+def test_the_home_page_says_the_model_is_switched_off_not_keyless(page, base_url):
+    """The app here runs with STACKSENSE_LLM=off; the page must say so rather than blame a missing key."""
+    page.goto(f"{base_url}/")
+    page.wait_for_selector("#out .pick-b")
+    page.wait_for_function("() => document.querySelector('#brief-llm').textContent.includes('off')")
+    note = page.inner_text("#brief-llm")
+    assert "switched off" in note and "no API key" not in note
+    page.click("#sum-go")
+    page.wait_for_selector(".sum-badge")
+    why = page.inner_text(".sum .muted")
+    assert "switched off" in why and "no API key" not in why

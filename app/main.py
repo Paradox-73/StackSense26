@@ -92,8 +92,9 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(lifespan=lifespan, title="StackSense", version=__version__,
               description="Deterministic, explainable tech-stack recommendation engine: the rules make every decision, so the same answers always "
                           "give the same stack. POST any subset of the answers (the schema is written from data/questions.json) and read "
-                          "the stack, the reasons, the cost and the warnings back. The /api/brief, /api/summary and /api/whatif "
-                          "endpoints optionally use a language model to read free text and word summaries; they work without a key.")
+                          "the stack, the reasons, the cost and the warnings back. The /api/brief and /api/summary endpoints "
+                          "optionally use a language model to read free text and word summaries; they work without a key. "
+                          "/api/whatif uses the pattern reader only.")
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 

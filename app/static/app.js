@@ -1089,11 +1089,14 @@ function onSlide(e) {
 const quickKeys = (Q) => (Q.key === "must" ? ["realtime", "offline", "seo", "platforms"] : [Q.key, Q.key2].filter(Boolean));
 const srcBadge = (f) => `<span class="src src-${esc(f.source)}" title="${f.source === "rule" ? "read by the pattern reader" : "read by the language model; the quote was found in your text"}">${f.source === "rule" ? "rule" : "LLM"}</span>`;
 
+/** Why the model is off: the STACKSENSE_LLM=off switch (reported by /api/health), else no key or the daily limit. */
+const offWhy = () => (S.health && S.health.llm_switched_off ? "switched off by STACKSENSE_LLM=off" : "no API key, or the daily limit is reached");
+
 /** One line saying whether the language model is on and what it did on the last request. */
 function setLlmNote(llm) {
   const el = $("#brief-llm");
   if (!el) return;
-  el.textContent = !llm.enabled ? "Language model: off (no API key), so only the rule reader runs."
+  el.textContent = !llm.enabled ? `Language model: off (${offWhy()}), so only the rule reader runs.`
     : llm.error ? `Language model: on, but it did not answer (${llm.error}). Rule reader only.`
     : llm.used ? `Language model: on (${llm.model}).` : "Language model: on.";
 }
@@ -1166,7 +1169,7 @@ function renderSummary() {
     return;
   }
   const ok = s.source === "llm" && s.checked;
-  const why = ok ? "" : !s.llm_enabled ? "The language model is off (no API key), so this is the engine's own template text."
+  const why = ok ? "" : !s.llm_enabled ? `The language model is off (${offWhy()}), so this is the engine's own template text.`
     : `The model's text did not pass the check${s.errors && s.errors.length ? ` (${esc(s.errors[0])})` : ""}, so this is the engine's template text.`;
   box.innerHTML = `<div class="sum"><div class="sum-h"><h3>Plain-English summary</h3>
       <span class="sum-badge ${ok ? "ok" : "fb"}">${ok ? `${ICON.check}checked against engine facts` : "template fallback"}</span>
@@ -1210,8 +1213,7 @@ async function askWhatIf() {
     const r = await api("/api/whatif", { answers: sent(), question: q });
     const keys = Object.keys(r.changes).filter(fieldByKey), before = {};
     if (!keys.length) {
-      out.textContent = r.llm.enabled ? "Nothing in that question maps to a change of an answer."
-        : "Nothing found. The language model is off (no API key), so only plain numbers and clear words work, such as “team of 8” or “budget $0”.";
+      out.textContent = "Nothing in that question maps to a change of an answer. Plain numbers and clear words work, such as “team of 8” or “budget $0”.";
       return;
     }
     keys.forEach((k) => { before[k] = structuredClone(S.answers[k]); S.answers[k] = structuredClone(r.changes[k].value); });
@@ -1249,8 +1251,14 @@ function bindExports() {
   $("#share-file").onchange = async (e) => {
     const f = e.target.files[0]; e.target.value = "";
     if (!f) return;
-    const r = Share.fromFile(await f.text(), (k) => !!fieldByKey(k));
+    const text = await f.text();
+    const r = Share.fromFile(text, (k) => !!fieldByKey(k));
     if (!r) { note("That file is not a JSON answers file."); return; }
+    if (r.scenario) {  /* a file in the standard scenario schema: hand it to the scenario page */
+      try { sessionStorage.setItem("ss-scenario", JSON.stringify({ name: f.name, text })); location.href = "/scenario"; }
+      catch (e) { $("#share-note").innerHTML = `That is a scenario file in the standard schema: load it on the <a href="/scenario">scenario-file page</a>.`; }
+      return;
+    }
     await loadProject(r.answers, r.unknown);
     const n = Object.keys(r.answers).length;
     note(`Loaded ${n} answer${n === 1 ? "" : "s"}${r.ignored.length ? `; ignored unknown: ${r.ignored.join(", ")}` : ""}.`);
@@ -1734,7 +1742,7 @@ async function settled() { /* deep links: wait for the debounce, the live run an
     renderRefine(); syncQuick(); syncSliders(); updateCounts();
     queueRun(Object.keys(before), before);
   };
-  $$(".nav-b").forEach((t) => (t.onclick = () => show(t.dataset.view)));
+  $$(".nav-b[data-view]").forEach((t) => (t.onclick = () => show(t.dataset.view)));
   $("#sumbar-btn").onclick = () => { $("#out").scrollIntoView({ behavior: smooth(), block: "start" }); $("#res-title")?.focus({ preventScroll: true }); };
   document.addEventListener("click", (e) => {
     const gi = e.target.closest(".gi");

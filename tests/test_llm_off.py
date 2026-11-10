@@ -135,3 +135,16 @@ def test_a_folder_run_survives_a_file_nested_past_the_recursion_limit_and_a_file
     assert deep["status"] == "invalid_input" and deep["validation_errors"][0]["field"] == "(file)"
     assert json.loads((tmp_path / "out" / "P1_output.json").read_text(encoding="utf-8"))["status"] == "ok"
     assert "b_boom.json: not run (RuntimeError: injected failure)" in capsys.readouterr().err
+
+
+def test_no_text_says_the_what_if_box_uses_the_model():
+    """/api/whatif runs the pattern reader only (app/main.py passes use_llm=False), so no description may say otherwise."""
+    from fastapi.testclient import TestClient
+    from app.main import app
+    description = TestClient(app).get("/openapi.json").json()["info"]["description"]
+    env_line = (ROOT / ".env.example").read_text(encoding="utf-8").splitlines()[0]
+    for sentence in description.split(". ") + [env_line]:
+        assert not ("language model" in sentence.replace("-", " ") and "what" in sentence), sentence
+    js = (ROOT / "app" / "static" / "app.js").read_text(encoding="utf-8")
+    what_if = js[js.index("async function askWhatIf"):js.index("S.cause = `your what-if")]
+    assert "language model" not in what_if and "API key" not in what_if

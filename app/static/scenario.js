@@ -207,6 +207,9 @@ async function init() {
   $("#sc-run").addEventListener("click", runScenario);
   $("#sc-dl-in").addEventListener("click", () => download(`${S.name}.json`, S.doc));
   $("#sc-dl-out").addEventListener("click", () => outCurrent() && download(`${S.name}_output.json`, S.out));
+  let handed = null;  /* a scenario file chosen on the home page's "Load answers" (app.js), read once */
+  try { handed = sessionStorage.getItem("ss-scenario"); sessionStorage.removeItem("ss-scenario"); } catch (e) { /* storage blocked */ }
+  if (handed) { const f = JSON.parse(handed); return loadText(f.text, f.name); }
   const want = new URLSearchParams(location.search).get("example");
   if (want && ex.some((x) => x.name === want)) load(await api(`/api/scenario/examples/${encodeURIComponent(want)}`), want);
 }

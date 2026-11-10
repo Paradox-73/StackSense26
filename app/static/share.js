@@ -47,12 +47,21 @@
     return JSON.stringify({ [FILE_MARK]: 1, answers: answers || {}, not_sure: [...(unknown || [])] }, null, 2);
   }
 
-  /** Read an answers file. Accepts the file above, a scenario ({"input": {...}}) or a bare answers object.
-   *  isKey(k) says whether k is a known question; others are returned in `ignored`. Returns null if unreadable. */
+  const SCENARIO_KEYS = ["scenario_id", "project", "scale", "team", "budget", "timeline", "infrastructure", "requirements"];
+  /** A file in the standard scenario schema of the problem statement: an object with its top-level sections, or an array of them. */
+  function isScenario(o) {
+    return Array.isArray(o) ? o.some(isScenario) : !!o && typeof o === "object" && SCENARIO_KEYS.some((k) => k in o);
+  }
+
+  /** Read an answers file. Accepts the file above, a preset ({"input": {...}}) or a bare answers object.
+   *  isKey(k) says whether k is a known question; others are returned in `ignored`. Returns null if unreadable,
+   *  and {scenario: true} for a file in the standard scenario schema, which belongs on the /scenario page. */
   function fromFile(text, isKey) {
     let o;
     try { o = JSON.parse(text); } catch (e) { return null; }
-    if (!o || typeof o !== "object" || Array.isArray(o)) return null;
+    if (!o || typeof o !== "object") return null;
+    if (isScenario(o)) return { scenario: true };
+    if (Array.isArray(o)) return null;
     let src = o, unknown = [];
     if (o[FILE_MARK] && o.answers && typeof o.answers === "object") { src = o.answers; unknown = Array.isArray(o.not_sure) ? o.not_sure : []; }
     else if (o.input && typeof o.input === "object" && !Array.isArray(o.input)) src = o.input;
