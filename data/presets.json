@@ -1,0 +1,710 @@
+{
+  "presets": [
+    {
+      "id": "startup_mvp",
+      "name": "Startup SaaS MVP",
+      "description": "2 TypeScript devs, 8 weeks to launch, $50/month, EU + US customers.",
+      "input": {
+        "project_name": "Invoicely (B2B SaaS MVP)",
+        "app_type": "saas",
+        "platforms": [
+          "web"
+        ],
+        "dau": 500,
+        "data_volume_gb": 2,
+        "data_growth_gb_month": 1,
+        "read_write": "balanced",
+        "data_shapes": [
+          "relational"
+        ],
+        "consistency": "strong",
+        "realtime": "some",
+        "latency_target_ms": 300,
+        "seo": "important",
+        "offline": false,
+        "availability": "99.9",
+        "regions": [
+          "north_america",
+          "europe"
+        ],
+        "team_size": 2,
+        "team_skills": [
+          "typescript",
+          "react",
+          "sql"
+        ],
+        "timeline_weeks": 8,
+        "architecture": "auto",
+        "budget_monthly": 50,
+        "currency": "USD",
+        "deployment": "cloud",
+        "cloud_preference": "none",
+        "lock_in_tolerance": "medium",
+        "compliance": [
+          "gdpr"
+        ]
+      }
+    },
+    {
+      "id": "india_ecommerce_scale",
+      "name": "Indian e-commerce at scale",
+      "description": "2M DAU sale-day traffic, 25 engineers (Java/React/AWS), PCI-DSS, RBI data localisation.",
+      "input": {
+        "project_name": "BazaarKart (e-commerce)",
+        "app_type": "ecommerce",
+        "platforms": [
+          "web",
+          "android",
+          "ios"
+        ],
+        "dau": 2000000,
+        "peak_rps": 25000,
+        "data_volume_gb": 800,
+        "data_growth_gb_month": 60,
+        "read_write": "read_heavy",
+        "data_shapes": [
+          "relational",
+          "document"
+        ],
+        "consistency": "strong",
+        "realtime": "some",
+        "latency_target_ms": 200,
+        "seo": "critical",
+        "offline": false,
+        "availability": "99.95",
+        "regions": [
+          "india"
+        ],
+        "team_size": 25,
+        "team_skills": [
+          "java",
+          "spring",
+          "react",
+          "typescript",
+          "aws",
+          "docker",
+          "kubernetes",
+          "sql",
+          "mysql"
+        ],
+        "timeline_weeks": 26,
+        "architecture": "microservices",
+        "budget_monthly": 2500000,
+        "currency": "INR",
+        "deployment": "cloud",
+        "cloud_preference": "aws",
+        "lock_in_tolerance": "medium",
+        "compliance": [
+          "pci_dss",
+          "dpdp",
+          "data_residency_india"
+        ]
+      }
+    },
+    {
+      "id": "hipaa_telehealth",
+      "name": "HIPAA telehealth platform",
+      "description": "US patients and clinicians, PHI everywhere, 5 Python/React devs, $3k/month.",
+      "input": {
+        "project_name": "CareLink (telehealth)",
+        "app_type": "healthcare",
+        "platforms": [
+          "web",
+          "ios",
+          "android"
+        ],
+        "dau": 20000,
+        "data_volume_gb": 100,
+        "data_growth_gb_month": 15,
+        "read_write": "balanced",
+        "data_shapes": [
+          "relational",
+          "document"
+        ],
+        "consistency": "strong",
+        "realtime": "some",
+        "latency_target_ms": 300,
+        "seo": "none",
+        "offline": false,
+        "availability": "99.95",
+        "regions": [
+          "north_america"
+        ],
+        "team_size": 5,
+        "team_skills": [
+          "python",
+          "react",
+          "typescript",
+          "aws",
+          "sql",
+          "docker"
+        ],
+        "timeline_weeks": 20,
+        "architecture": "auto",
+        "budget_monthly": 3000,
+        "currency": "USD",
+        "deployment": "cloud",
+        "cloud_preference": "none",
+        "lock_in_tolerance": "medium",
+        "compliance": [
+          "hipaa",
+          "soc2"
+        ]
+      }
+    },
+    {
+      "id": "realtime_multiplayer",
+      "name": "Realtime multiplayer game backend",
+      "description": "200k DAU across regions, 50 ms latency, websockets everywhere, eventual consistency OK.",
+      "input": {
+        "project_name": "PixelArena (multiplayer)",
+        "app_type": "realtime_collab",
+        "platforms": [
+          "web"
+        ],
+        "dau": 200000,
+        "data_volume_gb": 50,
+        "data_growth_gb_month": 10,
+        "read_write": "write_heavy",
+        "data_shapes": [
+          "key_value",
+          "document"
+        ],
+        "consistency": "eventual_ok",
+        "realtime": "core",
+        "latency_target_ms": 50,
+        "seo": "none",
+        "offline": false,
+        "availability": "99.9",
+        "regions": [
+          "global"
+        ],
+        "team_size": 4,
+        "team_skills": [
+          "typescript",
+          "go",
+          "react",
+          "docker"
+        ],
+        "timeline_weeks": 16,
+        "architecture": "auto",
+        "budget_monthly": 2000,
+        "currency": "USD",
+        "deployment": "cloud",
+        "cloud_preference": "none",
+        "lock_in_tolerance": "low",
+        "compliance": []
+      }
+    },
+    {
+      "id": "iot_telemetry",
+      "name": "IoT telemetry pipeline",
+      "description": "40k sensors reporting every 10 s, ~2 TB of time-series, EU-hosted, 6 engineers.",
+      "input": {
+        "project_name": "GridPulse (IoT)",
+        "app_type": "iot_telemetry",
+        "platforms": [
+          "web"
+        ],
+        "dau": 40000,
+        "peak_rps": 4000,
+        "data_volume_gb": 2000,
+        "data_growth_gb_month": 300,
+        "read_write": "write_heavy",
+        "data_shapes": [
+          "time_series",
+          "relational"
+        ],
+        "consistency": "eventual_ok",
+        "realtime": "some",
+        "latency_target_ms": 500,
+        "seo": "none",
+        "offline": false,
+        "availability": "99.9",
+        "regions": [
+          "europe"
+        ],
+        "team_size": 6,
+        "team_skills": [
+          "python",
+          "go",
+          "sql",
+          "postgres",
+          "aws",
+          "docker"
+        ],
+        "timeline_weeks": 16,
+        "architecture": "auto",
+        "budget_monthly": 4000,
+        "currency": "USD",
+        "deployment": "cloud",
+        "cloud_preference": "aws",
+        "lock_in_tolerance": "medium",
+        "compliance": [
+          "gdpr",
+          "data_residency_eu"
+        ]
+      }
+    },
+    {
+      "id": "internal_tool",
+      "name": "On-prem internal tool",
+      "description": "One Django developer, 3 weeks, 200 employees, must run on company servers.",
+      "input": {
+        "project_name": "OpsDesk (internal admin)",
+        "app_type": "internal_tool",
+        "platforms": [
+          "web"
+        ],
+        "dau": 200,
+        "data_volume_gb": 1,
+        "data_growth_gb_month": 0.2,
+        "read_write": "balanced",
+        "data_shapes": [
+          "relational"
+        ],
+        "consistency": "strong",
+        "realtime": "none",
+        "latency_target_ms": 1000,
+        "seo": "none",
+        "offline": false,
+        "availability": "99.0",
+        "regions": [
+          "india"
+        ],
+        "team_size": 1,
+        "team_skills": [
+          "python",
+          "django",
+          "html",
+          "sql",
+          "linux"
+        ],
+        "timeline_weeks": 3,
+        "architecture": "monolith",
+        "budget_monthly": 0,
+        "currency": "INR",
+        "deployment": "on_prem",
+        "cloud_preference": "none",
+        "lock_in_tolerance": "low",
+        "compliance": []
+      }
+    },
+    {
+      "id": "ml_product",
+      "name": "AI document-search product (RAG)",
+      "description": "Semantic search over customer documents, Python team, GCP credits, 30k DAU.",
+      "input": {
+        "project_name": "DocMind (RAG search)",
+        "app_type": "ml_product",
+        "platforms": [
+          "web"
+        ],
+        "dau": 30000,
+        "data_volume_gb": 200,
+        "data_growth_gb_month": 30,
+        "read_write": "read_heavy",
+        "data_shapes": [
+          "relational",
+          "vector"
+        ],
+        "consistency": "strong",
+        "realtime": "some",
+        "latency_target_ms": 1500,
+        "seo": "important",
+        "offline": false,
+        "availability": "99.9",
+        "regions": [
+          "north_america",
+          "europe"
+        ],
+        "team_size": 4,
+        "team_skills": [
+          "python",
+          "fastapi",
+          "react",
+          "typescript",
+          "gcp",
+          "docker",
+          "sql"
+        ],
+        "timeline_weeks": 12,
+        "architecture": "auto",
+        "budget_monthly": 1500,
+        "currency": "USD",
+        "deployment": "cloud",
+        "cloud_preference": "gcp",
+        "lock_in_tolerance": "medium",
+        "compliance": [
+          "gdpr",
+          "soc2"
+        ]
+      }
+    },
+    {
+      "id": "student_project",
+      "name": "Student project (zero budget)",
+      "description": "Solo student, knows JavaScript, 2 weeks, ₹0 budget, ~50 users.",
+      "input": {
+        "project_name": "CampusSwap (student project)",
+        "app_type": "prototype",
+        "platforms": [
+          "web"
+        ],
+        "dau": 50,
+        "data_volume_gb": 0.5,
+        "data_growth_gb_month": 0.1,
+        "read_write": "balanced",
+        "data_shapes": [
+          "document"
+        ],
+        "consistency": "eventual_ok",
+        "realtime": "some",
+        "latency_target_ms": 1000,
+        "seo": "none",
+        "offline": false,
+        "availability": "99.0",
+        "regions": [
+          "india"
+        ],
+        "team_size": 1,
+        "team_skills": [
+          "javascript",
+          "html",
+          "react"
+        ],
+        "timeline_weeks": 2,
+        "architecture": "auto",
+        "budget_monthly": 0,
+        "currency": "INR",
+        "deployment": "cloud",
+        "cloud_preference": "none",
+        "lock_in_tolerance": "high",
+        "compliance": []
+      }
+    },
+    {
+      "id": "content_site",
+      "name": "SEO content site / blog",
+      "description": "Marketing + blog where organic search is the business, 1 dev, $20/month.",
+      "input": {
+        "project_name": "TrailNotes (content)",
+        "app_type": "content_site",
+        "platforms": [
+          "web"
+        ],
+        "user_actions": [
+          "read"
+        ],
+        "dau": 20000,
+        "data_volume_gb": 0.5,
+        "data_growth_gb_month": 0.05,
+        "read_write": "read_heavy",
+        "data_shapes": [
+          "document"
+        ],
+        "consistency": "eventual_ok",
+        "realtime": "none",
+        "latency_target_ms": 200,
+        "seo": "critical",
+        "offline": false,
+        "availability": "99.9",
+        "regions": [
+          "global"
+        ],
+        "team_size": 1,
+        "team_skills": [
+          "javascript",
+          "html",
+          "react"
+        ],
+        "timeline_weeks": 4,
+        "architecture": "auto",
+        "budget_monthly": 20,
+        "currency": "USD",
+        "deployment": "cloud",
+        "cloud_preference": "none",
+        "lock_in_tolerance": "medium",
+        "compliance": [
+          "gdpr"
+        ]
+      }
+    },
+    {
+      "id": "india_social_mobile",
+      "name": "Mobile-first social app (India)",
+      "description": "Android-heavy audience, patchy connectivity, 3 devs, DPDP Act, ₹80k/month.",
+      "input": {
+        "project_name": "GupShup (social)",
+        "app_type": "social_network",
+        "platforms": [
+          "android",
+          "ios"
+        ],
+        "user_actions": [
+          "read",
+          "sign_in",
+          "post"
+        ],
+        "dau": 100000,
+        "data_volume_gb": 50,
+        "data_growth_gb_month": 20,
+        "read_write": "read_heavy",
+        "data_shapes": [
+          "document",
+          "graph"
+        ],
+        "consistency": "eventual_ok",
+        "realtime": "core",
+        "latency_target_ms": 300,
+        "seo": "none",
+        "offline": true,
+        "availability": "99.9",
+        "regions": [
+          "india"
+        ],
+        "team_size": 3,
+        "team_skills": [
+          "javascript",
+          "typescript",
+          "react",
+          "react_native",
+          "firebase"
+        ],
+        "timeline_weeks": 10,
+        "architecture": "auto",
+        "budget_monthly": 80000,
+        "currency": "INR",
+        "deployment": "cloud",
+        "cloud_preference": "none",
+        "lock_in_tolerance": "high",
+        "compliance": [
+          "dpdp"
+        ]
+      }
+    },
+    {
+      "id": "india_college_fest",
+      "name": "College fest website (India)",
+      "description": "3 student devs, 4 weeks, event pages plus registrations and UPI pass payments, ~8k visitors a day in fest week, ₹2,000/month.",
+      "input": {
+        "project_name": "Synapse Fest (college fest)",
+        "app_type": "content_site",
+        "platforms": [
+          "web"
+        ],
+        "user_actions": [
+          "read",
+          "sign_in",
+          "post",
+          "pay"
+        ],
+        "special_workloads": [],
+        "dau": 8000,
+        "data_volume_gb": 2,
+        "data_growth_gb_month": 1,
+        "read_write": "read_heavy",
+        "data_shapes": [
+          "relational",
+          "document"
+        ],
+        "consistency": "strong",
+        "realtime": "none",
+        "latency_target_ms": 500,
+        "seo": "important",
+        "offline": false,
+        "availability": "99.0",
+        "regions": [
+          "india"
+        ],
+        "team_size": 3,
+        "team_skills": [
+          "javascript",
+          "react",
+          "html",
+          "sql"
+        ],
+        "timeline_weeks": 4,
+        "architecture": "auto",
+        "budget_monthly": 2000,
+        "currency": "INR",
+        "deployment": "cloud",
+        "cloud_preference": "none",
+        "lock_in_tolerance": "high",
+        "compliance": [
+          "dpdp"
+        ]
+      }
+    },
+    {
+      "id": "india_upi_payments",
+      "name": "UPI payments app (India)",
+      "description": "500k DAU wallet and UPI payments, RBI data localisation, phone OTP login, 12 Java/Kotlin engineers on AWS.",
+      "input": {
+        "project_name": "PayKaro (UPI payments)",
+        "app_type": "fintech",
+        "platforms": [
+          "android",
+          "ios"
+        ],
+        "user_actions": [
+          "read",
+          "sign_in",
+          "post",
+          "pay"
+        ],
+        "special_workloads": [
+          "phone_otp"
+        ],
+        "dau": 500000,
+        "data_volume_gb": 500,
+        "data_growth_gb_month": 80,
+        "read_write": "balanced",
+        "data_shapes": [
+          "relational"
+        ],
+        "consistency": "strong",
+        "realtime": "some",
+        "latency_target_ms": 300,
+        "seo": "none",
+        "offline": false,
+        "availability": "99.95",
+        "regions": [
+          "india"
+        ],
+        "team_size": 12,
+        "team_skills": [
+          "java",
+          "kotlin",
+          "spring",
+          "android",
+          "sql",
+          "postgres",
+          "aws",
+          "docker",
+          "kubernetes"
+        ],
+        "timeline_weeks": 24,
+        "architecture": "auto",
+        "budget_monthly": 1500000,
+        "currency": "INR",
+        "deployment": "cloud",
+        "cloud_preference": "aws",
+        "lock_in_tolerance": "medium",
+        "compliance": [
+          "dpdp",
+          "data_residency_india"
+        ]
+      }
+    },
+    {
+      "id": "india_food_delivery",
+      "name": "Food delivery platform (India)",
+      "description": "1M DAU across customer, restaurant and rider apps, live rider tracking, dinner-time peaks, 20 engineers, ₹40 lakh/month.",
+      "input": {
+        "project_name": "ThaliGo (food delivery)",
+        "app_type": "ecommerce",
+        "platforms": [
+          "web",
+          "android",
+          "ios"
+        ],
+        "user_actions": [
+          "read",
+          "sign_in",
+          "post",
+          "pay"
+        ],
+        "special_workloads": [
+          "live_location",
+          "media_uploads",
+          "phone_otp"
+        ],
+        "dau": 1000000,
+        "data_volume_gb": 1000,
+        "data_growth_gb_month": 150,
+        "read_write": "balanced",
+        "data_shapes": [
+          "relational",
+          "document"
+        ],
+        "consistency": "strong",
+        "realtime": "core",
+        "latency_target_ms": 300,
+        "seo": "important",
+        "offline": false,
+        "availability": "99.95",
+        "regions": [
+          "india"
+        ],
+        "team_size": 20,
+        "team_skills": [
+          "typescript",
+          "node",
+          "nestjs",
+          "react",
+          "react_native",
+          "go",
+          "postgres",
+          "aws",
+          "docker",
+          "kubernetes"
+        ],
+        "timeline_weeks": 30,
+        "architecture": "auto",
+        "budget_monthly": 4000000,
+        "currency": "INR",
+        "deployment": "cloud",
+        "cloud_preference": "aws",
+        "lock_in_tolerance": "medium",
+        "compliance": [
+          "dpdp",
+          "pci_dss"
+        ]
+      }
+    },
+    {
+      "id": "contradictory",
+      "name": "Edge case: contradictory inputs",
+      "description": "10M DAU, ₹0 budget, 1 developer, microservices, HIPAA, 2-week timeline, 99.99% target.",
+      "input": {
+        "project_name": "Impossible Inc.",
+        "app_type": "healthcare",
+        "platforms": [
+          "web"
+        ],
+        "dau": 10000000,
+        "peak_rps": 5,
+        "data_volume_gb": 5000,
+        "data_growth_gb_month": 500,
+        "read_write": "balanced",
+        "data_shapes": [
+          "relational"
+        ],
+        "consistency": "strong",
+        "realtime": "core",
+        "latency_target_ms": 20,
+        "seo": "critical",
+        "offline": false,
+        "availability": "99.99",
+        "regions": [
+          "north_america",
+          "india"
+        ],
+        "team_size": 1,
+        "team_skills": [],
+        "timeline_weeks": 2,
+        "architecture": "microservices",
+        "budget_monthly": 0,
+        "currency": "INR",
+        "deployment": "cloud",
+        "cloud_preference": "none",
+        "lock_in_tolerance": "low",
+        "compliance": [
+          "hipaa",
+          "data_residency_india"
+        ]
+      }
+    }
+  ]
+}

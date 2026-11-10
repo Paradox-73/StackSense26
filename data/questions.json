@@ -1,0 +1,1131 @@
+{
+  "description": "Single source of truth for the questionnaire: the web UI renders it, and the engine uses it to apply defaults, clamp values and record assumptions. 'why' explains how each answer changes the recommendation; 'sources' back the reasoning.",
+  "steps": [
+    {
+      "id": "product",
+      "title": "Product",
+      "subtitle": "What are you building and for which platforms?",
+      "fields": [
+        {
+          "key": "project_name",
+          "label": "Project name",
+          "type": "text",
+          "default": "My project",
+          "help": "Used in the exported report only.",
+          "hint": "Any name works; it only labels the export.",
+          "why": "Labels the export.",
+          "sources": []
+        },
+        {
+          "key": "app_type",
+          "label": "Application type",
+          "type": "select",
+          "default": "saas",
+          "options": [
+            {
+              "value": "saas",
+              "label": "B2B / B2C SaaS"
+            },
+            {
+              "value": "ecommerce",
+              "label": "E-commerce / marketplace"
+            },
+            {
+              "value": "realtime_collab",
+              "label": "Realtime chat / collaboration / multiplayer"
+            },
+            {
+              "value": "content_site",
+              "label": "Content / blog / marketing (SEO)"
+            },
+            {
+              "value": "analytics_dashboard",
+              "label": "Analytics / dashboards"
+            },
+            {
+              "value": "ml_product",
+              "label": "ML / AI product"
+            },
+            {
+              "value": "iot_telemetry",
+              "label": "IoT / telemetry ingestion"
+            },
+            {
+              "value": "fintech",
+              "label": "Fintech / payments / ledger"
+            },
+            {
+              "value": "healthcare",
+              "label": "Healthcare / telehealth"
+            },
+            {
+              "value": "social_network",
+              "label": "Social network / UGC feed"
+            },
+            {
+              "value": "internal_tool",
+              "label": "Internal tool / admin panel"
+            },
+            {
+              "value": "mobile_first",
+              "label": "Mobile-first consumer app"
+            },
+            {
+              "value": "prototype",
+              "label": "Prototype / student / hackathon"
+            }
+          ],
+          "help": "The workload archetype sets default traffic shape, data model hints and which criteria matter (e.g. SEO for content, consistency for fintech).",
+          "hint": "Pick what users mostly do in the product. Unsure between two? Choose the one with stricter rules (fintech or healthcare beats SaaS).",
+          "why": "Archetypes carry well-known non-functional requirements: fintech needs ACID ledgers, content sites live on SEO and Core Web Vitals, IoT is write-heavy time-series.",
+          "sources": [
+            "https://learn.microsoft.com/azure/architecture/guide/",
+            "https://aws.amazon.com/architecture/well-architected/"
+          ]
+        },
+        {
+          "key": "platforms",
+          "label": "Client platforms",
+          "type": "multiselect",
+          "default": [
+            "web"
+          ],
+          "options": [
+            {
+              "value": "web",
+              "label": "Web"
+            },
+            {
+              "value": "ios",
+              "label": "iOS"
+            },
+            {
+              "value": "android",
+              "label": "Android"
+            }
+          ],
+          "help": "Choosing iOS/Android switches the frontend recommendation to mobile frameworks (a web companion is suggested separately).",
+          "hint": "Unsure? Start with web only: one codebase, no app-store review. Add iOS/Android when users ask for push notifications or offline use.",
+          "why": "Mobile targets rule out web-only frameworks and favour cross-platform toolkits when the team is small.",
+          "sources": [
+            "https://reactnative.dev/docs/getting-started",
+            "https://docs.flutter.dev/"
+          ]
+        },
+        {
+          "key": "user_actions",
+          "label": "What do users do?",
+          "type": "multiselect",
+          "default": [
+            "read",
+            "sign_in",
+            "post"
+          ],
+          "options": [
+            {
+              "value": "read",
+              "label": "Read or browse published content"
+            },
+            {
+              "value": "sign_in",
+              "label": "Sign in to their own account"
+            },
+            {
+              "value": "post",
+              "label": "Create or upload things (posts, orders, forms)"
+            },
+            {
+              "value": "pay",
+              "label": "Pay for something"
+            }
+          ],
+          "help": "If users only read (no sign-in, no posting, no payments), the site can be static files on a CDN: no database server and no API code to run.",
+          "hint": "A blog, docs site or college fest page where only your team edits content is 'Read' only.",
+          "why": "The functional requirements decide whether a database and a server are needed at all; a read-only site that runs neither costs nothing and has almost nothing to break.",
+          "sources": [
+            "https://docs.astro.build/en/guides/content-collections/"
+          ]
+        },
+        {
+          "key": "special_workloads",
+          "label": "Special workloads",
+          "type": "multiselect",
+          "default": [],
+          "options": [
+            {
+              "value": "media_uploads",
+              "label": "Users upload photos or files"
+            },
+            {
+              "value": "video_on_demand",
+              "label": "Recorded video (lectures, streaming)"
+            },
+            {
+              "value": "text_search",
+              "label": "Full-text search over many documents"
+            },
+            {
+              "value": "live_video",
+              "label": "Live video or calls"
+            },
+            {
+              "value": "live_location",
+              "label": "Live location / maps (delivery, rides)"
+            },
+            {
+              "value": "phone_otp",
+              "label": "Phone-number login (SMS OTP)"
+            },
+            {
+              "value": "user_code",
+              "label": "Run code that users submit"
+            }
+          ],
+          "help": "Each one adds a specialised service the four main picks do not cover, usually billed by use: video minutes, map loads, SMS messages or data served (egress). Two also change the picks: running users' code needs a host with long-running workers (functions-only hosts such as Vercel, Netlify, Cloudflare Workers and Lambda are excluded), and live location raises realtime to at least 'some'.",
+          "hint": "Leave empty if none apply. Images on a product page count as uploads only if your users upload them.",
+          "why": "Video, maps, SMS and file delivery are often the largest line on the bill, and none of them should run inside the web server.",
+          "sources": [
+            "https://docs.livekit.io/home/",
+            "https://developers.cloudflare.com/stream/pricing/",
+            "https://developers.google.com/maps/billing-and-pricing/pricing",
+            "https://www.twilio.com/en-us/verify/pricing",
+            "https://gvisor.dev/docs/",
+            "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html"
+          ]
+        },
+        {
+          "key": "background_work",
+          "label": "Work that runs in the background",
+          "type": "select",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None, or short jobs of a few minutes (emails, thumbnails)"
+            },
+            {
+              "value": "long",
+              "label": "Jobs that run longer than 15 minutes (big imports, reports, video encoding)"
+            },
+            {
+              "value": "gpu",
+              "label": "GPU work (running your own ML models, GPU encoding)"
+            }
+          ],
+          "help": "Short jobs fit every host, so the first option changes nothing. Jobs over 15 minutes outlive every function platform's time limit, so hosts that run code only as request-scoped functions (Vercel, Netlify, Cloudflare Workers, AWS Lambda) are excluded. GPU work keeps only hosts that rent GPUs: Google Cloud Run and GKE, AWS EKS, Azure Container Apps, or your own servers. GPU hours are not in the cost estimate.",
+          "hint": "Not sure? Keep the first option. Pick a longer one only if a single job (not the whole queue) runs past 15 minutes, or if you run a model on your own GPUs rather than calling an API.",
+          "why": "Function platforms stop a run at a fixed time limit (AWS Lambda 15 minutes, Vercel up to 800 s on Pro, Netlify background functions 15 minutes) and none of them rent GPUs; container platforms differ too (AWS Fargate has no GPUs, Cloud Run does).",
+          "sources": [
+            "https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html",
+            "https://vercel.com/docs/functions/limitations",
+            "https://docs.netlify.com/build/functions/background-functions/",
+            "https://docs.cloud.google.com/run/docs/configuring/services/gpu",
+            "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-tasks-services.html"
+          ]
+        },
+        {
+          "key": "tenancy",
+          "label": "Do several customer organisations share the app?",
+          "type": "select",
+          "default": "single",
+          "options": [
+            {
+              "value": "single",
+              "label": "No: one organisation, or a consumer app"
+            },
+            {
+              "value": "shared",
+              "label": "Yes, in one shared database (each row tagged with its customer)"
+            },
+            {
+              "value": "isolated",
+              "label": "Yes, each customer gets its own database or schema"
+            }
+          ],
+          "help": "Shared: databases that enforce each customer's rows inside the database (PostgreSQL and SQL Server row-level security, DynamoDB key conditions, Firestore security rules) score higher, and those where isolation lives only in application queries (MySQL, MongoDB, SQLite, Cassandra) score lower. Own database per customer: operations weigh more, since every migration and backup runs once per customer. The first option changes nothing.",
+          "hint": "B2B software sold to companies is usually 'shared'. Pick 'own database' only if contracts or regulators require each customer's data apart.",
+          "why": "In a shared database one query that forgets the customer filter leaks another customer's data; a policy enforced by the database applies to every query from every part of the code. A database per customer removes that risk but multiplies operations (AWS calls these the pool and silo models).",
+          "sources": [
+            "https://www.postgresql.org/docs/current/ddl-rowsecurity.html",
+            "https://learn.microsoft.com/en-us/sql/relational-databases/security/row-level-security",
+            "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html",
+            "https://docs.aws.amazon.com/wellarchitected/latest/saas-lens/silo-pool-and-bridge-models.html"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scale",
+      "title": "Scale & data",
+      "subtitle": "How much traffic and data, and what shape is it?",
+      "fields": [
+        {
+          "key": "dau",
+          "label": "Daily active users (or active devices)",
+          "type": "number",
+          "default": 1000,
+          "min": 0,
+          "max": 2000000000,
+          "unit": "users/day",
+          "help": "Expected DAU about 12 months after launch. For IoT, count active devices (assumed to send one reading a minute unless you give a peak RPS).",
+          "hint": "Unsure? Most new products have under 1,000 daily users in year one. Pick 1k unless you already have an audience or a launch partner.",
+          "why": "DAU sets the scale tier (<1k, 1k-10k, 10k-100k, 100k-1M, 1M-10M, >10M), or peak requests/s does when it gives a higher tier (<5, 5-50, 50-500, 500-5,000, 5,000-50,000, >50,000 req/s); the tier label names which one set it. The tier drives cost bands, scalability weight and per-technology scale ceilings.",
+          "sources": [
+            "https://sre.google/sre-book/handling-overload/"
+          ]
+        },
+        {
+          "key": "peak_rps",
+          "label": "Peak requests per second (optional)",
+          "type": "number",
+          "default": null,
+          "min": 0,
+          "max": 10000000,
+          "unit": "req/s",
+          "help": "Leave blank to derive it: DAU x requests-per-user-per-day (by app type) / 86,400 x a peak factor by app type (10 e-commerce, 6 social, 3 content sites, 1.5 IoT, 5 otherwise).",
+          "hint": "Leave blank unless you have load-test or analytics data; StackSense estimates it from daily users and app type.",
+          "why": "Peak RPS, not average, sizes compute. If your figure and the DAU-implied figure disagree by more than 30x, the larger one is used and a warning is shown (for IoT, your figure is used, since device reporting rates vary widely).",
+          "sources": [
+            "https://en.wikipedia.org/wiki/Little%27s_law",
+            "https://sre.google/sre-book/addressing-cascading-failures/"
+          ]
+        },
+        {
+          "key": "traffic_pattern",
+          "label": "Traffic pattern",
+          "type": "select",
+          "default": "auto",
+          "options": [
+            {
+              "value": "auto",
+              "label": "Typical for the app type"
+            },
+            {
+              "value": "steady",
+              "label": "Steady all day"
+            },
+            {
+              "value": "spiky",
+              "label": "Short spikes (launches, sales, events)"
+            }
+          ],
+          "help": "Sets how far the busiest second is above the average second. Mostly tunes the cost estimate: it changes a pick only when it moves the peak load into another scale tier. Only used when you do not enter a peak RPS.",
+          "hint": "Pick Short spikes if most traffic arrives in a few minutes (ticket sales, a viral post, a class deadline).",
+          "why": "Capacity is sized for the busiest moment, not the average; spiky traffic favours platforms that scale up fast.",
+          "sources": [
+            "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/design-your-workload-service-architecture.html"
+          ]
+        },
+        {
+          "key": "cacheable_share",
+          "label": "How much of the traffic can be cached?",
+          "type": "select",
+          "default": "auto",
+          "options": [
+            {
+              "value": "auto",
+              "label": "Typical for the app type"
+            },
+            {
+              "value": "little",
+              "label": "Little (mostly personal, changing data)"
+            },
+            {
+              "value": "some",
+              "label": "Some (shared pages, product lists)"
+            },
+            {
+              "value": "most",
+              "label": "Most (the same pages for everyone)"
+            }
+          ],
+          "help": "Cached requests are served by a CDN or memory and never reach the server or database. Mostly tunes the cost estimate: it changes a pick only when it moves the peak load into another scale tier. This also scales a peak RPS you enter yourself.",
+          "hint": "Most: a blog or catalogue where every visitor sees the same pages. Little: a banking dashboard where every page is personal.",
+          "why": "A CDN answers cached requests for a fraction of the cost, so the servers only see the rest.",
+          "sources": [
+            "https://developers.cloudflare.com/cache/concepts/default-cache-behavior/"
+          ]
+        },
+        {
+          "key": "data_volume_gb",
+          "label": "Data volume at launch",
+          "type": "number",
+          "default": 5,
+          "min": 0,
+          "max": 100000000,
+          "unit": "GB",
+          "help": "Primary database size, excluding media files (those go to object storage).",
+          "hint": "Unsure? A new SaaS or shop database is usually under 5 GB. Images and videos do not count.",
+          "why": "Large volumes raise database cost tier and favour columnar/time-series or horizontally scalable stores.",
+          "sources": [
+            "https://clickhouse.com/docs/concepts/why-clickhouse-is-so-fast"
+          ]
+        },
+        {
+          "key": "data_growth_gb_month",
+          "label": "Data growth per month",
+          "type": "number",
+          "default": 1,
+          "min": 0,
+          "max": 10000000,
+          "unit": "GB/month",
+          "help": "Used to project 12-month volume.",
+          "hint": "Unsure? 1 GB/month is typical for a business app. Telemetry or chat logs can add 10-100 GB/month.",
+          "why": "Projected 12-month size, not launch size, decides the database tier.",
+          "sources": []
+        },
+        {
+          "key": "read_write",
+          "label": "Do people mostly look at data, or mostly add and change it?",
+          "type": "select",
+          "default": "balanced",
+          "options": [
+            {
+              "value": "read_heavy",
+              "label": "Mostly look: more than 9 in 10 requests read (catalogues, articles)"
+            },
+            {
+              "value": "balanced",
+              "label": "About even"
+            },
+            {
+              "value": "write_heavy",
+              "label": "Mostly add or change (chat messages, events, sensor data)"
+            }
+          ],
+          "help": "Read-heavy workloads benefit from caches and replicas; write-heavy ones from LSM/wide-column or time-series engines.",
+          "hint": "Do users mostly look at things (catalogue, articles) or create things (messages, sensor data)? If both, pick balanced.",
+          "why": "Write throughput is the hardest dimension to scale on single-primary relational databases.",
+          "sources": [
+            "https://www.postgresql.org/docs/current/high-availability.html",
+            "https://cassandra.apache.org/doc/latest/cassandra/architecture/storage-engine.html"
+          ]
+        },
+        {
+          "key": "data_shapes",
+          "label": "What kinds of data do you store? (pick the main kind first)",
+          "type": "multiselect",
+          "default": [
+            "relational"
+          ],
+          "options": [
+            {
+              "value": "relational",
+              "label": "Tables of related records (users, orders, invoices)"
+            },
+            {
+              "value": "document",
+              "label": "Flexible records whose fields vary (JSON documents)"
+            },
+            {
+              "value": "key_value",
+              "label": "Simple lookups by key (sessions, carts, game state)"
+            },
+            {
+              "value": "time_series",
+              "label": "Readings over time (metrics, sensor data, prices)"
+            },
+            {
+              "value": "graph",
+              "label": "Connections between things (friends, follows, recommendations)"
+            },
+            {
+              "value": "analytical",
+              "label": "Large tables for reports and dashboards (sums, averages, trends)"
+            },
+            {
+              "value": "vector",
+              "label": "Embeddings for AI or meaning-based search (RAG)"
+            },
+            {
+              "value": "search",
+              "label": "Text that people search by typing words (documents, logs)"
+            }
+          ],
+          "help": "The kind you pick first is the main one: it decides the main database and counts double. Other kinds may get a second, supporting store.",
+          "hint": "If your data fits in spreadsheet-like tables with links between them, pick Relational. Add Vector only for AI search, and Search when people find records by typing words (logs, documents).",
+          "why": "Data model fit is the single largest database criterion; mismatches cause the most expensive migrations later.",
+          "sources": [
+            "https://www.mongodb.com/resources/basics/databases/nosql-explained",
+            "https://neo4j.com/docs/getting-started/graph-database/"
+          ]
+        },
+        {
+          "key": "consistency",
+          "label": "If two people change the same thing at the same moment, must everyone see one agreed result at once?",
+          "type": "select",
+          "default": "strong",
+          "options": [
+            {
+              "value": "strong",
+              "label": "Yes: exactly one wins and everyone sees it at once (payments, stock, bookings, health records)"
+            },
+            {
+              "value": "eventual_ok",
+              "label": "No: a few seconds of different views is fine (likes, feeds, sensor readings)"
+            }
+          ],
+          "help": "Yes is what databases call strong consistency (ACID transactions): stores that can show a stale or conflicting value for a moment (eventual consistency) are excluded as the main database.",
+          "hint": "Would a 1-second-old number ever cost money or harm someone (balances, stock, prescriptions)? Then Strong. Otherwise Eventual is fine.",
+          "why": "Under network partitions a store must choose between consistency and availability (CAP); ledgers and inventory cannot accept lost or stale writes.",
+          "sources": [
+            "https://jepsen.io/consistency",
+            "https://www.postgresql.org/docs/current/transaction-iso.html"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "experience",
+      "title": "User experience & reliability",
+      "subtitle": "Realtime, latency, SEO, offline, availability and where your users are.",
+      "fields": [
+        {
+          "key": "realtime",
+          "label": "Realtime needs",
+          "type": "select",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None (request/response)"
+            },
+            {
+              "value": "some",
+              "label": "Some (notifications, live counters)"
+            },
+            {
+              "value": "core",
+              "label": "Core (chat, collaboration, multiplayer, live tracking)"
+            }
+          ],
+          "help": "Core realtime requires persistent connections (WebSockets). Static/CDN hosts cannot hold them, and on serverless platforms support is limited or new (Vercel Functions added WebSockets in beta), so long-running servers score higher.",
+          "hint": "Does the screen need to change without the user refreshing? Chat or live cursors = Core; notification badges = Some; neither = None.",
+          "why": "Persistent connections change both backend choice (event-loop/actor runtimes) and hosting (long-running processes).",
+          "sources": [
+            "https://developer.mozilla.org/docs/Web/API/WebSockets_API",
+            "https://vercel.com/guides/do-vercel-serverless-functions-support-websocket-connections"
+          ]
+        },
+        {
+          "key": "peak_concurrent",
+          "label": "Users connected at the same moment, at peak (optional)",
+          "type": "number",
+          "default": null,
+          "min": 0,
+          "max": 100000000,
+          "unit": "users",
+          "help": "Leave blank if you do not know: nothing changes. A figure raises the scale tier to match (about 50 / 500 / 5,000 / 50,000 / 500,000 connected users start the Small to Very large tiers), plans for at least that many daily users, and with live updates it favours servers that keep connections open over request-scoped functions.",
+          "hint": "How many people are online at once at the busiest moment (e.g. 10,000 players in a live quiz). Not daily users: only a small share of them is online at the same time.",
+          "why": "Each connected user of a live app holds an open connection (WebSocket) for the whole session. Ten thousand open connections need processes that stay up and enough memory per connection; request-scoped functions either cannot hold them or bill each one as a running function.",
+          "sources": [
+            "https://en.wikipedia.org/wiki/Little%27s_law",
+            "https://vercel.com/kb/guide/do-vercel-serverless-functions-support-websocket-connections",
+            "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html"
+          ]
+        },
+        {
+          "key": "latency_target_ms",
+          "label": "How fast must the app answer? (slowest 1 in 20 requests, ms)",
+          "type": "number",
+          "default": 300,
+          "min": 5,
+          "max": 60000,
+          "unit": "ms",
+          "help": "The target for the 95th-percentile response time of the API: 19 of 20 requests must be faster. 100 ms feels instant; 1 s keeps the flow of thought (Nielsen).",
+          "hint": "Unsure? 300 ms suits most apps. Use 100 ms or lower only for games, trading or typing-as-you-search.",
+          "why": "Tight targets raise the weight of runtime performance and penalise cold-start-prone platforms.",
+          "sources": [
+            "https://www.nngroup.com/articles/response-times-3-important-limits/",
+            "https://web.dev/articles/rail"
+          ]
+        },
+        {
+          "key": "seo",
+          "label": "Search engine visibility",
+          "type": "select",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "Not needed (behind login)"
+            },
+            {
+              "value": "important",
+              "label": "Important (landing/product pages)"
+            },
+            {
+              "value": "critical",
+              "label": "Critical (organic traffic is the business)"
+            }
+          ],
+          "help": "SEO favours server-rendered or static HTML frameworks.",
+          "hint": "Will strangers find you through Google? If the product is behind a login, choose Not needed.",
+          "why": "Google renders JavaScript in a deferred second wave; server-rendered HTML is indexed faster and improves LCP.",
+          "sources": [
+            "https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics",
+            "https://web.dev/articles/vitals"
+          ]
+        },
+        {
+          "key": "offline",
+          "label": "Offline support required",
+          "type": "bool",
+          "default": false,
+          "help": "Field apps, rural connectivity, mobile-first markets.",
+          "hint": "Only say Yes if users must keep working with no signal (field staff, rural areas). It adds sync work.",
+          "why": "Offline needs local storage + sync, favouring mobile toolkits and databases with client sync (Firestore, SQLite on device).",
+          "sources": [
+            "https://firebase.google.com/docs/firestore/manage-data/enable-offline",
+            "https://web.dev/learn/pwa/offline-data"
+          ]
+        },
+        {
+          "key": "availability",
+          "label": "Availability target",
+          "type": "select",
+          "default": "99.9",
+          "options": [
+            {
+              "value": "99.0",
+              "label": "99% (~7.3 h downtime/month)"
+            },
+            {
+              "value": "99.9",
+              "label": "99.9% (~43 min/month)"
+            },
+            {
+              "value": "99.95",
+              "label": "99.95% (~22 min/month)"
+            },
+            {
+              "value": "99.99",
+              "label": "99.99% (~4.4 min/month)"
+            }
+          ],
+          "help": "Each extra nine roughly needs another layer of redundancy (multi-AZ, then multi-region).",
+          "hint": "Unsure? 99.9% (about 43 minutes down a month) is right for most new products. Higher needs someone on call.",
+          "why": "Higher targets weight maturity/scalability and trigger warnings for very small teams (someone must be on call).",
+          "sources": [
+            "https://sre.google/sre-book/availability-table/",
+            "https://sre.google/sre-book/embracing-risk/"
+          ]
+        },
+        {
+          "key": "regions",
+          "label": "Where are your users?",
+          "type": "multiselect",
+          "default": [],
+          "options": [
+            {
+              "value": "india",
+              "label": "India"
+            },
+            {
+              "value": "southeast_asia",
+              "label": "South-East Asia"
+            },
+            {
+              "value": "europe",
+              "label": "Europe"
+            },
+            {
+              "value": "north_america",
+              "label": "North America"
+            },
+            {
+              "value": "global",
+              "label": "Global (multi-region)"
+            }
+          ],
+          "help": "Hosting without a nearby region adds round-trip latency (e.g. Singapore to Mumbai is ~60 ms). Leave it empty if you are not sure: no region is then favoured.",
+          "hint": "Pick where most paying users live. Choose Global only if you really serve several continents at once. Not sure? Leave it empty.",
+          "why": "Region coverage is scored per host; data-residency rules can turn it into a hard filter.",
+          "sources": [
+            "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+            "https://cloud.google.com/about/locations"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "team",
+      "title": "Team & delivery",
+      "subtitle": "Who builds it, with what skills, and how fast?",
+      "fields": [
+        {
+          "key": "team_size",
+          "label": "Engineering team size",
+          "type": "number",
+          "default": 3,
+          "min": 1,
+          "max": 5000,
+          "unit": "engineers",
+          "help": "People writing and operating the software in the first year.",
+          "hint": "Count people who will write and run the code in the first year, including you.",
+          "why": "Small teams are weighted towards low ops burden and managed services; large teams towards structure and hiring pool (Conway's law, Team Topologies).",
+          "sources": [
+            "https://martinfowler.com/bliki/MonolithFirst.html",
+            "https://teamtopologies.com/key-concepts",
+            "https://martinfowler.com/bliki/ConwaysLaw.html"
+          ]
+        },
+        {
+          "key": "team_skills",
+          "label": "Existing team skills",
+          "type": "multiselect",
+          "default": [],
+          "free": true,
+          "options": [
+            {
+              "value": "javascript",
+              "label": "JavaScript"
+            },
+            {
+              "value": "typescript",
+              "label": "TypeScript"
+            },
+            {
+              "value": "react",
+              "label": "React"
+            },
+            {
+              "value": "nextjs",
+              "label": "Next.js"
+            },
+            {
+              "value": "vue",
+              "label": "Vue"
+            },
+            {
+              "value": "angular",
+              "label": "Angular"
+            },
+            {
+              "value": "svelte",
+              "label": "Svelte"
+            },
+            {
+              "value": "html",
+              "label": "HTML/CSS"
+            },
+            {
+              "value": "node",
+              "label": "Node.js"
+            },
+            {
+              "value": "python",
+              "label": "Python"
+            },
+            {
+              "value": "django",
+              "label": "Django"
+            },
+            {
+              "value": "go",
+              "label": "Go"
+            },
+            {
+              "value": "java",
+              "label": "Java"
+            },
+            {
+              "value": "kotlin",
+              "label": "Kotlin"
+            },
+            {
+              "value": "spring",
+              "label": "Spring"
+            },
+            {
+              "value": "csharp",
+              "label": "C#/.NET"
+            },
+            {
+              "value": "ruby",
+              "label": "Ruby/Rails"
+            },
+            {
+              "value": "php",
+              "label": "PHP/Laravel"
+            },
+            {
+              "value": "elixir",
+              "label": "Elixir"
+            },
+            {
+              "value": "dart",
+              "label": "Dart/Flutter"
+            },
+            {
+              "value": "swift",
+              "label": "Swift"
+            },
+            {
+              "value": "react_native",
+              "label": "React Native"
+            },
+            {
+              "value": "sql",
+              "label": "SQL"
+            },
+            {
+              "value": "postgres",
+              "label": "PostgreSQL"
+            },
+            {
+              "value": "mongodb",
+              "label": "MongoDB"
+            },
+            {
+              "value": "redis",
+              "label": "Redis"
+            },
+            {
+              "value": "aws",
+              "label": "AWS"
+            },
+            {
+              "value": "gcp",
+              "label": "GCP"
+            },
+            {
+              "value": "azure",
+              "label": "Azure"
+            },
+            {
+              "value": "docker",
+              "label": "Docker"
+            },
+            {
+              "value": "kubernetes",
+              "label": "Kubernetes"
+            },
+            {
+              "value": "linux",
+              "label": "Linux admin"
+            },
+            {
+              "value": "firebase",
+              "label": "Firebase"
+            }
+          ],
+          "help": "Familiar technology ships faster and with fewer defects; unfamiliar picks are flagged with a ramp-up risk.",
+          "hint": "Tick what at least one person has shipped to production, not what they have only tried.",
+          "why": "Skill match is weighted heavily when the timeline is short; with no skills given the criterion is neutral.",
+          "sources": [
+            "https://dora.dev/research/",
+            "https://survey.stackoverflow.co/2025/technology"
+          ]
+        },
+        {
+          "key": "timeline_weeks",
+          "label": "Time to MVP",
+          "type": "number",
+          "default": 12,
+          "min": 1,
+          "max": 520,
+          "unit": "weeks",
+          "help": "Calendar weeks until first real users.",
+          "hint": "Unsure? 12 weeks is a common MVP target. Under 6 weeks favours tools you already know.",
+          "why": "Short timelines weight developer velocity, learning curve and existing skills; long ones weight maturity.",
+          "sources": [
+            "https://dora.dev/research/"
+          ]
+        },
+        {
+          "key": "architecture",
+          "label": "Architecture preference",
+          "type": "select",
+          "default": "auto",
+          "options": [
+            {
+              "value": "auto",
+              "label": "Decide for me"
+            },
+            {
+              "value": "monolith",
+              "label": "Monolith / modular monolith"
+            },
+            {
+              "value": "microservices",
+              "label": "Microservices"
+            },
+            {
+              "value": "serverless",
+              "label": "Serverless / event-driven"
+            }
+          ],
+          "help": "Microservices with fewer than ~3 engineers per service is flagged as a risk.",
+          "hint": "Unsure? Keep 'Decide for me'. Small teams almost always do best with one deployable app.",
+          "why": "Microservices trade development speed for independent deployability, which only pays off with multiple teams.",
+          "sources": [
+            "https://martinfowler.com/bliki/MonolithFirst.html",
+            "https://martinfowler.com/articles/microservice-trade-offs.html"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "constraints",
+      "title": "Budget, infrastructure & compliance",
+      "subtitle": "Hard limits the stack must respect.",
+      "fields": [
+        {
+          "key": "budget_monthly",
+          "label": "Monthly infrastructure budget",
+          "type": "number",
+          "default": 100,
+          "min": 0,
+          "max": 100000000,
+          "unit": "per month",
+          "help": "Cloud spend only (not salaries). 0 means free tiers only.",
+          "hint": "Unsure? $100/month covers most MVPs. $0 limits you to free tiers, which some vendors forbid for commercial use.",
+          "why": "Budget sets the cost weight and is checked against each component's minimum price at your scale tier.",
+          "sources": [
+            "https://aws.amazon.com/free/",
+            "https://cloud.google.com/free"
+          ]
+        },
+        {
+          "key": "currency",
+          "label": "Currency",
+          "type": "select",
+          "default": "USD",
+          "options": [
+            {
+              "value": "USD",
+              "label": "USD ($)"
+            },
+            {
+              "value": "INR",
+              "label": "INR (₹)"
+            }
+          ],
+          "help": "INR is converted at a fixed rate (see results) for comparison with USD price lists.",
+          "hint": "Choose the currency you budget in; prices are converted at a fixed planning rate.",
+          "why": "Vendor prices are published in USD.",
+          "sources": []
+        },
+        {
+          "key": "deployment",
+          "label": "Deployment model",
+          "type": "select",
+          "default": "cloud",
+          "options": [
+            {
+              "value": "cloud",
+              "label": "Public cloud"
+            },
+            {
+              "value": "hybrid",
+              "label": "Hybrid (must stay portable)"
+            },
+            {
+              "value": "on_prem",
+              "label": "On-premises only"
+            }
+          ],
+          "help": "On-prem excludes managed-only services (Vercel, Lambda, DynamoDB, Firestore, Firebase).",
+          "hint": "Unsure? Public cloud. Choose on-premises only if a regulator or customer contract forbids cloud hosting.",
+          "why": "A hard constraint: managed-only services cannot run in your data centre.",
+          "sources": [
+            "https://kubernetes.io/docs/concepts/overview/"
+          ]
+        },
+        {
+          "key": "cloud_preference",
+          "label": "Preferred cloud",
+          "type": "select",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "No preference"
+            },
+            {
+              "value": "aws",
+              "label": "AWS"
+            },
+            {
+              "value": "gcp",
+              "label": "Google Cloud"
+            },
+            {
+              "value": "azure",
+              "label": "Azure"
+            }
+          ],
+          "help": "Existing credits, contracts or skills. Applied as a strong preference, not a hard filter.",
+          "hint": "Pick one only if you already have credits, a contract or certified engineers there.",
+          "why": "Existing accounts, credits and IAM setup cut time-to-production.",
+          "sources": []
+        },
+        {
+          "key": "lock_in_tolerance",
+          "label": "Vendor lock-in tolerance",
+          "type": "select",
+          "default": "medium",
+          "options": [
+            {
+              "value": "low",
+              "label": "Low (must be able to leave)"
+            },
+            {
+              "value": "medium",
+              "label": "Medium"
+            },
+            {
+              "value": "high",
+              "label": "High (speed over portability)"
+            }
+          ],
+          "help": "Low tolerance removes highly proprietary services (Firebase, DynamoDB, Firestore) unless nothing else fits.",
+          "hint": "Unsure? Medium. Choose Low if you may need to move providers or run on-premises later.",
+          "why": "Proprietary APIs make migration a rewrite; open-standard choices (Postgres, containers) keep exit costs low.",
+          "sources": [
+            "https://martinfowler.com/articles/oss-lockin.html"
+          ]
+        },
+        {
+          "key": "compliance",
+          "label": "Compliance & data residency",
+          "type": "multiselect",
+          "default": [],
+          "options": [
+            {
+              "value": "gdpr",
+              "label": "GDPR (EU personal data)"
+            },
+            {
+              "value": "dpdp",
+              "label": "India DPDP Act 2023"
+            },
+            {
+              "value": "hipaa",
+              "label": "HIPAA (US health data)"
+            },
+            {
+              "value": "pci_dss",
+              "label": "PCI-DSS (card data)"
+            },
+            {
+              "value": "soc2",
+              "label": "SOC 2 (vendor attestation)"
+            },
+            {
+              "value": "data_residency_india",
+              "label": "Data must stay in India"
+            },
+            {
+              "value": "data_residency_eu",
+              "label": "Data must stay in the EU"
+            }
+          ],
+          "help": "HIPAA requires a signed BAA with every vendor touching PHI; residency requires an in-country region. India's DPDP Act applies through the DPDP Rules 2025 (notified November 2025, phased in over 18 months) and does not by itself require data to stay in India; RBI's payment-data rule does, for payment system providers.",
+          "hint": "Unsure? Ask: do you store health records for US clients (HIPAA), card numbers (PCI-DSS), or data of EU (GDPR) or Indian (DPDP) users?",
+          "why": "Compliance is never traded off: non-compliant services are removed before scoring.",
+          "sources": [
+            "https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html",
+            "https://www.pcisecuritystandards.org/document_library/",
+            "https://www.meity.gov.in/data-protection-framework",
+            "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244",
+            "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/nov/doc20251117695301.pdf",
+            "https://gdpr-info.eu/art-44-gdpr/"
+          ]
+        },
+        {
+          "key": "enterprise_sso",
+          "label": "Customers sign in with their company account (SSO)",
+          "type": "bool",
+          "default": false,
+          "help": "Single sign-on over SAML or OpenID Connect with the customer's identity provider (Microsoft Entra ID / Azure AD, Okta, Google Workspace). On Supabase it needs the Pro plan or higher (50 SSO users included, then $0.015 each a month); on Firebase it needs the Identity Platform upgrade (50 free, then $0.015 each a month); other backends add a free self-hosted Keycloak to broker the logins.",
+          "hint": "Tick it if enterprise customers will ask to log in with their Azure AD / Entra, Okta or Google Workspace accounts.",
+          "why": "SSO is a paid feature on most backend-as-a-service plans, so it raises the minimum bill, and a self-run backend needs an identity broker to speak SAML.",
+          "sources": [
+            "https://supabase.com/pricing",
+            "https://firebase.google.com/docs/auth/web/saml",
+            "https://cloud.google.com/identity-platform/pricing",
+            "https://www.keycloak.org/docs/latest/server_admin/"
+          ]
+        },
+        {
+          "key": "priorities",
+          "label": "Your top 3 priorities (first = most important)",
+          "type": "multiselect",
+          "default": [],
+          "options": [
+            {
+              "value": "cost",
+              "label": "Lowest cost"
+            },
+            {
+              "value": "speed",
+              "label": "Ship fastest"
+            },
+            {
+              "value": "scale",
+              "label": "Scale to many users"
+            },
+            {
+              "value": "performance",
+              "label": "Fast responses"
+            },
+            {
+              "value": "low_ops",
+              "label": "Least maintenance"
+            },
+            {
+              "value": "proven",
+              "label": "Proven, mature tools"
+            }
+          ],
+          "help": "Optional. The first pick gets the biggest extra weight, then the second, then the third. Leave empty to use no extra weight.",
+          "hint": "If you had to trade one thing for another, which three would you protect, in order?",
+          "why": "The engine weighs 12 criteria equally by default; this lets your own ranking tip close calls.",
+          "sources": [
+            "https://martinfowler.com/articles/microservice-trade-offs.html"
+          ]
+        },
+        {
+          "key": "existing_systems",
+          "label": "Existing systems you must keep",
+          "type": "multiselect",
+          "default": [],
+          "options": [
+            {
+              "value": "postgres",
+              "label": "PostgreSQL"
+            },
+            {
+              "value": "mysql",
+              "label": "MySQL"
+            },
+            {
+              "value": "mongodb",
+              "label": "MongoDB"
+            },
+            {
+              "value": "redis",
+              "label": "Redis"
+            },
+            {
+              "value": "sqlserver",
+              "label": "SQL Server"
+            },
+            {
+              "value": "oracle",
+              "label": "Oracle Database"
+            }
+          ],
+          "help": "Databases your company already runs. A listed database StackSense knows gets a strong bonus; one it does not know is flagged instead.",
+          "hint": "Tick what is already in production and staffed by your team. Leave empty for a new project.",
+          "why": "Migrating a live database costs months; staying on it is often the cheapest correct answer.",
+          "sources": [
+            "https://martinfowler.com/articles/evodb.html"
+          ]
+        }
+      ]
+    }
+  ]
+}
