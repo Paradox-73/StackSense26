@@ -574,11 +574,12 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         add("Push notifications", "Firebase Cloud Messaging (+ APNs) or Expo Notifications", why,
             "https://firebase.google.com/docs/cloud-messaging")
 
-    scoring = p.get("ml_features") == "inference_api" and p["app_type"] != "ml_product"
-    if scoring:
+    if scoring_model(p):
         # A trained scoring or classification model (credit score, fraud score): a CPU endpoint, not an LLM service.
-        ml, src = SCORING_SERVING.get("" if env["hybrid"] or env["self_managed"] else env["cloud"] or "",
-                                      SCORING_SERVING["self"])
+        where = "" if env["hybrid"] or env["self_managed"] else env["cloud"] or ""
+        if not where and host.get("kind") in ("frontend_paas", "faas"):
+            where = "functions"  # a function platform runs no container beside the API
+        ml, src = SCORING_SERVING.get(where, SCORING_SERVING["self"])
         add("Model serving", ml, "Serve the model from its own endpoint, versioned and monitored apart from the web "
             "tier; a small scoring model runs on CPU.", src)
     elif p["app_type"] == "ml_product" or p.get("ml_features", "none") != "none":
@@ -1041,8 +1042,12 @@ REQUEST_BILLED = ("gcp_cloud_run",)  # scales per request across zones by defaul
 MODEL_CALLS_PER_USER_DAY = 1
 MODEL_TOKENS_PER_CALL = 1500
 MODEL_USD_PER_M_TOKENS = (0.15, 2.5)
-# A small scoring model (credit score, fraud score) on one or two always-on CPU instances, SageMaker list prices.
-SCORING_ENDPOINT_USD = (60.0, 250.0)
+# A small scoring model (credit score, fraud score) on one or two always-on CPU instances, SageMaker list prices:
+# one ml.c5.large ($0.102 an hour) to two ml.m5.large ($0.121 an hour in Mumbai), about 730 hours a month.
+SCORING_ENDPOINT_USD = (75.0, 180.0)
+# Project types whose model is usually a trained classifier or regressor of their own (credit, fraud, risk, demand,
+# anomaly scores); for other types an inference API is a hosted model, priced per call.
+SCORING_APP_TYPES = ("fintech", "ecommerce", "healthcare", "iot_telemetry", "analytics_dashboard")
 SCORING_SERVING = {
     "aws": ("Amazon SageMaker real-time endpoint for your own model (Amazon Bedrock for a hosted one)",
             "https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html"),
@@ -1052,7 +1057,14 @@ SCORING_SERVING = {
               "https://learn.microsoft.com/azure/machine-learning/concept-endpoints-online"),
     "self": ("Your own model in a CPU container beside the API (BentoML, or ONNX Runtime behind a small HTTP service)",
              "https://docs.bentoml.com/"),
+    "functions": ("Your model exported to ONNX and run inside the API's functions (ONNX Runtime), with no server of its own",
+                  "https://onnxruntime.ai/docs/get-started/with-javascript/node.html"),
 }
+
+
+def scoring_model(p: dict) -> bool:
+    """An inference API that serves the project's own small scoring model on CPU, not a hosted model."""
+    return p.get("ml_features") == "inference_api" and p["app_type"] in SCORING_APP_TYPES
 
 
 # Storage floor of a database bill: managed SSD storage per GB-month at list price (Amazon RDS gp3, the common
@@ -1239,10 +1251,12 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
             line(s["role"], *s["usage"])
         elif s.get("tier_usage") and not usage:
             line(s["role"], *s["tier_usage"])
-        if s["role"] == "Model serving" and p.get("ml_features") == "inference_api" and p["app_type"] != "ml_product":
+        if s["role"] == "Model serving" and scoring_model(p) and s["name"] != SCORING_SERVING["functions"][0]:
             line("Model serving: CPU endpoint", *SCORING_ENDPOINT_USD,
-                 "one or two always-on small CPU instances behind a real-time endpoint (about $0.10-0.17 an hour each, "
-                 "https://aws.amazon.com/sagemaker/pricing/)")
+                 "one or two always-on CPU instances behind a real-time endpoint: one ml.c5.large at $0.102 an hour to "
+                 "two ml.m5.large at $0.115-0.121 (US East, Mumbai), https://aws.amazon.com/sagemaker/pricing/")
+        elif s["role"] == "Model serving" and scoring_model(p):
+            pass  # the model runs inside the API's functions, already priced with them
         elif s["role"] == "Model serving" and usage and not _env(p, host)["onprem"]:
             tokens = p["dau"] * 30 * MODEL_CALLS_PER_USER_DAY * MODEL_TOKENS_PER_CALL
             line("Model serving: inference", tokens / 1e6 * MODEL_USD_PER_M_TOKENS[0], tokens / 1e6 * MODEL_USD_PER_M_TOKENS[1],

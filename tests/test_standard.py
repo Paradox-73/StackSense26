@@ -465,3 +465,15 @@ def test_a_static_site_under_a_residency_rule_names_where_its_files_stay(cloud, 
     choice = out["stack"]["hosting"]["choice"]
     assert out["architecture_style"] == "static" and choice.startswith(host) and region in choice, choice
     assert "for functions" not in choice and not out["stack"]["frontend"]["choice"].startswith("Server-rendered")
+
+
+def test_an_inference_api_is_a_cpu_scoring_endpoint_only_where_a_scoring_model_fits(outputs):
+    def ml(out):
+        return ([s["choice"] for s in out["stack"]["supporting"] if s["layer"] == "ml"],
+                [a for a in out["estimated_monthly_cost_usd"]["assumptions"] if a.startswith("Model serving")])
+    sage, cost = ml(outputs["P4"])  # fintech: a credit-scoring model of its own
+    assert sage[0].startswith("Amazon SageMaker real-time endpoint") and cost[0].startswith("Model serving: CPU endpoint: $75-180")
+    hosted, cost = ml(edited("P3", requirements={"ml_features": "inference_api"}))  # a whiteboard calls a hosted model
+    assert "endpoint for your own model" not in hosted[0] and cost[0].startswith("Model serving: inference")
+    inline, cost = ml(edited("P4", infrastructure={"cloud_preference": "none"}))  # functions only: no container
+    assert "inside the API's functions" in inline[0] and not cost, (inline, cost)
