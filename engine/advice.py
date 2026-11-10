@@ -708,7 +708,14 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
         gb = dau30 * MEDIA_GB_PER_USER_DAY
         add("Media delivery", "Your reverse proxy (nginx) serving files from the object store, images resized by "
             "imgproxy on your servers" if env["onprem"] else
+            # Uploads under HIPAA hold health information: no public CDN caches them (the storage line says so too).
+            "Short-lived signed URLs from the object storage, issued by the API after an access check (no public CDN "
+            "for PHI)" if env["hipaa"] else
             "CDN in front of the object storage, with image resizing at the edge",
+            "Hand uploads out from the object storage, not the app server; each signed URL expires within minutes and "
+            "every download is logged for the HIPAA audit trail." if env["hipaa"] and not env["onprem"] else
+            "Serve uploads from the object store through the reverse proxy, not the app server; resize images on the fly "
+            "instead of storing every size." if env["onprem"] else
             "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.",
             "https://developers.cloudflare.com/r2/pricing/",
             usage=(gb * EGRESS_USD_PER_GB[0], gb * EGRESS_USD_PER_GB[1],

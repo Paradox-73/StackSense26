@@ -276,12 +276,8 @@
       "delta": -24,
       "when": {
         "backend": [
-          "spring_boot",
-          "dotnet",
           "rails",
-          "phoenix",
-          "django",
-          "laravel"
+          "django"
         ],
         "hosting_kind": [
           "frontend_paas"
@@ -289,6 +285,39 @@
       },
       "note": "Frontend platforms run code only as short-lived functions; this framework expects a long-running server. Host the API on a container/PaaS service instead.",
       "source": "https://vercel.com/docs/functions/runtimes"
+    },
+    {
+      "id": "container_only_language_on_vercel",
+      "kind": "conflict",
+      "delta": -30,
+      "when": {
+        "backend": ["spring_boot", "dotnet", "laravel", "phoenix"],
+        "hosting": ["vercel"]
+      },
+      "note": "Vercel runs Java, .NET, PHP and Elixir only through its Container runtime, which is in beta, inside the Functions limits: each request is a function invocation, so there is no long-running process, background work or in-memory state, and a JVM or .NET container starts cold. Host this API on a container or PaaS service instead.",
+      "source": "https://vercel.com/docs/functions/runtimes/container"
+    },
+    {
+      "id": "container_only_language_on_workers",
+      "kind": "conflict",
+      "delta": -30,
+      "when": {
+        "backend": ["spring_boot", "dotnet", "laravel", "phoenix", "rails"],
+        "hosting": ["cloudflare"]
+      },
+      "note": "Cloudflare Workers run JavaScript, TypeScript, Python and Rust (other languages only compiled to WebAssembly); a Java, .NET, PHP, Elixir or Ruby server needs Cloudflare Containers instead, a separate product on the Workers Paid plan without autoscaling yet.",
+      "source": "https://developers.cloudflare.com/workers/languages/"
+    },
+    {
+      "id": "no_runtime_on_netlify",
+      "kind": "conflict",
+      "delta": -100,
+      "when": {
+        "backend": ["fastapi", "django", "rails", "spring_boot", "dotnet", "laravel", "phoenix", "go"],
+        "hosting": ["netlify"]
+      },
+      "note": "Netlify Functions run TypeScript and JavaScript; Go runs only in the deprecated Lambda-compatible mode, which accepts no deploys after 1 July 2027, and no other language runs there, so this API cannot run on Netlify. Host it on a container or PaaS service.",
+      "source": "https://docs.netlify.com/build/functions/get-started/"
     },
     {
       "id": "light_server_on_frontend_paas",

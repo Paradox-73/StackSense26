@@ -467,6 +467,18 @@ def test_a_static_site_under_a_residency_rule_names_where_its_files_stay(cloud, 
     assert "for functions" not in choice and not out["stack"]["frontend"]["choice"].startswith("Server-rendered")
 
 
+def test_the_relaxed_hipaa_variant_keeps_a_backend_and_services_its_host_can_run():
+    """Vercel runs Java, .NET, PHP and Elixir only through its beta Container runtime, and no container beside the
+    API; uploads with health information get no public CDN."""
+    out = run(edit("P4", project={"type": "healthtech", "platforms": ["web"]}, compliance=["hipaa", "gdpr", "pci_dss"],
+                   infrastructure={"cloud_preference": "none", "data_residency": "eu"}))
+    assert out["stack"]["hosting"]["choice"].startswith("Vercel")
+    assert not re.search(r"Spring|ASP\.NET|Laravel|Phoenix", out["stack"]["backend"]["choice"]), out["stack"]["backend"]
+    services = [s["choice"] for s in out["stack"]["supporting"]]
+    assert not [s for s in services if "container beside the API" in s], services
+    assert not [s for s in services if CDN.search(s) and not NO_CDN.search(s)], services
+
+
 def test_an_inference_api_is_a_cpu_scoring_endpoint_only_where_a_scoring_model_fits(outputs):
     def ml(out):
         return ([s["choice"] for s in out["stack"]["supporting"] if s["layer"] == "ml"],
