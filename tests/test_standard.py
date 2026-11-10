@@ -270,7 +270,7 @@ def test_self_hosted_cloud_vms_run_every_server_themselves():
 
 def test_a_scoring_model_is_served_from_a_cpu_endpoint(outputs):
     ml = [s["choice"] for s in outputs["P4"]["stack"]["supporting"] if s["layer"] == "ml"]
-    assert ml == ["Amazon SageMaker real-time endpoint"]
+    assert len(ml) == 1 and ml[0].startswith("Amazon SageMaker real-time endpoint")
 
 
 def test_existing_systems_in_extended_support_get_an_info_note(outputs):

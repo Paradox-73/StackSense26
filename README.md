@@ -37,7 +37,7 @@ python3 -m venv .venv
 
 ## Run the checks
 
-- Tests (932 tests, a few minutes): `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`)
+- Tests (936 tests, a few minutes): `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`)
 - Benchmark against the answer key: `python tools/bench.py` (add `--briefs` for one line per brief)
 - Random-input fuzz test: `python tools/fuzz.py` (exits 1 on any violation)
 - Report build and screenshots (needs Chrome and `requirements-dev.txt`): `python tools/build_report.py`
@@ -84,7 +84,7 @@ python3 -m venv .venv
 - **Who wrote the key:** a language model playing three architect personas, blind to the engine. They are not human raters, and the Krippendorff alpha of 0.91 (an agreement score; 1 is perfect) describes agreement between those personas only. The key's SHA-256 is in `tests/benchmark/answer_key.sha256`.
 - **Fuzz test** (`python tools/fuzz.py`): 10,000 seeded random projects against 14 must-hold rules (hard constraints, same output on repeat, rename and reorder invariance, no flip-back as users grow). 0 violations. In 1,000 growth walks, 0 have a layer that returns to an earlier pick, down from 296 before the stability rules.
 - **LLM-only comparison** (`python tools/llm_baseline.py --show`): the same 40 briefs answered by a language model alone with no rule engine, then graded by the rule engine. Method and numbers are in section 6.2 of `report/report.md`. The model alone scores about the same as the engine against the key (LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 81% and 96%) but breaks a hard requirement in 7 of the 40 briefs; the engine's own picks break none.
-- **Tests:** 932 tests, including a check that the numbers in this file match the code (`tests/test_docs.py`).
+- **Tests:** 936 tests, including a check that the numbers in this file match the code (`tests/test_docs.py`).
 
 ## Limitations
 

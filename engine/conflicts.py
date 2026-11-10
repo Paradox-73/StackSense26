@@ -127,11 +127,20 @@ def detect(p: dict, d: dict) -> list[dict]:
                        "Kept as given: the stack sticks to one deployable and boring, well-documented tools. Budget for "
                        "an operations hire or a managed-services contract before go-live.",
                        ["has_devops", "deployment"]))
+    pays = "pay" in (p.get("user_actions") or []) or (
+        p["app_type"] in ("ecommerce", "fintech") and "user_actions" in d.get("defaulted", ()))
+    outside = [label for label, on in (
+        ("taking payments", pays), ("SMS one-time codes", "phone_otp" in (p.get("special_workloads") or [])),
+        ("push notifications", d["mobile"])) if on] if p["deployment"] == "on_prem" else []
+    if outside and not p.get("air_gapped"):
+        w.append(_warn("ONPREM_EXTERNAL", "critical", "On-premises, but the project needs outside services",
+                       f"The project needs {', '.join(outside)}, and no payment network, SMS network or phone push service "
+                       "can run on your own servers.",
+                       "Kept as outside services reached through your firewall's outbound rules: a payment gateway's hosted "
+                       "checkout, an SMS gateway and the phone push services (FCM and APNs). Every other component in the "
+                       "stack is self-hosted, and uploads are served by your own reverse proxy instead of a CDN.",
+                       ["deployment", "user_actions", "special_workloads", "platforms"]))
     if p.get("air_gapped"):
-        outside = [label for label, on in (
-            ("taking payments", "pay" in (p.get("user_actions") or []) or p["app_type"] in ("ecommerce", "fintech")),
-            ("SMS one-time codes", "phone_otp" in (p.get("special_workloads") or [])),
-            ("push notifications", d["mobile"])) if on]
         if outside:
             w.append(_warn("AIR_GAPPED_EXTERNAL", "critical", "Air-gapped network, but the project needs outside services",
                            f"A network with no internet connection cannot reach a payment gateway, an SMS provider or the "

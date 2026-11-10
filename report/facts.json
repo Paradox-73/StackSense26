@@ -10,7 +10,7 @@
  "benchmark_top1_hits": 128,
  "benchmark_top1_pct": 81,
  "benchmark_top1_picks": 158,
- "conflict_warning_codes": 21,
+ "conflict_warning_codes": 22,
  "criteria": 19,
  "databases": 15,
  "frontends": 11,
@@ -35,6 +35,6 @@
  "scenario_fixtures": 8,
  "source_urls": 344,
  "technologies": 60,
- "tests": 932,
- "warning_codes": 50
+ "tests": 936,
+ "warning_codes": 51
 }

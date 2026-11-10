@@ -244,7 +244,7 @@
       },
       {
         "layer": "ml",
-        "choice": "Amazon SageMaker real-time endpoint",
+        "choice": "Amazon SageMaker real-time endpoint for your own model (Amazon Bedrock for a hosted one)",
         "justification": "Serve the model from its own endpoint, versioned and monitored apart from the web tier; a small scoring model runs on CPU.",
         "driven_by": [
           "requirements.ml_features",

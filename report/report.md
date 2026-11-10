@@ -17,7 +17,7 @@ StackSense recommends a frontend, backend, database and hosting platform from a 
 |---|---|---|
 | Agreement with an answer key written by a language model in three architect personas, blind to the engine (not human raters) | 96% of the 160 layer picks (one pick each for frontend, backend, database and hosting, over 40 briefs) are acceptable to at least 2 of 3 personas; 72% top-1 and 95% acceptable on the 10 briefs I never tuned on | Section 6.1; `python tools/bench.py` |
 | Hard constraints under attack | 0 violations of the 14 properties (hard constraints, meaning rules that remove an option before any scoring; consistency; and no return to an earlier pick as users grow) in 10,000 random projects; 0 of 1,000 growth walks returns to an earlier pick | Section 6; `python tools/fuzz.py` |
-| Tests | 932 tests pass, and every warning code the engine can raise has a test that triggers it | Section 6; `python -m pytest` |
+| Tests | 936 tests pass, and every warning code the engine can raise has a test that triggers it | Section 6; `python -m pytest` |
 
 **Where each judging criterion is answered**
 
@@ -189,7 +189,7 @@ Each pair changes a single answer of a built-in example; the layers that changed
 |---|---|
 | Missing answers | Uses the documented default and lists it under "Defaults used" |
 | Invalid values (negative users, text in a number field, an unknown option, a number too large for a float) | Clamps or replaces the value and shows a warning |
-| Contradictions (one developer and microservices, 99.99% availability with two people, 20 ms latency across continents) | Detects 21 contradiction checks, resolves by priority (compliance > deployment > physics and team > budget and preferences) and states the resolution |
+| Contradictions (one developer and microservices, 99.99% availability with two people, 20 ms latency across continents) | Detects 22 contradiction checks, resolves by priority (compliance > deployment > physics and team > budget and preferences) and states the resolution |
 | HIPAA or PCI on a free-tier budget | Never relaxes compliance; raises a critical warning with the minimum compliant cost |
 | EU and India residency together | Requires hosts with both regions; warns about split deployments |
 | No option survives the filters | Relaxes preference-based constraints only (never compliance) and says which one |
@@ -198,7 +198,7 @@ Each pair changes a single answer of a built-in example; the layers that changed
 | Model returns an unsupported value | The brief reader drops any model value that fails the schema or has no quote in the text, so it never reaches the form |
 | No API key, or the model is down | The pattern reader and the template summary are used, and the badge says "template fallback" |
 
-The engine can raise 50 distinct warning codes, and `tests/test_edge_cases.py` fails if any code lacks a test that triggers it. Screenshots of the contradictory example, HIPAA on a zero budget and a negative user count are in Appendix F.
+The engine can raise 51 distinct warning codes, and `tests/test_edge_cases.py` fails if any code lacks a test that triggers it. Screenshots of the contradictory example, HIPAA on a zero budget and a negative user count are in Appendix F.
 
 ---
 
@@ -207,14 +207,14 @@ The engine can raise 50 distinct warning codes, and `tests/test_edge_cases.py` f
 <!-- BEGIN validation -->
 | What is checked | Tests |
 |---|---|
-| Scoring, constraints and cost | 316 |
+| Scoring, constraints and cost | 320 |
 | Explanations match the engine | 116 |
 | Inputs, edge cases and warnings | 150 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 183 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 82 |
-| **All** | **932** |
+| **All** | **936** |
 <!-- END validation -->
 
 The per-file list is `report/validation.md`.
@@ -428,7 +428,7 @@ Why each group of questions is asked, with its sources, is in the app (the Why w
 
 1. **Normalise.** Missing answers get documented defaults, listed as assumptions; invalid or extreme values are clamped with a warning.
 2. **Derive.** Peak requests per second = daily users x requests per user for the app type / 86,400 x a peak factor x the share of traffic that reaches the servers. Scale tier (six size bands, from under 1,000 to over 10 million daily users, or under 5 to over 50,000 requests/s at peak) comes from daily users or peak load, whichever is higher, and its label names the one that set it (30,000 daily users of a realtime app at ~520 requests/s is "Large (500-5,000 req/s at peak)").
-3. **Detect conflicts.** 21 cross-field checks, for example one developer asking for microservices or HIPAA on a zero budget. Each states how it was resolved, in the order *compliance > deployment model > physics and team capacity > budget and preferences*.
+3. **Detect conflicts.** 22 cross-field checks, for example one developer asking for microservices or HIPAA on a zero budget. Each states how it was resolved, in the order *compliance > deployment model > physics and team capacity > budget and preferences*.
 4. **Weight the criteria.** 19 criteria (cost at your scale, scalability, ops burden, team skill match and more). A weight is a baseline plus contributions from specific answers, each stored with the answer that caused it.
 5. **Filter, then score.** Hard constraints remove options first (HIPAA agreement, PCI attestation, data residency, on-premises, strong consistency, scale ceiling); preference-based ones are relaxed only if a layer would be empty, compliance never. Score = sum(weight x score) / sum(weight), rescaled to 0 to 100.
 6. **Search stacks.** The top 5 options per layer give 625 combinations, adjusted by compatibility rules (synergies such as Next.js with Vercel, caveats, conflicts such as long-lived WebSockets on Netlify). A stack point is one point on the 0 to 100 stack score, the average of the four layer scores. Stacks within 1 point of the top are tied (the tie margin: the scores are estimates, so a gap that small is not a real difference) and are resolved by fixed preferences. The engine also works out the answer at all six scale tiers, so a pick does not flip back to a technology the growth path already left.

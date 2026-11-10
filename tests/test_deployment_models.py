@@ -98,5 +98,32 @@ def test_experience_and_infrastructure_skills_move_the_weights():
 
 def test_a_scoring_model_gets_a_cpu_endpoint_on_the_projects_cloud():
     r = rec(ml_features="inference_api", cloud_preference="aws", cloud_required=True)
-    assert services(r)["Model serving"] == "Amazon SageMaker real-time endpoint"
+    assert services(r)["Model serving"].startswith("Amazon SageMaker real-time endpoint")
     assert any(x["component"] == "Model serving: CPU endpoint" for x in r["cost"]["lines"])
+
+
+def test_ruling_out_the_big_three_reaches_services_and_raises_no_preference_warning():
+    r = rec(cloud_preference="no_hyperscaler", compliance=["data_residency_india"], special_workloads=["media_uploads"])
+    assert "CLOUD_PREFERENCE_OVERRIDDEN" not in codes(r)
+    text = " ".join(services(r).values()) + r["stack"]["database"]["managed_offering"]
+    assert not [n for n in ("Amazon", "AWS", "Azure", "Google Cloud", "Cloud SQL") if n in text], text
+    assert "CLOUD_PREFERENCE_OVERRIDDEN" not in codes(rec(cloud_preference="gcp", cloud_required=True))
+
+
+def test_self_managed_vps_runs_its_own_database():
+    r = rec(self_managed=True, cloud_preference="no_hyperscaler", compliance=["data_residency_eu"])
+    assert pick(r, "hosting")["kind"] == "vps"
+    assert "Self-managed" in r["stack"]["database"]["managed_offering"]
+
+
+def test_on_premises_names_its_outside_services_and_serves_uploads_itself():
+    r = rec(deployment="on_prem", platforms=["web", "android"], user_actions=["read", "sign_in", "pay"],
+            special_workloads=["phone_otp", "media_uploads"])
+    assert codes(r)["ONPREM_EXTERNAL"] == "critical" and "AIR_GAPPED_EXTERNAL" not in codes(r)
+    assert "nginx" in services(r)["Media delivery"]
+    assert "ONPREM_EXTERNAL" not in codes(rec(deployment="on_prem"))
+
+
+def test_stated_user_actions_without_paying_mean_no_payment_service():
+    assert "Payments" in services(rec(app_type="ecommerce"))
+    assert "Payments" not in services(rec(app_type="ecommerce", user_actions=["read", "sign_in", "post"]))

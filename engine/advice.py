@@ -40,11 +40,14 @@ def ops_budget(team: int) -> int | None:
     return None
 
 
-def portable_offering(item: dict, host: dict, onprem: bool, hybrid: bool) -> str | None:
+def portable_offering(item: dict, host: dict, onprem: bool, hybrid: bool, no_hyperscaler: bool = False) -> str | None:
     """Managed offering for a datastore. Under hybrid deployment, name the cloud service and its
-    on-premises twin (same engine and version), so the same code runs in both places."""
+    on-premises twin (same engine and version), so the same code runs in both places. With AWS, Google Cloud and
+    Azure ruled out, an offering that names one of them gives way to the self-managed setup."""
     offers = item.get("managed_offerings", {})
     cloud = offers.get("onprem" if onprem else host.get("provider")) or offers.get("any")
+    if no_hyperscaler and cloud and any(n in cloud for n in ("Amazon", "AWS", "Azure", "Google", "Cloud SQL", "Atlas")):
+        cloud = offers.get("onprem") or cloud
     if hybrid and not onprem and offers.get("onprem"):
         cloud = (cloud or "a managed " + item["name"]).replace(" / Aurora", "").replace(" (+ RDS Proxy for serverless)", "")
         twin = offers["onprem"][0].lower() + offers["onprem"][1:]
@@ -54,8 +57,9 @@ def portable_offering(item: dict, host: dict, onprem: bool, hybrid: bool) -> str
 
 def database_offering(db: dict, host: dict, p: dict) -> str:
     """The managed offering the stack's database runs as on this host (the API's host under split hosting)."""
-    onprem = host.get("kind") == "onprem" or (bool(p.get("self_managed")) and host.get("vm", False))
-    return portable_offering(db, host, onprem, p["deployment"] == "hybrid") or \
+    # 3. Self-managed cloud VMs (EC2-style or a VPS such as Hetzner) run the database themselves, as on-premises.
+    onprem = host.get("kind") == "onprem" or (bool(p.get("self_managed")) and (host.get("vm", False) or host.get("kind") == "vps"))
+    return portable_offering(db, host, onprem, p["deployment"] == "hybrid", p.get("cloud_preference") == "no_hyperscaler") or \
         f"a managed {db['name']} service in the same region as your compute"
 
 
@@ -86,7 +90,8 @@ def _env(p: dict, host: dict) -> dict:
             "air_gapped": bool(p.get("air_gapped")),
             # The team runs its own software on cloud VMs: no managed database, identity or monitoring service.
             "self_managed": bool(p.get("self_managed")) and p["deployment"] == "cloud",
-            "cloud": host.get("provider") if host.get("provider") in HYPERSCALER else None}
+            "cloud": host.get("provider") if host.get("provider") in HYPERSCALER else None,
+            "no_hyperscaler": p.get("cloud_preference") == "no_hyperscaler"}
 
 
 def _app_host_kind(stack: dict) -> str:
@@ -252,7 +257,8 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     out = []
 
     def offering(dbid: str) -> str:
-        text = portable_offering(kb["index"][dbid], host, env["onprem"] or env["self_managed"], env["hybrid"]) or \
+        text = portable_offering(kb["index"][dbid], host, env["onprem"] or env["self_managed"], env["hybrid"],
+                                 env["no_hyperscaler"]) or \
             f"a managed {kb['index'][dbid]['name']} service in the same region as your compute"
         return _redis_offering(text, env) if dbid == "redis" else text
 
@@ -461,12 +467,13 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     _special_workloads(p, d, env, add, has_storage=lambda: any(x["role"] == "Object storage" for x in out),
                        storage=lambda: _object_storage(env, prov))
 
-    if (p["app_type"] in ("ecommerce", "fintech") or "pay" in d["user_actions"]) and env["air_gapped"]:
+    takes_money = "pay" in d["user_actions"] or (p["app_type"] in ("ecommerce", "fintech") and "user_actions" in d["defaulted"])
+    if takes_money and env["air_gapped"]:
         add("Payments", "Payments taken outside the air-gapped network, by a separate connected system whose records "
             "are imported and reconciled", "No payment gateway can be reached from a network with no internet; "
             "keeping card data out entirely also keeps the isolated network out of PCI-DSS scope.",
             "https://www.pcisecuritystandards.org/document_library/")
-    elif p["app_type"] in ("ecommerce", "fintech") or "pay" in d["user_actions"]:
+    elif takes_money:
         pg = "Razorpay / Cashfree (India) or Stripe" if "india" in p["regions"] else "Stripe / Adyen"
         add("Payments", f"{pg} with hosted checkout (card tokens)",
             "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).",
@@ -576,6 +583,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             ml = ("a self-hosted inference server (vLLM or Hugging Face TGI) on your own GPUs" if env["onprem"] else
                   "a model API under a signed BAA, or self-hosted vLLM on HIPAA-eligible GPUs" if env["hipaa"] else
                   "self-hosted vLLM on GPUs in your Indian region, or a model API that processes data in India" if env["india"] else
+                  "self-hosted vLLM on GPUs in your EU region, or a model API that processes data in the EU" if env["eu"] else
                   "a hosted model API or GPU inference provider")
         add("Model serving", ml, "Keep GPU inference separate from the web tier so each scales on its own metric.",
             "https://cloud.google.com/vertex-ai/docs")
@@ -691,7 +699,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
     if "media_uploads" in work and p["app_type"] != "internal_tool":  # staff files: the app serves them, no CDN
         gb = dau30 * MEDIA_GB_PER_USER_DAY
         add("Media delivery", "Your reverse proxy (nginx) serving files from the object store, images resized by "
-            "imgproxy on your servers" if env["air_gapped"] else
+            "imgproxy on your servers" if env["onprem"] else
             "CDN in front of the object storage, with image resizing at the edge",
             "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.",
             "https://developers.cloudflare.com/r2/pricing/",
@@ -757,7 +765,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
         add("Phone login (SMS OTP)", "An SMS gateway inside your network (a GSM modem driven by Kannel or Gammu), or "
             "authenticator-app codes (TOTP) instead of SMS" if env["air_gapped"] else
             "MSG91 or Twilio Verify, with DLT-registered SMS templates" if india else
-            "Twilio Verify or Amazon SNS / Cognito SMS",
+            "Twilio Verify or Vonage Verify" if env["no_hyperscaler"] else "Twilio Verify or Amazon SNS / Cognito SMS",
             "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud"
             + ("; Indian operators deliver only DLT-registered templates." if india else "."),
             "https://www.twilio.com/en-us/verify/pricing",
@@ -777,9 +785,12 @@ def _object_storage(env: dict, prov: str) -> str:
     if env["cloud"]:
         return {"aws": "Amazon S3 + CloudFront", "gcp": "Cloud Storage + Cloud CDN", "azure": "Blob Storage + Front Door"}[env["cloud"]]
     if env["india"]:
-        return "S3-compatible storage in an Indian region (Amazon S3 Mumbai or Google Cloud Storage asia-south1) + CDN"
+        return ("S3-compatible storage in an Indian region (DigitalOcean Spaces BLR1 or MinIO on your servers) + CDN"
+                if env["no_hyperscaler"] else
+                "S3-compatible storage in an Indian region (Amazon S3 Mumbai or Google Cloud Storage asia-south1) + CDN")
     if env["hipaa"]:
-        return "Amazon S3 or Google Cloud Storage under a signed BAA (+ CDN for public, non-PHI files only)"
+        return ("MinIO on your BAA-covered servers (no public CDN for PHI)" if env["no_hyperscaler"] else
+                "Amazon S3 or Google Cloud Storage under a signed BAA (+ CDN for public, non-PHI files only)")
     if env["eu"]:
         return "S3-compatible storage in an EU jurisdiction (Cloudflare R2 EU or Backblaze B2 EU Central) + CDN"
     if prov == "cloudflare":
@@ -1026,11 +1037,13 @@ MODEL_USD_PER_M_TOKENS = (0.15, 2.5)
 # A small scoring model (credit score, fraud score) on one or two always-on CPU instances, SageMaker list prices.
 SCORING_ENDPOINT_USD = (60.0, 250.0)
 SCORING_SERVING = {
-    "aws": ("Amazon SageMaker real-time endpoint", "https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html"),
-    "gcp": ("Vertex AI online prediction endpoint", "https://cloud.google.com/vertex-ai/docs/predictions/overview"),
-    "azure": ("Azure Machine Learning managed online endpoint",
+    "aws": ("Amazon SageMaker real-time endpoint for your own model (Amazon Bedrock for a hosted one)",
+            "https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html"),
+    "gcp": ("Vertex AI online prediction endpoint for your own model (Gemini on Vertex AI for a hosted one)",
+            "https://cloud.google.com/vertex-ai/docs/predictions/overview"),
+    "azure": ("Azure Machine Learning managed online endpoint for your own model (Azure OpenAI for a hosted one)",
               "https://learn.microsoft.com/azure/machine-learning/concept-endpoints-online"),
-    "self": ("The model in its own CPU container beside the API (BentoML, or ONNX Runtime behind a small HTTP service)",
+    "self": ("Your own model in a CPU container beside the API (BentoML, or ONNX Runtime behind a small HTTP service)",
              "https://docs.bentoml.com/"),
 }
 

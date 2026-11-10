@@ -492,8 +492,8 @@ def _db_region_note(p: dict, stack: dict, api_host: dict | None) -> str | None:
 def _cloud_pref_warning(p: dict, combos: list[dict], hosting_excluded: list[dict]) -> dict | None:
     """A stated cloud preference is soft: when the chosen host is elsewhere, say so and what it cost."""
     pref = p["cloud_preference"]
-    if pref == "none" or p["deployment"] == "on_prem":
-        return None
+    if pref in ("none", "no_hyperscaler") or p["deployment"] == "on_prem" or p.get("cloud_required"):
+        return None  # no preference, or a hard rule that the filters already enforced
     best = combos[0]
     host = best["picks"]["hosting"]
     if host["item"].get("provider") == pref:
