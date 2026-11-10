@@ -1,0 +1,107 @@
+{
+ "note": "Result of tools/bench.py before any engine change made for the benchmark (engine at commit 4b41505).",
+ "tuning": {
+  "frontend": {
+   "top1": [
+    25,
+    30
+   ],
+   "acceptable": [
+    27,
+    30
+   ]
+  },
+  "backend": {
+   "top1": [
+    19,
+    29
+   ],
+   "acceptable": [
+    23,
+    30
+   ]
+  },
+  "database": {
+   "top1": [
+    20,
+    30
+   ],
+   "acceptable": [
+    26,
+    30
+   ]
+  },
+  "hosting": {
+   "top1": [
+    19,
+    29
+   ],
+   "acceptable": [
+    26,
+    30
+   ]
+  },
+  "all": {
+   "top1": [
+    83,
+    118
+   ],
+   "acceptable": [
+    102,
+    120
+   ]
+  }
+ },
+ "held_out": {
+  "frontend": {
+   "top1": [
+    6,
+    10
+   ],
+   "acceptable": [
+    7,
+    10
+   ]
+  },
+  "backend": {
+   "top1": [
+    7,
+    10
+   ],
+   "acceptable": [
+    10,
+    10
+   ]
+  },
+  "database": {
+   "top1": [
+    7,
+    10
+   ],
+   "acceptable": [
+    7,
+    10
+   ]
+  },
+  "hosting": {
+   "top1": [
+    4,
+    10
+   ],
+   "acceptable": [
+    8,
+    10
+   ]
+  },
+  "all": {
+   "top1": [
+    24,
+    40
+   ],
+   "acceptable": [
+    32,
+    40
+   ]
+  }
+ }
+}

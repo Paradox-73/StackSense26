@@ -1,0 +1,411 @@
+{
+ "description": "Second asking of the same briefs with the cache bypassed (repeatability of the LLM-only baseline).",
+ "briefs": {
+  "A01": {
+   "id": "A01",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "express",
+    "database": "mongodb",
+    "hosting": "render"
+   }
+  },
+  "A02": {
+   "id": "A02",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "flutter",
+    "backend": "spring_boot",
+    "database": "postgres",
+    "hosting": "aws_ecs"
+   }
+  },
+  "A03": {
+   "id": "A03",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "flutter",
+    "backend": "django",
+    "database": "postgres",
+    "hosting": "aws_ecs"
+   }
+  },
+  "A04": {
+   "id": "A04",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "htmx",
+    "backend": "laravel",
+    "database": "mysql",
+    "hosting": "onprem_docker"
+   }
+  },
+  "A05": {
+   "id": "A05",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "react_native",
+    "backend": "express",
+    "database": "postgres",
+    "hosting": "railway"
+   }
+  },
+  "A06": {
+   "id": "A06",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "django",
+    "database": "timescaledb",
+    "hosting": "hetzner"
+   }
+  },
+  "A07": {
+   "id": "A07",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nuxt",
+    "backend": "laravel",
+    "database": "mysql",
+    "hosting": "digitalocean"
+   }
+  },
+  "A08": {
+   "id": "A08",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "nestjs",
+    "database": "postgres",
+    "hosting": "aws_ecs"
+   }
+  },
+  "A09": {
+   "id": "A09",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "astro",
+    "backend": "django",
+    "database": "postgres",
+    "hosting": "aws_ecs"
+   }
+  },
+  "A10": {
+   "id": "A10",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "astro",
+    "backend": "no_custom_backend",
+    "database": "none_static",
+    "hosting": "vercel"
+   }
+  },
+  "A11": {
+   "id": "A11",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "react_native",
+    "backend": "express",
+    "database": "postgres",
+    "hosting": "railway"
+   }
+  },
+  "A12": {
+   "id": "A12",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "no_custom_backend",
+    "database": "none_static",
+    "hosting": "vercel"
+   }
+  },
+  "A13": {
+   "id": "A13",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "dotnet",
+    "database": "postgres",
+    "hosting": "azure_apps"
+   }
+  },
+  "A14": {
+   "id": "A14",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "native_mobile",
+    "backend": "go",
+    "database": "redis",
+    "hosting": "aws_eks"
+   }
+  },
+  "A15": {
+   "id": "A15",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "flutter",
+    "backend": "phoenix",
+    "database": "postgres",
+    "hosting": "aws_eks"
+   }
+  },
+  "A16": {
+   "id": "A16",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "angular",
+    "backend": "spring_boot",
+    "database": "mysql",
+    "hosting": "aws_ecs"
+   }
+  },
+  "A17": {
+   "id": "A17",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "flutter",
+    "backend": "firebase",
+    "database": "firestore",
+    "hosting": "aws_s3_cloudfront"
+   }
+  },
+  "A18": {
+   "id": "A18",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nuxt",
+    "backend": "nestjs",
+    "database": "mysql",
+    "hosting": "digitalocean"
+   }
+  },
+  "A19": {
+   "id": "A19",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "react_spa",
+    "backend": "fastapi",
+    "database": "postgres",
+    "hosting": "render"
+   }
+  },
+  "A20": {
+   "id": "A20",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "supabase",
+    "database": "postgres",
+    "hosting": "vercel"
+   }
+  },
+  "B01": {
+   "id": "B01",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "angular",
+    "backend": "spring_boot",
+    "database": "postgres",
+    "hosting": "aws_eks"
+   }
+  },
+  "B02": {
+   "id": "B02",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "htmx",
+    "backend": "django",
+    "database": "postgres",
+    "hosting": "onprem_docker"
+   }
+  },
+  "B03": {
+   "id": "B03",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "react_native",
+    "backend": "nestjs",
+    "database": "postgres",
+    "hosting": "aws_ecs"
+   }
+  },
+  "B04": {
+   "id": "B04",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "react_spa",
+    "backend": "django",
+    "database": "postgres",
+    "hosting": "hetzner"
+   }
+  },
+  "B05": {
+   "id": "B05",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "nestjs",
+    "database": "postgres",
+    "hosting": "aws_ecs"
+   }
+  },
+  "B06": {
+   "id": "B06",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "fastapi",
+    "database": "clickhouse",
+    "hosting": "aws_ecs"
+   }
+  },
+  "B07": {
+   "id": "B07",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "react_spa",
+    "backend": "go",
+    "database": "clickhouse",
+    "hosting": "aws_eks"
+   }
+  },
+  "B08": {
+   "id": "B08",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "react_spa",
+    "backend": "go",
+    "database": "redis",
+    "hosting": "flyio"
+   }
+  },
+  "B09": {
+   "id": "B09",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "fastapi",
+    "database": "postgres",
+    "hosting": "gcp_cloud_run"
+   }
+  },
+  "B10": {
+   "id": "B10",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "htmx",
+    "backend": "django",
+    "database": "postgres",
+    "hosting": "render"
+   }
+  },
+  "B11": {
+   "id": "B11",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "angular",
+    "backend": "spring_boot",
+    "database": "postgres",
+    "hosting": "onprem_k8s"
+   }
+  },
+  "B12": {
+   "id": "B12",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "angular",
+    "backend": "nestjs",
+    "database": "postgres",
+    "hosting": "azure_apps"
+   }
+  },
+  "B13": {
+   "id": "B13",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "angular",
+    "backend": "dotnet",
+    "database": "postgres",
+    "hosting": "azure_apps"
+   }
+  },
+  "B14": {
+   "id": "B14",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "angular",
+    "backend": "spring_boot",
+    "database": "postgres",
+    "hosting": "onprem_k8s"
+   }
+  },
+  "B15": {
+   "id": "B15",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "serverless_functions",
+    "database": "dynamodb",
+    "hosting": "aws_lambda"
+   }
+  },
+  "B16": {
+   "id": "B16",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "flutter",
+    "backend": "firebase",
+    "database": "firestore",
+    "hosting": "aws_lambda"
+   }
+  },
+  "B17": {
+   "id": "B17",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "express",
+    "database": "postgres",
+    "hosting": "vercel"
+   }
+  },
+  "B18": {
+   "id": "B18",
+   "model": "gemini-3.5-flash-lite",
+   "picks": {
+    "frontend": "react_native",
+    "backend": "firebase",
+    "database": "firestore",
+    "hosting": "cloudflare"
+   }
+  },
+  "B19": {
+   "id": "B19",
+   "model": "gemini-flash-lite-latest",
+   "picks": {
+    "frontend": "flutter",
+    "backend": "django",
+    "database": "postgres",
+    "hosting": "digitalocean"
+   }
+  },
+  "B20": {
+   "id": "B20",
+   "model": "gemini-flash-lite-latest",
+   "picks": {
+    "frontend": "nextjs",
+    "backend": "nestjs",
+    "database": "postgres",
+    "hosting": "aws_ecs"
+   }
+  }
+ },
+ "models_chain": [
+  "gemini-3.5-flash-lite",
+  "gemini-flash-lite-latest",
+  "gemini-2.5-flash-lite"
+ ],
+ "done": 40
+}

@@ -1,0 +1,1130 @@
+{
+ "note": "Adversarial inputs from a review of the engine: contradictions, extreme scale, regulated and on-premises projects, unusual teams and garbage values. Used as regression inputs by test_redteam_text.py and test_redteam_cost.py.",
+ "cases": [
+  {
+   "id": "t01_student_blog",
+   "desc": "Solo student blog, $0, HTML only, India",
+   "input": {
+    "app_type": "content_site",
+    "dau": 50,
+    "budget_monthly": 0,
+    "team_size": 1,
+    "team_skills": [
+     "html"
+    ],
+    "regions": [
+     "india"
+    ]
+   }
+  },
+  {
+   "id": "t02_hackathon_proto",
+   "desc": "Weekend prototype, 2 devs JS, $0, 2 weeks",
+   "input": {
+    "app_type": "prototype",
+    "dau": 100,
+    "budget_monthly": 0,
+    "team_size": 2,
+    "team_skills": [
+     "javascript",
+     "node",
+     "react"
+    ],
+    "timeline_weeks": 2
+   }
+  },
+  {
+   "id": "t03_10M_zero_budget",
+   "desc": "Contradiction: 10M DAU social network with $0",
+   "input": {
+    "app_type": "social_network",
+    "dau": 10000000,
+    "budget_monthly": 0,
+    "team_size": 3,
+    "team_skills": [
+     "javascript",
+     "node"
+    ],
+    "platforms": [
+     "web",
+     "android",
+     "ios"
+    ],
+    "regions": [
+     "global"
+    ]
+   }
+  },
+  {
+   "id": "t04_solo_9999",
+   "desc": "Contradiction: 1 dev, 99.99% availability, fintech, $200",
+   "input": {
+    "app_type": "fintech",
+    "dau": 2000,
+    "availability": "99.99",
+    "team_size": 1,
+    "team_skills": [
+     "python",
+     "django",
+     "sql"
+    ],
+    "budget_monthly": 200,
+    "regions": [
+     "north_america"
+    ],
+    "user_actions": [
+     "read",
+     "sign_in",
+     "pay"
+    ]
+   }
+  },
+  {
+   "id": "t05_hipaa_telehealth_aws",
+   "desc": "HIPAA telehealth, US, AWS pref, video, 8 devs TS",
+   "input": {
+    "app_type": "healthcare",
+    "dau": 20000,
+    "compliance": [
+     "hipaa",
+     "soc2"
+    ],
+    "regions": [
+     "north_america"
+    ],
+    "cloud_preference": "aws",
+    "team_size": 8,
+    "team_skills": [
+     "typescript",
+     "react",
+     "node",
+     "aws",
+     "postgres"
+    ],
+    "budget_monthly": 5000,
+    "special_workloads": [
+     "live_video",
+     "media_uploads"
+    ],
+    "realtime": "some",
+    "availability": "99.95"
+   }
+  },
+  {
+   "id": "t06_pci_ecom_eu",
+   "desc": "PCI + GDPR EU-residency e-commerce, 50k DAU, PHP team",
+   "input": {
+    "app_type": "ecommerce",
+    "dau": 50000,
+    "compliance": [
+     "pci_dss",
+     "gdpr",
+     "data_residency_eu"
+    ],
+    "regions": [
+     "europe"
+    ],
+    "team_size": 6,
+    "team_skills": [
+     "php",
+     "mysql",
+     "javascript",
+     "vue"
+    ],
+    "budget_monthly": 3000,
+    "seo": "critical",
+    "user_actions": [
+     "read",
+     "sign_in",
+     "pay"
+    ],
+    "special_workloads": [
+     "text_search",
+     "media_uploads"
+    ]
+   }
+  },
+  {
+   "id": "t07_india_fintech_inr",
+   "desc": "Indian UPI fintech, INR 5 lakh/mo, Java/Spring, 500k DAU",
+   "input": {
+    "app_type": "fintech",
+    "dau": 500000,
+    "currency": "INR",
+    "budget_monthly": 500000,
+    "regions": [
+     "india"
+    ],
+    "compliance": [
+     "pci_dss",
+     "data_residency_india",
+     "dpdp"
+    ],
+    "team_size": 20,
+    "team_skills": [
+     "java",
+     "spring",
+     "kotlin",
+     "postgres",
+     "aws",
+     "kubernetes"
+    ],
+    "platforms": [
+     "android",
+     "ios",
+     "web"
+    ],
+    "availability": "99.99",
+    "user_actions": [
+     "read",
+     "sign_in",
+     "pay"
+    ],
+    "special_workloads": [
+     "phone_otp"
+    ]
+   }
+  },
+  {
+   "id": "t08_inr_tiny",
+   "desc": "Indian college club app, INR 500/mo, Flutter/dart only",
+   "input": {
+    "app_type": "mobile_first",
+    "dau": 300,
+    "currency": "INR",
+    "budget_monthly": 500,
+    "team_size": 2,
+    "team_skills": [
+     "dart",
+     "firebase"
+    ],
+    "platforms": [
+     "android"
+    ],
+    "regions": [
+     "india"
+    ]
+   }
+  },
+  {
+   "id": "t09_govt_onprem_india",
+   "desc": "Indian govt internal tool, on-prem only, .NET team, residency India",
+   "input": {
+    "app_type": "internal_tool",
+    "dau": 3000,
+    "deployment": "on_prem",
+    "team_size": 5,
+    "team_skills": [
+     "csharp",
+     "sql",
+     "angular"
+    ],
+    "compliance": [
+     "data_residency_india"
+    ],
+    "regions": [
+     "india"
+    ],
+    "budget_monthly": 1000,
+    "existing_systems": [
+     "sqlserver"
+    ]
+   }
+  },
+  {
+   "id": "t10_bank_hybrid_oracle",
+   "desc": "Bank, hybrid, Java, existing Oracle, SOC2+PCI, 1M DAU",
+   "input": {
+    "app_type": "fintech",
+    "dau": 1000000,
+    "deployment": "hybrid",
+    "team_size": 60,
+    "team_skills": [
+     "java",
+     "spring",
+     "sql",
+     "kubernetes",
+     "linux"
+    ],
+    "existing_systems": [
+     "oracle"
+    ],
+    "compliance": [
+     "pci_dss",
+     "soc2"
+    ],
+    "regions": [
+     "north_america",
+     "europe"
+    ],
+    "budget_monthly": 200000,
+    "availability": "99.99",
+    "lock_in_tolerance": "low"
+   }
+  },
+  {
+   "id": "t11_gcp_ml_rag",
+   "desc": "RAG/semantic search ML product, GCP pref, data scientists (python only)",
+   "input": {
+    "app_type": "ml_product",
+    "dau": 5000,
+    "cloud_preference": "gcp",
+    "team_size": 3,
+    "team_skills": [
+     "python"
+    ],
+    "data_shapes": [
+     "vector",
+     "relational",
+     "document"
+    ],
+    "budget_monthly": 800,
+    "regions": [
+     "north_america"
+    ],
+    "latency_target_ms": 1500
+   }
+  },
+  {
+   "id": "t12_azure_enterprise_dotnet",
+   "desc": "Enterprise internal portal, Azure, .NET, SOC2, SQL Server",
+   "input": {
+    "app_type": "internal_tool",
+    "dau": 8000,
+    "cloud_preference": "azure",
+    "team_size": 10,
+    "team_skills": [
+     "csharp",
+     "azure",
+     "sql",
+     "angular"
+    ],
+    "compliance": [
+     "soc2"
+    ],
+    "existing_systems": [
+     "sqlserver"
+    ],
+    "budget_monthly": 4000,
+    "regions": [
+     "north_america",
+     "europe"
+    ]
+   }
+  },
+  {
+   "id": "t13_iot_fleet",
+   "desc": "IoT 200k devices, time-series, Go team, AWS",
+   "input": {
+    "app_type": "iot_telemetry",
+    "dau": 200000,
+    "team_size": 6,
+    "team_skills": [
+     "go",
+     "aws",
+     "docker",
+     "postgres"
+    ],
+    "cloud_preference": "aws",
+    "budget_monthly": 6000,
+    "data_volume_gb": 500,
+    "data_growth_gb_month": 300,
+    "regions": [
+     "europe"
+    ]
+   }
+  },
+  {
+   "id": "t14_realtime_collab_elixir",
+   "desc": "Figma-like realtime collab, Elixir team, 30k DAU",
+   "input": {
+    "app_type": "realtime_collab",
+    "dau": 30000,
+    "team_size": 5,
+    "team_skills": [
+     "elixir",
+     "postgres",
+     "typescript",
+     "react"
+    ],
+    "budget_monthly": 2500,
+    "regions": [
+     "global"
+    ],
+    "latency_target_ms": 100,
+    "data_shapes": [
+     "document",
+     "relational"
+    ]
+   }
+  },
+  {
+   "id": "t15_rails_marketplace",
+   "desc": "Two-sided marketplace, Ruby team, 15k DAU, payments, search",
+   "input": {
+    "app_type": "ecommerce",
+    "dau": 15000,
+    "team_size": 4,
+    "team_skills": [
+     "ruby",
+     "postgres",
+     "javascript"
+    ],
+    "budget_monthly": 1500,
+    "special_workloads": [
+     "text_search",
+     "media_uploads"
+    ],
+    "user_actions": [
+     "read",
+     "sign_in",
+     "post",
+     "pay"
+    ],
+    "regions": [
+     "north_america"
+    ],
+    "seo": "important"
+   }
+  },
+  {
+   "id": "t16_analytics_clickhouse",
+   "desc": "Product analytics dashboard, 5 TB events, Python, read heavy",
+   "input": {
+    "app_type": "analytics_dashboard",
+    "dau": 2000,
+    "team_size": 4,
+    "team_skills": [
+     "python",
+     "sql",
+     "react"
+    ],
+    "data_volume_gb": 5000,
+    "data_growth_gb_month": 800,
+    "budget_monthly": 3000,
+    "regions": [
+     "europe"
+    ],
+    "compliance": [
+     "gdpr"
+    ]
+   }
+  },
+  {
+   "id": "t17_offline_field",
+   "desc": "Offline-first field-survey mobile app, React Native, rural India",
+   "input": {
+    "app_type": "mobile_first",
+    "dau": 4000,
+    "offline": true,
+    "platforms": [
+     "android"
+    ],
+    "team_size": 3,
+    "team_skills": [
+     "react_native",
+     "javascript",
+     "node"
+    ],
+    "budget_monthly": 150,
+    "regions": [
+     "india"
+    ],
+    "realtime": "none"
+   }
+  },
+  {
+   "id": "t18_geo_ride",
+   "desc": "Ride-hailing: live location, realtime core, 300k DAU, Go/Kotlin",
+   "input": {
+    "app_type": "mobile_first",
+    "dau": 300000,
+    "platforms": [
+     "android",
+     "ios"
+    ],
+    "realtime": "core",
+    "special_workloads": [
+     "live_location",
+     "phone_otp"
+    ],
+    "team_size": 25,
+    "team_skills": [
+     "go",
+     "kotlin",
+     "swift",
+     "postgres",
+     "kubernetes",
+     "aws"
+    ],
+    "budget_monthly": 40000,
+    "regions": [
+     "southeast_asia"
+    ],
+    "user_actions": [
+     "read",
+     "sign_in",
+     "pay"
+    ],
+    "availability": "99.95"
+   }
+  },
+  {
+   "id": "t19_video_platform",
+   "desc": "VOD platform, 2M DAU, media heavy, global",
+   "input": {
+    "app_type": "social_network",
+    "dau": 2000000,
+    "special_workloads": [
+     "video_on_demand",
+     "media_uploads"
+    ],
+    "team_size": 40,
+    "team_skills": [
+     "typescript",
+     "react",
+     "node",
+     "go",
+     "aws",
+     "kubernetes"
+    ],
+    "budget_monthly": 300000,
+    "regions": [
+     "global"
+    ],
+    "platforms": [
+     "web",
+     "android",
+     "ios"
+    ],
+    "availability": "99.95",
+    "seo": "important"
+   }
+  },
+  {
+   "id": "t20_multitenant_saas_soc2",
+   "desc": "B2B multi-tenant SaaS, SOC2, 40k DAU, Python/Django",
+   "input": {
+    "app_type": "saas",
+    "dau": 40000,
+    "compliance": [
+     "soc2",
+     "gdpr"
+    ],
+    "team_size": 12,
+    "team_skills": [
+     "python",
+     "django",
+     "postgres",
+     "react",
+     "aws"
+    ],
+    "budget_monthly": 12000,
+    "regions": [
+     "north_america",
+     "europe"
+    ],
+    "availability": "99.95",
+    "priorities": [
+     "proven",
+     "scale"
+    ]
+   }
+  },
+  {
+   "id": "t21_game_backend",
+   "desc": "Casual multiplayer mobile game, realtime core, Unity-ish C# team",
+   "input": {
+    "app_type": "realtime_collab",
+    "dau": 100000,
+    "platforms": [
+     "android",
+     "ios"
+    ],
+    "team_size": 6,
+    "team_skills": [
+     "csharp"
+    ],
+    "budget_monthly": 5000,
+    "regions": [
+     "global"
+    ],
+    "latency_target_ms": 50,
+    "data_shapes": [
+     "key_value",
+     "relational"
+    ],
+    "consistency": "eventual_ok"
+   }
+  },
+  {
+   "id": "t22_mobile_only_team",
+   "desc": "Team of only iOS/Android devs (swift/kotlin), social app 20k DAU",
+   "input": {
+    "app_type": "social_network",
+    "dau": 20000,
+    "platforms": [
+     "android",
+     "ios"
+    ],
+    "team_size": 3,
+    "team_skills": [
+     "swift",
+     "kotlin"
+    ],
+    "budget_monthly": 500,
+    "regions": [
+     "north_america"
+    ],
+    "special_workloads": [
+     "media_uploads"
+    ]
+   }
+  },
+  {
+   "id": "t23_no_skills",
+   "desc": "Non-technical founder, no skills, small SaaS, $50",
+   "input": {
+    "app_type": "saas",
+    "dau": 200,
+    "team_size": 1,
+    "team_skills": [],
+    "budget_monthly": 50,
+    "regions": [
+     "north_america"
+    ],
+    "timeline_weeks": 6
+   }
+  },
+  {
+   "id": "t24_all_not_sure",
+   "desc": "Everything default / not sure (empty input)",
+   "input": {}
+  },
+  {
+   "id": "t25_huge_enterprise_budget",
+   "desc": "Hyperscale social, 50M DAU, $2M/mo, 300 engineers",
+   "input": {
+    "app_type": "social_network",
+    "dau": 50000000,
+    "budget_monthly": 2000000,
+    "team_size": 300,
+    "team_skills": [
+     "java",
+     "go",
+     "python",
+     "typescript",
+     "react",
+     "kubernetes",
+     "aws",
+     "linux"
+    ],
+    "regions": [
+     "global"
+    ],
+    "platforms": [
+     "web",
+     "ios",
+     "android"
+    ],
+    "availability": "99.99",
+    "consistency": "eventual_ok",
+    "data_shapes": [
+     "key_value",
+     "relational",
+     "graph"
+    ],
+    "data_volume_gb": 2000000,
+    "data_growth_gb_month": 200000
+   }
+  },
+  {
+   "id": "t26_graph_fraud",
+   "desc": "Fraud graph analytics, Neo4j-ish, Java team",
+   "input": {
+    "app_type": "fintech",
+    "dau": 1000,
+    "data_shapes": [
+     "graph",
+     "relational"
+    ],
+    "team_size": 5,
+    "team_skills": [
+     "java",
+     "spring"
+    ],
+    "budget_monthly": 3000,
+    "regions": [
+     "europe"
+    ],
+    "compliance": [
+     "gdpr",
+     "pci_dss"
+    ]
+   }
+  },
+  {
+   "id": "t27_fulltext_docs",
+   "desc": "Legal doc search, full-text search primary, 5k DAU, Python",
+   "input": {
+    "app_type": "saas",
+    "dau": 5000,
+    "data_shapes": [
+     "search",
+     "document"
+    ],
+    "special_workloads": [
+     "text_search"
+    ],
+    "team_size": 4,
+    "team_skills": [
+     "python",
+     "django",
+     "elasticsearch"
+    ],
+    "budget_monthly": 1500,
+    "data_volume_gb": 800,
+    "regions": [
+     "europe"
+    ],
+    "compliance": [
+     "data_residency_eu",
+     "gdpr"
+    ]
+   }
+  },
+  {
+   "id": "t28_laravel_shop_inr",
+   "desc": "Small Indian shop, PHP/Laravel, INR 3000/mo, 2k DAU",
+   "input": {
+    "app_type": "ecommerce",
+    "dau": 2000,
+    "currency": "INR",
+    "budget_monthly": 3000,
+    "team_size": 2,
+    "team_skills": [
+     "php",
+     "mysql",
+     "html"
+    ],
+    "regions": [
+     "india"
+    ],
+    "user_actions": [
+     "read",
+     "sign_in",
+     "pay"
+    ],
+    "compliance": [
+     "dpdp"
+    ]
+   }
+  },
+  {
+   "id": "t29_serverless_spiky",
+   "desc": "Ticketing site with spiky sale traffic, 20k DAU, prefers serverless",
+   "input": {
+    "app_type": "ecommerce",
+    "dau": 20000,
+    "traffic_pattern": "spiky",
+    "architecture": "serverless",
+    "team_size": 3,
+    "team_skills": [
+     "typescript",
+     "node",
+     "aws"
+    ],
+    "budget_monthly": 600,
+    "regions": [
+     "india"
+    ],
+    "user_actions": [
+     "read",
+     "sign_in",
+     "pay"
+    ]
+   }
+  },
+  {
+   "id": "t30_micro_small_team",
+   "desc": "2 devs demand microservices for 500-user app",
+   "input": {
+    "app_type": "saas",
+    "dau": 500,
+    "architecture": "microservices",
+    "team_size": 2,
+    "team_skills": [
+     "java",
+     "spring"
+    ],
+    "budget_monthly": 100,
+    "regions": [
+     "europe"
+    ]
+   }
+  },
+  {
+   "id": "t31_hipaa_gcp_onprem_hybrid",
+   "desc": "Hospital hybrid, HIPAA, Python, GCP",
+   "input": {
+    "app_type": "healthcare",
+    "dau": 10000,
+    "deployment": "hybrid",
+    "cloud_preference": "gcp",
+    "compliance": [
+     "hipaa"
+    ],
+    "team_size": 7,
+    "team_skills": [
+     "python",
+     "fastapi",
+     "postgres",
+     "gcp",
+     "react"
+    ],
+    "budget_monthly": 6000,
+    "regions": [
+     "north_america"
+    ]
+   }
+  },
+  {
+   "id": "t32_low_latency_trading",
+   "desc": "Low-latency trading API 10ms, Go, 99.99, strong consistency",
+   "input": {
+    "app_type": "fintech",
+    "dau": 5000,
+    "latency_target_ms": 10,
+    "peak_rps": 20000,
+    "team_size": 8,
+    "team_skills": [
+     "go",
+     "postgres",
+     "linux",
+     "kubernetes"
+    ],
+    "budget_monthly": 30000,
+    "regions": [
+     "north_america"
+    ],
+    "availability": "99.99",
+    "platforms": [
+     "web"
+    ]
+   }
+  },
+  {
+   "id": "t33_seo_static_marketing",
+   "desc": "Marketing site, SEO critical, read only, Vue team, $20",
+   "input": {
+    "app_type": "content_site",
+    "dau": 20000,
+    "seo": "critical",
+    "team_size": 2,
+    "team_skills": [
+     "vue",
+     "javascript"
+    ],
+    "budget_monthly": 20,
+    "user_actions": [
+     "read"
+    ],
+    "regions": [
+     "global"
+    ],
+    "data_volume_gb": 0,
+    "data_growth_gb_month": 0
+   }
+  },
+  {
+   "id": "t34_wordpress_shop_like",
+   "desc": "News site w/ comments, PHP, 300k DAU, SEO critical",
+   "input": {
+    "app_type": "content_site",
+    "dau": 300000,
+    "seo": "critical",
+    "team_size": 5,
+    "team_skills": [
+     "php",
+     "mysql"
+    ],
+    "budget_monthly": 3000,
+    "user_actions": [
+     "read",
+     "sign_in",
+     "post"
+    ],
+    "regions": [
+     "india"
+    ],
+    "special_workloads": [
+     "media_uploads",
+     "text_search"
+    ]
+   }
+  },
+  {
+   "id": "t35_user_code_edu",
+   "desc": "Coding-education platform running user code, 10k DAU",
+   "input": {
+    "app_type": "saas",
+    "dau": 10000,
+    "special_workloads": [
+     "user_code"
+    ],
+    "team_size": 4,
+    "team_skills": [
+     "python",
+     "typescript",
+     "react",
+     "docker"
+    ],
+    "budget_monthly": 2000,
+    "regions": [
+     "india",
+     "southeast_asia"
+    ]
+   }
+  },
+  {
+   "id": "t36_lockin_low_kubernetes",
+   "desc": "Lock-in low, k8s team, 100k DAU SaaS, Rust (not in list) + go",
+   "input": {
+    "app_type": "saas",
+    "dau": 100000,
+    "lock_in_tolerance": "low",
+    "team_size": 15,
+    "team_skills": [
+     "rust",
+     "go",
+     "kubernetes",
+     "postgres",
+     "linux"
+    ],
+    "budget_monthly": 15000,
+    "regions": [
+     "europe"
+    ]
+   }
+  },
+  {
+   "id": "t37_mongo_existing",
+   "desc": "Existing MongoDB, MERN team, social 50k DAU, $1000",
+   "input": {
+    "app_type": "social_network",
+    "dau": 50000,
+    "existing_systems": [
+     "mongodb"
+    ],
+    "team_size": 4,
+    "team_skills": [
+     "javascript",
+     "node",
+     "react",
+     "mongodb"
+    ],
+    "budget_monthly": 1000,
+    "data_shapes": [
+     "document"
+    ],
+    "regions": [
+     "india"
+    ],
+    "special_workloads": [
+     "media_uploads"
+    ]
+   }
+  },
+  {
+   "id": "t38_live_streaming",
+   "desc": "Live streaming (twitch-like), 100k DAU, live_video, Node",
+   "input": {
+    "app_type": "social_network",
+    "dau": 100000,
+    "special_workloads": [
+     "live_video"
+    ],
+    "realtime": "core",
+    "team_size": 10,
+    "team_skills": [
+     "typescript",
+     "node",
+     "react",
+     "aws"
+    ],
+    "budget_monthly": 50000,
+    "regions": [
+     "north_america"
+    ]
+   }
+  },
+  {
+   "id": "t39_eu_residency_cheap",
+   "desc": "EU-residency GDPR tiny SaaS, $30, Python",
+   "input": {
+    "app_type": "saas",
+    "dau": 800,
+    "compliance": [
+     "gdpr",
+     "data_residency_eu"
+    ],
+    "regions": [
+     "europe"
+    ],
+    "team_size": 2,
+    "team_skills": [
+     "python",
+     "django"
+    ],
+    "budget_monthly": 30
+   }
+  },
+  {
+   "id": "t40_india_residency_hipaa_mix",
+   "desc": "Contradiction: India residency + HIPAA + Azure",
+   "input": {
+    "app_type": "healthcare",
+    "dau": 5000,
+    "compliance": [
+     "hipaa",
+     "data_residency_india"
+    ],
+    "regions": [
+     "india"
+    ],
+    "cloud_preference": "azure",
+    "team_size": 4,
+    "team_skills": [
+     "csharp",
+     "azure"
+    ],
+    "budget_monthly": 2000
+   }
+  },
+  {
+   "id": "t41_dau0",
+   "desc": "Edge: 0 DAU, nonsense peak_rps text",
+   "input": {
+    "app_type": "saas",
+    "dau": 0,
+    "peak_rps": "lots",
+    "budget_monthly": -5,
+    "team_size": 0
+   }
+  },
+  {
+   "id": "t42_internal_tool_tiny",
+   "desc": "Internal admin tool for 20 staff, Django team, existing postgres",
+   "input": {
+    "app_type": "internal_tool",
+    "dau": 20,
+    "team_size": 1,
+    "team_skills": [
+     "python",
+     "django",
+     "postgres"
+    ],
+    "budget_monthly": 20,
+    "existing_systems": [
+     "postgres"
+    ],
+    "regions": [
+     "europe"
+    ]
+   }
+  },
+  {
+   "id": "v_eu_res_content",
+   "desc": "Content site with sign-in and posts, EU residency, $0",
+   "input": {
+    "app_type": "content_site",
+    "regions": [
+     "europe"
+    ],
+    "compliance": [
+     "data_residency_eu"
+    ],
+    "dau": 5000,
+    "budget_monthly": 0,
+    "user_actions": [
+     "read",
+     "sign_in",
+     "post"
+    ]
+   }
+  },
+  {
+   "id": "v_default_30k",
+   "desc": "Every answer left at its default except 30k daily users",
+   "input": {
+    "dau": 30000
+   }
+  },
+  {
+   "id": "v_default_300k",
+   "desc": "Every answer left at its default except 300k daily users",
+   "input": {
+    "dau": 300000
+   }
+  },
+  {
+   "id": "v_analytics_shapes_typed",
+   "desc": "The analytics dashboard case with its data shapes typed in",
+   "input": {
+    "app_type": "analytics_dashboard",
+    "dau": 2000,
+    "team_size": 4,
+    "team_skills": [
+     "python",
+     "sql",
+     "react"
+    ],
+    "data_volume_gb": 5000,
+    "data_growth_gb_month": 800,
+    "budget_monthly": 3000,
+    "regions": [
+     "europe"
+    ],
+    "compliance": [
+     "gdpr"
+    ],
+    "data_shapes": [
+     "analytical",
+     "relational"
+    ]
+   }
+  },
+  {
+   "id": "v_hipaa_zero_budget",
+   "desc": "HIPAA project with a zero budget",
+   "input": {
+    "app_type": "healthcare",
+    "compliance": [
+     "hipaa"
+    ],
+    "budget_monthly": 0,
+    "regions": [
+     "north_america"
+    ],
+    "dau": 500
+   }
+  },
+  {
+   "id": "v_hipaa_one_week",
+   "desc": "HIPAA project, solo developer, one-week timeline",
+   "input": {
+    "app_type": "healthcare",
+    "compliance": [
+     "hipaa"
+    ],
+    "timeline_weeks": 1,
+    "team_size": 1,
+    "dau": 100,
+    "regions": [
+     "north_america"
+    ],
+    "budget_monthly": 100
+   }
+  }
+ ]
+}
