@@ -1,0 +1,35 @@
+name: install
+
+# Does a fresh copy install, launch twice (the second launch reuses the .venv), pass the tests and print every example?
+on:
+  push:
+  pull_request:
+
+jobs:
+  install:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Launch run.py twice
+        run: python tools/ci_launch_check.py
+      - name: Tests
+        shell: bash
+        run: |
+          PY=.venv/bin/python
+          if [ ! -x "$PY" ]; then PY=.venv/Scripts/python.exe; fi
+          "$PY" -m pytest -q
+      - name: All examples from the command line
+        shell: bash
+        run: |
+          PY=.venv/bin/python
+          if [ ! -x "$PY" ]; then PY=.venv/Scripts/python.exe; fi
+          "$PY" cli.py --all > /dev/null
