@@ -96,6 +96,7 @@ Next.js (React) is the frontend for an E-commerce / marketplace project with abo
 - React Native (Expo): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
+- No frontend (API only): You target a user interface, so a frontend is needed
 
 ### Backend: Java/Kotlin + Spring Boot (97.1)
 
@@ -295,6 +296,9 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 - Hetzner Cloud / VPS (Docker, Coolify): The provider's SLA is 99.9% (each Cloud Server), below your 99.95% availability target; No PCI-DSS attestation published; No India region; data must stay in India
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud; Docker Compose runs an app's containers on one Docker host and restarts them only on that host; placing and moving containers across several hosts is what Swarm or Kubernetes add: no automatic failover to a second host, so it cannot meet 99.95% availability
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
+- AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Google Compute Engine VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Azure Virtual Machines (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
 
 ## Stack compatibility checks
 
@@ -303,6 +307,7 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 ## Supporting services
 
 - **Cache**: Redis/Valkey (ElastiCache (Valkey)): Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database.
+- **Realtime**: WebSockets in the Java/Kotlin + Spring Boot app (Spring WebSocket with STOMP): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
 - **Secondary store (document)**: MongoDB (MongoDB Atlas (runs on AWS, GCP or Azure in the same region as your compute)): Your primary database fits your data less well than MongoDB: 'document' 3/5 against 5/5.
 - **Analytics**: ClickHouse Cloud (AWS/GCP/Azure) fed by a continuous copy of database changes: Run heavy aggregations on a columnar store instead of the transactional database.
 - **Background jobs**: Spring Batch / SQS listeners: Send emails, process uploads and call slow APIs outside the request path.

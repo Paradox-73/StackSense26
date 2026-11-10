@@ -98,6 +98,7 @@ Native iOS + Android (Swift / Kotlin) is the app for a Fintech / payments / ledg
 - Angular: Web-only framework; you target iOS/Android only
 - Astro: Web-only framework; you target iOS/Android only
 - Server-rendered HTML + HTMX: Web-only framework; you target iOS/Android only
+- No frontend (API only): You target a user interface, so a frontend is needed
 
 ### Backend: Java/Kotlin + Spring Boot (95.9)
 
@@ -290,9 +291,13 @@ Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The data
 - Hetzner Cloud / VPS (Docker, Coolify): The provider's SLA is 99.9% (each Cloud Server), below your 99.95% availability target; No India region; data must stay in India
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud; Docker Compose runs an app's containers on one Docker host and restarts them only on that host; placing and moving containers across several hosts is what Swarm or Kubernetes add: no automatic failover to a second host, so it cannot meet 99.95% availability
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
+- AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Google Compute Engine VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Azure Virtual Machines (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
 
 ## Supporting services
 
+- **Realtime**: WebSockets in the Java/Kotlin + Spring Boot app (Spring WebSocket with STOMP): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
 - **Background jobs**: Spring Batch / SQS listeners: Send emails, process uploads and call slow APIs outside the request path.
 - **Phone login (SMS OTP)**: MSG91 or Twilio Verify, with DLT-registered SMS templates: One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates.
 - **Payments**: Razorpay / Cashfree (India) or Stripe with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).

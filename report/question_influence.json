@@ -1,522 +1,612 @@
 {
  "all": [
   {
-   "any_effect_rate": 0.9250585480093677,
+   "any_effect_rate": 0.9021739130434783,
    "bases_moved_share": 1.0,
    "cost_or_warning_only_rate": 0.0,
    "key": "team_skills",
    "label": "Existing team skills",
    "layer_rates": {
-    "backend": 0.8293325526932084,
-    "database": 0.20199063231850117,
-    "frontend": 0.4771662763466042,
-    "hosting": 0.23697306791569087
+    "backend": 0.8179347826086957,
+    "database": 0.10054347826086957,
+    "frontend": 0.41847826086956524,
+    "hosting": 0.19021739130434784
    },
-   "pick_change_rate": 0.9250585480093677,
-   "runs": 6832
+   "pick_change_rate": 0.9021739130434783,
+   "runs": 368
   },
   {
-   "any_effect_rate": 0.6783018867924528,
+   "any_effect_rate": 0.7506053268765133,
    "bases_moved_share": 1.0,
-   "cost_or_warning_only_rate": 0.0018867924528301887,
-   "key": "deployment",
-   "label": "Deployment model",
-   "layer_rates": {
-    "backend": 0.09811320754716982,
-    "database": 0.10518867924528302,
-    "frontend": 0.0580188679245283,
-    "hosting": 0.6287735849056604
-   },
-   "pick_change_rate": 0.6764150943396227,
-   "runs": 2120
-  },
-  {
-   "any_effect_rate": 0.7433350757971772,
-   "bases_moved_share": 0.995069033530572,
-   "cost_or_warning_only_rate": 0.08403031887088343,
+   "cost_or_warning_only_rate": 0.09685230024213075,
    "key": "data_shapes",
    "label": "What kinds of data do you store? (pick the main kind first)",
    "layer_rates": {
-    "backend": 0.05580240460010455,
-    "database": 0.6498954521693675,
-    "frontend": 0.017903815995818088,
-    "hosting": 0.052273915316257184
+    "backend": 0.0847457627118644,
+    "database": 0.6513317191283293,
+    "frontend": 0.012106537530266344,
+    "hosting": 0.029055690072639227
    },
-   "pick_change_rate": 0.6593047569262938,
-   "runs": 7652
+   "pick_change_rate": 0.6537530266343826,
+   "runs": 413
   },
   {
-   "any_effect_rate": 0.6236769894159153,
-   "bases_moved_share": 0.9930966469428008,
-   "cost_or_warning_only_rate": 0.07526460211681693,
+   "any_effect_rate": 0.7323943661971831,
+   "bases_moved_share": 0.8333333333333334,
+   "cost_or_warning_only_rate": 0.09859154929577464,
+   "key": "air_gapped",
+   "label": "Air-gapped (no internet connection)",
+   "layer_rates": {
+    "backend": 0.08450704225352113,
+    "database": 0.08450704225352113,
+    "frontend": 0.028169014084507043,
+    "hosting": 0.6338028169014085
+   },
+   "pick_change_rate": 0.6338028169014085,
+   "runs": 71
+  },
+  {
+   "any_effect_rate": 0.5871559633027523,
+   "bases_moved_share": 0.7592592592592593,
+   "cost_or_warning_only_rate": 0.07339449541284404,
+   "key": "deployment",
+   "label": "Deployment model",
+   "layer_rates": {
+    "backend": 0.08256880733944955,
+    "database": 0.06422018348623854,
+    "frontend": 0.05504587155963303,
+    "hosting": 0.45871559633027525
+   },
+   "pick_change_rate": 0.5137614678899083,
+   "runs": 109
+  },
+  {
+   "any_effect_rate": 0.673469387755102,
+   "bases_moved_share": 1.0,
+   "cost_or_warning_only_rate": 0.1836734693877551,
    "key": "platforms",
    "label": "Client platforms",
    "layer_rates": {
-    "backend": 0.03057624460995688,
-    "database": 0.006272050176401411,
-    "frontend": 0.5476283810270482,
-    "hosting": 0.00431203449627597
+    "backend": 0.034013605442176874,
+    "database": 0.013605442176870748,
+    "frontend": 0.4897959183673469,
+    "hosting": 0.006802721088435374
    },
-   "pick_change_rate": 0.5484123872990984,
-   "runs": 2551
+   "pick_change_rate": 0.4897959183673469,
+   "runs": 147
   },
   {
-   "any_effect_rate": 0.8160992682150812,
-   "bases_moved_share": 0.7485207100591716,
-   "cost_or_warning_only_rate": 0.37671014953865734,
-   "key": "availability",
-   "label": "Availability target",
-   "layer_rates": {
-    "backend": 0.06426980591791283,
-    "database": 0.07063315303849825,
-    "frontend": 0.035952911231307665,
-    "hosting": 0.39420935412026725
-   },
-   "pick_change_rate": 0.4393891186764238,
-   "runs": 3143
-  },
-  {
-   "any_effect_rate": 0.5758192550376552,
-   "bases_moved_share": 0.796844181459566,
-   "cost_or_warning_only_rate": 0.1437003867290861,
-   "key": "team_size",
-   "label": "Engineering team size",
-   "layer_rates": {
-    "backend": 0.3004274374109505,
-    "database": 0.05841644616324038,
-    "frontend": 0.147364135965805,
-    "hosting": 0.09607164665174028
-   },
-   "pick_change_rate": 0.4321188683085691,
-   "runs": 4913
-  },
-  {
-   "any_effect_rate": 0.6924896028704233,
-   "bases_moved_share": 0.8648915187376726,
-   "cost_or_warning_only_rate": 0.31639892359129085,
-   "key": "app_type",
-   "label": "Application type",
-   "layer_rates": {
-    "backend": 0.17361167740357172,
-    "database": 0.09671369159259562,
-    "frontend": 0.13422490418331567,
-    "hosting": 0.07706107803963141
-   },
-   "pick_change_rate": 0.37609067927913237,
-   "runs": 12263
-  },
-  {
-   "any_effect_rate": 0.7869296792651709,
-   "bases_moved_share": 0.7455621301775148,
-   "cost_or_warning_only_rate": 0.460924559554284,
-   "key": "existing_systems",
-   "label": "Existing systems you must keep",
-   "layer_rates": {
-    "backend": 0.04381870200271044,
-    "database": 0.30131004366812225,
-    "frontend": 0.014305074536967324,
-    "hosting": 0.026803192290317725
-   },
-   "pick_change_rate": 0.3260051197108869,
-   "runs": 6641
-  },
-  {
-   "any_effect_rate": 0.5680640602920396,
-   "bases_moved_share": 0.47928994082840237,
-   "cost_or_warning_only_rate": 0.2529439472444654,
+   "any_effect_rate": 0.5765765765765766,
+   "bases_moved_share": 0.6851851851851852,
+   "cost_or_warning_only_rate": 0.16216216216216217,
    "key": "seo",
    "label": "Search engine visibility",
    "layer_rates": {
-    "backend": 0.007536504945831371,
-    "database": 0.00659444182760245,
-    "frontend": 0.3127649552520019,
-    "hosting": 0.003297220913801225
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.4144144144144144,
+    "hosting": 0.009009009009009009
    },
-   "pick_change_rate": 0.3151201130475742,
-   "runs": 2123
+   "pick_change_rate": 0.4144144144144144,
+   "runs": 111
   },
   {
-   "any_effect_rate": 0.3647003745318352,
-   "bases_moved_share": 0.4388560157790927,
-   "cost_or_warning_only_rate": 0.06694756554307116,
-   "key": "realtime",
-   "label": "Realtime needs",
-   "layer_rates": {
-    "backend": 0.15870786516853932,
-    "database": 0.06741573033707865,
-    "frontend": 0.06413857677902622,
-    "hosting": 0.08895131086142322
-   },
-   "pick_change_rate": 0.29775280898876405,
-   "runs": 2136
-  },
-  {
-   "any_effect_rate": 0.6783851976450799,
-   "bases_moved_share": 0.5483234714003945,
-   "cost_or_warning_only_rate": 0.3809924306139613,
-   "key": "budget_monthly",
-   "label": "Monthly infrastructure budget",
-   "layer_rates": {
-    "backend": 0.06947014297729184,
-    "database": 0.1296888141295206,
-    "frontend": 0.02607232968881413,
-    "hosting": 0.18200168208578638
-   },
-   "pick_change_rate": 0.2973927670311186,
-   "runs": 5945
-  },
-  {
-   "any_effect_rate": 0.6997140133460439,
-   "bases_moved_share": 0.47041420118343197,
-   "cost_or_warning_only_rate": 0.411503018748014,
+   "any_effect_rate": 0.7174887892376681,
+   "bases_moved_share": 0.5925925925925926,
+   "cost_or_warning_only_rate": 0.30493273542600896,
    "key": "cloud_preference",
    "label": "Preferred cloud",
    "layer_rates": {
-    "backend": 0.029551954242135366,
-    "database": 0.05147759771210677,
-    "frontend": 0.012392755004766444,
-    "hosting": 0.26755640292341915
+    "backend": 0.07174887892376682,
+    "database": 0.05829596412556054,
+    "frontend": 0.02242152466367713,
+    "hosting": 0.4080717488789238
    },
-   "pick_change_rate": 0.28821099459802985,
-   "runs": 3147
+   "pick_change_rate": 0.4125560538116592,
+   "runs": 223
   },
   {
-   "any_effect_rate": 0.26405290505432216,
-   "bases_moved_share": 0.39447731755424065,
-   "cost_or_warning_only_rate": 0.0051960321209258385,
+   "any_effect_rate": 0.8606060606060606,
+   "bases_moved_share": 0.6111111111111112,
+   "cost_or_warning_only_rate": 0.49696969696969695,
+   "key": "availability",
+   "label": "Availability target",
+   "layer_rates": {
+    "backend": 0.024242424242424242,
+    "database": 0.048484848484848485,
+    "frontend": 0.048484848484848485,
+    "hosting": 0.32727272727272727
+   },
+   "pick_change_rate": 0.36363636363636365,
+   "runs": 165
+  },
+  {
+   "any_effect_rate": 0.51953125,
+   "bases_moved_share": 0.7407407407407407,
+   "cost_or_warning_only_rate": 0.15625,
+   "key": "team_size",
+   "label": "Engineering team size",
+   "layer_rates": {
+    "backend": 0.2734375,
+    "database": 0.0234375,
+    "frontend": 0.07421875,
+    "hosting": 0.06640625
+   },
+   "pick_change_rate": 0.36328125,
+   "runs": 256
+  },
+  {
+   "any_effect_rate": 0.32051282051282054,
+   "bases_moved_share": 0.46296296296296297,
+   "cost_or_warning_only_rate": 0.0,
+   "key": "self_managed",
+   "label": "We run our own VMs in the cloud",
+   "layer_rates": {
+    "backend": 0.05128205128205128,
+    "database": 0.02564102564102564,
+    "frontend": 0.0,
+    "hosting": 0.32051282051282054
+   },
+   "pick_change_rate": 0.32051282051282054,
+   "runs": 78
+  },
+  {
+   "any_effect_rate": 0.7916666666666666,
+   "bases_moved_share": 0.8148148148148148,
+   "cost_or_warning_only_rate": 0.49166666666666664,
+   "key": "existing_systems",
+   "label": "Existing systems you must keep",
+   "layer_rates": {
+    "backend": 0.041666666666666664,
+    "database": 0.2722222222222222,
+    "frontend": 0.005555555555555556,
+    "hosting": 0.013888888888888888
+   },
+   "pick_change_rate": 0.3,
+   "runs": 360
+  },
+  {
+   "any_effect_rate": 0.3153153153153153,
+   "bases_moved_share": 0.46296296296296297,
+   "cost_or_warning_only_rate": 0.018018018018018018,
    "key": "lock_in_tolerance",
    "label": "Vendor lock-in tolerance",
    "layer_rates": {
-    "backend": 0.06991025035427492,
-    "database": 0.11620217288615967,
-    "frontend": 0.09258384506376949,
-    "hosting": 0.07038261691072271
+    "backend": 0.07207207207207207,
+    "database": 0.11711711711711711,
+    "frontend": 0.0990990990990991,
+    "hosting": 0.06306306306306306
    },
-   "pick_change_rate": 0.2588568729333963,
-   "runs": 2117
+   "pick_change_rate": 0.2972972972972973,
+   "runs": 111
   },
   {
-   "any_effect_rate": 0.25759398496240604,
-   "bases_moved_share": 0.5433925049309665,
+   "any_effect_rate": 0.696923076923077,
+   "bases_moved_share": 0.7962962962962963,
+   "cost_or_warning_only_rate": 0.42,
+   "key": "app_type",
+   "label": "Application type",
+   "layer_rates": {
+    "backend": 0.13230769230769232,
+    "database": 0.026153846153846153,
+    "frontend": 0.09846153846153846,
+    "hosting": 0.06307692307692307
+   },
+   "pick_change_rate": 0.27692307692307694,
+   "runs": 650
+  },
+  {
+   "any_effect_rate": 0.3185840707964602,
+   "bases_moved_share": 0.4074074074074074,
+   "cost_or_warning_only_rate": 0.04424778761061947,
+   "key": "realtime",
+   "label": "Realtime needs",
+   "layer_rates": {
+    "backend": 0.1504424778761062,
+    "database": 0.07079646017699115,
+    "frontend": 0.035398230088495575,
+    "hosting": 0.07964601769911504
+   },
+   "pick_change_rate": 0.2743362831858407,
+   "runs": 113
+  },
+  {
+   "any_effect_rate": 0.7725856697819314,
+   "bases_moved_share": 0.48148148148148145,
+   "cost_or_warning_only_rate": 0.5607476635514018,
+   "key": "dau",
+   "label": "Daily active users (or active devices)",
+   "layer_rates": {
+    "backend": 0.03426791277258567,
+    "database": 0.037383177570093455,
+    "frontend": 0.018691588785046728,
+    "hosting": 0.1526479750778816
+   },
+   "pick_change_rate": 0.2118380062305296,
+   "runs": 321
+  },
+  {
+   "any_effect_rate": 0.34134615384615385,
+   "bases_moved_share": 0.3888888888888889,
+   "cost_or_warning_only_rate": 0.15384615384615385,
+   "key": "latency_target_ms",
+   "label": "How fast must the app answer? (slowest 1 in 20 requests, ms)",
+   "layer_rates": {
+    "backend": 0.057692307692307696,
+    "database": 0.009615384615384616,
+    "frontend": 0.08173076923076923,
+    "hosting": 0.057692307692307696
+   },
+   "pick_change_rate": 0.1875,
+   "runs": 208
+  },
+  {
+   "any_effect_rate": 0.6139240506329114,
+   "bases_moved_share": 0.4074074074074074,
+   "cost_or_warning_only_rate": 0.4272151898734177,
+   "key": "budget_monthly",
+   "label": "Monthly infrastructure budget",
+   "layer_rates": {
+    "backend": 0.03481012658227848,
+    "database": 0.028481012658227847,
+    "frontend": 0.00949367088607595,
+    "hosting": 0.12974683544303797
+   },
+   "pick_change_rate": 0.18670886075949367,
+   "runs": 316
+  },
+  {
+   "any_effect_rate": 0.1858974358974359,
+   "bases_moved_share": 0.5370370370370371,
    "cost_or_warning_only_rate": 0.0,
    "key": "priorities",
    "label": "Your top 3 priorities (first = most important)",
    "layer_rates": {
-    "backend": 0.1318796992481203,
-    "database": 0.05097744360902256,
-    "frontend": 0.08045112781954887,
-    "hosting": 0.06676691729323309
+    "backend": 0.09188034188034189,
+    "database": 0.02564102564102564,
+    "frontend": 0.05128205128205128,
+    "hosting": 0.053418803418803416
    },
-   "pick_change_rate": 0.25759398496240604,
-   "runs": 6650
+   "pick_change_rate": 0.1858974358974359,
+   "runs": 468
   },
   {
-   "any_effect_rate": 0.8169106760980425,
-   "bases_moved_share": 0.52465483234714,
-   "cost_or_warning_only_rate": 0.574272084224379,
-   "key": "dau",
-   "label": "Daily active users (or active devices)",
-   "layer_rates": {
-    "backend": 0.08044086198387893,
-    "database": 0.10347096561934528,
-    "frontend": 0.022372100674453034,
-    "hosting": 0.13505510774798488
-   },
-   "pick_change_rate": 0.24263859187366343,
-   "runs": 6079
-  },
-  {
-   "any_effect_rate": 0.4209486166007905,
-   "bases_moved_share": 0.47435897435897434,
-   "cost_or_warning_only_rate": 0.20528656126482214,
-   "key": "latency_target_ms",
-   "label": "How fast must the app answer? (slowest 1 in 20 requests, ms)",
-   "layer_rates": {
-    "backend": 0.10301383399209486,
-    "database": 0.03186758893280633,
-    "frontend": 0.05014822134387352,
-    "hosting": 0.09980237154150198
-   },
-   "pick_change_rate": 0.21566205533596838,
-   "runs": 4048
-  },
-  {
-   "any_effect_rate": 0.5685117967332124,
-   "bases_moved_share": 0.40927021696252464,
-   "cost_or_warning_only_rate": 0.3561705989110708,
-   "key": "peak_concurrent",
-   "label": "Users connected at the same moment, at peak (optional)",
-   "layer_rates": {
-    "backend": 0.08257713248638839,
-    "database": 0.07327586206896551,
-    "frontend": 0.03312159709618875,
-    "hosting": 0.09959165154264973
-   },
-   "pick_change_rate": 0.21234119782214156,
-   "runs": 4408
-  },
-  {
-   "any_effect_rate": 0.29500376600552347,
-   "bases_moved_share": 0.4289940828402367,
-   "cost_or_warning_only_rate": 0.08963093145869948,
-   "key": "timeline_weeks",
-   "label": "Time to MVP",
-   "layer_rates": {
-    "backend": 0.11323123273914135,
-    "database": 0.027617373838814963,
-    "frontend": 0.06803916645744414,
-    "hosting": 0.04318353000251067
-   },
-   "pick_change_rate": 0.205372834546824,
-   "runs": 3983
-  },
-  {
-   "any_effect_rate": 0.20515222482435597,
-   "bases_moved_share": 0.2869822485207101,
-   "cost_or_warning_only_rate": 0.008430913348946136,
+   "any_effect_rate": 0.18699186991869918,
+   "bases_moved_share": 0.2962962962962963,
+   "cost_or_warning_only_rate": 0.016260162601626018,
    "key": "background_work",
    "label": "Work that runs in the background",
    "layer_rates": {
-    "backend": 0.04355971896955504,
-    "database": 0.029039812646370025,
-    "frontend": 0.017798594847775177,
-    "hosting": 0.18688524590163935
+    "backend": 0.04065040650406504,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.17073170731707318
    },
-   "pick_change_rate": 0.19672131147540983,
-   "runs": 2135
+   "pick_change_rate": 0.17073170731707318,
+   "runs": 123
   },
   {
-   "any_effect_rate": 0.18480778138026865,
-   "bases_moved_share": 0.29092702169625245,
+   "any_effect_rate": 0.6424581005586593,
+   "bases_moved_share": 0.2777777777777778,
+   "cost_or_warning_only_rate": 0.4748603351955307,
+   "key": "peak_rps",
+   "label": "Peak requests per second (optional)",
+   "layer_rates": {
+    "backend": 0.0223463687150838,
+    "database": 0.0446927374301676,
+    "frontend": 0.00558659217877095,
+    "hosting": 0.12849162011173185
+   },
+   "pick_change_rate": 0.16759776536312848,
+   "runs": 179
+  },
+  {
+   "any_effect_rate": 0.5021645021645021,
+   "bases_moved_share": 0.3148148148148148,
+   "cost_or_warning_only_rate": 0.35064935064935066,
+   "key": "peak_concurrent",
+   "label": "Users connected at the same moment, at peak (optional)",
+   "layer_rates": {
+    "backend": 0.04329004329004329,
+    "database": 0.017316017316017316,
+    "frontend": 0.030303030303030304,
+    "hosting": 0.0735930735930736
+   },
+   "pick_change_rate": 0.15151515151515152,
+   "runs": 231
+  },
+  {
+   "any_effect_rate": 0.2111111111111111,
+   "bases_moved_share": 0.2777777777777778,
+   "cost_or_warning_only_rate": 0.07222222222222222,
+   "key": "team_experience",
+   "label": "Team experience",
+   "layer_rates": {
+    "backend": 0.1,
+    "database": 0.005555555555555556,
+    "frontend": 0.027777777777777776,
+    "hosting": 0.03333333333333333
+   },
+   "pick_change_rate": 0.1388888888888889,
+   "runs": 180
+  },
+  {
+   "any_effect_rate": 0.48214285714285715,
+   "bases_moved_share": 0.12962962962962962,
+   "cost_or_warning_only_rate": 0.35714285714285715,
+   "key": "offline",
+   "label": "Offline support required",
+   "layer_rates": {
+    "backend": 0.017857142857142856,
+    "database": 0.03571428571428571,
+    "frontend": 0.10714285714285714,
+    "hosting": 0.0
+   },
+   "pick_change_rate": 0.125,
+   "runs": 56
+  },
+  {
+   "any_effect_rate": 0.35039370078740156,
+   "bases_moved_share": 0.2962962962962963,
+   "cost_or_warning_only_rate": 0.24015748031496062,
+   "key": "compliance",
+   "label": "Compliance & data residency",
+   "layer_rates": {
+    "backend": 0.017716535433070866,
+    "database": 0.031496062992125984,
+    "frontend": 0.003937007874015748,
+    "hosting": 0.09645669291338582
+   },
+   "pick_change_rate": 0.11023622047244094,
+   "runs": 508
+  },
+  {
+   "any_effect_rate": 0.11023622047244094,
+   "bases_moved_share": 0.2037037037037037,
    "cost_or_warning_only_rate": 0.0,
    "key": "tenancy",
    "label": "Do several customer organisations share the app?",
    "layer_rates": {
-    "backend": 0.047707271885132005,
-    "database": 0.12088930060213061,
-    "frontend": 0.024085224641037517,
-    "hosting": 0.03751736915238536
+    "backend": 0.023622047244094488,
+    "database": 0.07874015748031496,
+    "frontend": 0.007874015748031496,
+    "hosting": 0.015748031496062992
    },
-   "pick_change_rate": 0.18480778138026865,
-   "runs": 2159
+   "pick_change_rate": 0.11023622047244094,
+   "runs": 127
   },
   {
-   "any_effect_rate": 0.6830488522660388,
-   "bases_moved_share": 0.27613412228796846,
-   "cost_or_warning_only_rate": 0.5138316656856975,
-   "key": "peak_rps",
-   "label": "Peak requests per second (optional)",
+   "any_effect_rate": 0.19047619047619047,
+   "bases_moved_share": 0.2222222222222222,
+   "cost_or_warning_only_rate": 0.08095238095238096,
+   "key": "timeline_weeks",
+   "label": "Time to MVP",
    "layer_rates": {
-    "backend": 0.05709240729841083,
-    "database": 0.058563861094761624,
-    "frontend": 0.018246027074749854,
-    "hosting": 0.08652148322542672
+    "backend": 0.06666666666666667,
+    "database": 0.009523809523809525,
+    "frontend": 0.03333333333333333,
+    "hosting": 0.01904761904761905
    },
-   "pick_change_rate": 0.16921718658034138,
-   "runs": 3398
+   "pick_change_rate": 0.10952380952380952,
+   "runs": 210
   },
   {
-   "any_effect_rate": 0.3791208791208791,
-   "bases_moved_share": 0.1804733727810651,
-   "cost_or_warning_only_rate": 0.21153846153846154,
-   "key": "offline",
-   "label": "Offline support required",
-   "layer_rates": {
-    "backend": 0.023809523809523808,
-    "database": 0.07875457875457875,
-    "frontend": 0.09065934065934066,
-    "hosting": 0.024725274725274724
-   },
-   "pick_change_rate": 0.16758241758241757,
-   "runs": 1092
-  },
-  {
-   "any_effect_rate": 0.2623985572587917,
-   "bases_moved_share": 0.17455621301775148,
-   "cost_or_warning_only_rate": 0.10279531109107304,
-   "key": "consistency",
-   "label": "If two people change the same thing at the same moment, must everyone see one agreed result at once?",
-   "layer_rates": {
-    "backend": 0.011722272317403066,
-    "database": 0.15238954012623984,
-    "frontend": 0.010820559062218215,
-    "hosting": 0.02254283137962128
-   },
-   "pick_change_rate": 0.15960324616771868,
-   "runs": 1109
-  },
-  {
-   "any_effect_rate": 0.3222013170272813,
-   "bases_moved_share": 0.24260355029585798,
-   "cost_or_warning_only_rate": 0.16509877704609596,
-   "key": "read_write",
-   "label": "Do people mostly look at data, or mostly add and change it?",
-   "layer_rates": {
-    "backend": 0.04233301975540922,
-    "database": 0.11571025399811853,
-    "frontend": 0.01975540921919097,
-    "hosting": 0.027281279397930385
-   },
-   "pick_change_rate": 0.1571025399811853,
-   "runs": 2126
-  },
-  {
-   "any_effect_rate": 0.4433471239823836,
-   "bases_moved_share": 0.3027613412228797,
-   "cost_or_warning_only_rate": 0.28906979847858,
-   "key": "compliance",
-   "label": "Compliance & data residency",
-   "layer_rates": {
-    "backend": 0.051381289203256374,
-    "database": 0.04017082610436407,
-    "frontend": 0.0261577472307487,
-    "hosting": 0.09488856265848125
-   },
-   "pick_change_rate": 0.15427732550380355,
-   "runs": 7493
-  },
-  {
-   "any_effect_rate": 0.41090213579853363,
-   "bases_moved_share": 0.2504930966469428,
-   "cost_or_warning_only_rate": 0.2808415683774307,
-   "key": "architecture",
-   "label": "Architecture preference",
-   "layer_rates": {
-    "backend": 0.054829454893210075,
-    "database": 0.01689512272872171,
-    "frontend": 0.011794708320051004,
-    "hosting": 0.08925725215173733
-   },
-   "pick_change_rate": 0.13006056742110297,
-   "runs": 3137
-  },
-  {
-   "any_effect_rate": 0.4556899530980005,
-   "bases_moved_share": 0.23767258382642997,
-   "cost_or_warning_only_rate": 0.33497901752653664,
+   "any_effect_rate": 0.46226415094339623,
+   "bases_moved_share": 0.2037037037037037,
+   "cost_or_warning_only_rate": 0.3632075471698113,
    "key": "data_volume_gb",
    "label": "Data volume at launch",
    "layer_rates": {
-    "backend": 0.024438410269069365,
-    "database": 0.10145643051098494,
-    "frontend": 0.009380399901258949,
-    "hosting": 0.02740064181683535
+    "backend": 0.04716981132075472,
+    "database": 0.08018867924528301,
+    "frontend": 0.0,
+    "hosting": 0.018867924528301886
    },
-   "pick_change_rate": 0.12071093557146384,
-   "runs": 4051
+   "pick_change_rate": 0.09905660377358491,
+   "runs": 212
   },
   {
-   "any_effect_rate": 0.33399307273626916,
-   "bases_moved_share": 0.1814595660749507,
-   "cost_or_warning_only_rate": 0.24443344878772885,
-   "key": "data_growth_gb_month",
-   "label": "Data growth per month",
+   "any_effect_rate": 0.29464285714285715,
+   "bases_moved_share": 0.16666666666666666,
+   "cost_or_warning_only_rate": 0.19642857142857142,
+   "key": "read_write",
+   "label": "Do people mostly look at data, or mostly add and change it?",
    "layer_rates": {
-    "backend": 0.02003958436417615,
-    "database": 0.07372587827808016,
-    "frontend": 0.0039584364176150424,
-    "hosting": 0.024492825333993072
+    "backend": 0.026785714285714284,
+    "database": 0.0625,
+    "frontend": 0.008928571428571428,
+    "hosting": 0.03571428571428571
    },
-   "pick_change_rate": 0.08955962394854032,
-   "runs": 4042
+   "pick_change_rate": 0.09821428571428571,
+   "runs": 112
   },
   {
-   "any_effect_rate": 0.05287114845938375,
-   "bases_moved_share": 0.1232741617357002,
-   "cost_or_warning_only_rate": 0.0010504201680672268,
+   "any_effect_rate": 0.09933774834437085,
+   "bases_moved_share": 0.18518518518518517,
+   "cost_or_warning_only_rate": 0.013245033112582781,
    "key": "user_actions",
    "label": "What do users do?",
    "layer_rates": {
-    "backend": 0.03991596638655462,
-    "database": 0.01995798319327731,
-    "frontend": 0.0070028011204481795,
-    "hosting": 0.02976190476190476
+    "backend": 0.07947019867549669,
+    "database": 0.046357615894039736,
+    "frontend": 0.0,
+    "hosting": 0.026490066225165563
    },
-   "pick_change_rate": 0.05182072829131653,
-   "runs": 2856
+   "pick_change_rate": 0.08609271523178808,
+   "runs": 151
   },
   {
-   "any_effect_rate": 0.5780096716721812,
-   "bases_moved_share": 0.11143984220907298,
-   "cost_or_warning_only_rate": 0.535505217612624,
+   "any_effect_rate": 0.3696682464454976,
+   "bases_moved_share": 0.12962962962962962,
+   "cost_or_warning_only_rate": 0.2938388625592417,
+   "key": "data_growth_gb_month",
+   "label": "Data growth per month",
+   "layer_rates": {
+    "backend": 0.037914691943127965,
+    "database": 0.04265402843601896,
+    "frontend": 0.009478672985781991,
+    "hosting": 0.023696682464454975
+   },
+   "pick_change_rate": 0.07582938388625593,
+   "runs": 211
+  },
+  {
+   "any_effect_rate": 0.45180722891566266,
+   "bases_moved_share": 0.16666666666666666,
+   "cost_or_warning_only_rate": 0.3795180722891566,
+   "key": "architecture",
+   "label": "Architecture preference",
+   "layer_rates": {
+    "backend": 0.03614457831325301,
+    "database": 0.006024096385542169,
+    "frontend": 0.006024096385542169,
+    "hosting": 0.03614457831325301
+   },
+   "pick_change_rate": 0.07228915662650602,
+   "runs": 166
+  },
+  {
+   "any_effect_rate": 0.058823529411764705,
+   "bases_moved_share": 0.07407407407407407,
+   "cost_or_warning_only_rate": 0.0,
+   "key": "cloud_required",
+   "label": "Must use this cloud (hard constraint)",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.058823529411764705
+   },
+   "pick_change_rate": 0.058823529411764705,
+   "runs": 68
+  },
+  {
+   "any_effect_rate": 0.44594594594594594,
+   "bases_moved_share": 0.07407407407407407,
+   "cost_or_warning_only_rate": 0.3918918918918919,
+   "key": "has_devops",
+   "label": "Someone can operate infrastructure",
+   "layer_rates": {
+    "backend": 0.02702702702702703,
+    "database": 0.0,
+    "frontend": 0.013513513513513514,
+    "hosting": 0.02702702702702703
+   },
+   "pick_change_rate": 0.05405405405405406,
+   "runs": 74
+  },
+  {
+   "any_effect_rate": 0.1206896551724138,
+   "bases_moved_share": 0.05555555555555555,
+   "cost_or_warning_only_rate": 0.06896551724137931,
+   "key": "consistency",
+   "label": "If two people change the same thing at the same moment, must everyone see one agreed result at once?",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.034482758620689655,
+    "frontend": 0.017241379310344827,
+    "hosting": 0.0
+   },
+   "pick_change_rate": 0.05172413793103448,
+   "runs": 58
+  },
+  {
+   "any_effect_rate": 0.5145631067961165,
+   "bases_moved_share": 0.16666666666666666,
+   "cost_or_warning_only_rate": 0.46601941747572817,
    "key": "special_workloads",
    "label": "Special workloads",
    "layer_rates": {
-    "backend": 0.023415627386103335,
-    "database": 0.010944260626113514,
-    "frontend": 0.00814456604734029,
-    "hosting": 0.021634003563247645
+    "backend": 0.019417475728155338,
+    "database": 0.0048543689320388345,
+    "frontend": 0.0,
+    "hosting": 0.038834951456310676
    },
-   "pick_change_rate": 0.04250445405955714,
-   "runs": 3929
+   "pick_change_rate": 0.04854368932038835,
+   "runs": 206
   },
   {
-   "any_effect_rate": 0.1252336448598131,
-   "bases_moved_share": 0.04240631163708087,
-   "cost_or_warning_only_rate": 0.0985981308411215,
-   "key": "traffic_pattern",
-   "label": "Traffic pattern",
-   "layer_rates": {
-    "backend": 0.009813084112149532,
-    "database": 0.009813084112149532,
-    "frontend": 0.001869158878504673,
-    "hosting": 0.010280373831775701
-   },
-   "pick_change_rate": 0.02663551401869159,
-   "runs": 2140
-  },
-  {
-   "any_effect_rate": 0.10037998733375554,
-   "bases_moved_share": 0.05029585798816568,
-   "cost_or_warning_only_rate": 0.07473084230525649,
+   "any_effect_rate": 0.09239130434782608,
+   "bases_moved_share": 0.037037037037037035,
+   "cost_or_warning_only_rate": 0.07065217391304347,
    "key": "cacheable_share",
    "label": "How much of the traffic can be cached?",
    "layer_rates": {
-    "backend": 0.007283090563647878,
-    "database": 0.012349588347055098,
-    "frontend": 0.0015832805573147563,
-    "hosting": 0.007916402786573781
+    "backend": 0.0,
+    "database": 0.005434782608695652,
+    "frontend": 0.0,
+    "hosting": 0.021739130434782608
    },
-   "pick_change_rate": 0.02564914502849905,
-   "runs": 3158
+   "pick_change_rate": 0.021739130434782608,
+   "runs": 184
   },
   {
-   "any_effect_rate": 0.3292972972972973,
-   "bases_moved_share": 0.054240631163708086,
-   "cost_or_warning_only_rate": 0.30767567567567566,
-   "key": "regions",
-   "label": "Where are your users?",
+   "any_effect_rate": 0.07874015748031496,
+   "bases_moved_share": 0.018518518518518517,
+   "cost_or_warning_only_rate": 0.06299212598425197,
+   "key": "traffic_pattern",
+   "label": "Traffic pattern",
    "layer_rates": {
-    "backend": 0.0041081081081081085,
-    "database": 0.0034594594594594594,
-    "frontend": 0.0017297297297297297,
-    "hosting": 0.01902702702702703
+    "backend": 0.015748031496062992,
+    "database": 0.015748031496062992,
+    "frontend": 0.0,
+    "hosting": 0.0
    },
-   "pick_change_rate": 0.021621621621621623,
-   "runs": 4625
+   "pick_change_rate": 0.015748031496062992,
+   "runs": 127
   },
   {
-   "any_effect_rate": 0.044642857142857144,
-   "bases_moved_share": 0.01775147928994083,
-   "cost_or_warning_only_rate": 0.02857142857142857,
+   "any_effect_rate": 0.11764705882352941,
+   "bases_moved_share": 0.018518518518518517,
+   "cost_or_warning_only_rate": 0.10294117647058823,
    "key": "enterprise_sso",
    "label": "Customers sign in with their company account (SSO)",
    "layer_rates": {
-    "backend": 0.0125,
-    "database": 0.0026785714285714286,
-    "frontend": 0.0035714285714285713,
-    "hosting": 0.0026785714285714286
+    "backend": 0.014705882352941176,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.0
    },
-   "pick_change_rate": 0.01607142857142857,
-   "runs": 1120
+   "pick_change_rate": 0.014705882352941176,
+   "runs": 68
+  },
+  {
+   "any_effect_rate": 0.22099447513812154,
+   "bases_moved_share": 0.037037037037037035,
+   "cost_or_warning_only_rate": 0.20994475138121546,
+   "key": "ml_features",
+   "label": "Machine-learning features",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.011049723756906077
+   },
+   "pick_change_rate": 0.011049723756906077,
+   "runs": 181
+  },
+  {
+   "any_effect_rate": 0.2510460251046025,
+   "bases_moved_share": 0.037037037037037035,
+   "cost_or_warning_only_rate": 0.24267782426778242,
+   "key": "regions",
+   "label": "Where are your users?",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.008368200836820083
+   },
+   "pick_change_rate": 0.008368200836820083,
+   "runs": 239
   }
  ],
  "bases": {
   "presets": 14,
-  "random": 1000,
+  "random": 40,
   "seed": 2026
  },
- "engine_runs": 135321,
+ "engine_runs": 8159,
  "presets_only": [
   {
    "any_effect_rate": 0.8969072164948454,
@@ -564,9 +654,9 @@
    "runs": 28
   },
   {
-   "any_effect_rate": 0.5714285714285714,
+   "any_effect_rate": 0.75,
    "bases_moved_share": 1.0,
-   "cost_or_warning_only_rate": 0.0,
+   "cost_or_warning_only_rate": 0.17857142857142858,
    "key": "platforms",
    "label": "Client platforms",
    "layer_rates": {
@@ -594,19 +684,49 @@
    "runs": 28
   },
   {
-   "any_effect_rate": 0.8333333333333334,
-   "bases_moved_share": 0.6428571428571429,
-   "cost_or_warning_only_rate": 0.40476190476190477,
+   "any_effect_rate": 0.875,
+   "bases_moved_share": 0.7857142857142857,
+   "cost_or_warning_only_rate": 0.39285714285714285,
    "key": "cloud_preference",
    "label": "Preferred cloud",
    "layer_rates": {
-    "backend": 0.09523809523809523,
-    "database": 0.023809523809523808,
+    "backend": 0.10714285714285714,
+    "database": 0.05357142857142857,
     "frontend": 0.0,
-    "hosting": 0.42857142857142855
+    "hosting": 0.4642857142857143
    },
-   "pick_change_rate": 0.42857142857142855,
-   "runs": 42
+   "pick_change_rate": 0.48214285714285715,
+   "runs": 56
+  },
+  {
+   "any_effect_rate": 0.4642857142857143,
+   "bases_moved_share": 0.9285714285714286,
+   "cost_or_warning_only_rate": 0.0,
+   "key": "air_gapped",
+   "label": "Air-gapped (no internet connection)",
+   "layer_rates": {
+    "backend": 0.14285714285714285,
+    "database": 0.07142857142857142,
+    "frontend": 0.0,
+    "hosting": 0.4642857142857143
+   },
+   "pick_change_rate": 0.4642857142857143,
+   "runs": 28
+  },
+  {
+   "any_effect_rate": 0.4642857142857143,
+   "bases_moved_share": 0.9285714285714286,
+   "cost_or_warning_only_rate": 0.0,
+   "key": "self_managed",
+   "label": "We run our own VMs in the cloud",
+   "layer_rates": {
+    "backend": 0.14285714285714285,
+    "database": 0.07142857142857142,
+    "frontend": 0.0,
+    "hosting": 0.4642857142857143
+   },
+   "pick_change_rate": 0.4642857142857143,
+   "runs": 28
   },
   {
    "any_effect_rate": 0.7,
@@ -759,6 +879,21 @@
    "runs": 28
   },
   {
+   "any_effect_rate": 0.39097744360902253,
+   "bases_moved_share": 0.5,
+   "cost_or_warning_only_rate": 0.21052631578947367,
+   "key": "compliance",
+   "label": "Compliance & data residency",
+   "layer_rates": {
+    "backend": 0.05263157894736842,
+    "database": 0.0,
+    "frontend": 0.007518796992481203,
+    "hosting": 0.18045112781954886
+   },
+   "pick_change_rate": 0.18045112781954886,
+   "runs": 133
+  },
+  {
    "any_effect_rate": 0.6444444444444445,
    "bases_moved_share": 0.21428571428571427,
    "cost_or_warning_only_rate": 0.4666666666666667,
@@ -787,21 +922,6 @@
    },
    "pick_change_rate": 0.17307692307692307,
    "runs": 52
-  },
-  {
-   "any_effect_rate": 0.4095238095238095,
-   "bases_moved_share": 0.5,
-   "cost_or_warning_only_rate": 0.23809523809523808,
-   "key": "compliance",
-   "label": "Compliance & data residency",
-   "layer_rates": {
-    "backend": 0.05714285714285714,
-    "database": 0.0,
-    "frontend": 0.0,
-    "hosting": 0.17142857142857143
-   },
-   "pick_change_rate": 0.17142857142857143,
-   "runs": 105
   },
   {
    "any_effect_rate": 0.37254901960784315,
@@ -879,19 +999,19 @@
    "runs": 37
   },
   {
-   "any_effect_rate": 0.10204081632653061,
-   "bases_moved_share": 0.35714285714285715,
+   "any_effect_rate": 0.10317460317460317,
+   "bases_moved_share": 0.42857142857142855,
    "cost_or_warning_only_rate": 0.0,
    "key": "priorities",
    "label": "Your top 3 priorities (first = most important)",
    "layer_rates": {
-    "backend": 0.030612244897959183,
+    "backend": 0.031746031746031744,
     "database": 0.0,
-    "frontend": 0.02040816326530612,
-    "hosting": 0.061224489795918366
+    "frontend": 0.015873015873015872,
+    "hosting": 0.07142857142857142
    },
-   "pick_change_rate": 0.10204081632653061,
-   "runs": 98
+   "pick_change_rate": 0.10317460317460317,
+   "runs": 126
   },
   {
    "any_effect_rate": 0.09523809523809523,
@@ -939,6 +1059,21 @@
    "runs": 28
   },
   {
+   "any_effect_rate": 0.10714285714285714,
+   "bases_moved_share": 0.14285714285714285,
+   "cost_or_warning_only_rate": 0.03571428571428571,
+   "key": "has_devops",
+   "label": "Someone can operate infrastructure",
+   "layer_rates": {
+    "backend": 0.03571428571428571,
+    "database": 0.0,
+    "frontend": 0.03571428571428571,
+    "hosting": 0.0
+   },
+   "pick_change_rate": 0.07142857142857142,
+   "runs": 28
+  },
+  {
    "any_effect_rate": 0.19230769230769232,
    "bases_moved_share": 0.14285714285714285,
    "cost_or_warning_only_rate": 0.1346153846153846,
@@ -952,6 +1087,36 @@
    },
    "pick_change_rate": 0.057692307692307696,
    "runs": 52
+  },
+  {
+   "any_effect_rate": 0.5,
+   "bases_moved_share": 0.14285714285714285,
+   "cost_or_warning_only_rate": 0.4642857142857143,
+   "key": "ml_features",
+   "label": "Machine-learning features",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.03571428571428571
+   },
+   "pick_change_rate": 0.03571428571428571,
+   "runs": 56
+  },
+  {
+   "any_effect_rate": 0.07142857142857142,
+   "bases_moved_share": 0.07142857142857142,
+   "cost_or_warning_only_rate": 0.03571428571428571,
+   "key": "team_experience",
+   "label": "Team experience",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.03571428571428571
+   },
+   "pick_change_rate": 0.03571428571428571,
+   "runs": 56
   },
   {
    "any_effect_rate": 0.3389830508474576,
@@ -1027,519 +1192,624 @@
    },
    "pick_change_rate": 0.0,
    "runs": 56
+  },
+  {
+   "any_effect_rate": 0.0,
+   "bases_moved_share": 0.0,
+   "cost_or_warning_only_rate": 0.0,
+   "key": "cloud_required",
+   "label": "Must use this cloud (hard constraint)",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.0
+   },
+   "pick_change_rate": 0.0,
+   "runs": 28
   }
  ],
  "random_only": [
   {
-   "any_effect_rate": 0.925463994060876,
+   "any_effect_rate": 0.9040590405904059,
    "bases_moved_share": 1.0,
    "cost_or_warning_only_rate": 0.0,
    "key": "team_skills",
    "label": "Existing team skills",
    "layer_rates": {
-    "backend": 0.8302895322939866,
-    "database": 0.20311804008908685,
-    "frontend": 0.4785449146250928,
-    "hosting": 0.23251670378619155
+    "backend": 0.8376383763837638,
+    "database": 0.09225092250922509,
+    "frontend": 0.4317343173431734,
+    "hosting": 0.06273062730627306
    },
-   "pick_change_rate": 0.925463994060876,
-   "runs": 6735
+   "pick_change_rate": 0.9040590405904059,
+   "runs": 271
   },
   {
-   "any_effect_rate": 0.6792543021032504,
-   "bases_moved_share": 1.0,
-   "cost_or_warning_only_rate": 0.0019120458891013384,
-   "key": "deployment",
-   "label": "Deployment model",
+   "any_effect_rate": 0.9069767441860465,
+   "bases_moved_share": 0.8,
+   "cost_or_warning_only_rate": 0.16279069767441862,
+   "key": "air_gapped",
+   "label": "Air-gapped (no internet connection)",
    "layer_rates": {
-    "backend": 0.09751434034416825,
-    "database": 0.10564053537284895,
-    "frontend": 0.05783938814531549,
-    "hosting": 0.630019120458891
+    "backend": 0.046511627906976744,
+    "database": 0.09302325581395349,
+    "frontend": 0.046511627906976744,
+    "hosting": 0.7441860465116279
    },
-   "pick_change_rate": 0.6773422562141491,
-   "runs": 2092
+   "pick_change_rate": 0.7441860465116279,
+   "runs": 43
   },
   {
-   "any_effect_rate": 0.7442353564802544,
-   "bases_moved_share": 0.995,
-   "cost_or_warning_only_rate": 0.08494566657831965,
+   "any_effect_rate": 0.7752442996742671,
+   "bases_moved_share": 1.0,
+   "cost_or_warning_only_rate": 0.1237785016286645,
    "key": "data_shapes",
    "label": "What kinds of data do you store? (pick the main kind first)",
    "layer_rates": {
-    "backend": 0.05380333951762523,
-    "database": 0.6498807315133845,
-    "frontend": 0.01815531407368142,
-    "hosting": 0.05168301086668434
+    "backend": 0.04560260586319218,
+    "database": 0.6514657980456026,
+    "frontend": 0.016286644951140065,
+    "hosting": 0.006514657980456026
    },
-   "pick_change_rate": 0.6592896899019348,
-   "runs": 7546
+   "pick_change_rate": 0.6514657980456026,
+   "runs": 307
   },
   {
-   "any_effect_rate": 0.6242568370986921,
-   "bases_moved_share": 0.993,
-   "cost_or_warning_only_rate": 0.07609988109393578,
+   "any_effect_rate": 0.5802469135802469,
+   "bases_moved_share": 0.675,
+   "cost_or_warning_only_rate": 0.09876543209876543,
+   "key": "deployment",
+   "label": "Deployment model",
+   "layer_rates": {
+    "backend": 0.06172839506172839,
+    "database": 0.06172839506172839,
+    "frontend": 0.04938271604938271,
+    "hosting": 0.43209876543209874
+   },
+   "pick_change_rate": 0.48148148148148145,
+   "runs": 81
+  },
+  {
+   "any_effect_rate": 0.6554621848739496,
+   "bases_moved_share": 1.0,
+   "cost_or_warning_only_rate": 0.18487394957983194,
    "key": "platforms",
    "label": "Client platforms",
    "layer_rates": {
-    "backend": 0.030519223147047168,
-    "database": 0.006341656757827983,
-    "frontend": 0.5473642489100278,
-    "hosting": 0.003963535473642489
+    "backend": 0.03361344537815126,
+    "database": 0.01680672268907563,
+    "frontend": 0.47058823529411764,
+    "hosting": 0.0
    },
-   "pick_change_rate": 0.5481569560047562,
-   "runs": 2523
+   "pick_change_rate": 0.47058823529411764,
+   "runs": 119
   },
   {
-   "any_effect_rate": 0.8152208964850048,
-   "bases_moved_share": 0.752,
-   "cost_or_warning_only_rate": 0.3747178329571106,
-   "key": "availability",
-   "label": "Availability target",
-   "layer_rates": {
-    "backend": 0.06385037084811351,
-    "database": 0.07062237987745888,
-    "frontend": 0.03643985811028701,
-    "hosting": 0.39503386004514673
-   },
-   "pick_change_rate": 0.4405030635278942,
-   "runs": 3101
-  },
-  {
-   "any_effect_rate": 0.5780251494537209,
-   "bases_moved_share": 0.799,
-   "cost_or_warning_only_rate": 0.1445062873634302,
-   "key": "team_size",
-   "label": "Engineering team size",
-   "layer_rates": {
-    "backend": 0.30220573077715934,
-    "database": 0.05916305916305916,
-    "frontend": 0.14883529169243456,
-    "hosting": 0.09503195217480932
-   },
-   "pick_change_rate": 0.43351886209029067,
-   "runs": 4851
-  },
-  {
-   "any_effect_rate": 0.6922695328648202,
-   "bases_moved_share": 0.865,
-   "cost_or_warning_only_rate": 0.3149235221165771,
-   "key": "app_type",
-   "label": "Application type",
-   "layer_rates": {
-    "backend": 0.17478296816866473,
-    "database": 0.09772633319553535,
-    "frontend": 0.13517982637453493,
-    "hosting": 0.07589913187267466
-   },
-   "pick_change_rate": 0.3773460107482431,
-   "runs": 12095
-  },
-  {
-   "any_effect_rate": 0.7872535534158643,
-   "bases_moved_share": 0.746,
-   "cost_or_warning_only_rate": 0.45957511844719545,
-   "key": "existing_systems",
-   "label": "Existing systems you must keep",
-   "layer_rates": {
-    "backend": 0.04294666055326303,
-    "database": 0.3038361607825157,
-    "frontend": 0.014519333639003516,
-    "hosting": 0.026440470732080085
-   },
-   "pick_change_rate": 0.32767843496866883,
-   "runs": 6543
-  },
-  {
-   "any_effect_rate": 0.5665871121718377,
-   "bases_moved_share": 0.475,
-   "cost_or_warning_only_rate": 0.25441527446300716,
-   "key": "seo",
-   "label": "Search engine visibility",
-   "layer_rates": {
-    "backend": 0.0076372315035799524,
-    "database": 0.006682577565632458,
-    "frontend": 0.30978520286396183,
-    "hosting": 0.002863961813842482
-   },
-   "pick_change_rate": 0.31217183770883056,
-   "runs": 2095
-  },
-  {
-   "any_effect_rate": 0.36527514231499053,
-   "bases_moved_share": 0.441,
-   "cost_or_warning_only_rate": 0.06641366223908918,
-   "key": "realtime",
-   "label": "Realtime needs",
-   "layer_rates": {
-    "backend": 0.15891840607210625,
-    "database": 0.06783681214421253,
-    "frontend": 0.06499051233396584,
-    "hosting": 0.08823529411764706
-   },
-   "pick_change_rate": 0.29886148007590135,
-   "runs": 2108
-  },
-  {
-   "any_effect_rate": 0.6780903665814152,
-   "bases_moved_share": 0.547,
-   "cost_or_warning_only_rate": 0.38158567774936064,
-   "key": "budget_monthly",
-   "label": "Monthly infrastructure budget",
-   "layer_rates": {
-    "backend": 0.06922421142369992,
-    "database": 0.13128729752770674,
-    "frontend": 0.026427962489343565,
-    "hosting": 0.18056265984654732
-   },
-   "pick_change_rate": 0.29650468883205455,
-   "runs": 5865
-  },
-  {
-   "any_effect_rate": 0.6979066022544284,
-   "bases_moved_share": 0.468,
-   "cost_or_warning_only_rate": 0.4115942028985507,
+   "any_effect_rate": 0.6646706586826348,
+   "bases_moved_share": 0.525,
+   "cost_or_warning_only_rate": 0.2754491017964072,
    "key": "cloud_preference",
    "label": "Preferred cloud",
    "layer_rates": {
-    "backend": 0.028663446054750404,
-    "database": 0.05185185185185185,
-    "frontend": 0.012560386473429951,
-    "hosting": 0.26537842190016103
+    "backend": 0.059880239520958084,
+    "database": 0.059880239520958084,
+    "frontend": 0.029940119760479042,
+    "hosting": 0.38922155688622756
    },
-   "pick_change_rate": 0.2863123993558776,
-   "runs": 3105
+   "pick_change_rate": 0.38922155688622756,
+   "runs": 167
   },
   {
-   "any_effect_rate": 0.25992063492063494,
-   "bases_moved_share": 0.546,
+   "any_effect_rate": 0.5567010309278351,
+   "bases_moved_share": 0.775,
+   "cost_or_warning_only_rate": 0.18041237113402062,
+   "key": "team_size",
+   "label": "Engineering team size",
+   "layer_rates": {
+    "backend": 0.30927835051546393,
+    "database": 0.030927835051546393,
+    "frontend": 0.08762886597938144,
+    "hosting": 0.030927835051546393
+   },
+   "pick_change_rate": 0.37628865979381443,
+   "runs": 194
+  },
+  {
+   "any_effect_rate": 0.5421686746987951,
+   "bases_moved_share": 0.65,
+   "cost_or_warning_only_rate": 0.1686746987951807,
+   "key": "seo",
+   "label": "Search engine visibility",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.37349397590361444,
+    "hosting": 0.0
+   },
+   "pick_change_rate": 0.37349397590361444,
+   "runs": 83
+  },
+  {
+   "any_effect_rate": 0.8536585365853658,
+   "bases_moved_share": 0.65,
+   "cost_or_warning_only_rate": 0.4878048780487805,
+   "key": "availability",
+   "label": "Availability target",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.04065040650406504,
+    "frontend": 0.06504065040650407,
+    "hosting": 0.3252032520325203
+   },
+   "pick_change_rate": 0.36585365853658536,
+   "runs": 123
+  },
+  {
+   "any_effect_rate": 0.8015267175572519,
+   "bases_moved_share": 0.85,
+   "cost_or_warning_only_rate": 0.46946564885496184,
+   "key": "existing_systems",
+   "label": "Existing systems you must keep",
+   "layer_rates": {
+    "backend": 0.019083969465648856,
+    "database": 0.3244274809160305,
+    "frontend": 0.007633587786259542,
+    "hosting": 0.0
+   },
+   "pick_change_rate": 0.3320610687022901,
+   "runs": 262
+  },
+  {
+   "any_effect_rate": 0.3373493975903614,
+   "bases_moved_share": 0.475,
+   "cost_or_warning_only_rate": 0.024096385542168676,
+   "key": "lock_in_tolerance",
+   "label": "Vendor lock-in tolerance",
+   "layer_rates": {
+    "backend": 0.04819277108433735,
+    "database": 0.13253012048192772,
+    "frontend": 0.12048192771084337,
+    "hosting": 0.03614457831325301
+   },
+   "pick_change_rate": 0.3132530120481928,
+   "runs": 83
+  },
+  {
+   "any_effect_rate": 0.3176470588235294,
+   "bases_moved_share": 0.45,
+   "cost_or_warning_only_rate": 0.023529411764705882,
+   "key": "realtime",
+   "label": "Realtime needs",
+   "layer_rates": {
+    "backend": 0.15294117647058825,
+    "database": 0.08235294117647059,
+    "frontend": 0.047058823529411764,
+    "hosting": 0.058823529411764705
+   },
+   "pick_change_rate": 0.29411764705882354,
+   "runs": 85
+  },
+  {
+   "any_effect_rate": 0.6929460580912863,
+   "bases_moved_share": 0.775,
+   "cost_or_warning_only_rate": 0.4190871369294606,
+   "key": "app_type",
+   "label": "Application type",
+   "layer_rates": {
+    "backend": 0.14730290456431536,
+    "database": 0.026970954356846474,
+    "frontend": 0.10995850622406639,
+    "hosting": 0.029045643153526972
+   },
+   "pick_change_rate": 0.27385892116182575,
+   "runs": 482
+  },
+  {
+   "any_effect_rate": 0.24,
+   "bases_moved_share": 0.3,
+   "cost_or_warning_only_rate": 0.0,
+   "key": "self_managed",
+   "label": "We run our own VMs in the cloud",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.24
+   },
+   "pick_change_rate": 0.24,
+   "runs": 50
+  },
+  {
+   "any_effect_rate": 0.21637426900584794,
+   "bases_moved_share": 0.575,
    "cost_or_warning_only_rate": 0.0,
    "key": "priorities",
    "label": "Your top 3 priorities (first = most important)",
    "layer_rates": {
-    "backend": 0.1333943833943834,
-    "database": 0.051739926739926737,
-    "frontend": 0.08134920634920635,
-    "hosting": 0.06684981684981685
+    "backend": 0.11403508771929824,
+    "database": 0.03508771929824561,
+    "frontend": 0.06432748538011696,
+    "hosting": 0.04678362573099415
    },
-   "pick_change_rate": 0.25992063492063494,
-   "runs": 6552
+   "pick_change_rate": 0.21637426900584794,
+   "runs": 342
   },
   {
-   "any_effect_rate": 0.26424126376256585,
-   "bases_moved_share": 0.394,
-   "cost_or_warning_only_rate": 0.005265677357587362,
-   "key": "lock_in_tolerance",
-   "label": "Vendor lock-in tolerance",
-   "layer_rates": {
-    "backend": 0.06893250359023456,
-    "database": 0.11680229775011967,
-    "frontend": 0.09334609861177597,
-    "hosting": 0.06941120153183342
-   },
-   "pick_change_rate": 0.2589755864049785,
-   "runs": 2089
-  },
-  {
-   "any_effect_rate": 0.8164388129376459,
-   "bases_moved_share": 0.527,
-   "cost_or_warning_only_rate": 0.5735245081693898,
+   "any_effect_rate": 0.7458333333333333,
+   "bases_moved_share": 0.525,
+   "cost_or_warning_only_rate": 0.5375,
    "key": "dau",
    "label": "Daily active users (or active devices)",
    "layer_rates": {
-    "backend": 0.08069356452150717,
-    "database": 0.10386795598532844,
-    "frontend": 0.022674224741580526,
-    "hosting": 0.13471157052350782
+    "backend": 0.025,
+    "database": 0.025,
+    "frontend": 0.025,
+    "hosting": 0.15
    },
-   "pick_change_rate": 0.2429143047682561,
-   "runs": 5998
+   "pick_change_rate": 0.20833333333333334,
+   "runs": 240
   },
   {
-   "any_effect_rate": 0.42225,
-   "bases_moved_share": 0.477,
-   "cost_or_warning_only_rate": 0.2055,
+   "any_effect_rate": 0.35,
+   "bases_moved_share": 0.425,
+   "cost_or_warning_only_rate": 0.14375,
    "key": "latency_target_ms",
    "label": "How fast must the app answer? (slowest 1 in 20 requests, ms)",
    "layer_rates": {
-    "backend": 0.1035,
-    "database": 0.03225,
-    "frontend": 0.05025,
-    "hosting": 0.1005
+    "backend": 0.05625,
+    "database": 0.0125,
+    "frontend": 0.09375,
+    "hosting": 0.0625
    },
-   "pick_change_rate": 0.21675,
-   "runs": 4000
+   "pick_change_rate": 0.20625,
+   "runs": 160
   },
   {
-   "any_effect_rate": 0.5703125,
-   "bases_moved_share": 0.41,
-   "cost_or_warning_only_rate": 0.35799632352941174,
+   "any_effect_rate": 0.27419354838709675,
+   "bases_moved_share": 0.35,
+   "cost_or_warning_only_rate": 0.08870967741935484,
+   "key": "team_experience",
+   "label": "Team experience",
+   "layer_rates": {
+    "backend": 0.14516129032258066,
+    "database": 0.008064516129032258,
+    "frontend": 0.04032258064516129,
+    "hosting": 0.03225806451612903
+   },
+   "pick_change_rate": 0.18548387096774194,
+   "runs": 124
+  },
+  {
+   "any_effect_rate": 0.6417910447761194,
+   "bases_moved_share": 0.3,
+   "cost_or_warning_only_rate": 0.47761194029850745,
+   "key": "peak_rps",
+   "label": "Peak requests per second (optional)",
+   "layer_rates": {
+    "backend": 0.022388059701492536,
+    "database": 0.029850746268656716,
+    "frontend": 0.007462686567164179,
+    "hosting": 0.13432835820895522
+   },
+   "pick_change_rate": 0.16417910447761194,
+   "runs": 134
+  },
+  {
+   "any_effect_rate": 0.42857142857142855,
+   "bases_moved_share": 0.15,
+   "cost_or_warning_only_rate": 0.2857142857142857,
+   "key": "offline",
+   "label": "Offline support required",
+   "layer_rates": {
+    "backend": 0.023809523809523808,
+    "database": 0.023809523809523808,
+    "frontend": 0.11904761904761904,
+    "hosting": 0.0
+   },
+   "pick_change_rate": 0.14285714285714285,
+   "runs": 42
+  },
+  {
+   "any_effect_rate": 0.5257142857142857,
+   "bases_moved_share": 0.3,
+   "cost_or_warning_only_rate": 0.3942857142857143,
    "key": "peak_concurrent",
    "label": "Users connected at the same moment, at peak (optional)",
    "layer_rates": {
-    "backend": 0.08272058823529412,
-    "database": 0.07329963235294118,
-    "frontend": 0.03354779411764706,
-    "hosting": 0.09949448529411764
+    "backend": 0.03428571428571429,
+    "database": 0.0,
+    "frontend": 0.04,
+    "hosting": 0.06285714285714286
    },
-   "pick_change_rate": 0.21231617647058823,
-   "runs": 4352
+   "pick_change_rate": 0.13142857142857142,
+   "runs": 175
   },
   {
-   "any_effect_rate": 0.29636224879165607,
-   "bases_moved_share": 0.433,
-   "cost_or_warning_only_rate": 0.08903586873569067,
+   "any_effect_rate": 0.5847457627118644,
+   "bases_moved_share": 0.325,
+   "cost_or_warning_only_rate": 0.4576271186440678,
+   "key": "budget_monthly",
+   "label": "Monthly infrastructure budget",
+   "layer_rates": {
+    "backend": 0.01694915254237288,
+    "database": 0.03389830508474576,
+    "frontend": 0.012711864406779662,
+    "hosting": 0.07627118644067797
+   },
+   "pick_change_rate": 0.1271186440677966,
+   "runs": 236
+  },
+  {
+   "any_effect_rate": 0.189873417721519,
+   "bases_moved_share": 0.25,
+   "cost_or_warning_only_rate": 0.06329113924050633,
    "key": "timeline_weeks",
    "label": "Time to MVP",
    "layer_rates": {
-    "backend": 0.11472907657084712,
-    "database": 0.027982701602645637,
-    "frontend": 0.06893920122106334,
-    "hosting": 0.04299160518951921
+    "backend": 0.08860759493670886,
+    "database": 0.012658227848101266,
+    "frontend": 0.04430379746835443,
+    "hosting": 0.006329113924050633
    },
-   "pick_change_rate": 0.2073263800559654,
-   "runs": 3931
+   "pick_change_rate": 0.12658227848101267,
+   "runs": 158
   },
   {
-   "any_effect_rate": 0.20305781175346393,
-   "bases_moved_share": 0.283,
-   "cost_or_warning_only_rate": 0.008600095556617296,
-   "key": "background_work",
-   "label": "Work that runs in the background",
-   "layer_rates": {
-    "backend": 0.042044911610129,
-    "database": 0.029622551361681796,
-    "frontend": 0.018155757286192068,
-    "hosting": 0.18442427138079312
-   },
-   "pick_change_rate": 0.19445771619684663,
-   "runs": 2093
-  },
-  {
-   "any_effect_rate": 0.1865847897968824,
-   "bases_moved_share": 0.291,
+   "any_effect_rate": 0.11764705882352941,
+   "bases_moved_share": 0.175,
    "cost_or_warning_only_rate": 0.0,
    "key": "tenancy",
    "label": "Do several customer organisations share the app?",
    "layer_rates": {
-    "backend": 0.048181388757675955,
-    "database": 0.1223429381199811,
-    "frontend": 0.024090694378837978,
-    "hosting": 0.038261691072272085
+    "backend": 0.023529411764705882,
+    "database": 0.09411764705882353,
+    "frontend": 0.0,
+    "hosting": 0.023529411764705882
    },
-   "pick_change_rate": 0.1865847897968824,
-   "runs": 2117
+   "pick_change_rate": 0.11764705882352941,
+   "runs": 85
   },
   {
-   "any_effect_rate": 0.6835669549657024,
-   "bases_moved_share": 0.277,
-   "cost_or_warning_only_rate": 0.5144646585147629,
-   "key": "peak_rps",
-   "label": "Peak requests per second (optional)",
-   "layer_rates": {
-    "backend": 0.05756039367730391,
-    "database": 0.05815687444079928,
-    "frontend": 0.018490903668356696,
-    "hosting": 0.08619147032508202
-   },
-   "pick_change_rate": 0.16910229645093947,
-   "runs": 3353
-  },
-  {
-   "any_effect_rate": 0.37569573283859,
-   "bases_moved_share": 0.182,
-   "cost_or_warning_only_rate": 0.20686456400742115,
-   "key": "offline",
-   "label": "Offline support required",
-   "layer_rates": {
-    "backend": 0.02411873840445269,
-    "database": 0.07884972170686456,
-    "frontend": 0.09090909090909091,
-    "hosting": 0.02504638218923933
-   },
-   "pick_change_rate": 0.16883116883116883,
-   "runs": 1078
-  },
-  {
-   "any_effect_rate": 0.2648401826484018,
-   "bases_moved_share": 0.177,
-   "cost_or_warning_only_rate": 0.10319634703196347,
-   "key": "consistency",
-   "label": "If two people change the same thing at the same moment, must everyone see one agreed result at once?",
-   "layer_rates": {
-    "backend": 0.011872146118721462,
-    "database": 0.154337899543379,
-    "frontend": 0.010958904109589041,
-    "hosting": 0.0228310502283105
-   },
-   "pick_change_rate": 0.16164383561643836,
-   "runs": 1095
-  },
-  {
-   "any_effect_rate": 0.32221163012392756,
-   "bases_moved_share": 0.244,
-   "cost_or_warning_only_rate": 0.16396568160152525,
+   "any_effect_rate": 0.2857142857142857,
+   "bases_moved_share": 0.175,
+   "cost_or_warning_only_rate": 0.17857142857142858,
    "key": "read_write",
    "label": "Do people mostly look at data, or mostly add and change it?",
    "layer_rates": {
-    "backend": 0.04242135367016206,
-    "database": 0.11630123927550047,
-    "frontend": 0.02001906577693041,
-    "hosting": 0.02716873212583413
+    "backend": 0.023809523809523808,
+    "database": 0.05952380952380952,
+    "frontend": 0.011904761904761904,
+    "hosting": 0.03571428571428571
    },
-   "pick_change_rate": 0.15824594852240229,
-   "runs": 2098
+   "pick_change_rate": 0.10714285714285714,
+   "runs": 84
   },
   {
-   "any_effect_rate": 0.44382782891174877,
-   "bases_moved_share": 0.3,
-   "cost_or_warning_only_rate": 0.28979426096372496,
+   "any_effect_rate": 0.1,
+   "bases_moved_share": 0.1,
+   "cost_or_warning_only_rate": 0.0,
+   "key": "cloud_required",
+   "label": "Must use this cloud (hard constraint)",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.1
+   },
+   "pick_change_rate": 0.1,
+   "runs": 40
+  },
+  {
+   "any_effect_rate": 0.12345679012345678,
+   "bases_moved_share": 0.2,
+   "cost_or_warning_only_rate": 0.024691358024691357,
+   "key": "background_work",
+   "label": "Work that runs in the background",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.09876543209876543
+   },
+   "pick_change_rate": 0.09876543209876543,
+   "runs": 81
+  },
+  {
+   "any_effect_rate": 0.336,
+   "bases_moved_share": 0.225,
+   "cost_or_warning_only_rate": 0.25066666666666665,
    "key": "compliance",
    "label": "Compliance & data residency",
    "layer_rates": {
-    "backend": 0.05129940443963184,
-    "database": 0.04074174336762317,
-    "frontend": 0.026529507309149974,
-    "hosting": 0.09380075798592312
+    "backend": 0.005333333333333333,
+    "database": 0.042666666666666665,
+    "frontend": 0.0026666666666666666,
+    "hosting": 0.06666666666666667
    },
-   "pick_change_rate": 0.15403356794802384,
-   "runs": 7388
+   "pick_change_rate": 0.08533333333333333,
+   "runs": 375
   },
   {
-   "any_effect_rate": 0.40969305331179323,
-   "bases_moved_share": 0.249,
-   "cost_or_warning_only_rate": 0.27948303715670436,
-   "key": "architecture",
-   "label": "Architecture preference",
-   "layer_rates": {
-    "backend": 0.05492730210016155,
-    "database": 0.017124394184168012,
-    "frontend": 0.011954765751211632,
-    "hosting": 0.08917609046849757
-   },
-   "pick_change_rate": 0.13021001615508884,
-   "runs": 3095
-  },
-  {
-   "any_effect_rate": 0.4548637159289822,
-   "bases_moved_share": 0.236,
-   "cost_or_warning_only_rate": 0.3348337084271068,
-   "key": "data_volume_gb",
-   "label": "Data volume at launch",
-   "layer_rates": {
-    "backend": 0.023755938984746188,
-    "database": 0.10152538134533634,
-    "frontend": 0.009502375593898474,
-    "hosting": 0.026756689172293072
-   },
-   "pick_change_rate": 0.12003000750187547,
-   "runs": 3999
-  },
-  {
-   "any_effect_rate": 0.33350037584565273,
-   "bases_moved_share": 0.181,
-   "cost_or_warning_only_rate": 0.24480080180405914,
-   "key": "data_growth_gb_month",
-   "label": "Data growth per month",
-   "layer_rates": {
-    "backend": 0.019543973941368076,
-    "database": 0.073916311701328,
-    "frontend": 0.004009020295665247,
-    "hosting": 0.023552994237033324
-   },
-   "pick_change_rate": 0.08869957404159358,
-   "runs": 3991
-  },
-  {
-   "any_effect_rate": 0.05214615111741752,
-   "bases_moved_share": 0.122,
-   "cost_or_warning_only_rate": 0.001064207165661582,
+   "any_effect_rate": 0.09649122807017543,
+   "bases_moved_share": 0.175,
+   "cost_or_warning_only_rate": 0.017543859649122806,
    "key": "user_actions",
    "label": "What do users do?",
    "layer_rates": {
-    "backend": 0.039020929407591345,
-    "database": 0.01915572898190848,
-    "frontend": 0.0070947144377438804,
-    "hosting": 0.02908832919474991
+    "backend": 0.07017543859649122,
+    "database": 0.03508771929824561,
+    "frontend": 0.0,
+    "hosting": 0.008771929824561403
    },
-   "pick_change_rate": 0.05108194395175594,
-   "runs": 2819
+   "pick_change_rate": 0.07894736842105263,
+   "runs": 114
   },
   {
-   "any_effect_rate": 0.5771812080536913,
-   "bases_moved_share": 0.108,
-   "cost_or_warning_only_rate": 0.5356220960247806,
-   "key": "special_workloads",
-   "label": "Special workloads",
+   "any_effect_rate": 0.44375,
+   "bases_moved_share": 0.15,
+   "cost_or_warning_only_rate": 0.36875,
+   "key": "data_volume_gb",
+   "label": "Data volume at launch",
    "layer_rates": {
-    "backend": 0.023231801755291687,
-    "database": 0.01109963861641714,
-    "frontend": 0.008260196179659268,
-    "hosting": 0.020392359318533816
+    "backend": 0.0375,
+    "database": 0.075,
+    "frontend": 0.0,
+    "hosting": 0.0
    },
-   "pick_change_rate": 0.04155911202891069,
-   "runs": 3874
+   "pick_change_rate": 0.075,
+   "runs": 160
   },
   {
-   "any_effect_rate": 0.1263107721639657,
-   "bases_moved_share": 0.043,
-   "cost_or_warning_only_rate": 0.09914204003813155,
-   "key": "traffic_pattern",
-   "label": "Traffic pattern",
+   "any_effect_rate": 0.13636363636363635,
+   "bases_moved_share": 0.075,
+   "cost_or_warning_only_rate": 0.06818181818181818,
+   "key": "consistency",
+   "label": "If two people change the same thing at the same moment, must everyone see one agreed result at once?",
    "layer_rates": {
-    "backend": 0.010009532888465206,
-    "database": 0.010009532888465206,
-    "frontend": 0.0019065776930409914,
-    "hosting": 0.010486177311725452
+    "backend": 0.0,
+    "database": 0.045454545454545456,
+    "frontend": 0.022727272727272728,
+    "hosting": 0.0
    },
-   "pick_change_rate": 0.02716873212583413,
-   "runs": 2098
+   "pick_change_rate": 0.06818181818181818,
+   "runs": 44
   },
   {
-   "any_effect_rate": 0.10219213410702772,
-   "bases_moved_share": 0.051,
-   "cost_or_warning_only_rate": 0.07607994842037395,
+   "any_effect_rate": 0.43548387096774194,
+   "bases_moved_share": 0.1,
+   "cost_or_warning_only_rate": 0.3790322580645161,
+   "key": "architecture",
+   "label": "Architecture preference",
+   "layer_rates": {
+    "backend": 0.03225806451612903,
+    "database": 0.008064516129032258,
+    "frontend": 0.008064516129032258,
+    "hosting": 0.016129032258064516
+   },
+   "pick_change_rate": 0.056451612903225805,
+   "runs": 124
+  },
+  {
+   "any_effect_rate": 0.36875,
+   "bases_moved_share": 0.1,
+   "cost_or_warning_only_rate": 0.31875,
+   "key": "data_growth_gb_month",
+   "label": "Data growth per month",
+   "layer_rates": {
+    "backend": 0.03125,
+    "database": 0.0375,
+    "frontend": 0.0125,
+    "hosting": 0.0
+   },
+   "pick_change_rate": 0.05,
+   "runs": 160
+  },
+  {
+   "any_effect_rate": 0.6521739130434783,
+   "bases_moved_share": 0.05,
+   "cost_or_warning_only_rate": 0.6086956521739131,
+   "key": "has_devops",
+   "label": "Someone can operate infrastructure",
+   "layer_rates": {
+    "backend": 0.021739130434782608,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.043478260869565216
+   },
+   "pick_change_rate": 0.043478260869565216,
+   "runs": 46
+  },
+  {
+   "any_effect_rate": 0.1328125,
+   "bases_moved_share": 0.05,
+   "cost_or_warning_only_rate": 0.1015625,
    "key": "cacheable_share",
    "label": "How much of the traffic can be cached?",
    "layer_rates": {
-    "backend": 0.007414571244358479,
-    "database": 0.012572533849129593,
-    "frontend": 0.0016118633139909735,
-    "hosting": 0.008059316569954868
+    "backend": 0.0,
+    "database": 0.0078125,
+    "frontend": 0.0,
+    "hosting": 0.03125
    },
-   "pick_change_rate": 0.02611218568665377,
-   "runs": 3102
+   "pick_change_rate": 0.03125,
+   "runs": 128
   },
   {
-   "any_effect_rate": 0.3291721419185282,
-   "bases_moved_share": 0.054,
-   "cost_or_warning_only_rate": 0.30749014454664914,
-   "key": "regions",
-   "label": "Where are your users?",
+   "any_effect_rate": 0.47019867549668876,
+   "bases_moved_share": 0.1,
+   "cost_or_warning_only_rate": 0.44370860927152317,
+   "key": "special_workloads",
+   "label": "Special workloads",
    "layer_rates": {
-    "backend": 0.004161191414805081,
-    "database": 0.003504161191414805,
-    "frontend": 0.0017520805957074025,
-    "hosting": 0.019053876478318004
+    "backend": 0.013245033112582781,
+    "database": 0.006622516556291391,
+    "frontend": 0.0,
+    "hosting": 0.013245033112582781
    },
-   "pick_change_rate": 0.021681997371879105,
-   "runs": 4566
+   "pick_change_rate": 0.026490066225165563,
+   "runs": 151
   },
   {
-   "any_effect_rate": 0.04304029304029304,
-   "bases_moved_share": 0.018,
-   "cost_or_warning_only_rate": 0.026556776556776556,
+   "any_effect_rate": 0.125,
+   "bases_moved_share": 0.025,
+   "cost_or_warning_only_rate": 0.1,
    "key": "enterprise_sso",
    "label": "Customers sign in with their company account (SSO)",
    "layer_rates": {
-    "backend": 0.01282051282051282,
-    "database": 0.0027472527472527475,
-    "frontend": 0.003663003663003663,
-    "hosting": 0.0027472527472527475
+    "backend": 0.025,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.0
    },
-   "pick_change_rate": 0.016483516483516484,
-   "runs": 1092
+   "pick_change_rate": 0.025,
+   "runs": 40
+  },
+  {
+   "any_effect_rate": 0.08235294117647059,
+   "bases_moved_share": 0.025,
+   "cost_or_warning_only_rate": 0.058823529411764705,
+   "key": "traffic_pattern",
+   "label": "Traffic pattern",
+   "layer_rates": {
+    "backend": 0.023529411764705882,
+    "database": 0.023529411764705882,
+    "frontend": 0.0,
+    "hosting": 0.0
+   },
+   "pick_change_rate": 0.023529411764705882,
+   "runs": 85
+  },
+  {
+   "any_effect_rate": 0.2222222222222222,
+   "bases_moved_share": 0.025,
+   "cost_or_warning_only_rate": 0.21666666666666667,
+   "key": "regions",
+   "label": "Where are your users?",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.005555555555555556
+   },
+   "pick_change_rate": 0.005555555555555556,
+   "runs": 180
+  },
+  {
+   "any_effect_rate": 0.096,
+   "bases_moved_share": 0.0,
+   "cost_or_warning_only_rate": 0.096,
+   "key": "ml_features",
+   "label": "Machine-learning features",
+   "layer_rates": {
+    "backend": 0.0,
+    "database": 0.0,
+    "frontend": 0.0,
+    "hosting": 0.0
+   },
+   "pick_change_rate": 0.0,
+   "runs": 125
   }
  ],
- "seconds": 5798.2
+ "seconds": 171.5
 }

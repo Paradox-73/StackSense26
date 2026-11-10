@@ -516,6 +516,41 @@
         "why": "One app per platform, each in its own language (Swift for iOS, Kotlin for Android)",
         "sources": ["https://developer.apple.com/swift/", "https://developer.android.com/kotlin"]
       }
+    },
+    {
+      "id": "no_frontend",
+      "name": "No frontend (API only)",
+      "kind": "none",
+      "platforms": [],
+      "summary": "No user interface: customers' own applications call the API, so the work is the API, its documentation and its client libraries.",
+      "scores": {
+        "ease": 5,
+        "ops": 5,
+        "maturity": 5,
+        "realtime": 3,
+        "performance": 5,
+        "seo": 1,
+        "velocity": 5,
+        "hiring": 5,
+        "offline": 1,
+        "structure": 3,
+        "interactivity": 1
+      },
+      "skills": [],
+      "related_skills": [],
+      "team_min": 1,
+      "lock_in": 1,
+      "strengths": [
+        "Nothing to build or host for a UI: the effort goes into the API contract",
+        "An OpenAPI description gives customers documentation and generated client libraries"
+      ],
+      "weaknesses": [
+        "A developer portal (docs, keys, usage) is still needed for customers to adopt the API"
+      ],
+      "sources": [
+        "https://spec.openapis.org/oas/latest.html",
+        "https://swagger.io/docs/specification/v3_0/about/"
+      ]
     }
   ]
 }

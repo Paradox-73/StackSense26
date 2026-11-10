@@ -94,6 +94,7 @@ Next.js (React) is the frontend for an ML / AI product project with about 30,000
 - React Native (Expo): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
+- No frontend (API only): You target a user interface, so a frontend is needed
 
 ### Backend: Python + FastAPI (90.0)
 
@@ -281,6 +282,9 @@ Runs here: Next.js (server rendering + static files), the Python + FastAPI API a
 - Hetzner Cloud / VPS (Docker, Coolify): No SOC 2 report available
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
+- AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Google Compute Engine VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Azure Virtual Machines (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
 
 ## Stack compatibility checks
 
@@ -289,6 +293,7 @@ Runs here: Next.js (server rendering + static files), the Python + FastAPI API a
 ## Supporting services
 
 - **Cache**: Redis/Valkey (Memorystore): Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database.
+- **Realtime**: WebSockets in the Python + FastAPI app (FastAPI WebSockets): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
 - **Vector search**: pgvector extension in the primary Postgres: Keeps embeddings next to relational data with transactional consistency; move to a dedicated vector DB only past ~10M+ vectors.
 - **Background jobs**: Celery / RQ / Dramatiq (Redis/Valkey broker): Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (Memorystore).
 - **Object storage**: Cloud Storage + Cloud CDN: Media and documents belong in object storage, not the database.

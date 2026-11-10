@@ -52,7 +52,8 @@ RULES = {
     "pci_host": "PCI DSS project: host and managed-only database are PCI DSS attested",
     "residency_region": "Data-residency project: host, BaaS and managed-only database have that region",
     "on_prem": "On-prem project: on-prem host, no FaaS or cloud-only BaaS, no managed-only database",
-    "mobile_frontend": "Mobile-only project (no web platform) gets a mobile frontend",
+    "mobile_frontend": "Mobile-only project (only iOS or Android) gets a mobile frontend",
+    "api_only_frontend": "An API-only project, and only such a project, gets no frontend",
     "strong_consistency": "Strong consistency never gets an eventually consistent primary database (unless all data is analytical or search, or the stated or app-type main shape is and consistency was not answered)",
     "worker_host": "Work that needs long-running processes (user-submitted code, jobs over 15 minutes, GPU work) gets a host that runs them, with GPUs for GPU work",
     "same_input_same_hash": "The same input twice gives byte-identical output",
@@ -131,8 +132,10 @@ def constraint_violations(inp: dict, r: dict) -> dict[str, list[str]]:
     if p.get("background_work") == "gpu" and not (host.get("runs") or {}).get("gpu"):
         bad("worker_host", f"host {host['id']} has no GPUs")
     plats = set(p.get("platforms") or [])
-    if plats and "web" not in plats and fe.get("kind") != "mobile":
+    if plats and plats <= {"ios", "android"} and fe.get("kind") != "mobile":
         bad("mobile_frontend", f"frontend {fe['id']} for platforms {sorted(plats)}")
+    if (plats == {"api_only"}) != (fe.get("kind") == "none"):
+        bad("api_only_frontend", f"frontend {fe['id']} for platforms {sorted(plats)}")
     # Analytical data and a search index are read in bulk or through an index, not records that a transaction
     # must protect, so a project whose only data shapes are these has no system of record for strong consistency to bind.
     # An unanswered consistency question does not bind when the stated (or app-type default) main shape is analytical or search: the

@@ -14,6 +14,31 @@
       },
       {
         "open": true,
+        "when": {
+          "kind": [
+            "none"
+          ]
+        },
+        "text": "There is no user interface to build: the customers' own code calls the API, about {peak} requests/s at peak from {users} {user_noun}."
+      },
+      {
+        "when": {
+          "kind": [
+            "none"
+          ]
+        },
+        "text": "The {weeks} weeks of {team_phrase} go into the API contract instead: an OpenAPI description, its reference documentation and the client libraries generated from it."
+      },
+      {
+        "when": {
+          "kind": [
+            "none"
+          ]
+        },
+        "text": "A web or mobile frontend would be a second codebase to build, host and keep in step with the API; add a developer portal for keys and usage when customers ask for one."
+      },
+      {
+        "open": true,
         "text": "{name} is the frontend for {app_phrase} with about {users} {user_noun} (~{peak} requests/s at peak), built by {team_phrase} in {weeks} weeks."
       },
       {

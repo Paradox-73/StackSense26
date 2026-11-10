@@ -224,7 +224,8 @@ def normalize(raw: dict | None) -> tuple[dict, list[dict], list[dict]]:
             if key == "regions" and not default:
                 assumptions.append({"field": key, "label": spec.get("label", key), "value": default, "kind": "default",
                                     "reason": "Not provided: no region is favoured when hosts are scored."})
-            elif key not in ("project_name", "peak_rps", "peak_concurrent", "background_work", "tenancy", "enterprise_sso", "team_skills", "compliance", "priorities", "existing_systems", "traffic_pattern", "cacheable_share"):
+            elif key not in ("project_name", "peak_rps", "peak_concurrent", "background_work", "tenancy", "enterprise_sso", "team_skills", "compliance", "priorities", "existing_systems", "traffic_pattern", "cacheable_share",
+                             "ml_features", "team_experience", "has_devops", "self_managed", "air_gapped", "cloud_required"):
                 assumptions.append({"field": key, "label": spec.get("label", key), "value": default, "kind": "default",
                                     "reason": f"Not provided; using default '{_fmt(default)}'."})
             continue
@@ -279,6 +280,10 @@ def normalize(raw: dict | None) -> tuple[dict, list[dict], list[dict]]:
         else:
             profile[key] = str(val)[:120]
 
+    if profile.get("air_gapped") and profile["deployment"] != "on_prem":
+        assumptions.append({"field": "deployment", "label": "Deployment model", "value": "on_prem", "kind": "derived",
+                            "reason": "Air-gapped servers have no internet connection, so they run on your own premises."})
+        profile["deployment"] = "on_prem"
     profile["dau"] = int(profile["dau"])
     profile["team_size"] = max(1, int(round(profile["team_size"])))
     profile["timeline_weeks"] = max(1, int(round(profile["timeline_weeks"])))
@@ -499,7 +504,9 @@ def derive(profile: dict, assumptions: list[dict], warnings: list[dict]) -> dict
     availability = float(p["availability"])
     skills = set(p["team_skills"])
     mobile = any(x in p["platforms"] for x in ("ios", "android"))
-    web = "web" in p["platforms"]
+    # A desktop app is the web frontend in a desktop shell (engine/advice.py adds the shell); API only has no frontend.
+    web = bool({"web", "desktop"} & set(p["platforms"]))
+    api_only = p["platforms"] == ["api_only"]
 
     arch = p["architecture"]
     actions = set(p.get("user_actions") or [])
@@ -553,6 +560,7 @@ def derive(profile: dict, assumptions: list[dict], warnings: list[dict]) -> dict
         "skills": skills,
         "mobile": mobile,
         "web": web,
+        "api_only": api_only,
         "primary_shape": p["data_shapes"][0],
         "secondary_shapes": p["data_shapes"][1:],
         "architecture": arch,

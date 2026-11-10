@@ -95,6 +95,7 @@ Next.js (React) is the frontend for an E-commerce / marketplace project with abo
 - React Native (Expo): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
+- No frontend (API only): You target a user interface, so a frontend is needed
 
 ### Backend: Node.js + NestJS (88.4)
 
@@ -291,6 +292,9 @@ Runs here: Next.js (server rendering + static files), the Node.js + NestJS API a
 - Hetzner Cloud / VPS (Docker, Coolify): The provider's SLA is 99.9% (each Cloud Server), below your 99.95% availability target; No PCI-DSS attestation published
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud; Docker Compose runs an app's containers on one Docker host and restarts them only on that host; placing and moving containers across several hosts is what Swarm or Kubernetes add: no automatic failover to a second host, so it cannot meet 99.95% availability
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
+- AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Google Compute Engine VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Azure Virtual Machines (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
 
 ## Supporting services
 

@@ -96,6 +96,7 @@ Server-rendered HTML + HTMX is the frontend for an Internal tool / admin panel p
 - React Native (Expo): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
+- No frontend (API only): You target a user interface, so a frontend is needed
 
 ### Backend: Python + Django (100.0)
 
@@ -298,6 +299,9 @@ Runs here: Server-rendered HTML + HTMX (server rendering + static files), the Py
 - Azure App Service / Container Apps: Public-cloud service; deployment must be on-premises
 - DigitalOcean (App Platform + Managed DBs): Public-cloud service; deployment must be on-premises
 - Hetzner Cloud / VPS (Docker, Coolify): Public-cloud service; deployment must be on-premises
+- AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs; Public-cloud service; deployment must be on-premises
+- Google Compute Engine VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs; Public-cloud service; deployment must be on-premises
+- Azure Virtual Machines (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs; Public-cloud service; deployment must be on-premises
 
 ## Stack compatibility checks
 

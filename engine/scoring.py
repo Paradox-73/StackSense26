@@ -43,6 +43,8 @@ INPUT_LABELS = {
     "consistency": "Consistency need", "architecture": "Architecture preference",
     "cloud_preference": "Cloud preference", "data_shapes": "Data shape", "regions": "User regions",
     "platforms": "Client platforms", "priorities": "Your priority", "existing_systems": "Existing systems", "stack": "Stack compatibility", "data_volume_gb": "Data volume",
+    "team_experience": "Team experience", "has_devops": "Infrastructure skills", "self_managed": "Self-managed VMs",
+    "cloud_required": "Required cloud", "ml_features": "Machine-learning features", "air_gapped": "Air-gapped network",
 }
 
 
@@ -50,10 +52,15 @@ INPUT_LABELS = {
 PRIORITY_CRITERIA = {
     "cost": [("cost", 2.0)], "speed": [("velocity", 1.5), ("ease", 0.5)], "scale": [("scalability", 1.5), ("performance", 0.5)],
     "performance": [("performance", 1.5), ("realtime", 0.3)], "low_ops": [("ops", 2.0)], "proven": [("maturity", 1.5), ("hiring", 0.5)],
+    # Maintainable: enforced structure and a small surface to operate; secure: the provider's attestations, audit
+    # logging and isolation options (the compliance-maturity criterion) and mature, well-patched tools.
+    "maintainability": [("structure", 1.0), ("ops", 0.7), ("maturity", 0.3)],
+    "security": [("compliance_maturity", 1.5), ("maturity", 0.5)],
 }
 PRIORITY_RANK_FACTOR = (1.0, 0.7, 0.4)
 PRIORITY_LABELS = {"cost": "lowest cost", "speed": "ship fastest", "scale": "scale to many users",
-                   "performance": "fast responses", "low_ops": "least maintenance", "proven": "proven, mature tools"}
+                   "performance": "fast responses", "low_ops": "least maintenance", "proven": "proven, mature tools",
+                   "maintainability": "easy to maintain", "security": "security"}
 EXISTING_SYSTEM_BONUS = 14.0
 # Existing-system answers that are databases in the knowledge base (the rest are flagged as unknown).
 KEPT_DATABASES = ("postgres", "mysql", "mongodb", "redis", "sqlserver")
@@ -135,6 +142,17 @@ def build_weights(p: dict, d: dict) -> Weights:
     if n >= 30:
         w.add("structure", "team_size", 1, "Large organisation")
         w.add("hiring", "team_size", 0.5, "Large organisation")
+
+    exp = p.get("team_experience", "intermediate")
+    if exp == "beginner":
+        w.add("ease", "team_experience", 1.5, "Beginner team: tools it can learn while building")
+        w.add("ops", "team_experience", 1, "Beginner team: managed services instead of servers to run")
+    elif exp == "mixed":
+        w.add("ease", "team_experience", 0.5, "Mixed experience: juniors must pick the tools up quickly")
+    elif exp == "senior":
+        w.add("ease", "team_experience", -0.3, "Senior team: the learning curve matters less")
+    if p.get("has_devops") is False:
+        w.add("ops", "has_devops", 1, "Nobody on the team operates infrastructure: favour managed services")
 
     tier = d["compute_tier"]
     if tier == 0:
@@ -668,6 +686,11 @@ def hard_constraints(layer: str, item: dict, p: dict, d: dict) -> list[tuple[str
     comp = item.get("compliance", {})
     kind = item.get("kind")
     if layer == "frontend":
+        if d.get("api_only") or kind == "none":
+            if d.get("api_only") != (kind == "none"):
+                out.append(("API only: there is no user interface to build" if d.get("api_only") else
+                            "You target a user interface, so a frontend is needed", "platforms", 0))
+            return out
         if not d["web"] and kind != "mobile":
             out.append(("Web-only framework; you target iOS/Android only", "platforms", 0))
         # A mobile-first app is built around the store app, so a mobile toolkit may be its primary frontend
@@ -684,6 +707,24 @@ def hard_constraints(layer: str, item: dict, p: dict, d: dict) -> list[tuple[str
         elif layer == "database" and d["data_12mo_gb"] > STATIC_CONTENT_MAX_GB:
             out.append((f"~{d['data_12mo_gb']:,.0f} GB within 12 months is too much to keep as files in git "
                         f"(over ~{STATIC_CONTENT_MAX_GB} GB)", "data_volume_gb", 0))
+    required = p.get("cloud_required") or p["cloud_preference"] == "no_hyperscaler"  # ruling clouds out is always a rule
+    if required and p["cloud_preference"] != "none" and p["deployment"] != "on_prem":
+        pref = p["cloud_preference"]
+        where = item.get("provider") if layer == "hosting" else item.get("cloud")
+        if layer == "backend" and kind == "baas":
+            where = item.get("cloud") or item["id"]
+        if (layer == "hosting" or where) and (where in HYPERSCALERS if pref == "no_hyperscaler" else where != pref):
+            out.append(("Runs on AWS, Google Cloud or Azure, which you ruled out" if pref == "no_hyperscaler" else
+                        f"Not on {CLOUD_NAMES[pref]}, the cloud you require", "cloud_preference", 0))
+    if p.get("self_managed") and p["deployment"] == "cloud":
+        if layer == "hosting" and kind != "vps":
+            out.append(("A managed platform; you run your own VMs", "self_managed", 0))
+        if layer == "backend" and kind in ("baas", "faas") and not item.get("self_hostable"):
+            out.append(("Managed-only platform; it cannot run on VMs you operate", "self_managed", 0))
+        if layer == "database" and item.get("managed_only"):
+            out.append(("Managed-only cloud database; it cannot run on VMs you operate", "self_managed", 0))
+    elif layer == "hosting" and item.get("vm"):
+        out.append(("Plain VMs your team patches and operates; offered when you choose self-managed VMs", "self_managed", 0))
     if p["deployment"] == "on_prem":
         if layer == "hosting" and not item.get("on_prem"):
             out.append(("Public-cloud service; deployment must be on-premises", "deployment", 0))
@@ -726,13 +767,14 @@ def hard_constraints(layer: str, item: dict, p: dict, d: dict) -> list[tuple[str
             out.append(("No PCI-DSS attestation published", "compliance", 0))
         if "soc2" in p["compliance"] and not comp.get("soc2", True):
             out.append(("No SOC 2 report available", "compliance", 0))
+        if "iso27001" in p["compliance"] and not comp.get("iso27001"):
+            out.append(("No ISO/IEC 27001 certification published", "compliance", 0))
         regions = item.get("residency_regions", item.get("regions"))
         if regions is not None:
             note = item.get("residency_note")
-            if "data_residency_india" in p["compliance"] and "india" not in regions:
-                out.append((note or "No India region; data must stay in India", "compliance", 0))
-            if "data_residency_eu" in p["compliance"] and "europe" not in regions:
-                out.append((note or "No EU region; data must stay in the EU", "compliance", 0))
+            for rule, region in RESIDENCY_RULES.items():
+                if rule in p["compliance"] and region not in regions:
+                    out.append((note or RESIDENCY_TEXT[rule], "compliance", 0))
     if (stated_avail and layer == "hosting" and kind != "onprem" and not sla and d["availability"] > 99.9
             and d["budget_usd"] > 0):
         # No published SLA commits to nothing, so a target above 99.9% fails it as surely as a lower SLA does.
@@ -998,7 +1040,11 @@ STRICT_LATENCY_MS = 50
 # cost more than always-on instances (engine/advice.py API_HOST_MIN_TIER uses the same tier).
 STEADY_TRAFFIC_TIER = 3
 # Data-residency answers and the region each one needs.
-RESIDENCY_RULES = {"data_residency_india": "india", "data_residency_eu": "europe"}
+RESIDENCY_RULES = {"data_residency_india": "india", "data_residency_eu": "europe", "data_residency_us": "north_america"}
+RESIDENCY_TEXT = {"data_residency_india": "No India region; data must stay in India",
+                  "data_residency_eu": "No EU region; data must stay in the EU",
+                  "data_residency_us": "No US region; data must stay in the US"}
+CLOUD_NAMES = {"aws": "AWS", "gcp": "Google Cloud", "azure": "Azure"}
 # A service that can keep the data in the region but needs extra work to do so (for example a part
 # that runs only in the US and must be kept free of personal data): one team-week of work and a
 # design constraint, the same size as missing platform skills.

@@ -166,7 +166,7 @@ def test_fonts_are_cited_in_report_and_readme():
 
 def test_no_assistant_or_team_wording_in_shipped_files():
     banned = re.compile("cl" + "aude|anth" + "ropic|co-auth" + "ored|pri" + "ze|team" + "mate", re.I)
-    skip = {".venv", "__pycache__", ".git", ".pytest_cache", "planning", "." + "cl" + "aude"}
+    skip = {".venv", "__pycache__", ".git", ".pytest_cache", "planning", "spec_10nov", "." + "cl" + "aude"}  # spec_10nov: organiser files, never packaged
     for path in ROOT.rglob("*"):
         if not path.is_file() or skip & set(path.relative_to(ROOT).parts) or path.name.upper().startswith("CL" + "AUDE"):
             continue

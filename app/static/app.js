@@ -160,7 +160,7 @@ const QUICK = [
 ];
 /* Order in which unknown answers are sent to /api/sensitivity (most decisive first): the measured order from
  * tools/question_influence.py (share of re-runs where changing the answer changed a pick), see report/question_influence.md. */
-const UNKNOWN_ORDER = ["team_skills", "deployment", "data_shapes", "platforms", "availability", "team_size", "app_type", "existing_systems", "seo", "realtime", "budget_monthly", "cloud_preference", "lock_in_tolerance", "priorities", "dau", "latency_target_ms", "peak_concurrent", "timeline_weeks", "background_work", "tenancy", "peak_rps", "offline", "consistency", "read_write", "compliance", "architecture", "data_volume_gb", "data_growth_gb_month", "user_actions", "special_workloads", "traffic_pattern", "cacheable_share", "regions", "enterprise_sso"];
+const UNKNOWN_ORDER = ["team_skills", "data_shapes", "air_gapped", "deployment", "platforms", "seo", "cloud_preference", "availability", "team_size", "self_managed", "existing_systems", "lock_in_tolerance", "app_type", "realtime", "dau", "latency_target_ms", "budget_monthly", "priorities", "background_work", "peak_rps", "peak_concurrent", "team_experience", "offline", "compliance", "tenancy", "timeline_weeks", "data_volume_gb", "read_write", "user_actions", "data_growth_gb_month", "architecture", "cloud_required", "has_devops", "consistency", "special_workloads", "cacheable_share", "traffic_pattern", "enterprise_sso", "ml_features", "regions"];
 /* How an answer is named inside a sentence ("Depends on your daily users"). */
 const FIELD_NOUN = {
   app_type: "what you are building", dau: "your daily users", budget_monthly: "your budget", team_size: "your team size",
@@ -171,6 +171,8 @@ const FIELD_NOUN = {
   read_write: "the read/write mix", data_volume_gb: "data volume", data_growth_gb_month: "data growth",
   architecture: "architecture preference", cloud_preference: "cloud preference", offline: "offline support",
   peak_rps: "peak requests per second", currency: "currency", peak_concurrent: "users online at once",
+  ml_features: "machine-learning features", team_experience: "your team's experience", has_devops: "who runs infrastructure",
+  self_managed: "running your own VMs", air_gapped: "an air-gapped network", cloud_required: "a required cloud",
 };
 const noun = (k) => FIELD_NOUN[k] || (fieldByKey(k) ? fieldByKey(k).label.toLowerCase() : k);
 

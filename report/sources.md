@@ -31,6 +31,8 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - frontend: Native iOS + Android (Swift / Kotlin): https://developer.android.com/compose
 - frontend: Native iOS + Android (Swift / Kotlin): https://developer.android.com/kotlin
 - frontend: Native iOS + Android (Swift / Kotlin): https://developer.apple.com/swift/
+- frontend: No frontend (API only): https://spec.openapis.org/oas/latest.html
+- frontend: No frontend (API only): https://swagger.io/docs/specification/v3_0/about/
 - backend: Node.js + Express: https://expressjs.com/
 - backend: Node.js + Express: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
 - backend: Node.js + Express: https://socket.io/docs/v4/
@@ -217,6 +219,10 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - hosting: On-prem Kubernetes (k3s / RKE2 / OpenShift): https://kubernetes.io/docs/home/
 - hosting: On-prem Kubernetes (k3s / RKE2 / OpenShift): https://docs.k3s.io/
 - hosting: On-prem Kubernetes (k3s / RKE2 / OpenShift): https://docs.rke2.io/
+- hosting: AWS EC2 VMs (Docker Compose): https://aws.amazon.com/ec2/pricing/on-demand/
+- hosting: Google Compute Engine VMs (Docker Compose): https://cloud.google.com/compute/vm-instance-pricing
+- hosting: Google Compute Engine VMs (Docker Compose): https://cloud.google.com/compute/sla
+- hosting: Azure Virtual Machines (Docker Compose): https://azure.microsoft.com/pricing/details/virtual-machines/linux/
 - rule nextjs_vercel: https://nextjs.org/docs/app/building-your-application/deploying
 - rule static_spa_frontend_paas: https://vite.dev/guide/static-deploy
 - rule supabase_postgres: https://supabase.com/docs/guides/database/overview
@@ -280,6 +286,8 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - input: background_work: https://docs.netlify.com/build/functions/background-functions/
 - input: background_work: https://docs.cloud.google.com/run/docs/configuring/services/gpu
 - input: background_work: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-tasks-services.html
+- input: ml_features: https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html
+- input: ml_features: https://cloud.google.com/vertex-ai/docs/predictions/overview
 - input: tenancy: https://www.postgresql.org/docs/current/ddl-rowsecurity.html
 - input: tenancy: https://learn.microsoft.com/en-us/sql/relational-databases/security/row-level-security
 - input: tenancy: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html
@@ -307,10 +315,13 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - input: team_size: https://martinfowler.com/bliki/MonolithFirst.html
 - input: team_size: https://teamtopologies.com/key-concepts
 - input: team_size: https://martinfowler.com/bliki/ConwaysLaw.html
-- input: team_skills: https://dora.dev/research/
+- input: team_experience: https://dora.dev/research/
+- input: team_experience: https://sre.google/sre-book/being-on-call/
+- input: has_devops: https://sre.google/sre-book/eliminating-toil/
 - input: architecture: https://martinfowler.com/articles/microservice-trade-offs.html
 - input: budget_monthly: https://aws.amazon.com/free/
 - input: budget_monthly: https://cloud.google.com/free
+- input: cloud_required: https://aws.amazon.com/compliance/shared-responsibility-model/
 - input: lock_in_tolerance: https://martinfowler.com/articles/oss-lockin.html
 - input: compliance: https://www.meity.gov.in/data-protection-framework
 - input: compliance: https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244

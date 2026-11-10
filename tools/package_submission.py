@@ -33,7 +33,8 @@ MAX_BYTES = 10 * 1024 * 1024
 # Top-level files and folders that may be packaged (everything else is left out).
 ALLOW_FILES = ["README.md", "run.py", "cli.py", "requirements.txt", "requirements.lock.txt", "requirements-dev.txt", ".gitignore", ".env.example"]
 ALLOW_DIRS = ["app", "engine", "data", "docs", "tests", "tools", "report", "benchmark", ".github"]
-SKIP_PARTS = {"__pycache__", ".pytest_cache", ".venv", ".git", "node_modules", "dist"}
+# spec_10nov holds the organisers' own statement files (kept out of git): never ours to ship.
+SKIP_PARTS = {"__pycache__", ".pytest_cache", ".venv", ".git", "node_modules", "dist", "spec_10nov"}
 SKIP_SUFFIXES = {".pyc", ".pyo", ".tmp", ".log"}
 # Paths that never ship: the internal recording checklist, the local counter of language-model calls, and any
 # secrets file. The allowlist already leaves them out; this is a second, explicit guard.

@@ -2,7 +2,7 @@
 
 Author: Kanav Bhardwaj (IIIT Bangalore), Synergy '26 StackSense Challenge. Source: this folder (submitted as `StackSense_submission.zip`)
 
-- StackSense asks up to 36 questions about a software project (scale, data, team, budget, compliance) and recommends a **frontend, backend, database and hosting** platform.
+- StackSense asks up to 42 questions about a software project (scale, data, team, budget, compliance) and recommends a **frontend, backend, database and hosting** platform.
 - Each pick comes with a 0-100 score, the answers that drove it, trade-offs, two alternatives, the options ruled out and why, a monthly cost estimate, and a "what would change this" analysis.
 - 14 ready-made scenarios (presets) cover typical projects, from a college fest site to HIPAA telehealth.
 - It is **rule-based and deterministic**: the same answers always give the same output, and every number traces to a JSON file in `data/`.
@@ -37,7 +37,7 @@ python3 -m venv .venv
 
 ## Run the checks
 
-- Tests (839 tests, a few minutes): `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`)
+- Tests (854 tests, a few minutes): `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`)
 - Benchmark against the answer key: `python tools/bench.py` (add `--briefs` for one line per brief)
 - Random-input fuzz test: `python tools/fuzz.py` (exits 1 on any violation)
 - Report build and screenshots (needs Chrome and `requirements-dev.txt`): `python tools/build_report.py`
@@ -56,7 +56,7 @@ python3 -m venv .venv
 
 ## How it decides
 
-- **Knowledge base:** 56 technologies (10 frontends, 14 backends, 15 databases, 17 hosting platforms) and 62 compatibility rules, curated on 2026-10-01 from official documentation. Each technology has 1-5 scores for 19 criteria.
+- **Knowledge base:** 60 technologies (11 frontends, 14 backends, 15 databases, 20 hosting platforms) and 62 compatibility rules, curated on 2026-10-01 from official documentation. Each technology has 1-5 scores for 19 criteria.
 - **Weights:** each criterion's weight starts at a baseline and is raised or lowered by specific answers (for example, "SEO critical" adds +4 to the SEO weight). Each change is stored with the answer that caused it.
 - **Hard constraints first:** an option that breaks a requirement (HIPAA agreement, data residency, deployment model, scale ceiling and others) is removed before scoring. Compliance is never relaxed.
 - **Score:** weighted average of the criterion scores, rescaled to 0-100, plus small adjustments with stated reasons (near the scale limit, over the budget share).
@@ -85,13 +85,13 @@ python3 -m venv .venv
 - **Who wrote the key:** a language model playing three architect personas, blind to the engine. They are not human raters, and the Krippendorff alpha of 0.91 (an agreement score; 1 is perfect) describes agreement between those personas only. The key's SHA-256 is in `tests/benchmark/answer_key.sha256`.
 - **Fuzz test** (`python tools/fuzz.py`): 10,000 seeded random projects against 14 must-hold rules (hard constraints, same output on repeat, rename and reorder invariance, no flip-back as users grow). 0 violations. In 1,000 growth walks, 0 have a layer that returns to an earlier pick, down from 296 before the stability rules.
 - **LLM-only comparison** (`python tools/llm_baseline.py --show`): the same 40 briefs answered by a language model alone with no rule engine, then graded by the rule engine. Method and numbers are in section 6.2 of `report/report.md`. The model alone scores about the same as the engine against the key (LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 81% and 96%) but breaks a hard requirement in 7 of the 40 briefs; the engine's own picks break none.
-- **Tests:** 839 tests, including a check that the numbers in this file match the code (`tests/test_docs.py`).
+- **Tests:** 854 tests, including a check that the numbers in this file match the code (`tests/test_docs.py`).
 
 ## Limitations
 
 - Scores, cost bands and compliance flags are curated estimates from public documentation as of October 2026. Verify prices and compliance with each vendor before committing.
 - The cost model uses price bands per scale tier, not an itemised bill. Egress, support plans and third-party SaaS are excluded.
-- The knowledge base has 56 technologies. Niche options (CockroachDB, Oracle, Rust-specific frameworks and others) are not included.
+- The knowledge base has 60 technologies. Niche options (CockroachDB, Oracle, Rust-specific frameworks and others) are not included.
 - The answer key was written by a language model, not human architects.
 - Without an API key, the pattern reader understands numbers, money and common phrases but not arbitrary prose, so some answers stay unfilled and the questions still ask for them.
 
@@ -132,7 +132,7 @@ The licence text is in [`app/static/fonts/OFL.txt`](app/static/fonts/OFL.txt). `
 
 **Data sources:**
 
-- Every technology, rule and question cites official documentation. The full register of 333 URLs is in [`report/sources.md`](report/sources.md).
+- Every technology, rule and question cites official documentation. The full register of 344 URLs is in [`report/sources.md`](report/sources.md).
 - Key methodological references:
   - Google SRE book: [availability table](https://sre.google/sre-book/availability-table/), [handling overload](https://sre.google/sre-book/handling-overload/)
   - Martin Fowler: [MonolithFirst](https://martinfowler.com/bliki/MonolithFirst.html), [Microservice trade-offs](https://martinfowler.com/articles/microservice-trade-offs.html)

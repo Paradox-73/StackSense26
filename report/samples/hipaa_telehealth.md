@@ -94,6 +94,7 @@ React SPA (Vite) is the frontend for a Healthcare / telehealth project with abou
 - React Native (Expo): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
+- No frontend (API only): You target a user interface, so a frontend is needed
 
 ### Backend: Python + Django (88.6)
 
@@ -290,9 +291,13 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 - Hetzner Cloud / VPS (Docker, Coolify): The provider's SLA is 99.9% (each Cloud Server), below your 99.95% availability target; No HIPAA Business Associate Agreement available; No SOC 2 report available
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud; Docker Compose runs an app's containers on one Docker host and restarts them only on that host; placing and moving containers across several hosts is what Swarm or Kubernetes add: no automatic failover to a second host, so it cannot meet 99.95% availability
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
+- AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Google Compute Engine VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Azure Virtual Machines (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
 
 ## Supporting services
 
+- **Realtime**: WebSockets in the Python + Django app (Django Channels): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
 - **Background jobs**: Celery / RQ / Dramatiq (Redis/Valkey broker): Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (ElastiCache (Valkey)).
 - **Static frontend**: Amazon S3 + CloudFront: React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Python + Django instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.
 - **Object storage**: Amazon S3 (a separate bucket for uploaded files, served through the same CloudFront as the static frontend): Media and documents belong in object storage, not the database.

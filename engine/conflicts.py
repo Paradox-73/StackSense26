@@ -13,6 +13,8 @@ from .profile import _warn
 
 # People needed for a 24x7 on-call rotation without burnout (one week on call in five or six).
 SLA_ONCALL_MIN_TEAM = 6
+# Three or more client platforms (each with its own build, testing and release) cannot all ship in this many weeks.
+MANY_PLATFORMS_MIN_WEEKS = 4
 
 
 def detect(p: dict, d: dict) -> list[dict]:
@@ -99,6 +101,45 @@ def detect(p: dict, d: dict) -> list[dict]:
         w.append(_warn("BUDGET_OVERSIZED", "info", "Budget far above what this scale needs",
                        "A budget is a ceiling, not a target.", "Cost still weighted; the estimate shows expected spend.",
                        ["budget_monthly"]))
+    exp = p.get("team_experience", "intermediate")
+    if d["availability"] >= 99.95 and exp == "beginner" and team < SLA_ONCALL_MIN_TEAM:
+        w.append(_warn("BEGINNER_HIGH_AVAILABILITY", "critical",
+                       f"{p['availability']}% availability from a beginner team of {team}",
+                       f"{p['availability']}% allows at most {(100 - d['availability']) * 438:.0f} minutes of downtime a "
+                       "month. Meeting it takes multi-zone failover, tested restores and someone on call who can fix "
+                       "production at night, which a beginner team of this size cannot staff.",
+                       "Relaxed: the stack uses managed services whose providers carry the SLA, and the target is "
+                       "treated as a goal until the team can staff on-call; 99.9% is a realistic first commitment.",
+                       ["availability", "team_experience", "team_size"]))
+    clients = [x for x in p["platforms"] if x != "api_only"]
+    if len(clients) >= 3 and p["timeline_weeks"] <= MANY_PLATFORMS_MIN_WEEKS:
+        w.append(_warn("MANY_PLATFORMS_SHORT_TIMELINE", "critical",
+                       f"{len(clients)} client platforms in {p['timeline_weeks']} week(s)",
+                       f"Each of {', '.join(clients)} needs its own build, testing and store or release work; "
+                       f"{p['timeline_weeks']} week(s) is not enough to ship all of them with {team} engineer(s).",
+                       "Relaxed: one shared codebase is recommended, and the first release should ship one platform "
+                       "(the one most users need), with the others after the MVP.",
+                       ["platforms", "timeline_weeks", "team_size"]))
+    if p.get("has_devops") is False and (p["deployment"] in ("on_prem", "hybrid") or p.get("self_managed")):
+        w.append(_warn("SELF_HOSTED_NO_OPS", "warning", "Self-hosted servers but nobody to operate them",
+                       "The deployment model puts servers, patching, backups and monitoring on the team, and the team "
+                       "says nobody can operate infrastructure.",
+                       "Kept as given: the stack sticks to one deployable and boring, well-documented tools. Budget for "
+                       "an operations hire or a managed-services contract before go-live.",
+                       ["has_devops", "deployment"]))
+    if p.get("air_gapped"):
+        outside = [label for label, on in (
+            ("taking payments", "pay" in (p.get("user_actions") or []) or p["app_type"] in ("ecommerce", "fintech")),
+            ("SMS one-time codes", "phone_otp" in (p.get("special_workloads") or [])),
+            ("push notifications", d["mobile"])) if on]
+        if outside:
+            w.append(_warn("AIR_GAPPED_EXTERNAL", "critical", "Air-gapped network, but the project needs outside services",
+                           f"A network with no internet connection cannot reach a payment gateway, an SMS provider or the "
+                           f"phone push services, and the project needs {', '.join(outside)}.",
+                           "Relaxed: payments run on a separate connected system and are imported for reconciliation; "
+                           "SMS goes through a GSM modem inside the network or authenticator-app codes replace it; "
+                           "phones get in-app notifications only. Confirm each with the network's security owner.",
+                           ["air_gapped", "user_actions", "special_workloads", "platforms"]))
     if p["team_size"] > 200 and tier <= 1:
         w.append(_warn("TEAM_OVERSIZED", "info", "Very large team for a small user base",
                        "Check the team size counts engineers on this product only.", "Kept as given.", ["team_size"]))

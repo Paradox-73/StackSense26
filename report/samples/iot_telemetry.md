@@ -98,6 +98,7 @@ React SPA (Vite) is the frontend for an IoT / telemetry ingestion project with a
 - React Native (Expo): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
+- No frontend (API only): You target a user interface, so a frontend is needed
 
 ### Backend: Go (net/http, chi or Gin) (92.9)
 
@@ -284,9 +285,13 @@ Runs here: the Go API as long-running processes. React SPA is built to static fi
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
+- AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Google Compute Engine VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Azure Virtual Machines (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
 
 ## Supporting services
 
+- **Realtime**: WebSockets in the Go app (coder/websocket or gorilla/websocket): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
 - **Ingestion buffer**: Amazon Kinesis / MSK (MQTT via AWS IoT Core): A durable log absorbs write bursts and keeps device ingestion separate from database writes, and lets you replay messages.
 - **Static frontend**: Amazon S3 + CloudFront: React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Go instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.
 - **Authentication**: Auth0 (EU tenant) / framework built-in auth: Do not hand-roll password storage, MFA or SSO.

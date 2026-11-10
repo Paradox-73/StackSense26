@@ -102,9 +102,17 @@
             {
               "value": "android",
               "label": "Android"
+            },
+            {
+              "value": "desktop",
+              "label": "Desktop app (Windows, macOS, Linux)"
+            },
+            {
+              "value": "api_only",
+              "label": "API only (no user interface)"
             }
           ],
-          "help": "Choosing iOS/Android switches the frontend recommendation to mobile frameworks (a web companion is suggested separately).",
+          "help": "Choosing iOS/Android switches the frontend recommendation to mobile frameworks (a web companion is suggested separately). Desktop adds a desktop shell (Electron) around the web frontend; API only means there is no frontend to build: your customers' own code calls the API.",
           "hint": "Unsure? Start with web only: one codebase, no app-store review. Add iOS/Android when users ask for push notifications or offline use.",
           "why": "Mobile targets rule out web-only frameworks and favour cross-platform toolkits when the team is small.",
           "sources": [
@@ -221,6 +229,38 @@
             "https://docs.netlify.com/build/functions/background-functions/",
             "https://docs.cloud.google.com/run/docs/configuring/services/gpu",
             "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-tasks-services.html"
+          ]
+        },
+        {
+          "key": "ml_features",
+          "label": "Machine-learning features",
+          "type": "select",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "inference_api",
+              "label": "Calls a trained model (inference API)"
+            },
+            {
+              "value": "llm_rag",
+              "label": "Language model over your own documents (RAG)"
+            },
+            {
+              "value": "training",
+              "label": "Trains its own models"
+            }
+          ],
+          "help": "Inference adds a model-serving endpoint next to the API; RAG adds vector search beside the database; training adds GPU jobs.",
+          "hint": "Unsure? None. Pick inference if the product calls a model it does not train itself.",
+          "why": "Model serving scales on its own metric and needs its own host or a managed endpoint; vector search is a second data shape; training needs GPUs.",
+          "sources": [
+            "https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html",
+            "https://cloud.google.com/vertex-ai/docs/predictions/overview",
+            "https://github.com/pgvector/pgvector"
           ]
         },
         {
@@ -671,6 +711,49 @@
           ]
         },
         {
+          "key": "team_experience",
+          "label": "Team experience",
+          "type": "select",
+          "default": "intermediate",
+          "options": [
+            {
+              "value": "beginner",
+              "label": "Beginner"
+            },
+            {
+              "value": "intermediate",
+              "label": "Intermediate"
+            },
+            {
+              "value": "senior",
+              "label": "Senior"
+            },
+            {
+              "value": "mixed",
+              "label": "Mixed"
+            }
+          ],
+          "help": "Beginners get more weight on tools that are quick to learn and on managed services; seniors get less.",
+          "hint": "Unsure? Intermediate.",
+          "why": "Learning curve and operational burden cost a beginner team far more time than a senior one; a beginner team cannot staff the on-call that a 99.95% target needs.",
+          "sources": [
+            "https://dora.dev/research/",
+            "https://sre.google/sre-book/being-on-call/"
+          ]
+        },
+        {
+          "key": "has_devops",
+          "label": "Someone can operate infrastructure",
+          "type": "bool",
+          "default": null,
+          "help": "Someone on the team can run servers, networks, backups and deploy pipelines.",
+          "hint": "Untick if nobody on the team has run production servers.",
+          "why": "Without that skill, managed platforms get more weight, and self-hosted deployments raise a warning.",
+          "sources": [
+            "https://sre.google/sre-book/eliminating-toil/"
+          ]
+        },
+        {
           "key": "team_skills",
           "label": "Existing team skills",
           "type": "multiselect",
@@ -934,6 +1017,31 @@
           ]
         },
         {
+          "key": "self_managed",
+          "label": "We run our own VMs in the cloud",
+          "type": "bool",
+          "default": false,
+          "help": "Cloud virtual machines the team patches and operates (EC2, Compute Engine, Azure VMs, Hetzner). Rules out managed-only platforms: serverless functions, managed backends and cloud-only databases.",
+          "hint": "Leave unticked unless a rule or your own ops team requires self-managed servers.",
+          "why": "A hard constraint: only software you can run on a plain VM stays in the stack.",
+          "sources": [
+            "https://docs.docker.com/compose/",
+            "https://aws.amazon.com/ec2/pricing/on-demand/"
+          ]
+        },
+        {
+          "key": "air_gapped",
+          "label": "Air-gapped (no internet connection)",
+          "type": "bool",
+          "default": false,
+          "help": "The servers have no internet access at all. Implies on-premises, and rules out every SaaS and CDN dependency: hosted sign-in, payment gateways, SMS, push notifications and model APIs.",
+          "hint": "Tick only for isolated networks such as defence, utilities or regulated labs.",
+          "why": "A hard constraint: every component must be self-hostable and updated from inside the network.",
+          "sources": [
+            "https://kubernetes.io/docs/concepts/overview/"
+          ]
+        },
+        {
           "key": "cloud_preference",
           "label": "Preferred cloud",
           "type": "select",
@@ -954,12 +1062,28 @@
             {
               "value": "azure",
               "label": "Azure"
+            },
+            {
+              "value": "no_hyperscaler",
+              "label": "No AWS, Google Cloud or Azure"
             }
           ],
-          "help": "Existing credits, contracts or skills. Applied as a strong preference, not a hard filter.",
+          "help": "Existing credits, contracts or skills. Applied as a strong preference; tick \"Must use this cloud\" below to make it a hard constraint. No AWS, Google Cloud or Azure is always a hard constraint.",
           "hint": "Pick one only if you already have credits, a contract or certified engineers there.",
           "why": "Existing accounts, credits and IAM setup cut time-to-production.",
           "sources": []
+        },
+        {
+          "key": "cloud_required",
+          "label": "Must use this cloud (hard constraint)",
+          "type": "bool",
+          "default": false,
+          "help": "Ticked, the preferred cloud is a rule: options on other providers are ruled out instead of scoring lower.",
+          "hint": "Tick it when your company already has an account, credits or a contract with that cloud.",
+          "why": "An explicit cloud is a hard constraint in procurement and security reviews; a preference only breaks ties.",
+          "sources": [
+            "https://aws.amazon.com/compliance/shared-responsibility-model/"
+          ]
         },
         {
           "key": "lock_in_tolerance",
@@ -1020,6 +1144,14 @@
             {
               "value": "data_residency_eu",
               "label": "Data must stay in the EU"
+            },
+            {
+              "value": "data_residency_us",
+              "label": "Data must stay in the US"
+            },
+            {
+              "value": "iso27001",
+              "label": "Vendors must hold ISO/IEC 27001 certification"
             }
           ],
           "help": "HIPAA requires a signed BAA with every vendor touching PHI; residency requires an in-country region. India's DPDP Act applies through the DPDP Rules 2025 (notified November 2025, phased in over 18 months) and does not by itself require data to stay in India; RBI's payment-data rule does, for payment system providers.",
@@ -1078,6 +1210,14 @@
             {
               "value": "proven",
               "label": "Proven, mature tools"
+            },
+            {
+              "value": "maintainability",
+              "label": "Easy to maintain"
+            },
+            {
+              "value": "security",
+              "label": "Security"
             }
           ],
           "help": "Optional. The first pick gets the biggest extra weight, then the second, then the third. Leave empty to use no extra weight.",

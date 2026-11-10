@@ -314,6 +314,7 @@
         "hipaa_note": "Atlas BAA on dedicated (M10+) clusters",
         "pci": true,
         "soc2": true,
+        "iso27001": true,
         "gdpr_dpa": true
       },
       "cost_usd": [
@@ -434,6 +435,7 @@
         "hipaa": true,
         "pci": true,
         "soc2": true,
+        "iso27001": true,
         "gdpr_dpa": true
       },
       "cost_usd": [
@@ -1186,6 +1188,7 @@
         "hipaa": true,
         "pci": true,
         "soc2": true,
+        "iso27001": true,
         "gdpr_dpa": true
       },
       "cost_usd": [
@@ -1488,6 +1491,7 @@
         "hipaa": true,
         "pci": true,
         "soc2": true,
+        "iso27001": true,
         "gdpr_dpa": true
       },
       "cost_usd": [

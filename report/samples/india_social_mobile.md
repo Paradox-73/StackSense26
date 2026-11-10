@@ -100,6 +100,7 @@ React Native (Expo) is the app for a Social network / UGC feed project with abou
 - Angular: Web-only framework; you target iOS/Android only
 - Astro: Web-only framework; you target iOS/Android only
 - Server-rendered HTML + HTMX: Web-only framework; you target iOS/Android only
+- No frontend (API only): You target a user interface, so a frontend is needed
 
 ### Backend: Firebase (BaaS on Google Cloud) (96.2)
 
@@ -267,6 +268,9 @@ With about 100,000 daily users on iOS and Android, nothing of yours needs separa
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
+- AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Google Compute Engine VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Azure Virtual Machines (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
 
 ## Stack compatibility checks
 

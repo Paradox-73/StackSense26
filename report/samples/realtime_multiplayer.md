@@ -97,6 +97,7 @@ React SPA (Vite) is the frontend for a Realtime chat / collaboration / multiplay
 - React Native (Expo): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
+- No frontend (API only): You target a user interface, so a frontend is needed
 
 ### Backend: Go (net/http, chi or Gin) (94.0)
 
@@ -275,6 +276,9 @@ Runs here: React SPA (static files), the Go API as long-running processes. The d
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
+- AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Google Compute Engine VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
+- Azure Virtual Machines (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
 
 ## Stack compatibility checks
 
@@ -285,6 +289,7 @@ Runs here: React SPA (static files), the Go API as long-running processes. The d
 
 - **Cache**: Redis/Valkey (Upstash Redis on Fly): Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database.
 - **Realtime**: Redis pub/sub for cross-instance fan-out (Upstash Redis on Fly): With several app instances, a message published on one must reach sockets on all others.
+- **Collaboration sync**: Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus or y-websocket as the sync server: Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke.
 - **Ingestion buffer**: Redpanda/Kafka or NATS JetStream: A durable log absorbs write bursts and keeps device ingestion separate from database writes, and lets you replay messages.
 - **Authentication**: Clerk / Auth0 / framework built-in auth: Do not hand-roll password storage, MFA or SSO.
 - **Observability**: OpenTelemetry instrumentation -> Grafana Cloud / Sentry: Traces, metrics and error tracking from day one; required to defend an availability target.

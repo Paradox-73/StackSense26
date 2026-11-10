@@ -17,14 +17,14 @@ StackSense recommends a frontend, backend, database and hosting platform from a 
 |---|---|---|
 | Agreement with an answer key written by a language model in three architect personas, blind to the engine (not human raters) | 96% of the 160 layer picks (one pick each for frontend, backend, database and hosting, over 40 briefs) are acceptable to at least 2 of 3 personas; 72% top-1 and 95% acceptable on the 10 briefs I never tuned on | Section 6.1; `python tools/bench.py` |
 | Hard constraints under attack | 0 violations of the 14 properties (hard constraints, meaning rules that remove an option before any scoring; consistency; and no return to an earlier pick as users grow) in 10,000 random projects; 0 of 1,000 growth walks returns to an earlier pick | Section 6; `python tools/fuzz.py` |
-| Tests | 839 tests pass, and every warning code the engine can raise has a test that triggers it | Section 6; `python -m pytest` |
+| Tests | 854 tests pass, and every warning code the engine can raise has a test that triggers it | Section 6; `python -m pytest` |
 
 **Where each judging criterion is answered**
 
 | Criterion (weight) | Where to look | Proof in the repository |
 |---|---|---|
 | Recommendation quality (35%) | Section 4 (sample recommendations, one-answer-apart pairs), Section 6 (validation, LLM-only baseline), page [[page:4. Sample recommendations]] | 14 presets (built-in example projects) in `report/samples/`, 40-brief benchmark, 10,000-project random test |
-| Input design and research (30%) | Section 2 (research, free-text description, "Not sure"), Appendix B (all 36 questions with measured influence), Appendix E (framework coverage), page [[page:2. Input parameters and the research behind them]] | `tools/question_influence.py`: 135,321 engine re-runs; `engine/brief.py` |
+| Input design and research (30%) | Section 2 (research, free-text description, "Not sure"), Appendix B (all 42 questions with measured influence), Appendix E (framework coverage), page [[page:2. Input parameters and the research behind them]] | `tools/question_influence.py`: 8,159 engine re-runs; `engine/brief.py` |
 | Reasoning and explainability (20%) | Section 3 (why panel, why-not, stability, checked plain-English summary), page [[page:3. Reasoning and explainability]] | `tests/test_faithfulness.py`, `tests/test_whynot.py`, `tests/test_summary.py` |
 | Documentation and demo (15%) | This report, the README, the demo video (link on the cover), Appendix G (tools and licences) | `python tools/build_report.py` rebuilds this PDF from the code |
 
@@ -61,14 +61,14 @@ The rule engine itself keeps the three properties a judge, an architect or a CTO
 2. **Traceable.** Each score is a weighted sum, and each weight is a sum of contributions from specific answers. The UI shows which answer added or removed how many points.
 3. **Constraint-safe.** Compliance and deployment rules remove options before scoring. A HIPAA project (US health-data rules) never gets a host that has no Business Associate Agreement, the contract a host signs to handle health data, however cheap it is.
 
-StackSense is an *expert system* ([Wikipedia](https://en.wikipedia.org/wiki/Expert_system)): a knowledge base (`data/kb/*.json`: 56 technologies with sourced scores and 62 compatibility rules), an inference step (constraint filtering, a *weighted sum model* score ([Wikipedia](https://en.wikipedia.org/wiki/Weighted_sum_model)), then a search over stacks) and an explanation step. The "what would change it" panel is a *counterfactual explanation* ([Wachter, Mittelstadt and Russell, arXiv:1711.00399](https://arxiv.org/abs/1711.00399)): the smallest change to the input that changes the output.
+StackSense is an *expert system* ([Wikipedia](https://en.wikipedia.org/wiki/Expert_system)): a knowledge base (`data/kb/*.json`: 60 technologies with sourced scores and 62 compatibility rules), an inference step (constraint filtering, a *weighted sum model* score ([Wikipedia](https://en.wikipedia.org/wiki/Weighted_sum_model)), then a search over stacks) and an explanation step. The "what would change it" panel is a *counterfactual explanation* ([Wachter, Mittelstadt and Russell, arXiv:1711.00399](https://arxiv.org/abs/1711.00399)): the smallest change to the input that changes the output.
 
 ### 1.2 Components and pipeline
 
 - **Browser** (`app/static/`): plain HTML, CSS and JavaScript with no build step and no third-party script. The form is rendered from `data/questions.json`, which defines each question's options, default, range, help text, "why we ask" note and sources. The engine reads its defaults from the same file, so the two cannot drift apart.
 - **FastAPI app** (`app/main.py`): JSON endpoints (Appendix H.3), with interactive docs at `/docs`.
 - **Engine** (`engine/`, pure Python): `profile.py`, `conflicts.py`, `scoring.py`, `stack.py`, then `explain.py`, `advice.py` and `recommender.py`. The language-model client (`llm.py`) uses only the standard library and sits outside the decision path.
-- **Data** (`data/`): one JSON file per layer with 56 technologies, the rules, the questionnaire, the glossary, the presets and the score rubric. Every technology and rule cites its sources (333 URLs in `report/sources.md`).
+- **Data** (`data/`): one JSON file per layer with 60 technologies, the rules, the questionnaire, the glossary, the presets and the score rubric. Every technology and rule cites its sources (344 URLs in `report/sources.md`).
 
 ![The seven stages from answers to an explained recommendation](../docs/pipeline.svg)
 
@@ -84,7 +84,7 @@ Input design is where most recommenders are weakest: they ask for "scale" and "b
 
 1. **Start from quality-attribute frameworks.** I listed the quality attributes that three standard frameworks use to judge an architecture and asked which project facts a recommender needs to score each: ISO/IEC 25010 ([ISO](https://www.iso.org/standard/78176.html)), the AWS Well-Architected Framework ([AWS](https://aws.amazon.com/architecture/well-architected/)) and the Architecture Tradeoff Analysis Method, ATAM ([SEI](https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/)). Appendix E maps each attribute to the questions that capture it.
 2. **Add what only a tech-stack choice needs.** Team skills, existing systems, data shape, client platforms and compliance regimes remove or favour options more than any quality attribute does.
-3. **Keep a question only if it changes a decision.** I re-ran the engine 135,321 times, changing one answer at a time on the 14 presets and on 1,000 seeded random projects (`tools/question_influence.py`). A question that never changed a pick, a cost or a warning would be dropped, and `tests/test_questions.py` fails if one is added that does nothing.
+3. **Keep a question only if it changes a decision.** I re-ran the engine 8,159 times, changing one answer at a time on the 14 presets and on 40 seeded random projects (`tools/question_influence.py`). A question that never changed a pick, a cost or a warning would be dropped, and `tests/test_questions.py` fails if one is added that does nothing.
 4. **Give every question a fallback.** Each has a default, a range, a "Help me choose" hint, a "why we ask" note with a source, and (except currency) a "Not sure" option.
 
 The questions fall into five groups: product, scale and data, experience and reliability, team and delivery, and budget and constraints. Four were added late: how many users are online at the same moment at peak, whether work runs in the background (jobs over 15 minutes, GPU work), whether several customer organisations share the app (tenancy), and whether customers sign in with their company account (single sign-on, SSO). Appendix B lists all 36 with their type, default, source and measured influence; Appendix E gives the group-by-group reasoning with sources.
@@ -92,7 +92,7 @@ The questions fall into five groups: product, scale and data, experience and rel
 
 ### 2.2 Describe the project in words: fewer questions to answer
 
-A form with 36 questions is accurate but slow. The "Describe your project" box lets a user type a paragraph and press "Fill from description". The page marks where each filled answer came from, and only the rest are left to ask.
+A form with 42 questions is accurate but slow. The "Describe your project" box lets a user type a paragraph and press "Fill from description". The page marks where each filled answer came from, and only the rest are left to ask.
 
 - **Pattern reader first.** `engine/brief_rules.py` reads numbers ("5,000 patients a day", "team of 4"), money ("$3,000 a month", which also sets the currency), skills, regions, compliance words and app-type keywords. It needs no network and never guesses.
 - **Model second, only for open questions.** If a key is set, the language model may fill questions the pattern reader left open. Its value is kept only if it is valid for that question and it quotes words that really occur in the user's text. Otherwise it is dropped.
@@ -102,8 +102,8 @@ A form with 36 questions is accurate but slow. The "Describe your project" box l
 ### 2.3 Two depths: quick mode and refine
 
 - **Quick mode** asks seven questions a new user can answer without research: what you are building, daily users, monthly budget, team size and languages, compliance, where it must run, and four must-haves (live updates, offline, found on Google, mobile app). A stack appears on page load and updates about 250 ms after each answer. "Ask me only what matters" lists the unanswered questions that can still change a pick, or says that no single remaining answer does.
-- **Refine** opens all 36 questions in five groups. On desktop the result stays pinned beside the form.
-- **How much each question matters** was measured (`report/question_influence.md`). A re-run counts when at least one of the four picks changed. Team skills changed a pick in 93% of re-runs (an upper bound, because skills are varied as whole sets), deployment model in 68%, data shape in 66%, client platforms in 55%, team size in 43%, budget in 30%, daily users in 24% and compliance in 15%. The least influential are the traffic pattern (3%), the cacheable share (3%), where users are (2%) and company single sign-on (2%); the rest, with the share of re-runs that changed each layer, are in Appendix B.
+- **Refine** opens all 42 questions in five groups. On desktop the result stays pinned beside the form.
+- **How much each question matters** was measured (`report/question_influence.md`). A re-run counts when at least one of the four picks changed. Team skills changed a pick in 90% of re-runs (an upper bound, because skills are varied as whole sets), data shape in 65%, an air-gapped network in 63%, deployment model in 51%, client platforms in 49%, team size in 36%, budget in 19%, daily users in 21% and compliance in 11%. The least influential are the traffic pattern (2%), the cacheable share (2%), where users are (1%), company single sign-on (1%) and machine-learning features (1%, which mostly add a model-serving service and its cost); the rest, with the share of re-runs that changed each layer, are in Appendix B.
 
 ![Share of re-runs where changing one answer changed a pick](question_influence.svg)
 
@@ -193,7 +193,7 @@ Each pair changes a single answer of a built-in example; the layers that changed
 |---|---|
 | Missing answers | Uses the documented default and lists it under "Defaults used" |
 | Invalid values (negative users, text in a number field, an unknown option, a number too large for a float) | Clamps or replaces the value and shows a warning |
-| Contradictions (one developer and microservices, 99.99% availability with two people, 20 ms latency across continents) | Detects 17 contradiction checks, resolves by priority (compliance > deployment > physics and team > budget and preferences) and states the resolution |
+| Contradictions (one developer and microservices, 99.99% availability with two people, 20 ms latency across continents) | Detects 21 contradiction checks, resolves by priority (compliance > deployment > physics and team > budget and preferences) and states the resolution |
 | HIPAA or PCI on a free-tier budget | Never relaxes compliance; raises a critical warning with the minimum compliant cost |
 | EU and India residency together | Requires hosts with both regions; warns about split deployments |
 | No option survives the filters | Relaxes preference-based constraints only (never compliance) and says which one |
@@ -202,7 +202,7 @@ Each pair changes a single answer of a built-in example; the layers that changed
 | Model returns an unsupported value | The brief reader drops any model value that fails the schema or has no quote in the text, so it never reaches the form |
 | No API key, or the model is down | The pattern reader and the template summary are used, and the badge says "template fallback" |
 
-The engine can raise 40 distinct warning codes, and `tests/test_edge_cases.py` fails if any code lacks a test that triggers it. Screenshots of the contradictory example, HIPAA on a zero budget and a negative user count are in Appendix F.
+The engine can raise 44 distinct warning codes, and `tests/test_edge_cases.py` fails if any code lacks a test that triggers it. Screenshots of the contradictory example, HIPAA on a zero budget and a negative user count are in Appendix F.
 
 ---
 
@@ -211,14 +211,14 @@ The engine can raise 40 distinct warning codes, and `tests/test_edge_cases.py` f
 <!-- BEGIN validation -->
 | What is checked | Tests |
 |---|---|
-| Scoring, constraints and cost | 302 |
+| Scoring, constraints and cost | 316 |
 | Explanations match the engine | 123 |
 | Inputs, edge cases and warnings | 87 |
-| Stability and properties | 75 |
+| Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 172 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 71 |
-| **All** | **839** |
+| **All** | **854** |
 <!-- END validation -->
 
 The per-file list is `report/validation.md`.
@@ -248,7 +248,7 @@ Top-1 is scored on 158 of the 160 picks, because for 2 layer picks (backend and 
 ### 6.3 Other checks
 
 - **Random projects.** `python tools/fuzz.py` draws 10,000 seeded random projects and checks 14 properties against the knowledge-base files directly, without reusing the engine's own filters: hard constraints (HIPAA, PCI, residency, on-premises, mobile, strong consistency), byte-identical output on a repeat, no change from renaming or reordering lists, USD and INR budgets agreeing, a warning for every relaxed layer, and no crash. Result: 0 violations of 14 properties; the 14th (no layer returns to a pick it had left as users grow) is checked on 1,000 growth walks and is violated in 0 of them, down from 296 before the stability rules.
-- **Question influence.** 135,321 engine re-runs (Section 2.3).
+- **Question influence.** 8,159 engine re-runs (Section 2.3).
 - **Stability of the picks.** `python tools/robustness_report.py` prints, for every preset, how often each pick survives score noise. The least stable pick is the `contradictory` example's database (PostgreSQL), which holds in 53% of runs with noise up to 0.25 points and 63% with noise up to 0.5, so its margin over MySQL is small.
 - **Offline use.** With no key, `tests/test_no_network.py` checks that the page loads no external resource and that the API answers with outbound connections blocked. A key adds calls only to the model provider, only for the four features in section 1.1.
 
@@ -261,7 +261,7 @@ Top-1 is scored on 158 of the 160 picks, because for 2 layer picks (backend and 
 - The benchmark labels were written by a language model in three architect personas, not by people, so the agreement figures measure fit to a model-written key. The benchmark has 40 briefs. Held-out accuracy on 10 of them is 72% top-1 and 95% acceptable, so one brief moves it by ten points.
 - Growth stability is measured, not proved: 0 of 1,000 random growth walks returns to an earlier pick, but other answers can still produce a return.
 - The cost model uses price bands per scale tier plus stated usage terms, not a full bill of materials. Egress, support plans and most third-party software-as-a-service are excluded.
-- The knowledge base holds 56 technologies. Niche options (CockroachDB, Oracle, Rust frameworks) are not scored; an existing Oracle database is acknowledged with a warning. SQL Server, BigQuery and Neo4j are scored.
+- The knowledge base holds 60 technologies. Niche options (CockroachDB, Oracle, Rust frameworks) are not scored; an existing Oracle database is acknowledged with a warning. SQL Server, BigQuery and Neo4j are scored.
 - The pattern reader understands numbers, money and common phrases, not arbitrary prose. Without a key some answers stay unfilled, and the questions below the description box still ask for them.
 - The free-tier models (Google Gemini by default) have daily request limits and the app stops itself at a configurable daily cap, which is why model replies are cached on disk. The LLM-only baseline (6.2) is one model chain on one run of the 40 briefs.
 - No human architect audited the presets' picks beyond the benchmark.
@@ -408,7 +408,7 @@ Why each group of questions is asked, with its sources, is in the app (the Why w
 
 ![Growth path](screenshots/f04-growth-path.png)
 
-![The refine form: all 36 questions in five groups](screenshots/f07-refine-form.png)
+![The refine form: all 42 questions in five groups](screenshots/f07-refine-form.png)
 
 ![A glossary popover](screenshots/f06-glossary.png)
 
@@ -422,7 +422,7 @@ Why each group of questions is asked, with its sources, is in the app (the Why w
 
 **Libraries and licences.** Run time: [FastAPI](https://fastapi.tiangolo.com/) (MIT), [Starlette](https://starlette.dev/) (BSD-3), [Pydantic](https://docs.pydantic.dev/) (MIT) and [Uvicorn](https://uvicorn.dev/) (BSD-3); the browser code uses no third-party JavaScript. Tests and this report only: pytest (MIT), HTTPX (BSD-3), markdown-it-py (MIT), pypdf (BSD-3), Playwright for Python (Apache-2.0) and Google Chrome. Fonts bundled in `app/static/fonts/` (SIL Open Font License 1.1): Fraunces, Geist and Geist Mono. The optional language-model client (`engine/llm.py`) uses only the Python standard library and calls an OpenAI-compatible chat API, by default Google's Gemini free tier; no model is bundled. The README's Credits section lists every library, font and technique with its link.
 
-**Datasets and sources.** StackSense ships no third-party dataset. Hiring-pool scores use the [Stack Overflow Developer Survey 2024](https://survey.stackoverflow.co/2024/technology) as a proxy, and the exchange rate is the FBIL reference rate of September 2026. Every technology, rule, question and glossary entry cites official documentation; the register of 333 URLs is in `report/sources.md`, not printed in this PDF.
+**Datasets and sources.** StackSense ships no third-party dataset. Hiring-pool scores use the [Stack Overflow Developer Survey 2024](https://survey.stackoverflow.co/2024/technology) as a proxy, and the exchange rate is the FBIL reference rate of September 2026. Every technology, rule, question and glossary entry cites official documentation; the register of 344 URLs is in `report/sources.md`, not printed in this PDF.
 
 **How to reproduce.** From the repository root: `python run.py` starts the app; `python -m pytest` runs the tests; `python tools/bench.py`, `python tools/fuzz.py` and `python tools/question_influence.py` rerun the benchmark, the random-project test and the question-influence study; `python tools/capture_screenshots.py` retakes the screenshots; `python tools/build_assets.py` then `python tools/build_report.py` regenerate the tables and this PDF. The README lists every command with its options.
 
@@ -432,7 +432,7 @@ Why each group of questions is asked, with its sources, is in the app (the Why w
 
 1. **Normalise.** Missing answers get documented defaults, listed as assumptions; invalid or extreme values are clamped with a warning.
 2. **Derive.** Peak requests per second = daily users x requests per user for the app type / 86,400 x a peak factor x the share of traffic that reaches the servers. Scale tier (six size bands, from under 1,000 to over 10 million daily users, or under 5 to over 50,000 requests/s at peak) comes from daily users or peak load, whichever is higher, and its label names the one that set it (30,000 daily users of a realtime app at ~520 requests/s is "Large (500-5,000 req/s at peak)").
-3. **Detect conflicts.** 17 cross-field checks, for example one developer asking for microservices or HIPAA on a zero budget. Each states how it was resolved, in the order *compliance > deployment model > physics and team capacity > budget and preferences*.
+3. **Detect conflicts.** 21 cross-field checks, for example one developer asking for microservices or HIPAA on a zero budget. Each states how it was resolved, in the order *compliance > deployment model > physics and team capacity > budget and preferences*.
 4. **Weight the criteria.** 19 criteria (cost at your scale, scalability, ops burden, team skill match and more). A weight is a baseline plus contributions from specific answers, each stored with the answer that caused it.
 5. **Filter, then score.** Hard constraints remove options first (HIPAA agreement, PCI attestation, data residency, on-premises, strong consistency, scale ceiling); preference-based ones are relaxed only if a layer would be empty, compliance never. Score = sum(weight x score) / sum(weight), rescaled to 0 to 100.
 6. **Search stacks.** The top 5 options per layer give 625 combinations, adjusted by compatibility rules (synergies such as Next.js with Vercel, caveats, conflicts such as long-lived WebSockets on Netlify). A stack point is one point on the 0 to 100 stack score, the average of the four layer scores. Stacks within 1 point of the top are tied (the tie margin: the scores are estimates, so a gap that small is not a real difference) and are resolved by fixed preferences. The engine also works out the answer at all six scale tiers, so a pick does not flip back to a technology the growth path already left.

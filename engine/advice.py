@@ -54,7 +54,8 @@ def portable_offering(item: dict, host: dict, onprem: bool, hybrid: bool) -> str
 
 def database_offering(db: dict, host: dict, p: dict) -> str:
     """The managed offering the stack's database runs as on this host (the API's host under split hosting)."""
-    return portable_offering(db, host, host.get("kind") == "onprem", p["deployment"] == "hybrid") or \
+    onprem = host.get("kind") == "onprem" or (bool(p.get("self_managed")) and host.get("vm", False))
+    return portable_offering(db, host, onprem, p["deployment"] == "hybrid") or \
         f"a managed {db['name']} service in the same region as your compute"
 
 
@@ -82,6 +83,9 @@ def _env(p: dict, host: dict) -> dict:
             "eu": "data_residency_eu" in p["compliance"],
             "hipaa": "hipaa" in p["compliance"],
             "hybrid": p["deployment"] == "hybrid",
+            "air_gapped": bool(p.get("air_gapped")),
+            # The team runs its own software on cloud VMs: no managed database, identity or monitoring service.
+            "self_managed": bool(p.get("self_managed")) and p["deployment"] == "cloud",
             "cloud": host.get("provider") if host.get("provider") in HYPERSCALER else None}
 
 
@@ -248,7 +252,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     out = []
 
     def offering(dbid: str) -> str:
-        text = portable_offering(kb["index"][dbid], host, env["onprem"], env["hybrid"]) or \
+        text = portable_offering(kb["index"][dbid], host, env["onprem"] or env["self_managed"], env["hybrid"]) or \
             f"a managed {kb['index'][dbid]['name']} service in the same region as your compute"
         return _redis_offering(text, env) if dbid == "redis" else text
 
@@ -284,6 +288,16 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             add("Realtime", name, "With several app instances, a message published on one must reach sockets on all others.",
                 "https://redis.io/docs/latest/develop/interact/pubsub/",
                 None if phoenix else "redis", None if phoenix else tier, None if phoenix else "redis")
+        elif be.get("id") in WEBSOCKET_LIBS:
+            lib, src = WEBSOCKET_LIBS[be["id"]]
+            add("Realtime", f"WebSockets in the {short_name(be)} app ({lib})",
+                "Chat and live updates for a part of the product: the app server holds the connections itself; add "
+                "Redis pub/sub only when a second instance must reach the same users.", src)
+        if p["app_type"] == "realtime_collab" and p["realtime"] == "core" and be.get("kind") != "baas":
+            add("Collaboration sync", "Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus "
+                "or y-websocket as the sync server", "Many people editing one document at once need conflict-free "
+                "merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke.",
+                "https://docs.yjs.dev/")
 
     secondary: dict[str, tuple[dict, list[str]]] = {}  # store id -> (candidate, shapes it serves)
     # A specialist store kept out of the primary role only because the project also has records it should not hold
@@ -348,7 +362,9 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             kb["index"][wh]["sources"][0], wh, d["db_tier"] if big_dashboard else tier, wh,
             None if big_dashboard else "when dashboard or reporting queries on the primary database take more than ~2 s")
 
-    if p["app_type"] == "iot_telemetry" or (p["read_write"] == "write_heavy" and tier >= 3):
+    # Write volume follows the users and the request rate; open connections alone (users online at once) do not
+    # need a log in front of the database.
+    if p["app_type"] == "iot_telemetry" or (p["read_write"] == "write_heavy" and d["dau_tier"] >= 3):
         managed = {"aws": "Amazon Kinesis / MSK", "gcp": "Google Pub/Sub", "azure": "Azure Event Hubs"}.get(
             "" if env["hybrid"] else env["cloud"] or "", "Redpanda/Kafka or NATS JetStream")
         add("Ingestion buffer", managed + (" (MQTT via AWS IoT Core)" if prov == "aws" and p["app_type"] == "iot_telemetry" else ""),
@@ -445,7 +461,12 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     _special_workloads(p, d, env, add, has_storage=lambda: any(x["role"] == "Object storage" for x in out),
                        storage=lambda: _object_storage(env, prov))
 
-    if p["app_type"] in ("ecommerce", "fintech") or "pay" in d["user_actions"]:
+    if (p["app_type"] in ("ecommerce", "fintech") or "pay" in d["user_actions"]) and env["air_gapped"]:
+        add("Payments", "Payments taken outside the air-gapped network, by a separate connected system whose records "
+            "are imported and reconciled", "No payment gateway can be reached from a network with no internet; "
+            "keeping card data out entirely also keeps the isolated network out of PCI-DSS scope.",
+            "https://www.pcisecuritystandards.org/document_library/")
+    elif p["app_type"] in ("ecommerce", "fintech") or "pay" in d["user_actions"]:
         pg = "Razorpay / Cashfree (India) or Stripe" if "india" in p["regions"] else "Stripe / Adyen"
         add("Payments", f"{pg} with hosted checkout (card tokens)",
             "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).",
@@ -523,7 +544,15 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         add("Offline sync", sync[0], "Offline use needs a local copy of the data and conflict handling when the device "
             "reconnects; the primary database does not provide that by itself.", sync[1])
 
-    if d["mobile"]:
+    if "desktop" in p["platforms"]:
+        add("Desktop app", "Electron, packaging the web frontend as a Windows, macOS and Linux app",
+            "One codebase for web and desktop; Tauri gives smaller installers but needs some Rust for native features.",
+            "https://www.electronjs.org/docs/latest/")
+    if d["mobile"] and env["air_gapped"]:
+        add("Notifications", "In-app and on-device notifications only",
+            "Firebase Cloud Messaging and Apple Push Notification service need the internet, which an air-gapped "
+            "network does not have.", "https://firebase.google.com/docs/cloud-messaging")
+    elif d["mobile"]:
         why = "Standard channel for mobile engagement on Android and iOS."
         if env["hipaa"]:
             why += (" Push services are not covered by a BAA: put no health information in the notification "
@@ -531,7 +560,14 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         add("Push notifications", "Firebase Cloud Messaging (+ APNs) or Expo Notifications", why,
             "https://firebase.google.com/docs/cloud-messaging")
 
-    if p["app_type"] == "ml_product":
+    scoring = p.get("ml_features") == "inference_api" and p["app_type"] != "ml_product"
+    if scoring:
+        # A trained scoring or classification model (credit score, fraud score): a CPU endpoint, not an LLM service.
+        ml, src = SCORING_SERVING.get("" if env["hybrid"] or env["self_managed"] else env["cloud"] or "",
+                                      SCORING_SERVING["self"])
+        add("Model serving", ml, "Serve the model from its own endpoint, versioned and monitored apart from the web "
+            "tier; a small scoring model runs on CPU.", src)
+    elif p["app_type"] == "ml_product" or p.get("ml_features", "none") != "none":
         ml = {"gcp": "Vertex AI endpoints", "aws": "Amazon Bedrock / SageMaker", "azure": "Azure AI Foundry"}.get(
             "" if env["hybrid"] else env["cloud"] or "")
         if not ml and env["hybrid"]:
@@ -652,9 +688,11 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
     if work & {"media_uploads", "video_on_demand"} and not has_storage():
         add("Object storage", storage(), "Uploaded files and video belong in object storage, not the database.",
             "https://aws.amazon.com/s3/")
-    if "media_uploads" in work:
+    if "media_uploads" in work and p["app_type"] != "internal_tool":  # staff files: the app serves them, no CDN
         gb = dau30 * MEDIA_GB_PER_USER_DAY
-        add("Media delivery", "CDN in front of the object storage, with image resizing at the edge",
+        add("Media delivery", "Your reverse proxy (nginx) serving files from the object store, images resized by "
+            "imgproxy on your servers" if env["air_gapped"] else
+            "CDN in front of the object storage, with image resizing at the edge",
             "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.",
             "https://developers.cloudflare.com/r2/pricing/",
             usage=(gb * EGRESS_USD_PER_GB[0], gb * EGRESS_USD_PER_GB[1],
@@ -716,7 +754,9 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
         india = "india" in p["regions"]
         price = OTP_USD["india" if india else "other"]
         sms = dau30 * OTP_PER_USER_DAY
-        add("Phone login (SMS OTP)", "MSG91 or Twilio Verify, with DLT-registered SMS templates" if india else
+        add("Phone login (SMS OTP)", "An SMS gateway inside your network (a GSM modem driven by Kannel or Gammu), or "
+            "authenticator-app codes (TOTP) instead of SMS" if env["air_gapped"] else
+            "MSG91 or Twilio Verify, with DLT-registered SMS templates" if india else
             "Twilio Verify or Amazon SNS / Cognito SMS",
             "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud"
             + ("; Indian operators deliver only DLT-registered templates." if india else "."),
@@ -750,7 +790,7 @@ def _object_storage(env: dict, prov: str) -> str:
 
 
 def _auth(env: dict) -> str:
-    if env["onprem"]:
+    if env["onprem"] or env["self_managed"]:
         return "Keycloak (self-hosted)"
     if env["hybrid"]:
         return "Keycloak (runs on-premises and in the cloud; OIDC for every app)"
@@ -769,12 +809,15 @@ def _auth(env: dict) -> str:
 def _observability(env: dict) -> str:
     if env["onprem"] or env["hybrid"]:
         return "self-hosted Grafana + Prometheus + Loki + Tempo (the same stack on-premises and in the cloud)"
+    if env["self_managed"]:
+        return "self-hosted Grafana + Prometheus + Loki + Tempo on your own VMs"
     if env["cloud"]:
         return {"aws": "CloudWatch + X-Ray", "gcp": "Cloud Monitoring/Trace", "azure": "Azure Monitor / App Insights"}[env["cloud"]]
     if env["hipaa"]:
         return "Datadog or New Relic under a signed BAA, or self-hosted Grafana + Prometheus + Loki"
     if env["india"]:
-        return "self-hosted Grafana + Prometheus + Loki in your Indian region"
+        return ("the host's built-in metrics and logs, kept in your Indian region; self-hosted Grafana + Prometheus + "
+                "Loki there once you outgrow them")
     return "Grafana Cloud / Sentry"
 
 
@@ -808,6 +851,19 @@ SERVER_RENDERED = ("nextjs", "nuxt", "sveltekit", "htmx")
 # built files belong in that cloud's object storage behind its CDN, not in the API's containers (no instance
 # time spent handing out files, cached at the edge, deployed apart from the API). Per cloud: (name, source,
 # price per GB delivered, fixed monthly fee). AWS is priced from the knowledge base's S3 + CloudFront item.
+# Each server framework's own WebSocket support, for realtime features that are a part of the product.
+WEBSOCKET_LIBS = {
+    "django": ("Django Channels", "https://channels.readthedocs.io/"),
+    "fastapi": ("FastAPI WebSockets", "https://fastapi.tiangolo.com/advanced/websockets/"),
+    "express": ("Socket.IO", "https://socket.io/docs/v4/"),
+    "nestjs": ("NestJS WebSocket gateways", "https://docs.nestjs.com/websockets/gateways"),
+    "spring_boot": ("Spring WebSocket with STOMP", "https://docs.spring.io/spring-framework/reference/web/websocket.html"),
+    "dotnet": ("ASP.NET Core SignalR", "https://learn.microsoft.com/aspnet/core/signalr/introduction"),
+    "rails": ("Action Cable", "https://guides.rubyonrails.org/action_cable_overview.html"),
+    "laravel": ("Laravel Reverb", "https://laravel.com/docs/reverb"),
+    "go": ("coder/websocket or gorilla/websocket", "https://pkg.go.dev/github.com/coder/websocket"),
+    "phoenix": ("Phoenix Channels", "https://hexdocs.pm/phoenix/channels.html"),
+}
 SPA_STATIC_HOME = {
     "aws": ("Amazon S3 + CloudFront", "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html",
             None, None),
@@ -967,6 +1023,16 @@ REQUEST_BILLED = ("gcp_cloud_run",)  # scales per request across zones by defaul
 MODEL_CALLS_PER_USER_DAY = 1
 MODEL_TOKENS_PER_CALL = 1500
 MODEL_USD_PER_M_TOKENS = (0.15, 2.5)
+# A small scoring model (credit score, fraud score) on one or two always-on CPU instances, SageMaker list prices.
+SCORING_ENDPOINT_USD = (60.0, 250.0)
+SCORING_SERVING = {
+    "aws": ("Amazon SageMaker real-time endpoint", "https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html"),
+    "gcp": ("Vertex AI online prediction endpoint", "https://cloud.google.com/vertex-ai/docs/predictions/overview"),
+    "azure": ("Azure Machine Learning managed online endpoint",
+              "https://learn.microsoft.com/azure/machine-learning/concept-endpoints-online"),
+    "self": ("The model in its own CPU container beside the API (BentoML, or ONNX Runtime behind a small HTTP service)",
+             "https://docs.bentoml.com/"),
+}
 
 
 # Storage floor of a database bill: managed SSD storage per GB-month at list price (Amazon RDS gp3, the common
@@ -1153,7 +1219,11 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
             line(s["role"], *s["usage"])
         elif s.get("tier_usage") and not usage:
             line(s["role"], *s["tier_usage"])
-        if s["role"] == "Model serving" and usage and not _env(p, host)["onprem"]:
+        if s["role"] == "Model serving" and p.get("ml_features") == "inference_api" and p["app_type"] != "ml_product":
+            line("Model serving: CPU endpoint", *SCORING_ENDPOINT_USD,
+                 "one or two always-on small CPU instances behind a real-time endpoint (about $0.10-0.17 an hour each, "
+                 "https://aws.amazon.com/sagemaker/pricing/)")
+        elif s["role"] == "Model serving" and usage and not _env(p, host)["onprem"]:
             tokens = p["dau"] * 30 * MODEL_CALLS_PER_USER_DAY * MODEL_TOKENS_PER_CALL
             line("Model serving: inference", tokens / 1e6 * MODEL_USD_PER_M_TOKENS[0], tokens / 1e6 * MODEL_USD_PER_M_TOKENS[1],
                  f"~{MODEL_CALLS_PER_USER_DAY} call/user/day x {MODEL_TOKENS_PER_CALL:,} tokens = ~{tokens / 1e6:,.0f}M tokens/month "
