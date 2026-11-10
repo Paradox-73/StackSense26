@@ -489,3 +489,16 @@ def test_an_inference_api_is_a_cpu_scoring_endpoint_only_where_a_scoring_model_f
     assert "endpoint for your own model" not in hosted[0] and cost[0].startswith("Model serving: inference")
     inline, cost = ml(edited("P4", infrastructure={"cloud_preference": "none"}))  # functions only: no container
     assert "inside the API's functions" in inline[0] and not cost, (inline, cost)
+
+
+def test_each_service_stays_on_the_named_cloud_and_the_deployment_model():
+    sms = lambda out: [s["choice"] for s in out["stack"]["supporting"] if "Verify" in s["choice"]]
+    assert sms(edited("P2", infrastructure={"cloud_preference": "gcp", "data_residency": "eu"})) == [
+        "Twilio Verify or Identity Platform phone sign-in (SMS)"]
+    assert sms(edited("P2", infrastructure={"deployment_model": "self_hosted_cloud_vm", "data_residency": "eu"})) == [
+        "Twilio Verify or Vonage Verify"]
+    for cloud in ("aws", "gcp", "none"):
+        assert "Azure" not in edited("P5", infrastructure={"cloud_preference": cloud})["stack"]["database"]["choice"], cloud
+    queue = [s["choice"] for s in edited("P4", infrastructure={"deployment_model": "self_hosted_cloud_vm"})["stack"][
+        "supporting"] if s["layer"] == "queue"]
+    assert queue and not [q for q in queue if "SQS" in q], queue

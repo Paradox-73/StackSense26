@@ -380,8 +380,10 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     else:
         jobs = {"node": "BullMQ (Redis)", "python": "Celery / RQ / Dramatiq (Redis/Valkey broker)", "ruby": "Sidekiq (Redis/Valkey)",
                 "elixir": "Oban",
-                "jvm": "Spring Batch / SQS listeners" if prov == "aws" and not env["hybrid"] else "Spring Batch / JobRunr",
-                "dotnet": "Hangfire / Azure Queue" if prov == "azure" and not env["hybrid"] else "Hangfire",
+                "jvm": "Spring Batch / SQS listeners" if prov == "aws" and not env["hybrid"] and not env["self_managed"]
+                else "Spring Batch / JobRunr",
+                "dotnet": "Hangfire / Azure Queue" if prov == "azure" and not env["hybrid"] and not env["self_managed"]
+                else "Hangfire",
                 "go": "River / Asynq", "php": "Laravel Queues"}
         if be.get("kind") == "server" and host.get("kind") in ("faas", "frontend_paas") and not stack.get("api_host"):
             # Functions-only hosting has no always-on process to run a worker or hold a queue connection,
@@ -697,6 +699,11 @@ OTP_USD = {"india": (0.002, 0.005), "other": (0.01, 0.05)}
 SSO_DAU_PER_MAU = 0.2  # daily to monthly users, the same planning heuristic the brief reader uses
 
 
+SMS_BY_CLOUD = {"aws": "Twilio Verify or Amazon SNS / Cognito SMS",
+                "gcp": "Twilio Verify or Identity Platform phone sign-in (SMS)",
+                "azure": "Twilio Verify or Azure Communication Services SMS"}
+
+
 def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -> None:
     """Services for workloads the four main picks do not cover, each with a usage-based cost."""
     work = set(p.get("special_workloads") or [])
@@ -780,7 +787,8 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
         add("Phone login (SMS OTP)", "An SMS gateway inside your network (a GSM modem driven by Kannel or Gammu), or "
             "authenticator-app codes (TOTP) instead of SMS" if env["air_gapped"] else
             "MSG91 or Twilio Verify, with DLT-registered SMS templates" if india else
-            "Twilio Verify or Vonage Verify" if env["no_hyperscaler"] else "Twilio Verify or Amazon SNS / Cognito SMS",
+            # The cloud's own SMS service only on that cloud and when the team may use managed services there.
+            SMS_BY_CLOUD.get("" if env["self_managed"] or env["hybrid"] else env["cloud"] or "", "Twilio Verify or Vonage Verify"),
             "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud"
             + ("; Indian operators deliver only DLT-registered templates." if india else "."),
             "https://www.twilio.com/en-us/verify/pricing",

@@ -1336,7 +1336,7 @@
         "how": "row-level security (CREATE SECURITY POLICY) filters every query by tenant",
         "source": "https://learn.microsoft.com/en-us/sql/relational-databases/security/row-level-security"
       },
-      "name": "Microsoft SQL Server / Azure SQL Database",
+      "name": "Microsoft SQL Server",
       "summary": "Microsoft's relational database: SQL Server on any server, or Azure SQL Database as the managed service, with T-SQL, columnstore indexes, JSON and full-text search.",
       "models": {
         "relational": 5,

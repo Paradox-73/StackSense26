@@ -1697,7 +1697,7 @@
       "weaknesses": [
         "Fewer managed services than hyperscalers",
         {"text": "Its HIPAA BAA does not cover App Platform or Managed Databases (only Droplets, Kubernetes and other listed products)", "when": {"compliance_any": ["hipaa"]}},
-        {"text": "Static sites in BLR1 (Bangalore) have limited availability: they are served through the Cloudflare CDN only", "when": {"india": true}}
+        {"text": "Static sites in BLR1 (Bangalore) have limited availability: they are served through the Cloudflare CDN only", "when": {"india": true, "stack_any": ["no_custom_backend"]}}
       ],
       "static_cost_usd": [[0, 0], [1, 6], [6, 60], [60, 600], [600, 6000], [6000, 30000]],
       "static_cost_note": "Three static-site apps are free with 1 GiB of transfer each a month; more transfer is $0.02 per GiB, and static-only apps past three are $3 a month each.",
