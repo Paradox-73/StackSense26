@@ -27,9 +27,9 @@ The statement judges a stack on its fit to the constraints, on the inputs the en
 
 ## 3. System architecture
 
-![StackSense architecture: the browser pages, the FastAPI app, the pure-Python engine, the data files and the optional language-model layer with its checks](../docs/architecture.svg)
+![StackSense architecture: the entry points, the FastAPI app, the scenario adapter, the rule engine and its data files, and the optional language-model layer with its checks and off switch](../docs/architecture.svg)
 
-The engine (`engine/`) is pure Python. A FastAPI app (`app/main.py`) serves a JSON API, the guided questionnaire and the Scenario file page (`/scenario`), which loads a scenario JSON or a public example, shows every standard field as a form, runs it and downloads the output JSON. Knowledge lives in JSON files under `data/` with their sources; the optional language-model layer (`engine/llm.py`, `brief.py`, `summary.py`) sits outside the decision path.
+The engine (`engine/`) is pure Python. A FastAPI app (`app/main.py`) serves a JSON API, the guided questionnaire and the Scenario file page (`/scenario`), which loads a scenario JSON or a public example, shows every standard field as a form, runs it and downloads the output JSON. Scenario files reach the engine only through the adapter `engine/standard.py`. Knowledge lives in JSON files under `data/` with their sources; the optional language-model layer (`engine/llm.py`, `brief.py`, `summary.py`) sits outside the decision path, and `STACKSENSE_LLM=off` switches it off (Section 5.5).
 
 ### 3.1 Data flow from input to output
 

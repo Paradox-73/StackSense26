@@ -148,15 +148,15 @@ def test_every_scripted_screenshot_exists_and_is_listed(facts):
 
 
 def test_architecture_figures_quote_the_right_counts(facts):
-    svg = (ROOT / "docs" / "architecture.svg").read_text(encoding="utf-8")
-    for pat, key in ((r"(\d+) technologies", "technologies"), (r"(\d+) rules", "rules"), (r"(\d+) examples", "presets"),
-                     (r"Refine: (\d+) questions", "questions"), (r"Quick mode: (\d+) questions", "quick_questions"),
-                     (r"(\d+) questions, defaults", "questions")):
-        for m in re.findall(pat, svg):
-            assert int(m) == facts[key], (pat, m)
     for name in ("architecture.svg", "pipeline.svg"):
-        text = (ROOT / "docs" / name).read_text(encoding="utf-8")
-        assert "<title" in text and "<desc" in text
+        svg = (ROOT / "docs" / name).read_text(encoding="utf-8")
+        for pat, key in ((r"(\d+) technologies", "technologies"), (r"(\d+) (?:compatibility )?rules", "rules"),
+                         (r"(\d+) examples", "presets"), (r"Refine: (\d+) questions", "questions"),
+                         (r"Quick mode: (\d+) questions", "quick_questions"), (r"(\d+) questions, defaults", "questions"),
+                         (r"(\d+) (?:contradiction )?checks", "conflict_warning_codes"), (r"(\d+) criteria", "criteria")):
+            for m in re.findall(pat, svg):
+                assert int(m) == facts[key], (name, pat, m)
+        assert "<title" in svg and "<desc" in svg
 
 
 def test_readme_starts_with_the_architecture_figure():

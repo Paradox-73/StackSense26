@@ -4,7 +4,7 @@ An explainable tech-stack recommendation engine for the Synergy '26 StackSense C
 
 StackSense takes a software project's parameters (scale, team and skills, budget, timeline, infrastructure, compliance, priorities) and recommends a frontend, backend, database and hosting platform, plus supporting services such as a cache, a job queue, sign-in, storage, a CDN or payments when the inputs call for them. It reads scenario files in the challenge's standard input schema and writes the standard output schema. Every choice comes from rules and weighted scoring over a cited knowledge base of 60 technologies, never from a language model, so the same input always gives the same stack. Each component lists the input fields that drove it, at least one alternative with the reason it lost, its trade-offs and a monthly cost band; contradictions and broken constraints come back as warnings with a severity.
 
-![StackSense architecture: browser, FastAPI app, pure-Python rule engine, the data files, and the optional language-model layer with its checks](docs/architecture.svg)
+![StackSense architecture: the entry points, the FastAPI app, the scenario adapter, the pure-Python rule engine and its data files, and the optional language-model layer with its checks and off switch](docs/architecture.svg)
 
 ## System architecture
 
