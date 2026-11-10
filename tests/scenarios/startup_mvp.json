@@ -1,0 +1,66 @@
+{
+  "id": "startup_mvp",
+  "name": "Startup SaaS MVP",
+  "input": {
+    "project_name": "Invoicely (B2B SaaS MVP)",
+    "app_type": "saas",
+    "platforms": [
+      "web"
+    ],
+    "dau": 500,
+    "data_volume_gb": 2,
+    "data_growth_gb_month": 1,
+    "read_write": "balanced",
+    "data_shapes": [
+      "relational"
+    ],
+    "consistency": "strong",
+    "realtime": "some",
+    "latency_target_ms": 300,
+    "seo": "important",
+    "offline": false,
+    "availability": "99.9",
+    "regions": [
+      "north_america",
+      "europe"
+    ],
+    "team_size": 2,
+    "team_skills": [
+      "typescript",
+      "react",
+      "sql"
+    ],
+    "timeline_weeks": 8,
+    "architecture": "auto",
+    "budget_monthly": 50,
+    "currency": "USD",
+    "deployment": "cloud",
+    "cloud_preference": "none",
+    "lock_in_tolerance": "medium",
+    "compliance": [
+      "gdpr"
+    ]
+  },
+  "expect": {
+    "pick_in": {
+      "frontend": [
+        "nextjs"
+      ],
+      "backend": [
+        "supabase",
+        "express",
+        "nestjs",
+        "serverless_functions"
+      ],
+      "database": [
+        "postgres"
+      ],
+      "hosting": [
+        "vercel",
+        "netlify",
+        "cloudflare"
+      ]
+    },
+    "max_cost_high": 100
+  }
+}

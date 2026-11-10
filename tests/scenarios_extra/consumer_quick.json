@@ -1,0 +1,306 @@
+[
+ {
+  "name": "Q01 ecommerce 100k $500 team6 js dpdp",
+  "input": {
+   "app_type": "ecommerce",
+   "dau": 100000,
+   "budget_monthly": 500,
+   "currency": "USD",
+   "team_size": 6,
+   "team_skills": [
+    "javascript",
+    "typescript",
+    "react",
+    "node"
+   ],
+   "compliance": [
+    "dpdp"
+   ]
+  }
+ },
+ {
+  "name": "Q02 social 1M $2k team12 java dpdp",
+  "input": {
+   "app_type": "social_network",
+   "dau": 1000000,
+   "budget_monthly": 2000,
+   "currency": "USD",
+   "team_size": 12,
+   "team_skills": [
+    "java",
+    "spring"
+   ],
+   "compliance": [
+    "dpdp"
+   ]
+  }
+ },
+ {
+  "name": "Q03 fintech 10k $100 team3 python pci",
+  "input": {
+   "app_type": "fintech",
+   "dau": 10000,
+   "budget_monthly": 100,
+   "currency": "USD",
+   "team_size": 3,
+   "team_skills": [
+    "python"
+   ],
+   "compliance": [
+    "pci_dss"
+   ]
+  }
+ },
+ {
+  "name": "Q04 realtime 10k $25 solo js",
+  "input": {
+   "app_type": "realtime_collab",
+   "dau": 10000,
+   "budget_monthly": 25,
+   "currency": "USD",
+   "team_size": 1,
+   "team_skills": [
+    "javascript",
+    "typescript",
+    "react",
+    "node"
+   ],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q05 healthcare 1k $0 solo python dpdp",
+  "input": {
+   "app_type": "healthcare",
+   "dau": 1000,
+   "budget_monthly": 0,
+   "currency": "USD",
+   "team_size": 1,
+   "team_skills": [
+    "python"
+   ],
+   "compliance": [
+    "dpdp"
+   ]
+  }
+ },
+ {
+  "name": "Q06 mobile 100k $500 team3 js",
+  "input": {
+   "app_type": "mobile_first",
+   "dau": 100000,
+   "budget_monthly": 500,
+   "currency": "USD",
+   "team_size": 3,
+   "team_skills": [
+    "javascript",
+    "typescript",
+    "react",
+    "node"
+   ],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q07 prototype 100 $0 team3 python",
+  "input": {
+   "app_type": "prototype",
+   "dau": 100,
+   "budget_monthly": 0,
+   "currency": "USD",
+   "team_size": 3,
+   "team_skills": [
+    "python"
+   ],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q08 content 10k $25 solo php",
+  "input": {
+   "app_type": "content_site",
+   "dau": 10000,
+   "budget_monthly": 25,
+   "currency": "USD",
+   "team_size": 1,
+   "team_skills": [
+    "php"
+   ],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q09 ml 1k $100 team3 python",
+  "input": {
+   "app_type": "ml_product",
+   "dau": 1000,
+   "budget_monthly": 100,
+   "currency": "USD",
+   "team_size": 3,
+   "team_skills": [
+    "python"
+   ],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q10 saas 10M $10k team40 go soc2",
+  "input": {
+   "app_type": "saas",
+   "dau": 10000000,
+   "budget_monthly": 10000,
+   "currency": "USD",
+   "team_size": 40,
+   "team_skills": [
+    "go"
+   ],
+   "compliance": [
+    "soc2"
+   ]
+  }
+ },
+ {
+  "name": "Q11 dashboards 1k $100 team3 csharp",
+  "input": {
+   "app_type": "analytics_dashboard",
+   "dau": 1000,
+   "budget_monthly": 100,
+   "currency": "USD",
+   "team_size": 3,
+   "team_skills": [
+    "csharp"
+   ],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q12 internal 100 $0 solo java",
+  "input": {
+   "app_type": "internal_tool",
+   "dau": 100,
+   "budget_monthly": 0,
+   "currency": "USD",
+   "team_size": 1,
+   "team_skills": [
+    "java",
+    "spring"
+   ],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q13 iot 10k $500 team6 python",
+  "input": {
+   "app_type": "iot_telemetry",
+   "dau": 10000,
+   "budget_monthly": 500,
+   "currency": "USD",
+   "team_size": 6,
+   "team_skills": [
+    "python"
+   ],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q14 ecommerce 10k $100 team3 java dpdp",
+  "input": {
+   "app_type": "ecommerce",
+   "dau": 10000,
+   "budget_monthly": 100,
+   "currency": "USD",
+   "team_size": 3,
+   "team_skills": [
+    "java",
+    "spring"
+   ],
+   "compliance": [
+    "dpdp"
+   ]
+  }
+ },
+ {
+  "name": "Q15 saas 1k $25 team3 java",
+  "input": {
+   "app_type": "saas",
+   "dau": 1000,
+   "budget_monthly": 25,
+   "currency": "USD",
+   "team_size": 3,
+   "team_skills": [
+    "java",
+    "spring"
+   ],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q16 saas 10k $100 team6 php",
+  "input": {
+   "app_type": "saas",
+   "dau": 10000,
+   "budget_monthly": 100,
+   "currency": "USD",
+   "team_size": 6,
+   "team_skills": [
+    "php"
+   ],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q17 social 10k $100 team3 python",
+  "input": {
+   "app_type": "social_network",
+   "dau": 10000,
+   "budget_monthly": 100,
+   "currency": "USD",
+   "team_size": 3,
+   "team_skills": [
+    "python"
+   ],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q18 fintech 100k $2k team12 java dpdp",
+  "input": {
+   "app_type": "fintech",
+   "dau": 100000,
+   "budget_monthly": 2000,
+   "currency": "USD",
+   "team_size": 12,
+   "team_skills": [
+    "java",
+    "spring"
+   ],
+   "compliance": [
+    "dpdp"
+   ]
+  }
+ },
+ {
+  "name": "Q19 prototype 100 $0 solo any",
+  "input": {
+   "app_type": "prototype",
+   "dau": 100,
+   "budget_monthly": 0,
+   "currency": "USD",
+   "team_size": 1,
+   "team_skills": [],
+   "compliance": []
+  }
+ },
+ {
+  "name": "Q20 mobile 10k $25 solo any",
+  "input": {
+   "app_type": "mobile_first",
+   "dau": 10000,
+   "budget_monthly": 25,
+   "currency": "USD",
+   "team_size": 1,
+   "team_skills": [],
+   "compliance": []
+  }
+ }
+]

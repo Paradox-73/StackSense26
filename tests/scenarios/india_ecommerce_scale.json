@@ -1,0 +1,89 @@
+{
+  "id": "india_ecommerce_scale",
+  "name": "Indian e-commerce at scale",
+  "input": {
+    "project_name": "BazaarKart (e-commerce)",
+    "app_type": "ecommerce",
+    "platforms": [
+      "web",
+      "android",
+      "ios"
+    ],
+    "dau": 2000000,
+    "peak_rps": 25000,
+    "data_volume_gb": 800,
+    "data_growth_gb_month": 60,
+    "read_write": "read_heavy",
+    "data_shapes": [
+      "relational",
+      "document"
+    ],
+    "consistency": "strong",
+    "realtime": "some",
+    "latency_target_ms": 200,
+    "seo": "critical",
+    "offline": false,
+    "availability": "99.95",
+    "regions": [
+      "india"
+    ],
+    "team_size": 25,
+    "team_skills": [
+      "java",
+      "spring",
+      "react",
+      "typescript",
+      "aws",
+      "docker",
+      "kubernetes",
+      "sql",
+      "mysql"
+    ],
+    "timeline_weeks": 26,
+    "architecture": "microservices",
+    "budget_monthly": 2500000,
+    "currency": "INR",
+    "deployment": "cloud",
+    "cloud_preference": "aws",
+    "lock_in_tolerance": "medium",
+    "compliance": [
+      "pci_dss",
+      "dpdp",
+      "data_residency_india"
+    ]
+  },
+  "expect": {
+    "pick_in": {
+      "frontend": [
+        "nextjs",
+        "nuxt",
+        "sveltekit"
+      ],
+      "backend": [
+        "spring_boot"
+      ],
+      "database": [
+        "postgres",
+        "mysql"
+      ],
+      "hosting": [
+        "aws_ecs",
+        "aws_eks"
+      ]
+    },
+    "excluded": {
+      "hosting": [
+        "render",
+        "railway",
+        "netlify",
+        "hetzner"
+      ]
+    },
+    "companion": true,
+    "services_include": [
+      "Cache",
+      "Payments",
+      "Search"
+    ]
+  }
+}

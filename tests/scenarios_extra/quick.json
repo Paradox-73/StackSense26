@@ -1,0 +1,20 @@
+[
+ {"name": "J01 college fest site (content, 10k, $0, 2-3 JS, none)", "input": {"project_name": "Fest site", "app_type": "content_site", "dau": 10000, "budget_monthly": 0, "team_size": 3, "team_skills": ["javascript", "typescript", "react", "node"], "compliance": []}},
+ {"name": "J02 food delivery India (ecommerce, 100k, $500, 4-8 Java, DPDP)", "input": {"project_name": "Food delivery", "app_type": "ecommerce", "dau": 100000, "budget_monthly": 500, "team_size": 6, "team_skills": ["java", "spring"], "compliance": ["dpdp"]}},
+ {"name": "J03 hackathon prototype (prototype, 100, $0, solo Python)", "input": {"project_name": "Hack", "app_type": "prototype", "dau": 100, "budget_monthly": 0, "team_size": 1, "team_skills": ["python"], "compliance": []}},
+ {"name": "J04 chat app (realtime, 10k, $25, 2-3 JS)", "input": {"project_name": "Chat", "app_type": "realtime_collab", "dau": 10000, "budget_monthly": 25, "team_size": 3, "team_skills": ["javascript", "typescript", "react", "node"], "compliance": []}},
+ {"name": "J05 UPI fintech (fintech, 1M, $10k, 9-20 Java, PCI+DPDP)", "input": {"project_name": "UPI app", "app_type": "fintech", "dau": 1000000, "budget_monthly": 10000, "team_size": 12, "team_skills": ["java", "spring"], "compliance": ["pci_dss", "dpdp"]}},
+ {"name": "J06 hospital mgmt India (healthcare, 1k, $100, 4-8 Python, DPDP)", "input": {"project_name": "Hospital", "app_type": "healthcare", "dau": 1000, "budget_monthly": 100, "team_size": 6, "team_skills": ["python"], "compliance": ["dpdp"]}},
+ {"name": "J07 RAG chatbot SaaS (ml, 10k, $500, 2-3 Python)", "input": {"project_name": "RAG bot", "app_type": "ml_product", "dau": 10000, "budget_monthly": 500, "team_size": 3, "team_skills": ["python"], "compliance": []}},
+ {"name": "J08 internal tool PHP (internal, 100, $0, solo PHP)", "input": {"project_name": "Admin", "app_type": "internal_tool", "dau": 100, "budget_monthly": 0, "team_size": 1, "team_skills": ["php"], "compliance": []}},
+ {"name": "J09 social app (social, 1M, $2k, 4-8 JS, DPDP)", "input": {"project_name": "Social", "app_type": "social_network", "dau": 1000000, "budget_monthly": 2000, "team_size": 6, "team_skills": ["javascript", "typescript", "react", "node"], "compliance": ["dpdp"]}},
+ {"name": "J10 analytics dashboard (dash, 1k, $100, 2-3 Python, SOC2)", "input": {"project_name": "Dash", "app_type": "analytics_dashboard", "dau": 1000, "budget_monthly": 100, "team_size": 3, "team_skills": ["python"], "compliance": ["soc2"]}},
+ {"name": "J11 smart campus IoT (iot, 10k, $100, 2-3 Python)", "input": {"project_name": "Campus IoT", "app_type": "iot_telemetry", "dau": 10000, "budget_monthly": 100, "team_size": 3, "team_skills": ["python"], "compliance": []}},
+ {"name": "J12 small shop (ecommerce, 1k, $25, solo PHP, PCI)", "input": {"project_name": "Shop", "app_type": "ecommerce", "dau": 1000, "budget_monthly": 25, "team_size": 1, "team_skills": ["php"], "compliance": ["pci_dss"]}},
+ {"name": "J13 mobile app (mobile, 10k, $100, 2-3 JS)", "input": {"project_name": "Mobile", "app_type": "mobile_first", "dau": 10000, "budget_monthly": 100, "team_size": 3, "team_skills": ["javascript", "typescript", "react", "node"], "compliance": []}},
+ {"name": "J14 B2B SaaS .NET (saas, 10k, $500, 4-8 C#, SOC2)", "input": {"project_name": "B2B", "app_type": "saas", "dau": 10000, "budget_monthly": 500, "team_size": 6, "team_skills": ["csharp"], "compliance": ["soc2"]}},
+ {"name": "J15 Go realtime (realtime, 100k, $2k, 4-8 Go)", "input": {"project_name": "Go RT", "app_type": "realtime_collab", "dau": 100000, "budget_monthly": 2000, "team_size": 6, "team_skills": ["go"], "compliance": []}},
+ {"name": "J16 page-load defaults (no answers)", "input": {}},
+ {"name": "J17 demo step: ecommerce 100k $2k (defaults otherwise)", "input": {"app_type": "ecommerce", "dau": 100000, "budget_monthly": 2000}},
+ {"name": "J18 LMS for college (saas, 5k, $50, 2-3 Python, DPDP, India)", "input": {"project_name": "LMS", "app_type": "saas", "dau": 5000, "budget_monthly": 50, "team_size": 3, "team_skills": ["python"], "compliance": ["dpdp"]}}
+]

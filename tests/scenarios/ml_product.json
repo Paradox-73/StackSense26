@@ -1,0 +1,69 @@
+{
+  "id": "ml_product",
+  "name": "AI document-search product (RAG)",
+  "input": {
+    "project_name": "DocMind (RAG search)",
+    "app_type": "ml_product",
+    "platforms": [
+      "web"
+    ],
+    "dau": 30000,
+    "data_volume_gb": 200,
+    "data_growth_gb_month": 30,
+    "read_write": "read_heavy",
+    "data_shapes": [
+      "relational",
+      "vector"
+    ],
+    "consistency": "strong",
+    "realtime": "some",
+    "latency_target_ms": 1500,
+    "seo": "important",
+    "offline": false,
+    "availability": "99.9",
+    "regions": [
+      "north_america",
+      "europe"
+    ],
+    "team_size": 4,
+    "team_skills": [
+      "python",
+      "fastapi",
+      "react",
+      "typescript",
+      "gcp",
+      "docker",
+      "sql"
+    ],
+    "timeline_weeks": 12,
+    "architecture": "auto",
+    "budget_monthly": 1500,
+    "currency": "USD",
+    "deployment": "cloud",
+    "cloud_preference": "gcp",
+    "lock_in_tolerance": "medium",
+    "compliance": [
+      "gdpr",
+      "soc2"
+    ]
+  },
+  "expect": {
+    "pick_in": {
+      "backend": [
+        "fastapi",
+        "django"
+      ],
+      "database": [
+        "postgres"
+      ],
+      "hosting": [
+        "gcp_cloud_run",
+        "gcp_gke"
+      ]
+    },
+    "services_include": [
+      "Vector search",
+      "Model serving"
+    ]
+  }
+}

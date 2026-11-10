@@ -1,0 +1,80 @@
+{
+  "id": "hipaa_telehealth",
+  "name": "HIPAA telehealth platform",
+  "input": {
+    "project_name": "CareLink (telehealth)",
+    "app_type": "healthcare",
+    "platforms": [
+      "web",
+      "ios",
+      "android"
+    ],
+    "dau": 20000,
+    "data_volume_gb": 100,
+    "data_growth_gb_month": 15,
+    "read_write": "balanced",
+    "data_shapes": [
+      "relational",
+      "document"
+    ],
+    "consistency": "strong",
+    "realtime": "some",
+    "latency_target_ms": 300,
+    "seo": "none",
+    "offline": false,
+    "availability": "99.95",
+    "regions": [
+      "north_america"
+    ],
+    "team_size": 5,
+    "team_skills": [
+      "python",
+      "react",
+      "typescript",
+      "aws",
+      "sql",
+      "docker"
+    ],
+    "timeline_weeks": 20,
+    "architecture": "auto",
+    "budget_monthly": 3000,
+    "currency": "USD",
+    "deployment": "cloud",
+    "cloud_preference": "none",
+    "lock_in_tolerance": "medium",
+    "compliance": [
+      "hipaa",
+      "soc2"
+    ]
+  },
+  "expect": {
+    "pick_not_in": {
+      "backend": [
+        "firebase"
+      ],
+      "hosting": [
+        "netlify",
+        "railway",
+        "digitalocean",
+        "hetzner",
+        "cloudflare"
+      ]
+    },
+    "excluded": {
+      "hosting": [
+        "netlify",
+        "railway",
+        "hetzner",
+        "cloudflare",
+        "digitalocean"
+      ],
+      "backend": [
+        "firebase"
+      ]
+    },
+    "hosting_flag": "hipaa",
+    "services_include": [
+      "Audit & security"
+    ]
+  }
+}

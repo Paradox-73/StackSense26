@@ -1,0 +1,72 @@
+{
+  "id": "realtime_multiplayer",
+  "name": "Realtime multiplayer game backend",
+  "input": {
+    "project_name": "PixelArena (multiplayer)",
+    "app_type": "realtime_collab",
+    "platforms": [
+      "web"
+    ],
+    "dau": 200000,
+    "data_volume_gb": 50,
+    "data_growth_gb_month": 10,
+    "read_write": "write_heavy",
+    "data_shapes": [
+      "key_value",
+      "document"
+    ],
+    "consistency": "eventual_ok",
+    "realtime": "core",
+    "latency_target_ms": 50,
+    "seo": "none",
+    "offline": false,
+    "availability": "99.9",
+    "regions": [
+      "global"
+    ],
+    "team_size": 4,
+    "team_skills": [
+      "typescript",
+      "go",
+      "react",
+      "docker"
+    ],
+    "timeline_weeks": 16,
+    "architecture": "auto",
+    "budget_monthly": 2000,
+    "currency": "USD",
+    "deployment": "cloud",
+    "cloud_preference": "none",
+    "lock_in_tolerance": "low",
+    "compliance": []
+  },
+  "expect": {
+    "pick_in": {
+      "backend": [
+        "go",
+        "phoenix",
+        "express",
+        "nestjs",
+        "dotnet"
+      ]
+    },
+    "pick_not_in": {
+      "hosting": [
+        "vercel",
+        "netlify",
+        "aws_lambda"
+      ],
+      "database": [
+        "redis",
+        "firestore",
+        "dynamodb"
+      ]
+    },
+    "excluded": {
+      "database": [
+        "firestore",
+        "dynamodb"
+      ]
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "internal_tool",
+  "name": "On-prem internal tool",
+  "input": {
+    "project_name": "OpsDesk (internal admin)",
+    "app_type": "internal_tool",
+    "platforms": [
+      "web"
+    ],
+    "dau": 200,
+    "data_volume_gb": 1,
+    "data_growth_gb_month": 0.2,
+    "read_write": "balanced",
+    "data_shapes": [
+      "relational"
+    ],
+    "consistency": "strong",
+    "realtime": "none",
+    "latency_target_ms": 1000,
+    "seo": "none",
+    "offline": false,
+    "availability": "99.0",
+    "regions": [
+      "india"
+    ],
+    "team_size": 1,
+    "team_skills": [
+      "python",
+      "django",
+      "html",
+      "sql",
+      "linux"
+    ],
+    "timeline_weeks": 3,
+    "architecture": "monolith",
+    "budget_monthly": 0,
+    "currency": "INR",
+    "deployment": "on_prem",
+    "cloud_preference": "none",
+    "lock_in_tolerance": "low",
+    "compliance": []
+  },
+  "expect": {
+    "pick_in": {
+      "backend": [
+        "django"
+      ],
+      "hosting": [
+        "onprem_docker",
+        "onprem_k8s"
+      ],
+      "frontend": [
+        "htmx",
+        "react_spa",
+        "nextjs"
+      ]
+    },
+    "excluded": {
+      "hosting": [
+        "vercel",
+        "aws_lambda"
+      ],
+      "database": [
+        "dynamodb",
+        "firestore"
+      ]
+    },
+    "max_cost_low": 0
+  }
+}

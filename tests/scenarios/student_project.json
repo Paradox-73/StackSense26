@@ -1,0 +1,52 @@
+{
+  "id": "student_project",
+  "name": "Student project (zero budget)",
+  "input": {
+    "project_name": "CampusSwap (student project)",
+    "app_type": "prototype",
+    "platforms": [
+      "web"
+    ],
+    "dau": 50,
+    "data_volume_gb": 0.5,
+    "data_growth_gb_month": 0.1,
+    "read_write": "balanced",
+    "data_shapes": [
+      "document"
+    ],
+    "consistency": "eventual_ok",
+    "realtime": "some",
+    "latency_target_ms": 1000,
+    "seo": "none",
+    "offline": false,
+    "availability": "99.0",
+    "regions": [
+      "india"
+    ],
+    "team_size": 1,
+    "team_skills": [
+      "javascript",
+      "html",
+      "react"
+    ],
+    "timeline_weeks": 2,
+    "architecture": "auto",
+    "budget_monthly": 0,
+    "currency": "INR",
+    "deployment": "cloud",
+    "cloud_preference": "none",
+    "lock_in_tolerance": "high",
+    "compliance": []
+  },
+  "expect": {
+    "pick_in": {
+      "backend": [
+        "firebase",
+        "supabase",
+        "serverless_functions",
+        "express"
+      ]
+    },
+    "max_cost_low": 0
+  }
+}

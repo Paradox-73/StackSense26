@@ -1,0 +1,75 @@
+{
+  "id": "iot_telemetry",
+  "name": "IoT telemetry pipeline",
+  "input": {
+    "project_name": "GridPulse (IoT)",
+    "app_type": "iot_telemetry",
+    "platforms": [
+      "web"
+    ],
+    "dau": 40000,
+    "peak_rps": 4000,
+    "data_volume_gb": 2000,
+    "data_growth_gb_month": 300,
+    "read_write": "write_heavy",
+    "data_shapes": [
+      "time_series",
+      "relational"
+    ],
+    "consistency": "eventual_ok",
+    "realtime": "some",
+    "latency_target_ms": 500,
+    "seo": "none",
+    "offline": false,
+    "availability": "99.9",
+    "regions": [
+      "europe"
+    ],
+    "team_size": 6,
+    "team_skills": [
+      "python",
+      "go",
+      "sql",
+      "postgres",
+      "aws",
+      "docker"
+    ],
+    "timeline_weeks": 16,
+    "architecture": "auto",
+    "budget_monthly": 4000,
+    "currency": "USD",
+    "deployment": "cloud",
+    "cloud_preference": "aws",
+    "lock_in_tolerance": "medium",
+    "compliance": [
+      "gdpr",
+      "data_residency_eu"
+    ]
+  },
+  "expect": {
+    "pick_in": {
+      "database": [
+        "timescaledb",
+        "clickhouse",
+        "cassandra"
+      ],
+      "backend": [
+        "go",
+        "fastapi",
+        "dotnet",
+        "spring_boot"
+      ]
+    },
+    "hosting_provider": "aws",
+    "services_include": [
+      "Ingestion buffer"
+    ],
+    "pick_not_in": {
+      "database": [
+        "dynamodb",
+        "redis",
+        "sqlite"
+      ]
+    }
+  }
+}
