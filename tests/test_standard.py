@@ -1,0 +1,305 @@
+"""The Synergy '26 scenario format: schema of the output, hard constraints on the public scenarios, validation,
+determinism and the LLM-off switch (problem statement sections 3-8)."""
+import copy
+import json
+from pathlib import Path
+
+import pytest
+
+from engine.standard import FIELD_PATHS, run
+
+ROOT = Path(__file__).resolve().parent.parent
+PUBLIC = sorted((ROOT / "scenarios" / "public").glob("P*.json"))
+STATUSES = {"ok", "ok_with_warnings", "infeasible", "invalid_input"}
+STYLES = {"static", "monolith", "modular_monolith", "serverless", "service_oriented", "microservices", "hybrid", "other"}
+SUPPORT = {"cache", "queue", "search", "auth", "storage", "cdn", "realtime", "payments", "ml", "ci_cd", "observability",
+           "other"}
+SAAS = ("Clerk", "Auth0", "Stripe", "Razorpay", "Cloudflare", "CloudFront", "Firebase", "Twilio", "MSG91", "Sentry",
+        "Grafana Cloud", "Vercel", "Netlify", "Algolia", "Ably", "Pusher", "GitHub Actions", "Upstash", "Expo")
+
+
+def load(name: str) -> dict:
+    return json.loads((ROOT / "scenarios" / "public" / f"{name}.json").read_text(encoding="utf-8"))
+
+
+@pytest.fixture(scope="module")
+def outputs() -> dict:
+    return {p.stem: run(json.loads(p.read_text(encoding="utf-8"))) for p in PUBLIC}
+
+
+def check_component(c: dict, core: bool) -> None:
+    assert isinstance(c["choice"], str) and c["choice"].strip()
+    assert isinstance(c["justification"], str) and len(c["justification"]) > 40
+    assert c["driven_by"] and set(c["driven_by"]) <= set(FIELD_PATHS), c["driven_by"]
+    assert isinstance(c["alternatives"], list) and isinstance(c["tradeoffs"], list)
+    if core:
+        assert c["alternatives"], c["choice"]
+    for alt in c["alternatives"]:
+        assert alt["choice"].strip() and alt["why_not"].strip()
+
+
+def check_schema(out: dict) -> None:
+    assert out["status"] in STATUSES
+    assert isinstance(out["summary"], str) and out["summary"]
+    assert isinstance(out["warnings"], list) and isinstance(out["assumptions"], list)
+    assert isinstance(out["validation_errors"], list)
+    for w in out["warnings"]:
+        assert w["severity"] in ("info", "warning", "critical") and w["code"] and w["message"]
+        assert set(w["fields"]) <= set(FIELD_PATHS), w
+    assert all(isinstance(a, str) and a for a in out["assumptions"])
+    if out["status"] == "invalid_input":
+        assert out["stack"] is None and out["validation_errors"]
+        return
+    assert not out["validation_errors"]
+    if out["status"] == "infeasible":
+        assert any(w["severity"] == "critical" for w in out["warnings"])
+        return
+    assert out["architecture_style"] in STYLES
+    for layer in ("frontend", "backend", "database", "hosting"):
+        check_component(out["stack"][layer], core=True)
+    for s in out["stack"]["supporting"]:
+        assert s["layer"] in SUPPORT
+        check_component(s, core=False)
+    cost = out["estimated_monthly_cost_usd"]
+    assert 0 <= cost["min"] <= cost["max"] and cost["assumptions"]
+
+
+def test_six_public_scenarios_are_present():
+    assert [p.stem for p in PUBLIC] == ["P1", "P2", "P3", "P4", "P5", "P6"]
+
+
+@pytest.mark.parametrize("name", ["P1", "P2", "P3", "P4", "P5", "P6"])
+def test_public_output_follows_the_schema(outputs, name):
+    out = outputs[name]
+    check_schema(out)
+    assert out["status"] in ("ok", "ok_with_warnings") and out["scenario_id"] == name
+
+
+def test_explicit_cloud_and_residency_hold(outputs):
+    assert "AWS" in outputs["P4"]["stack"]["hosting"]["choice"] and "ap-south-1" in outputs["P4"]["stack"]["hosting"]["choice"]
+    assert "Azure" in outputs["P5"]["stack"]["hosting"]["choice"] and "India" in outputs["P5"]["stack"]["hosting"]["choice"]
+    for name in ("P2", "P4", "P5", "P6"):
+        host = outputs[name]["stack"]["hosting"]["choice"]
+        assert any(city in host for city in ("Mumbai", "Pune", "Bangalore", "India")), (name, host)
+
+
+def test_small_teams_get_no_microservices_or_kubernetes(outputs):
+    for name in ("P1", "P2", "P5", "P6"):
+        out = outputs[name]
+        assert out["architecture_style"] not in ("microservices", "service_oriented"), name
+        assert "Kubernetes" not in out["stack"]["hosting"]["choice"], name
+
+
+def test_zero_budget_portfolio_starts_free(outputs):
+    assert outputs["P1"]["estimated_monthly_cost_usd"]["min"] == 0
+    assert outputs["P1"]["stack"]["database"]["choice"] == "None"
+    assert outputs["P1"]["stack"]["backend"]["choice"] == "None"
+    assert "content files in git" in outputs["P1"]["stack"]["database"]["justification"]
+
+
+def test_same_input_gives_identical_output():
+    doc = load("P3")
+    assert json.dumps(run(doc), sort_keys=True) == json.dumps(run(copy.deepcopy(doc)), sort_keys=True)
+
+
+@pytest.mark.parametrize("path,value", [
+    ("scale.users_12_months", -5), ("scale.users_12_months", "30000"), ("team.size", 0), ("team.size", 2.5),
+    ("project.type", "blockchain"), ("project.platforms", []), ("project.platforms", ["web", "watch"]),
+    ("requirements.availability", 99.9), ("requirements.auth", True), ("requirements.p95_latency_ms", 0),
+    ("budget.monthly_infra_usd", -1), ("compliance", ["sox"]), ("priorities.cost", 7), ("priorities.speed", 3),
+    ("infrastructure.data_residency", "mars"), ("requirements.realtime", "yes"), ("team.languages", "python"),
+])
+def test_invalid_values_are_field_level_errors(path, value):
+    doc = load("P2")
+    node = doc
+    *parents, leaf = path.split(".")
+    for part in parents:
+        node = node[part]
+    node[leaf] = value
+    out = run(doc)
+    assert out["status"] == "invalid_input" and out["stack"] is None
+    assert path in {e["field"] for e in out["validation_errors"]}, out["validation_errors"]
+
+
+@pytest.mark.parametrize("doc", [None, [], "P1", 42, {"project": "web"}, {"priorities": [1, 2]}])
+def test_malformed_files_never_crash(doc):
+    out = run(doc)
+    assert out["status"] == "invalid_input" and out["validation_errors"]
+
+
+def test_missing_required_fields_use_listed_defaults():
+    out = run({"scenario_id": "few", "project": {"type": "internal_tool", "platforms": ["web"]}})
+    check_schema(out)
+    assert out["status"] == "ok_with_warnings"
+    missing = {w["fields"][0] for w in out["warnings"] if w["code"] == "MISSING_REQUIRED_FIELD"}
+    assert missing == {"scale.users_at_launch", "scale.users_12_months", "team.size", "team.experience",
+                       "team.languages", "budget.monthly_infra_usd", "timeline.mvp_weeks"}
+    assert any(a.startswith("budget.monthly_infra_usd missing") for a in out["assumptions"])
+
+
+def test_extra_fields_are_ignored_not_fatal():
+    doc = load("P1")
+    doc["scale"]["requests_per_second"] = 50
+    doc["vendor_lock_in"] = "low"
+    out = run(doc)
+    assert out["status"] in ("ok", "ok_with_warnings")
+    assert {"scale.requests_per_second", "vendor_lock_in"} <= {w["fields"][0] for w in out["warnings"] if w["code"] == "UNKNOWN_FIELD"}
+
+
+@pytest.mark.parametrize("cloud,word", [("aws", "AWS"), ("gcp", "Google"), ("azure", "Azure")])
+def test_explicit_cloud_is_a_hard_constraint(cloud, word):
+    doc = load("P2")
+    doc["infrastructure"]["cloud_preference"] = cloud
+    out = run(doc)
+    check_schema(out)
+    assert word in out["stack"]["hosting"]["choice"]
+
+
+def test_air_gapped_stack_has_no_saas_or_cdn():
+    doc = load("P5")
+    doc["infrastructure"].update(deployment_model="air_gapped", cloud_preference="none", existing_systems=[])
+    out = run(doc)
+    check_schema(out)
+    text = json.dumps({k: v for k, v in out["stack"].items()})
+    choices = [out["stack"][l]["choice"] for l in ("frontend", "backend", "database", "hosting")] + \
+              [s["choice"] for s in out["stack"]["supporting"]]
+    assert not [n for n in SAAS for c in choices if n in c], choices
+    assert "On-prem" in out["stack"]["hosting"]["choice"], text[:300]
+
+
+def test_air_gapped_payments_and_sms_are_flagged():
+    doc = load("P2")
+    doc["infrastructure"].update(deployment_model="air_gapped", cloud_preference="none")
+    out = run(doc)
+    codes = {w["code"]: w["severity"] for w in out["warnings"]}
+    assert codes.get("AIR_GAPPED_EXTERNAL") == "critical", codes
+    assert any(a.startswith("Relaxed or flagged (AIR_GAPPED_EXTERNAL)") for a in out["assumptions"])
+
+
+def test_api_only_has_no_frontend():
+    doc = load("P2")
+    doc["project"].update(type="api_platform", platforms=["api_only"])
+    doc["requirements"]["seo_critical"] = False
+    out = run(doc)
+    check_schema(out)
+    assert out["stack"]["frontend"]["choice"] == "None"
+    assert "API only" in out["stack"]["frontend"]["justification"]
+
+
+def test_end_of_life_existing_systems_are_warned():
+    doc = load("P5")
+    doc["infrastructure"]["existing_systems"] = ["SQL Server 2014 on Windows Server 2012 R2", "CentOS 7 file server"]
+    out = run(doc)
+    eol = [w for w in out["warnings"] if w["code"] == "EOL_EXISTING_SYSTEM"]
+    assert len(eol) == 2 and all(w["fields"] == ["infrastructure.existing_systems"] for w in eol)
+
+
+def test_existing_sql_server_is_reused(outputs):
+    assert "SQL Server" in outputs["P5"]["stack"]["database"]["choice"]
+
+
+def test_driven_by_names_the_strongest_inputs_only(outputs):
+    for name, out in outputs.items():
+        for layer in ("frontend", "backend", "database", "hosting"):
+            assert len(out["stack"][layer]["driven_by"]) <= 7, (name, layer)
+    assert outputs["P5"]["stack"]["database"]["driven_by"][0] == "infrastructure.existing_systems"
+    assert "infrastructure.cloud_preference" in outputs["P5"]["stack"]["hosting"]["driven_by"]
+
+
+def edited(name: str, **sections) -> dict:
+    doc = load(name)
+    for sec, values in sections.items():
+        doc[sec].update(values)
+    return run(doc)
+
+
+def codes(out: dict) -> dict:
+    return {w["code"]: w["severity"] for w in out["warnings"]}
+
+
+def test_public_cloud_with_on_premise_is_a_critical_conflict():
+    out = edited("P5", infrastructure={"deployment_model": "on_premise", "cloud_preference": "azure"})
+    assert codes(out)["CLOUD_VS_DEPLOYMENT"] == "critical"
+    assert out["stack"]["hosting"]["choice"].startswith("On-prem")
+    assert any("Relaxed: infrastructure.cloud_preference" in a for a in out["assumptions"])
+
+
+def test_rbi_localisation_with_eu_residency_is_a_critical_conflict():
+    out = edited("P4", infrastructure={"data_residency": "eu"})
+    assert codes(out)["RESIDENCY_CONFLICT"] == "critical"
+
+
+def test_unnamed_residency_country_is_a_warning():
+    out = edited("P2", infrastructure={"data_residency": "other"})
+    assert codes(out)["RESIDENCY_UNVERIFIED"] == "warning"
+
+
+def test_enterprise_availability_from_a_beginner_solo_developer_is_critical():
+    doc = load("P1")
+    doc["requirements"].update(availability="99.99", auth="email_password")
+    out = run(doc)
+    assert codes(out)["BEGINNER_HIGH_AVAILABILITY"] == "critical"
+    assert out["status"] == "ok_with_warnings" and out["stack"] is not None
+    doc["team"]["experience"] = "senior"
+    assert "BEGINNER_HIGH_AVAILABILITY" not in codes(run(doc))
+
+
+def test_many_platforms_on_a_short_timeline_is_critical():
+    out = edited("P2", project={"platforms": ["web", "android", "ios", "desktop"]}, timeline={"mvp_weeks": 3})
+    assert codes(out)["MANY_PLATFORMS_SHORT_TIMELINE"] == "critical"
+    assert "MANY_PLATFORMS_SHORT_TIMELINE" not in codes(edited("P2", timeline={"mvp_weeks": 3}))
+
+
+def test_self_hosted_servers_without_operators_are_warned():
+    assert codes(edited("P5", infrastructure={"deployment_model": "on_premise", "cloud_preference": "any"}))[
+        "SELF_HOSTED_NO_OPS"] == "warning"
+    assert "SELF_HOSTED_NO_OPS" not in codes(edited("P5", team={"has_devops": True},
+                                                    infrastructure={"deployment_model": "on_premise", "cloud_preference": "any"}))
+
+
+def test_self_hosted_cloud_vms_run_every_server_themselves():
+    out = edited("P4", infrastructure={"deployment_model": "self_hosted_cloud_vm"})
+    check_schema(out)
+    stack = out["stack"]
+    assert stack["hosting"]["choice"].startswith("AWS EC2 VMs") and "ap-south-1" in stack["hosting"]["choice"]
+    assert "Self-managed" in stack["database"]["choice"]
+    auth = [s["choice"] for s in stack["supporting"] if s["layer"] == "auth"]
+    assert any("Keycloak" in a for a in auth) and not any("Cognito" in a for a in auth)
+    assert not any(w["code"] == "RELAXED_CONSTRAINT" for w in out["warnings"])
+
+
+def test_a_scoring_model_is_served_from_a_cpu_endpoint(outputs):
+    ml = [s["choice"] for s in outputs["P4"]["stack"]["supporting"] if s["layer"] == "ml"]
+    assert ml == ["Amazon SageMaker real-time endpoint"]
+
+
+def test_existing_systems_in_extended_support_get_an_info_note(outputs):
+    notes = [w for w in outputs["P5"]["warnings"] if w["code"] == "EXISTING_SYSTEM_EXTENDED_SUPPORT"]
+    assert len(notes) == 1 and notes[0]["severity"] == "info" and "2030" in notes[0]["message"]
+    assert outputs["P5"]["status"] == "ok"
+
+
+def test_search_is_added_only_when_the_scenario_asks_for_it(outputs):
+    assert "search" not in {s["layer"] for s in outputs["P1"]["stack"]["supporting"]}
+    assert any("full_text_search is false" in a for a in outputs["P1"]["assumptions"])
+    assert "search" in {s["layer"] for s in outputs["P2"]["stack"]["supporting"]}
+
+
+def core(out: dict) -> list[str]:
+    return [out["stack"][l]["choice"] for l in ("frontend", "backend", "database", "hosting")]
+
+
+@pytest.mark.parametrize("name", ["P1", "P2", "P3", "P4", "P5", "P6"])
+def test_small_input_changes_give_local_changes(name, outputs):
+    """Judges run modified copies of the public scenarios: a rename, a reordered list or a 5% change in users must not
+    move the stack, and the output must never depend on scenario_id."""
+    base = core(outputs[name])
+    doc = load(name)
+    doc["project"]["name"] = "Renamed project"
+    doc["scenario_id"] = "hidden_copy"
+    for path in (("project", "platforms"), ("team", "languages")):
+        doc[path[0]][path[1]] = list(reversed(doc[path[0]][path[1]]))
+    doc["compliance"] = list(reversed(doc["compliance"]))
+    assert core(run(doc)) == base
+    doc["scale"]["users_12_months"] = round(doc["scale"]["users_12_months"] * 1.05)
+    assert core(run(doc)) == base

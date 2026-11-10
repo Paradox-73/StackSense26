@@ -92,7 +92,7 @@ CATEGORIES = {
     "Explanations match the engine": ["test_explanations", "test_reasoning_text", "test_switch_reasons", "test_whynot", "test_adr",
                                       "test_faithfulness", "test_robustness", "test_wording", "test_second_opinion", "test_redteam_cost",
                                       "test_redteam_text", "test_paragraph_wording"],
-    "Inputs, edge cases and warnings": ["test_edge_cases", "test_input_validation", "test_input_questions", "test_questions", "test_next",
+    "Inputs, edge cases and warnings": ["test_standard", "test_edge_cases", "test_input_validation", "test_input_questions", "test_questions", "test_next",
                                         "test_sensitivity", "test_defaults_used", "test_scale_warnings", "test_question_influence", "test_question_wording"],
     "Stability and properties": ["test_stability", "test_invariants", "test_scenarios"],
     "Language-model layer (checks and fallbacks)": ["test_llm", "test_brief", "test_brief_audit", "test_brief_regression", "test_summary", "test_whatif", "test_llm_baseline"],
