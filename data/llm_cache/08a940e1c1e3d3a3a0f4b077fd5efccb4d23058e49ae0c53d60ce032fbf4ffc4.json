@@ -1,0 +1,19 @@
+{
+ "models": [
+  "gemini-3.5-flash-lite",
+  "gemini-flash-lite-latest",
+  "gemini-2.5-flash-lite"
+ ],
+ "messages": [
+  {
+   "role": "system",
+   "content": "You are a senior engineer choosing a technology stack. Read the project description and pick exactly one option per layer (frontend, backend, database, hosting) from the allowed lists. Use the id exactly as listed. Reply with one JSON object: {\"frontend\": \"<id>\", \"backend\": \"<id>\", \"database\": \"<id>\", \"hosting\": \"<id>\"}."
+  },
+  {
+   "role": "user",
+   "content": "Allowed options (id = name):\nfrontend: nextjs = Next.js (React); react_spa = React SPA (Vite); nuxt = Nuxt (Vue); sveltekit = SvelteKit; angular = Angular; astro = Astro; htmx = Server-rendered HTML + HTMX; react_native = React Native (Expo); flutter = Flutter; native_mobile = Native iOS + Android (Swift / Kotlin)\nbackend: express = Node.js + Express; nestjs = Node.js + NestJS; fastapi = Python + FastAPI; django = Python + Django; go = Go (net/http, chi or Gin); spring_boot = Java/Kotlin + Spring Boot; dotnet = C# + ASP.NET Core; rails = Ruby on Rails; laravel = PHP + Laravel; phoenix = Elixir + Phoenix; serverless_functions = Serverless functions (Node/Python FaaS); supabase = Supabase (BaaS on Postgres); firebase = Firebase (BaaS on Google Cloud); no_custom_backend = No server code (static site)\ndatabase: postgres = PostgreSQL; mysql = MySQL; mongodb = MongoDB; dynamodb = Amazon DynamoDB; redis = Redis / Valkey; cassandra = Apache Cassandra / ScyllaDB; clickhouse = ClickHouse; opensearch = OpenSearch / Elasticsearch; neo4j = Neo4j; timescaledb = TimescaleDB (Postgres); sqlite = SQLite (+ Litestream backups); firestore = Cloud Firestore; none_static = No database (content files in git)\nhosting: vercel = Vercel; netlify = Netlify; cloudflare = Cloudflare Pages + Workers; render = Render; railway = Railway; flyio = Fly.io; aws_ecs = AWS ECS on Fargate; aws_eks = AWS EKS (Kubernetes); aws_lambda = AWS Lambda + API Gateway; aws_s3_cloudfront = AWS S3 + CloudFront (static); gcp_cloud_run = Google Cloud Run; gcp_gke = Google Kubernetes Engine (Autopilot); azure_apps = Azure App Service / Container Apps; digitalocean = DigitalOcean (App Platform + Managed DBs); hetzner = Hetzner Cloud / VPS (Docker, Coolify); onprem_docker = On-prem VMs + Docker Compose; onprem_k8s = On-prem Kubernetes (k3s / RKE2 / OpenShift)\n\nProject description:\nA large manufacturer needs a supplier collaboration platform covering purchase orders, shipment notices, quality inspections and invoice matching for 20,000 supplier users a day across India, Europe and North America. Our 40-person IT organisation is standardised on Java and Kotlin with Spring, Angular, PostgreSQL and Kubernetes, and splits work across several domain teams. Group policy says the system must run both in our own data centres and in a public cloud and stay portable between them. We need 99.95% availability, 600 GB of data growing 25 GB a month, and GDPR applies to European supplier contacts."
+  }
+ ],
+ "model": "gemini-3.5-flash-lite",
+ "text": "{\n  \"frontend\": \"angular\",\n  \"backend\": \"spring_boot\",\n  \"database\": \"postgres\",\n  \"hosting\": \"onprem_k8s\"\n}"
+}
