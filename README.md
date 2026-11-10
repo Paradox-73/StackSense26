@@ -162,7 +162,7 @@ Sources:
 
 ## Key results
 
-- **Tests:** 946 tests, including checks that every warning code is tested, that `outputs/` matches the engine and that the numbers in this file match the code (`tests/test_docs.py`).
+- **Tests:** 947 tests, including checks that every warning code is tested, that `outputs/` matches the engine and that the numbers in this file match the code (`tests/test_docs.py`).
 - **Benchmark** (`python tools/bench.py`): 40 project briefs scored against an answer key written before measurement. Result: 81% top-1 (128 of the 158 layer picks that have a best pick) and 96% acceptable (154 of all 160 layer picks); held-out 72% and 95%. Ten briefs were held out and not used for tuning. The key was written by a language model playing three architect personas, blind to the engine, not by human architects.
 - **LLM-only comparison** (`python tools/llm_baseline.py --show`, an offline experiment, not part of the engine): the same 40 briefs answered by a language model alone, then graded by the rules. LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 81% and 96%, but the model breaks a hard requirement in 7 of the 40 briefs; the engine's own picks break none.
 - **Random projects** (`python tools/fuzz.py --n 1000 --growth-n 100`): 1,000 seeded random projects against 15 properties (hard constraints, the same output on a repeat, renaming and reordering changing nothing, no return to an earlier pick as users grow): 0 violations.

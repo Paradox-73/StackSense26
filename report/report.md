@@ -154,29 +154,17 @@ Requests go to Google's Gemini API through its OpenAI-compatible endpoint at tem
 
 ## 6. Sample recommendations
 
-Each screenshot is the Scenario file page of the running app after loading the public scenario file; `python cli.py --scenario scenarios/public --out outputs` writes the same results to `outputs/`.
-
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 8pt;">
-
-![P1 DevFolio: a static Astro site on Netlify, no backend or database, $0 a month](screenshots/s-P1.png)
-
-![P2 FixIt Now: Next.js, Django, PostgreSQL and DigitalOcean in Bangalore, $207 to $851, with a budget warning](screenshots/s-P2.png)
-
-![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io, $1,190 to $4,635](screenshots/s-P3.png)
-
-![P4 QuickCredit: React SPA, Spring Boot, Amazon RDS for PostgreSQL and ECS on Fargate in Mumbai, $1,945 to $7,310](screenshots/s-P4.png)
-
-![P5 PeopleDesk: HTMX, ASP.NET Core, Azure SQL Database and Azure App Service in Central India, $44 to $375](screenshots/s-P5.png)
-
-![P6 KhetSurvey: React Native, Django, PostgreSQL and DigitalOcean in Bangalore, $69 to $488](screenshots/s-P6.png)
-
-</div>
+Each screenshot is the top of the result on the Scenario file page of the running app after loading the public scenario file: the status, the architecture style, a summary naming the four picks and the cost band, and any warnings. `python cli.py --scenario scenarios/public --out outputs` writes the same results to `outputs/`.
 
 ### 6.1 P1 DevFolio: personal portfolio and blog
+
+![P1 DevFolio: a static Astro site on Netlify, no backend or database, $0 a month](screenshots/s-P1.png)
 
 A solo beginner with $0, two weeks and critical SEO publishes pages nobody signs in to, so static options are allowed and the backend and database are "None", each with its reason. Astro (SEO 5/5) leads SvelteKit by 1.1 stack points, and Netlify's free static plan leads Cloudflare Pages by 1.1 and Vercel by 8.4 (no free option at this scale). `assumptions` notes that no search service is added because `full_text_search` is false.
 
 ### 6.2 P2 FixIt Now: home-services marketplace in India (in depth)
+
+![P2 FixIt Now: Next.js, Django, PostgreSQL and DigitalOcean, $207 to $851 a month, with a budget warning](screenshots/s-P2.png)
 
 Three intermediate engineers (JavaScript, TypeScript, Python) with nobody on operations have 8 weeks and $150 a month for a marketplace with India residency, critical SEO, chat, phone sign-in, uploads, payments and search, sized at about 6,000 daily users and 12 requests per second at peak.
 
@@ -189,9 +177,13 @@ Three intermediate engineers (JavaScript, TypeScript, Python) with nobody on ope
 
 ### 6.3 P3 BoardRoom: realtime collaborative whiteboard
 
+![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io, $1,190 to $4,635 a month](screenshots/s-P3.png)
+
 Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1. PostgreSQL leads; MySQL takes a penalty because tenants share one database and its privileges stop at table and column level. Supporting services add Yjs shared documents (CRDTs), Redis pub/sub across instances, a cache, hosted checkout and social sign-in.
 
 ### 6.4 P4 QuickCredit: digital lending in India (in depth)
+
+![P4 QuickCredit: React SPA, Spring Boot, PostgreSQL and AWS ECS on Fargate, $1,945 to $7,310 a month](screenshots/s-P4.png)
 
 P4 is the most constrained scenario: AWS required, RBI localisation, PCI DSS, ISO 27001 and 99.95%, for eight seniors (Java, Kotlin, TypeScript) who can run infrastructure, sized at about 60,000 daily users and 833 requests per second at peak.
 
@@ -204,15 +196,19 @@ P4 is the most constrained scenario: AWS required, RBI localisation, PCI DSS, IS
 
 ### 6.5 P5 PeopleDesk: internal HR tool
 
+![P5 PeopleDesk: HTMX, ASP.NET Core, Azure SQL Database and Azure App Service, $44 to $375 a month](screenshots/s-P5.png)
+
 Two C# developers build a tool for 1,200 employees on Azure in India under ISO 27001, for $300 a month. Azure rules out every other host, and Supabase also lacks ISO 27001. ASP.NET Core leads Laravel by 3.7 points (Laravel and Express would need an identity broker for company sign-in), and HTMX leads a React SPA by 1.4. Existing systems are reused: sign-in through Microsoft Entra ID over OpenID Connect, SQL Server kept as Azure SQL Database, Microsoft 365 through the Graph API; an info warning notes that SQL Server 2019 security updates end on 8 January 2030.
 
 ### 6.6 P6 KhetSurvey: offline-first crop survey app
+
+![P6 KhetSurvey: React Native, Django, PostgreSQL and DigitalOcean, $69 to $488 a month](screenshots/s-P6.png)
 
 Two developers (JavaScript, Python) build an Android-only survey app that must work offline, in India, for $100 a month; type `other` on phones only is scored as a mobile-first app. React Native (Expo) leads Flutter by 3.5 points on skills, and PowerSync or ElectricSQL keeps a local SQLite copy in sync with PostgreSQL. Django and DigitalOcean in Bangalore win ties (0.5 and 0.6 points), and most of the cost is the database for about 100 GB of surveys and photos. The description's 2 GB phones and 2G/3G links are not read from the file; the offline flag carries that need.
 
 ## 7. Edge-case handling
 
-The nine files in `scenarios/edge/` cover the nine categories of the statement's section 6; the screenshots follow the table.
+The nine files in `scenarios/edge/` cover the nine categories of the statement's section 6. The screenshots after the table show each file's result on the Scenario file page, cut to the part that shows the handling.
 
 | Category and file | How it is detected | What the engine does | Screenshot |
 |---|---|---|---|
@@ -226,72 +222,41 @@ The nine files in `scenarios/edge/` cover the nine categories of the statement's
 | Skill mismatch (E8: P2 with a PHP-only team) | Skill match is weighted; an unknown server language takes a penalty | Laravel, HTMX and MySQL; Laravel leads FastAPI by 6.4 points on skill match, and its trade-offs note that high throughput needs Octane | E8 |
 | Deprecated technology (E9: AngularJS 1.5, CentOS 7, Python 2.7, PHP 7.2) | An end-of-life table citing the vendor or endoflife.date | Four `EOL_EXISTING_SYSTEM` warnings with sources; each system integrated through its API | E9 |
 
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 8pt;">
+![E1 Missing fields: a stack from the documented defaults, and the first two of seven MISSING_REQUIRED_FIELD warnings](screenshots/e-E1.png)
 
-![E1 Missing fields: MISSING_REQUIRED_FIELD warnings and the defaults in assumptions](screenshots/e-E1.png)
+![E2 Invalid values: invalid_input, no stack and seven field-level validation errors](screenshots/e-E2.png)
 
-![E2 Invalid values: invalid_input with seven field-level errors and no stack](screenshots/e-E2.png)
+![E3 Contradictions: the three critical warnings, each stating what the reduced-scope stack relaxes or costs](screenshots/e-E3.png)
 
-![E3 Contradictions: three critical warnings and a reduced-scope stack](screenshots/e-E3.png)
+![E4 Over-engineering trap: a static Astro site on Netlify for two million readers](screenshots/e-E4.png)
 
-![E4 Over-engineering trap: a static Astro site for two million readers](screenshots/e-E4.png)
+![E5 Regulatory constraints: Cloud Run in Frankfurt under a HIPAA BAA, with Vercel and Netlify ruled out](screenshots/e-E5.png)
 
-![E5 Regulatory constraints: HIPAA, GDPR and PCI DSS kept in Frankfurt](screenshots/e-E5.png)
+![E6 Existing systems: SQL Server kept as Azure SQL Database, and two end-of-life warnings](screenshots/e-E6.png)
 
-![E6 Existing systems: Okta reused, SQL Server kept, SAP integrated](screenshots/e-E6.png)
+![E7 Restricted deployment: on-premises VMs, and a critical warning for the outside services an air-gapped network cannot reach](screenshots/e-E7.png)
 
-![E7 Restricted deployment: only self-hostable components](screenshots/e-E7.png)
+![E8 Skill mismatch: Laravel leads FastAPI by 6.4 stack points on the PHP team's skills](screenshots/e-E8.png)
 
-![E8 Skill mismatch: a PHP team gets Laravel, HTMX and MySQL](screenshots/e-E8.png)
-
-![E9 Deprecated technology: four end-of-life warnings with sources](screenshots/e-E9.png)
-
-</div>
+![E9 Deprecated technology: four EOL_EXISTING_SYSTEM warnings, each with its source](screenshots/e-E9.png)
 
 The adapter also raises `CLOUD_VS_DEPLOYMENT`, `RESIDENCY_CONFLICT` and `RESIDENCY_UNVERIFIED` (Section 5.3); a system on extended support, such as P5's SQL Server 2019, gets an info warning with its end date.
 
 ## 8. Validation
 
-I checked the recommendations with a test suite, an answer key, an LLM-only baseline, a random-input property test and pairs of projects one answer apart.
+I checked the recommendations with a test suite, an answer key, an LLM-only baseline, a random-input property test and pairs of projects one answer apart. Appendix F has the tables behind 8.1 to 8.3.
 
 ### 8.1 Tests
 
-<!-- BEGIN validation -->
-| What is checked | Tests |
-|---|---|
-| Scoring, constraints and cost | 320 |
-| Explanations match the engine | 116 |
-| Inputs, edge cases and warnings | 156 |
-| Stability and properties | 76 |
-| Language-model layer (checks and fallbacks) | 185 |
-| Accuracy against the answer key | 9 |
-| App, packaging and documents | 84 |
-| **All** | **946** |
-<!-- END validation -->
-
-`report/validation.md` lists every file. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 947 tests cover scoring, constraints and cost; explanations against the engine's numbers; inputs, edge cases and warnings; stability properties; the language-model checks and fallbacks; accuracy against the answer key; and the app, packaging and documents. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
-<!-- BEGIN bench -->
-- **Benchmark against an answer key** (`python tools/bench.py`, `tests/test_benchmark.py`): 40 project briefs, each with a best pick and an acceptable set per layer, from an answer key written before measurement, with sources. The labels were written by a language model playing three architect personas (a startup CTO, an enterprise architect, a cloud engineer), blind to the engine, not by human raters. A pick counts as acceptable if at least 2 of 3 personas accept it. The personas agree on the best pick 92% of the time (Krippendorff alpha 0.91, a measure of agreement between the personas, not between human raters). 10 briefs were held out and never used for tuning.
-
-| Layer | Tuning top-1 | Tuning acceptable | Held-out top-1 | Held-out acceptable |
-|---|---|---|---|---|
-| frontend | 97% (29/30) | 100% (30/30) | 80% (8/10) | 90% (9/10) |
-| backend | 86% (25/29) | 93% (28/30) | 80% (8/10) | 100% (10/10) |
-| database | 80% (24/30) | 97% (29/30) | 70% (7/10) | 100% (10/10) |
-| hosting | 72% (21/29) | 97% (29/30) | 60% (6/10) | 90% (9/10) |
-| All layers | 84% (99/118) | 97% (116/120) | 72% (29/40) | 95% (38/40) |
-
-Before the general rule fixes made on the 30 tuning briefs, the held-out briefs scored 60% (24/40) top-1 and 80% (32/40) acceptable. The picks outside the acceptable set are listed by `python tools/bench.py --briefs`.
-<!-- END bench -->
-
-Top-1 is scored on 158 of the 160 layer picks, because the personas have no majority for the backend and hosting of brief A05. A language model wrote the key, so it may favour the LLM-only baseline below; no human architect has checked it.
+`python tools/bench.py` scores the engine on 40 project briefs against an answer key written before measurement: a best pick and an acceptable set per layer, labelled by a language model playing three architect personas, blind to the engine. Result: 81% top-1 (128 of the 158 layer picks that have a best pick) and 96% acceptable (154 of all 160 layer picks); on the ten briefs held out from tuning, 72% and 95%. No human architect has checked the key.
 
 ### 8.3 LLM-only baseline
 
-<!-- INSERT llm-baseline -->
+A language model with no rule engine picked the four layers for the same briefs (`python tools/llm_baseline.py`, an offline experiment, not part of the engine). Its agreement with the key is close to the engine's (LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 81% and 96%), and the key's language-model origin may favour it. Graded by the rules, the model breaks a hard requirement in 7 of the 40 briefs, against none for the engine's picks graded the same way, and it gives no costs, reasons or sources.
 
 ### 8.4 Random projects and the public scenarios
 
@@ -299,22 +264,7 @@ Top-1 is scored on 158 of the 160 layer picks, because the personas have no majo
 
 ### 8.5 One answer apart
 
-The pair below changes one answer of a built-in example; changed layers are in bold, with the engine's reason (two more pairs are in Appendix D). Among the edge scenarios, E8 changes only P2's languages and moves three layers to the PHP team's skills, while E7 changes only P2's deployment and cloud fields and keeps Next.js and Django.
-
-<!-- BEGIN pairs -->
-**Startup SaaS MVP, then add HIPAA** (preset `startup_mvp`; changed answer: `compliance`: gdpr → gdpr, hipaa)
-
-| Layer | Before | After |
-|---|---|---|
-| Frontend | Next.js (React) | Next.js (React) |
-| Backend | Supabase (BaaS on Postgres) | **Node.js + Express** |
-| Database | PostgreSQL | PostgreSQL |
-| Hosting | Cloudflare Pages + Workers | **Google Cloud Run** |
-| Est. cost / month | $26 | $22–$85 |
-
-- Backend: Supabase (BaaS on Postgres) now takes a penalty (Minimum ~$584/month is 11.7x the whole budget), moving the gap 17.8 points toward Node.js + Express; cost at your scale moved the gap 11.1 points toward Node.js + Express (Node.js + Express 5.0/5 vs Supabase (BaaS on Postgres) 1.5/5, was 5.0 vs 4.8).
-- Hosting: Cloudflare Pages + Workers is now ruled out: No HIPAA Business Associate Agreement available.
-<!-- END pairs -->
+Pairs of projects one answer apart check that a change moves only the layers it should, each with the engine's reason; Appendix D has three. Adding HIPAA to the startup example, for instance, replaces Supabase, whose plan with a BAA costs far more than the budget, and Cloudflare Pages, which offers no BAA. Among the edge scenarios, E8 changes only P2's languages and moves three layers to the PHP team's skills, while E7 changes only P2's deployment and cloud fields and keeps Next.js and Django.
 
 ## 9. Limitations and future work
 
@@ -400,7 +350,7 @@ Scores of 2 and 4 sit between the anchors. The rubric is a reading guide: the so
 
 ## Appendix D. More sample recommendations
 
-The guided questionnaire runs the same engine on its own answers. Below are all 14 built-in examples as the engine recommends them, six screenshots of the questionnaire's result page and two more one-answer-apart pairs.
+The guided questionnaire runs the same engine on its own answers. Below are all 14 built-in examples as the engine recommends them, two screenshots of the questionnaire's result page and three one-answer-apart pairs, with changed layers in bold and the engine's reason.
 
 <!-- BEGIN presets -->
 The 14 built-in examples, as the engine recommends them today:
@@ -435,27 +385,22 @@ Why it fits: backend, low ops burden: 5.0/5 vs 4.2 average for this layer; hosti
 
 **HIPAA telehealth platform.** React SPA (Vite) + Python + Django + PostgreSQL + AWS ECS on Fargate, about $370–$1,815 a month.
 Why it fits: backend, ecosystem maturity: 5.0/5 vs 4.4 average for this layer; hosting, realtime fit: 4.0/5 vs 3.4 average for this layer.
-
-![Indian e-commerce at scale](screenshots/gallery/india_ecommerce_scale.png)
-
-**Indian e-commerce at scale.** Next.js (React) + Java/Kotlin + Spring Boot + MySQL + AWS EKS (Kubernetes), about $10,800–$57,000 a month.
-Why it fits: backend, structure for large teams: 5.0/5 vs 3.2 average for this layer; hosting, realtime fit: 4.0/5 vs 3.4 average for this layer.
-
-![IoT telemetry pipeline](screenshots/gallery/iot_telemetry.png)
-
-**IoT telemetry pipeline.** React SPA (Vite) + Go (net/http, chi or Gin) + TimescaleDB (Postgres) + AWS ECS on Fargate, about $1,365–$7,700 a month.
-Why it fits: backend, scalability: 5.0/5 vs 4.3 average for this layer; hosting, scalability: 5.0/5 vs 4.5 average for this layer.
-
-![Student project (zero budget)](screenshots/gallery/student_project.png)
-
-**Student project (zero budget).** React SPA (Vite) + Firebase (BaaS on Google Cloud) + Cloud Firestore + Vercel, about $0 a month.
-Why it fits: backend, learning curve: 5.0/5 vs 3.8 average for this layer; hosting, cost at your scale: 5.0/5 vs 3.9 average for this layer.
-
-![SEO content site / blog](screenshots/gallery/content_site.png)
-
-**SEO content site / blog.** Next.js (React) + No server code (static site) + No database (content files in git) + Netlify, about $0 a month.
-Why it fits: backend, learning curve: 5.0/5 vs 3.9 average for this layer; hosting, cost at your scale: 5.0/5 vs 2.3 average for this layer.
 <!-- END gallery_more -->
+
+<!-- BEGIN pairs -->
+**Startup SaaS MVP, then add HIPAA** (preset `startup_mvp`; changed answer: `compliance`: gdpr → gdpr, hipaa)
+
+| Layer | Before | After |
+|---|---|---|
+| Frontend | Next.js (React) | Next.js (React) |
+| Backend | Supabase (BaaS on Postgres) | **Node.js + Express** |
+| Database | PostgreSQL | PostgreSQL |
+| Hosting | Cloudflare Pages + Workers | **Google Cloud Run** |
+| Est. cost / month | $26 | $22–$85 |
+
+- Backend: Supabase (BaaS on Postgres) now takes a penalty (Minimum ~$584/month is 11.7x the whole budget), moving the gap 17.8 points toward Node.js + Express; cost at your scale moved the gap 11.1 points toward Node.js + Express (Node.js + Express 5.0/5 vs Supabase (BaaS on Postgres) 1.5/5, was 5.0 vs 4.8).
+- Hosting: Cloudflare Pages + Workers is now ruled out: No HIPAA Business Associate Agreement available.
+<!-- END pairs -->
 
 <!-- BEGIN pairs_more -->
 **IoT telemetry, 40,000 devices vs 5 million** (preset `iot_telemetry`; changed answer: `dau`: 40,000 → 5,000,000)
@@ -506,5 +451,50 @@ Safety (new in 2023) is not scored: the four layers are infrastructure, and no o
 **ATAM in this engine.** The Architecture Tradeoff Analysis Method's utility tree is the set of criterion weights; its scenarios are the six public scenarios, the nine edge scenarios, the 14 presets and the 40 benchmark briefs; its sensitivity points are what "Not sure" and the question-influence study find; and its trade-off points are the contradiction warnings and the compatibility rules that cost points on one layer to gain on another.
 
 **Inputs deliberately not asked.** Sustainability and carbon (no vendor publishes a comparable figure per workload, so a score would be invented), interface design and accessibility (StackSense picks infrastructure layers), CI/CD, testing and monitoring vendors (they follow from the stack and appear as supporting services), start-up credits (they vary by programme and date, so costs could not be reproduced), and tool taste such as "I like Svelte" (skills are asked, taste is not).
+
+</div>
+
+## Appendix F. Validation in detail
+
+<div class="appx">
+
+### F.1 Tests by area
+
+<!-- BEGIN validation -->
+| What is checked | Tests |
+|---|---|
+| Scoring, constraints and cost | 320 |
+| Explanations match the engine | 116 |
+| Inputs, edge cases and warnings | 156 |
+| Stability and properties | 76 |
+| Language-model layer (checks and fallbacks) | 185 |
+| Accuracy against the answer key | 9 |
+| App, packaging and documents | 85 |
+| **All** | **947** |
+<!-- END validation -->
+
+`report/validation.md` lists every test file with its count.
+
+### F.2 Benchmark against an answer key
+
+<!-- BEGIN bench -->
+- **Benchmark against an answer key** (`python tools/bench.py`, `tests/test_benchmark.py`): 40 project briefs, each with a best pick and an acceptable set per layer, from an answer key written before measurement, with sources. The labels were written by a language model playing three architect personas (a startup CTO, an enterprise architect, a cloud engineer), blind to the engine, not by human raters. A pick counts as acceptable if at least 2 of 3 personas accept it. The personas agree on the best pick 92% of the time (Krippendorff alpha 0.91, a measure of agreement between the personas, not between human raters). 10 briefs were held out and never used for tuning.
+
+| Layer | Tuning top-1 | Tuning acceptable | Held-out top-1 | Held-out acceptable |
+|---|---|---|---|---|
+| frontend | 97% (29/30) | 100% (30/30) | 80% (8/10) | 90% (9/10) |
+| backend | 86% (25/29) | 93% (28/30) | 80% (8/10) | 100% (10/10) |
+| database | 80% (24/30) | 97% (29/30) | 70% (7/10) | 100% (10/10) |
+| hosting | 72% (21/29) | 97% (29/30) | 60% (6/10) | 90% (9/10) |
+| All layers | 84% (99/118) | 97% (116/120) | 72% (29/40) | 95% (38/40) |
+
+Before the general rule fixes made on the 30 tuning briefs, the held-out briefs scored 60% (24/40) top-1 and 80% (32/40) acceptable. The picks outside the acceptable set are listed by `python tools/bench.py --briefs`.
+<!-- END bench -->
+
+Top-1 is scored on 158 of the 160 layer picks, because the personas have no majority for the backend and hosting of brief A05. A language model wrote the key, so it may favour the LLM-only baseline below; no human architect has checked it.
+
+### F.3 LLM-only baseline
+
+<!-- INSERT llm-baseline -->
 
 </div>

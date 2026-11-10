@@ -172,6 +172,8 @@ CLAIMS = [
     ("benchmark_top1_picks", [r"\(\d+ of the (\d+) layer picks that have a best pick"]),
     ("benchmark_acceptable_hits", [r"acceptable \((\d+) of all \d+ layer picks"]),
     ("benchmark_acceptable_picks", [r"acceptable \(\d+ of all (\d+) layer picks"]),
+    ("benchmark_held_out_top1_pct", [r"held out from tuning, (\d+)% and \d+%"]),
+    ("benchmark_held_out_acceptable_pct", [r"held out from tuning, \d+% and (\d+)%"]),
     ("llm_top1_pct", [r"\(LLM (\d+)% top-1 on \d+ picks"]),
     ("llm_top1_picks", [r"\(LLM \d+% top-1 on (\d+) picks"]),
     ("llm_acceptable_pct", [r"(\d+)% acceptable on \d+, against"]),
@@ -259,8 +261,7 @@ def _figures(html_text: str, fig_counter: list[int], missing: list[str]) -> str:
         fig_counter[0] += 1
         # Judges read the PDF and do not run code, so a figure carries no 'Reproduce' command; the appendix has one how-to paragraph.
         cap = f'<figcaption><b>Figure {fig_counter[0]}.</b> {html.escape(alt)}</figcaption>'
-        cls = ' class="gal"' if src.startswith("screenshots/gallery/") else ""
-        return f'<figure{cls}><img src="{html.escape(src)}" alt="{html.escape(alt)}">{cap}</figure>'
+        return f'<figure><img src="{html.escape(src)}" alt="{html.escape(alt)}">{cap}</figure>'
 
     return re.sub(r'<p><img src="([^"]+)" alt="([^"]*)"[^>]*></p>', lambda m: repl(m), html_text)
 
@@ -367,8 +368,8 @@ def cover_html(cover: dict) -> str:
     return (f'<section class="cover"><div class="kicker">{html.escape(cover["event"])}</div>'
             f'<h1 class="cover-title">{html.escape(cover["title"])}</h1>'
             f'<p class="cover-pitch">{html.escape(cover["pitch"])}</p>'
-            f'<table class="cover-meta"><tr><td>Author</td><td>{html.escape(cover["author"])}</td></tr>'
-            f'<tr><td>Institute</td><td>{html.escape(cover["institute"])}</td></tr>'
+            f'<table class="cover-meta"><tr><td>Full name</td><td>{html.escape(cover["author"])}</td></tr>'
+            f'<tr><td>College</td><td>{html.escape(cover["institute"])}</td></tr>'
             f'<tr><td>Unstop registered email</td><td>{html.escape(cover.get("email") or "to be added by the entrant")}</td></tr>'
             f'<tr><td>Date</td><td>{html.escape(cover["date"])}</td></tr>{links}</table></section>')
 
@@ -475,7 +476,20 @@ def build_pdf(draft: bool) -> int:
     leaks = pdf_mentions(PDF)
     for leak in leaks:
         print("PDF names the coding assistant outside the declaration line:", leak)
-    return 1 if leaks else 0
+    over = page_limits(pages2, n2)
+    for o in over:
+        print("PAGE LIMIT:", o)
+    return 1 if leaks or over else 0
+
+
+def page_limits(pages: dict[str, int], n: int) -> list[str]:
+    """Statement section 10: sections 1-10 within 15 pages, appendices within 10 further pages. The cover is page 1 and
+    section 11 opens a page (tools/report_print.css), so sections 1-10 fill page 2 to the page before section 11;
+    section 11 is counted with the appendices. `pages` is heading_pages' result, which does not search page 2."""
+    s11 = pages["11. AI assistance declaration"]
+    body, rest = s11 - 2, n - s11 + 1
+    return ([f"sections 1-10 take {body} pages, over the 15 allowed"] if body > 15 else []) + \
+           ([f"section 11 and the appendices take {rest} pages, over the 10 allowed"] if rest > 10 else [])
 
 
 def pdf_mentions(pdf: Path) -> list[str]:

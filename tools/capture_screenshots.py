@@ -1,17 +1,19 @@
 """Take every screenshot used in the report from the running app, and check each one shows what the engine says.
 
-    python tools/capture_screenshots.py            # write report/screenshots/*.png (20 images)
-    python tools/capture_screenshots.py --check    # write nothing; exit 1 if any page disagrees with the engine
+    python tools/capture_screenshots.py            # write report/screenshots/*.png (30 images)
+    python tools/capture_screenshots.py --check    # write nothing; exit 1 if any page disagrees with the engine or prints too small
     python tools/capture_screenshots.py --only f02-why-hosting
 
 Starts the app on a free local port and opens each deep link (a URL fragment such as #preset=<id>&panel=why)
 in the installed Chrome through Playwright (build-time only, see requirements-dev.txt). Each shot lists
 text that must appear on the page, computed from the engine's own output for the same answers. A shot
-whose page lacks that text is a mismatch. Set CHROME to a browser path if Chrome is not found.
+whose page lacks that text is a mismatch. So is a shot the report prints (the scenario shots and the gallery) whose
+smallest text would print under 7 pt across the report's text column, or that would print taller than a page. Set
+CHROME to a browser path if Chrome is not found.
 
 Two shots (f09, f10) show the language-model features, so they need an API key in `.env` or the environment
 (they send real requests; replies are cached in data/llm_cache/). Without a key they are skipped with a printed note and
-the other 17 are taken as usual. With a key set, the shots that do not click a model button are taken the same way.
+the other 28 are taken as usual. With a key set, the shots that do not click a model button are taken the same way.
 """
 from __future__ import annotations
 
@@ -34,6 +36,10 @@ from engine.kb import LAYERS, load_presets  # noqa: E402
 OUT = ROOT / "report" / "screenshots"
 MAX_H = 1250  # pixels; taller panels are cut at the bottom so they print at a readable size
 CHROME_EXE = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+COLUMN_PT = 514.9  # tools/report_print.css prints every screenshot across the 182 mm text column, less its 0.5 pt borders
+MIN_PT = 7  # the smallest text in a printed screenshot
+PAGE_PT = 720  # the tallest picture that fits a page with its caption: tools/report_print.css leaves 265 mm (751 pt)
+GALLERY_W = 1180  # window width for the gallery: the result card is then about 710 px wide, so its 10.5 px labels print at 7 pt
 
 
 def _result(preset: str, **override) -> dict:
@@ -83,7 +89,7 @@ SHOTS = [
      "A negative user count is replaced by a valid one and a warning says so.",
      lambda: ["Clamped to 0."]),
 ]
-GALLERY = ["startup_mvp", "hipaa_telehealth", "india_ecommerce_scale", "iot_telemetry", "student_project", "content_site"]
+GALLERY = ["startup_mvp", "hipaa_telehealth"]
 for _p in GALLERY:
     SHOTS.append((f"gallery/{_p}", f"#preset={_p}", "#out", f"Sample result: {_p}.", (lambda p=_p: _stack_names(p))))
 
@@ -120,12 +126,17 @@ CAPTIONS = {n: c for n, _l, _s, c, _e in SHOTS}
 LINKS = {n: l for n, l, *_ in SHOTS}
 
 # The scenario-file page (/scenario) running the six public scenarios and the nine edge cases in scenarios/edge:
-# (name, example file stem, where the picture ends). "core" ends under the four core components, "top" above the
-# Stack heading (status, summary, errors and warnings), "all" takes the whole result.
-SCENARIO_SHOTS = [(f"s-P{i}", f"P{i}", "core") for i in range(1, 7)] + [
-    ("e-E1", "E1_missing_fields", "top"), ("e-E2", "E2_invalid_values", "all"), ("e-E3", "E3_contradictions", "top"),
-    ("e-E4", "E4_static_at_scale", "core"), ("e-E5", "E5_regulatory", "core"), ("e-E6", "E6_existing_systems", "top"),
-    ("e-E7", "E7_air_gapped", "top"), ("e-E8", "E8_skill_mismatch", "core"), ("e-E9", "E9_deprecated", "top"),
+# (name, example file stem, first element, last element), both CSS selectors inside the result (#sc-out). The picture
+# runs from the top of the first to the bottom of the last, across the full width of the result. No first element:
+# the top of the result. No last element: the end of the part above the Stack heading (status, summary, validation
+# errors and warnings), which names the four picks and the cost.
+CARD = ".sc-core > .sc-c:nth-child({})"  # the component cards: 1 frontend, 2 backend, 3 database, 4 hosting
+SCENARIO_SHOTS = [(f"s-P{i}", f"P{i}", None, None) for i in range(1, 7)] + [
+    ("e-E1", "E1_missing_fields", None, ".sc-w:nth-child(2)"), ("e-E2", "E2_invalid_values", None, None),
+    ("e-E3", "E3_contradictions", ".sc-w.critical", None), ("e-E4", "E4_static_at_scale", None, None),
+    ("e-E5", "E5_regulatory", CARD.format(4), CARD.format(4) + " ul"), ("e-E6", "E6_existing_systems", None, None),
+    ("e-E7", "E7_air_gapped", None, ".sc-w:nth-child(2)"), ("e-E8", "E8_skill_mismatch", CARD.format(2), CARD.format(2) + " li"),
+    ("e-E9", "E9_deprecated", "h2", None),
 ]
 
 
@@ -139,21 +150,51 @@ def scenario_expect(stem: str) -> list[str]:
     return [out["status"]] + [out["stack"][l]["choice"] for l in LAYERS]
 
 
-def scenario_clip(page, end: str) -> dict:
-    page.evaluate("window.scrollTo(0, 0)")
-    box = page.locator("#sc-out").bounding_box()
-    bottom = box["y"] + box["height"]
-    if end == "core":
-        core = page.locator("#sc-out .sc-core").bounding_box()
-        bottom = core["y"] + core["height"] + 8
-    elif end == "top" and page.locator("#sc-out h2", has_text="Stack").count():
-        bottom = page.locator("#sc-out h2", has_text="Stack").bounding_box()["y"] - 4
-    return {"x": box["x"] - 8, "y": box["y"] - 8, "width": box["width"] + 16, "height": min(bottom - box["y"] + 8, MAX_H)}
+def scenario_clip(page, first: str | None, last: str | None) -> dict:
+    """The page area from the top of `first` to the bottom of `last` (see SCENARIO_SHOTS), with an 8 px margin that
+    stops short of the neighbouring elements, so no sliver of the item before or after shows at the edge."""
+    return page.evaluate("""([first, last]) => {
+        const out = document.querySelector('#sc-out'), box = (e) => e.getBoundingClientRect();
+        const find = (s) => { const e = out.querySelector(s); if (!e) throw new Error('no element matches ' + s); return e; };
+        const start = first ? find(first) : out;
+        let end = last && find(last);
+        if (!end) { const kids = [...out.children];
+            const stop = kids.findIndex(k => k.tagName === 'DETAILS' || (k.tagName === 'H2' && k.textContent.trim() === 'Stack'));
+            end = kids[(stop < 0 ? kids.length : stop) - 1]; }
+        const before = first && start.previousElementSibling, after = end.nextElementSibling;
+        const top = Math.max(box(start).top - 8, before ? box(before).bottom + 1 : -Infinity);
+        const bottom = Math.min(box(end).bottom + 8, after ? box(after).top - 1 : Infinity);
+        return {x: box(out).left + scrollX - 8, y: top + scrollY, width: box(out).width + 16, height: bottom - top}; }""",
+                         [first, last])
+
+
+def print_problems(page, clip: dict) -> tuple[float, list[str]]:
+    """The point size of the smallest text inside the clip once the report prints the picture across its text column,
+    and what would keep the picture from printing legibly on one page."""
+    px = page.evaluate("""(c) => { let m = Infinity; const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        while (w.nextNode()) { const t = w.currentNode, r = document.createRange(); if (!t.textContent.trim()) continue;
+            r.selectNodeContents(t);
+            for (const b of r.getClientRects()) { const x = b.left + scrollX, y = b.top + scrollY;
+                if (b.width && x < c.x + c.width && x + b.width > c.x && y < c.y + c.height && y + b.height > c.y) {
+                    m = Math.min(m, parseFloat(getComputedStyle(t.parentElement).fontSize)); break; } } }
+        return m; }""", clip)
+    scale = COLUMN_PT / clip["width"]
+    pt, tall = px * scale, clip["height"] * scale
+    return pt, ([f"its smallest text prints at {pt:.1f} pt, under {MIN_PT} pt"] if pt < MIN_PT else []) +                ([f"it prints {tall:.0f} pt tall, more than a page"] if tall > PAGE_PT else [])
+
+
+def report(name: str, problems: list[str], pt: float | None = None) -> list:
+    """Print the verdict for one shot and return it as a mismatch list (empty when the shot is fine)."""
+    if problems:
+        print(f"MISMATCH {name}: {'; '.join(problems)}")
+        return [(name, problems)]
+    print(f"ok       {name}" + (f" (smallest text {pt:.1f} pt in print)" if pt is not None else ""))
+    return []
 
 
 def capture_scenarios(browser, port: int, only: str | None, check_only: bool) -> tuple[list, int]:
     mismatches, written = [], 0
-    for name, stem, end in SCENARIO_SHOTS:
+    for name, stem, first, last in SCENARIO_SHOTS:
         if only and only != name:
             continue
         page = browser.new_page(viewport={"width": 1280, "height": 900}, device_scale_factor=1.5)
@@ -161,14 +202,12 @@ def capture_scenarios(browser, port: int, only: str | None, check_only: bool) ->
         page.wait_for_selector("#sc-out .sc-status", timeout=30000)
         page.wait_for_timeout(500)
         text = page.evaluate("document.querySelector('#sc-out').innerText")
-        missing = [t for t in scenario_expect(stem) if t.lower() not in text.lower()]
-        if missing:
-            mismatches.append((name, missing))
-            print(f"MISMATCH {name}: page lacks {missing}")
-        else:
-            print(f"ok       {name}")
+        missing = [f"page lacks {t!r}" for t in scenario_expect(stem) if t.lower() not in text.lower()]
+        clip = scenario_clip(page, first, last)
+        pt, problems = print_problems(page, clip)
+        mismatches += report(name, missing + problems, pt)
         if not check_only:
-            page.screenshot(path=str(OUT / f"{name}.png"), full_page=True, clip=scenario_clip(page, end))
+            page.screenshot(path=str(OUT / f"{name}.png"), full_page=True, clip=clip)
             written += 1
         page.close()
     return mismatches, written
@@ -247,7 +286,8 @@ def main() -> int:
                 if name in ACTS and not llm.available():
                     print(f"skipped  {name}: no language-model API key is set, so the model features cannot be shown")
                     continue
-                page = browser.new_page(viewport={"width": 1280, "height": 900}, device_scale_factor=1.5)
+                gallery = name.startswith("gallery/")
+                page = browser.new_page(viewport={"width": GALLERY_W if gallery else 1280, "height": 900}, device_scale_factor=1.5)
                 page.goto(f"http://127.0.0.1:{port}/?theme=light{link}")
                 page.wait_for_selector("#out .pick-b, #view-kb .kb-sec", timeout=30000)
                 page.wait_for_timeout(2000)
@@ -260,23 +300,23 @@ def main() -> int:
                     page.evaluate("document.querySelectorAll('#out details').forEach(d => { if (d.querySelector('.wb-more')) d.open = true; })")
                     page.wait_for_timeout(400)
                 text = page.evaluate("document.body.innerText")
-                missing = [t for t in expect() if t.lower() not in text.lower()]
-                if missing:
-                    mismatches.append((name, missing))
-                    print(f"MISMATCH {name}: page lacks {missing}")
-                else:
-                    print(f"ok       {name}")
+                missing = [f"page lacks {t!r}" for t in expect() if t.lower() not in text.lower()]
+                clip = None
+                if sel:
+                    page.locator(sel).first.scroll_into_view_if_needed()
+                    box = page.locator(sel).first.bounding_box()
+                    sy = page.evaluate("window.scrollY")
+                    height = content_h(page, sel, box)
+                    if gallery:  # the picks and the cost only; the what-if sliders and links add nothing to a gallery
+                        height = min(height, cards_bottom(page, sel))
+                    clip = {"x": box["x"], "y": box["y"] + sy, "width": content_w(page, sel, box), "height": min(height, MAX_H)}
+                # Of these shots only the gallery prints in the report, so only its print size is checked.
+                pt, problems = print_problems(page, clip) if gallery else (None, [])
+                mismatches += report(name, missing + problems, pt)
                 if not a.check:
                     dest = OUT / f"{name}.png"
                     dest.parent.mkdir(parents=True, exist_ok=True)
-                    if sel:
-                        page.locator(sel).first.scroll_into_view_if_needed()
-                        box = page.locator(sel).first.bounding_box()
-                        sy = page.evaluate("window.scrollY")
-                        height = content_h(page, sel, box)
-                        if name.startswith("gallery/"):  # the picks and the cost only; the what-if sliders and links add nothing to a gallery
-                            height = min(height, cards_bottom(page, sel))
-                        clip = {"x": box["x"], "y": box["y"] + sy, "width": content_w(page, sel, box), "height": min(height, MAX_H)}
+                    if clip:
                         page.screenshot(path=str(dest), full_page=True, clip=clip)
                     else:
                         page.screenshot(path=str(dest))

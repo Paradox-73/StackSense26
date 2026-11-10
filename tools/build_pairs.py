@@ -26,9 +26,9 @@ PAIRS = [
     ("Internal tool, own servers vs cloud", "internal_tool", {"deployment": "cloud"}),
 ]
 
-GALLERY = ["startup_mvp", "hipaa_telehealth", "india_ecommerce_scale", "iot_telemetry", "student_project", "content_site"]  # the six sample screenshots of tools/capture_screenshots.py
-KEY_GALLERY = 1  # the first one prints in the report body; the rest go to the appendix
-KEY_PAIRS = 1    # the first pair prints in the report body; the rest go to the appendix
+GALLERY = ["startup_mvp", "hipaa_telehealth"]  # the two sample screenshots of tools/capture_screenshots.py
+KEY_GALLERY = 1  # report.md blocks: the first sample is block gallery, the rest gallery_more
+KEY_PAIRS = 1    # report.md blocks: the first pair is block pairs, the rest pairs_more
 
 
 def _preset(pid: str) -> dict:

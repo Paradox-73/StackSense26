@@ -1,5 +1,5 @@
 /* Print styles for report/StackSense_Report.pdf (A4). Used by tools/build_report.py. */
-@page { size: A4; margin: 18mm 16mm 20mm 16mm; @bottom-center { content: "Page " counter(page) " of " counter(pages); font: 9pt "Geist", sans-serif; color: #5b5266; } }
+@page { size: A4; margin: 15mm 14mm 17mm 14mm; @bottom-center { content: "Page " counter(page) " of " counter(pages); font: 9pt "Geist", sans-serif; color: #5b5266; } }
 @page :first { margin: 0; @bottom-center { content: none; } }
 :root { --ink: #241c2e; --muted: #5b5266; --accent: #4b2a63; --gold: #b8872b; --line: #d9d0e0; --paper: #f6f1ea; }
 html { font: 10.5pt/1.45 "Geist", "Segoe UI", Arial, sans-serif; color: var(--ink); }
@@ -21,11 +21,10 @@ th, td { border: 0.6pt solid var(--line); padding: 3pt 4.5pt; vertical-align: to
 th { background: var(--paper); font-weight: 600; overflow-wrap: normal; word-break: normal; }
 tr { break-inside: avoid; }
 thead { display: table-header-group; }
-figure { margin: 6pt 0 10pt; text-align: center; break-inside: avoid; }
-figure img { max-width: 100%; max-height: 68mm; width: auto; height: auto; border: 0.5pt solid var(--line); border-radius: 3pt; }
-figure.gal img { max-height: 36mm; }
-figure.gal { margin: 4pt 0 6pt; }
-figcaption { font-size: 8.5pt; color: var(--muted); margin-top: 3pt; text-align: left; }
+/* Every figure spans the text column: tools/capture_screenshots.py checks its text prints at 7 pt or more at this width. */
+figure { margin: 4pt 0 8pt; break-inside: avoid; }
+figure img { display: block; box-sizing: border-box; width: 100%; height: auto; border: 0.5pt solid var(--line); border-radius: 3pt; }
+figcaption { font-size: 8.5pt; color: var(--muted); margin-top: 3pt; }
 figcaption .repro { display: block; font-size: 7.8pt; margin-top: 1pt; }
 figcaption code { font-size: 7.6pt; }
 em { color: var(--ink); }
@@ -47,8 +46,9 @@ nav.toc li { display: flex; align-items: baseline; gap: 4pt; font-size: 9.5pt; m
 nav.toc .dots { flex: 1; border-bottom: 0.7pt dotted var(--muted); transform: translateY(-2pt); }
 nav.toc .pg { font-variant-numeric: tabular-nums; color: var(--muted); }
 
-/* the report starts with "At a glance" on page 2; each numbered section starts where it falls, but appendices start a page */
-h2[id^="appendix-"]:not(#appendix-a-one-recommendation-in-detail-hipaa-telehealth) { break-before: page; }
+/* sections 1-10 run on from page 2; section 11 opens a new page and the appendices follow it on, so sections 1-10 end on
+   the page before section 11 (tools/build_report.py checks both page limits from that page) */
+h2[id="11-ai-assistance-declaration"] { break-before: page; }
 h2#at-a-glance { margin-top: 0; }
 
 /* Appendix A: the full sample is reference material, so it is set smaller */

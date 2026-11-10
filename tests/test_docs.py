@@ -106,6 +106,14 @@ def test_limitations_do_not_call_a_scored_technology_unscored():
         assert not (name in unscored and kb_id in ids), f"{name} is in the knowledge base but the report says it is not scored"
 
 
+def test_page_limits_flag_a_report_over_the_statement_budget():
+    """Sections 1-10 on pages 2-16 and section 11 plus the appendices on pages 17-26 is the most the statement allows."""
+    fits = {"3. System architecture": 3, "11. AI assistance declaration": 17}  # heading_pages never lists page 2's headings
+    assert build_report.page_limits(fits, 26) == []
+    assert build_report.page_limits({**fits, "11. AI assistance declaration": 18}, 27) == ["sections 1-10 take 16 pages, over the 15 allowed"]
+    assert build_report.page_limits(fits, 27) == ["section 11 and the appendices take 11 pages, over the 10 allowed"]
+
+
 def test_facts_file_is_current(facts):
     stored = (ROOT / "report" / "facts.json").read_text(encoding="utf-8").replace(chr(13) + chr(10), chr(10))
     assert stored == build_report.facts_text(facts), "run python tools/build_report.py --facts"
@@ -144,7 +152,7 @@ def test_every_scripted_screenshot_exists_and_is_listed(facts):
     import capture_screenshots as cs
     for name, *_ in cs.SHOTS + cs.SCENARIO_SHOTS:
         assert (ROOT / "report" / "screenshots" / f"{name}.png").exists(), name
-    assert len(cs.SHOTS) == 19 and len(cs.SCENARIO_SHOTS) == 15
+    assert len(cs.SHOTS) == 15 and len(cs.SCENARIO_SHOTS) == 15
 
 
 def test_architecture_figures_quote_the_right_counts(facts):
