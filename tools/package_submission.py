@@ -13,7 +13,9 @@ The folder (FullName is the author in report/cover.json, spaces as underscores):
       Report_<FullName>.pdf   report/StackSense_Report.pdf, built by tools/build_report.py
 
 Only paths on the allowlist go into source/, so a stray file in the working folder cannot reach it. Self-checks:
-  * every required file is present, and each output equals what the engine returns for its scenario now
+  * every required file is present, each output equals what the engine returns for its scenario now, and the two
+    outputs/ folders hold nothing else
+  * report/cover.json has the Unstop registered email the title page needs
   * no .venv, caches, .git, tool-settings folders, planning notes or secrets files
   * no text file that mentions a local path or a name that should not ship; the report's section 11, the AI
     assistance declaration the statement asks for, is the one place allowed to name the coding assistant
@@ -69,6 +71,8 @@ FORBIDDEN_NAMES = ["cl" + "aude", "plan" + ".md", "planning", ".venv", ".git/", 
 # The first line of report section 11, the AI assistance declaration (statement 5.1, FAQ and template), must name the
 # coding assistant; only this exact opening, at the start of a line of report/report.md, is exempt from the check.
 DECLARATION = "- Cl" + "aude Code (Anth" + "ropic), an AI coding assistant: "
+NO_EMAIL = ("report/cover.json has no Unstop registered email, so the report's title page says it is still to be added: "
+            "fill it in, then rebuild the PDF (python tools/build_report.py) and this folder")
 
 
 def _excluded(rel: Path) -> bool:
@@ -154,8 +158,16 @@ def check(dest: Path) -> list[str]:
             for f in FORBIDDEN_TEXT:
                 if f.lower() in text:
                     bad.append(f"{n} contains {f!r}")
+    cover = source / "report" / "cover.json"
+    if cover.is_file() and not str(json.loads(cover.read_text(encoding="utf-8")).get("email") or "").strip():
+        bad.append(NO_EMAIL)
     if len([n for n in names if n.startswith("data/") and n.endswith(".json")]) < 8:
         bad.append("fewer than 8 data files in source")
+    want = {f"{f.stem}_output.json" for f in PUBLIC.glob("*.json")}
+    for folder in ("outputs", "source/outputs"):
+        if (dest / folder).is_dir():  # a stray file there is copied with the allowlist and never compared with the engine
+            bad += [f"{folder}/{p.name} is not the output of a public scenario" for p in (dest / folder).iterdir()
+                    if p.name not in want]
     for f in sorted(PUBLIC.glob("*.json")):
         fresh = run(json.loads(f.read_text(encoding="utf-8")))
         for folder in ("outputs", "source/outputs"):

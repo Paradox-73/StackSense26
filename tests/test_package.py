@@ -20,7 +20,8 @@ def built(tmp_path_factory):
 
 def test_folder_has_the_section_9_3_layout_and_passes_its_checks(built):
     dest, problems = built
-    assert problems == []
+    email = json.loads((ROOT / "report" / "cover.json").read_text(encoding="utf-8"))["email"]
+    assert problems == ([] if email.strip() else [ps.NO_EMAIL])  # the owner adds the email before submitting
     full = "_".join(json.loads((ROOT / "report" / "cover.json").read_text(encoding="utf-8"))["author"].split())
     assert dest.name == f"StackSense26_{full}"
     assert sorted(p.name for p in dest.iterdir()) == ["Report_" + full + ".pdf", "outputs", "source"]
@@ -39,7 +40,31 @@ def test_an_output_that_is_not_the_engines_is_caught(built, tmp_path):
     doc = json.loads(out.read_text(encoding="utf-8"))
     doc["stack"]["database"]["choice"] = "A database typed in by hand"
     out.write_text(json.dumps(doc), encoding="utf-8")
-    assert ps.check(dest) == ["outputs/P3_output.json is not what the engine returns for P3.json now"]
+    assert [p for p in ps.check(dest) if p != ps.NO_EMAIL] == ["outputs/P3_output.json is not what the engine returns for P3.json now"]
+
+
+def test_an_output_file_for_no_public_scenario_is_caught(built, tmp_path):
+    """A stray outputs/E1_output.json (say from a run over scenarios/edge) is copied with the allowlist; it is not one
+    of the six outputs the folder must hold, and no check compares it with the engine."""
+    import shutil
+    dest = tmp_path / built[0].name
+    shutil.copytree(built[0], dest)
+    for folder in ("outputs", "source/outputs"):
+        (dest / folder / "E1_output.json").write_text('{"status": "ok"}', encoding="utf-8")
+    assert [p for p in ps.check(dest) if p != ps.NO_EMAIL] == [
+        "outputs/E1_output.json is not the output of a public scenario",
+        "source/outputs/E1_output.json is not the output of a public scenario"]
+
+
+def test_a_title_page_without_the_registered_email_is_a_problem(built, tmp_path):
+    import shutil
+    dest = tmp_path / built[0].name
+    shutil.copytree(built[0], dest)
+    cover = dest / "source" / "report" / "cover.json"
+    doc = json.loads(cover.read_text(encoding="utf-8"))
+    for email, flagged in (("", True), ("  ", True), ("entrant@example.com", False)):
+        cover.write_text(json.dumps(dict(doc, email=email)), encoding="utf-8")
+        assert (ps.NO_EMAIL in ps.check(dest)) == flagged, email
 
 
 def test_self_check_catches_a_leaked_name_a_local_path_and_secrets(built, tmp_path):
