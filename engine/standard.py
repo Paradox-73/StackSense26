@@ -150,13 +150,15 @@ IDENTITY_HOW = {"Active Directory": "AD FS or Keycloak user federation (LDAP/Ker
 IDENTITY_DOCS = {"Microsoft Entra ID": "https://learn.microsoft.com/entra/identity-platform/v2-protocols-oidc",
                  "Okta": "https://developer.okta.com/docs/concepts/oauth-openid/",
                  "Google Workspace": "https://developers.google.com/identity/openid-connect/openid-connect"}
-# Well-known business systems and the interface the stack integrates through.
+# Identity providers reached over the internet, which an air-gapped network cannot reach.
+CLOUD_IDENTITY = ("Microsoft Entra ID", "Okta", "Google Workspace", "Auth0", "Amazon Cognito")
+# Well-known business systems and the interface the stack integrates through; True marks a cloud-only service.
 INTEGRATIONS = [(r"microsoft 365|office 365|\bo365\b|outlook|\bteams\b|sharepoint",
-                 "Microsoft Graph API (mail, calendar and Teams notifications, files)"),
-                (r"google workspace|gmail|google drive", "Google Workspace APIs (Gmail, Calendar, Drive)"),
-                (r"salesforce", "Salesforce REST API"), (r"\bsap\b", "SAP OData services"),
-                (r"slack", "Slack Web API and incoming webhooks"), (r"tally", "Tally's XML over HTTP interface"),
-                (r"zoho", "Zoho REST APIs"), (r"jira", "Jira REST API")]
+                 "Microsoft Graph API (mail, calendar and Teams notifications, files)", True),
+                (r"google workspace|gmail|google drive", "Google Workspace APIs (Gmail, Calendar, Drive)", True),
+                (r"salesforce", "Salesforce REST API", True), (r"\bsap\b", "SAP OData services", False),
+                (r"slack", "Slack Web API and incoming webhooks", True), (r"tally", "Tally's XML over HTTP interface", False),
+                (r"zoho", "Zoho REST APIs", True), (r"jira", "Jira REST API", False)]
 END_OF_LIFE = [  # the source page gives each product's end date
     (r"sql ?server ?(2008|2012|2014|2016)\b", "SQL Server {0}", "extended support has ended",
      "https://learn.microsoft.com/lifecycle/products/?terms=sql%20server"),
@@ -559,7 +561,15 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
                 warns.append(_std_warn("EXISTING_SYSTEM_EXTENDED_SUPPORT", "info",
                                        f"'{text}': {product} {status} ({source}). Keeping it is fine; schedule the "
                                        "upgrade before that date.", ["infrastructure.existing_systems"]))
+    unreachable = "an air-gapped network cannot reach it"
     for name in idps:
+        if name in _cloud_only_identity(idps, f):
+            warns.append(_std_warn("EXISTING_SYSTEM_UNREACHABLE", "warning",
+                                   f"{name} is a cloud identity provider, and {unreachable}. Sign-in uses a directory "
+                                   f"inside the network instead; if {name} is synchronised from an on-premises Active "
+                                   "Directory, federate that directory.",
+                                   ["infrastructure.existing_systems", "infrastructure.deployment_model"]))
+            continue
         notes.append(f"Existing identity provider {name}: sign-in reuses it through "
                      f"{IDENTITY_HOW.get(name, 'OpenID Connect or SAML')} instead of a new user store")
     names = {it["id"]: it["name"] for it in load_kb()["database"]}
@@ -570,9 +580,22 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
                          "the pick, move its data to the recommended offering with the vendor's migration tool, or reach "
                          "it over a private link (site-to-site VPN) while it stays where it is")
     for text in other:
-        how = next((api for pattern, api in INTEGRATIONS if re.search(pattern, text.lower())), "its API")
+        how, cloud_only = next(((api, c) for pattern, api, c in INTEGRATIONS if re.search(pattern, text.lower())),
+                               ("its API", False))
+        if cloud_only and deploy == "air_gapped":
+            warns.append(_std_warn("EXISTING_SYSTEM_UNREACHABLE", "warning",
+                                   f"'{text}' is a cloud service, and {unreachable} through {how}. Move its data across "
+                                   "the air gap with the site's approved transfer process, or keep that integration on a "
+                                   "connected system outside the network.",
+                                   ["infrastructure.existing_systems", "infrastructure.deployment_model"]))
+            continue
         notes.append(f"Existing system '{text}': integrated through {how}; it stays the system of record for its own data")
     return a, origin, notes, warns
+
+
+def _cloud_only_identity(idps: list[str], f: dict) -> list[str]:
+    """The existing identity providers the network cannot reach: the cloud ones, when the site is air-gapped."""
+    return [i for i in idps if i in CLOUD_IDENTITY] if f["infrastructure.deployment_model"] == "air_gapped" else []
 
 
 def _std_warn(code: str, severity: str, message: str, fields: list[str]) -> dict:
@@ -660,6 +683,7 @@ def _supporting(result: dict, f: dict) -> list[dict]:
         out.append({"layer": layer, "choice": s["name"], "justification": why, "driven_by": fields,
                     "alternatives": [], "tradeoffs": tradeoffs, "source": s.get("source"), "role": s["role"]})
     idps = _systems(f["infrastructure.existing_systems"])[1]
+    idps = [i for i in idps if i not in _cloud_only_identity(idps, f)]
     if idps and f["requirements.auth"] != "none":
         replaced = [x for x in out if x["role"] in ("Authentication", "Enterprise SSO")]
         first = out.index(replaced[0]) if replaced else len(out)

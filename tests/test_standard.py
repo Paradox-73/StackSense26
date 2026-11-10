@@ -2,6 +2,7 @@
 determinism and the LLM-off switch (problem statement sections 3-8)."""
 import copy
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -155,16 +156,28 @@ def test_explicit_cloud_is_a_hard_constraint(cloud, word):
     assert word in out["stack"]["hosting"]["choice"]
 
 
-def test_air_gapped_stack_has_no_saas_or_cdn():
+# Services an air-gapped network cannot reach: SaaS by name, cloud identity providers, and any CDN.
+UNREACHABLE = SAAS + ("Datadog", "New Relic", "Okta", "Entra", "Azure AD", "Google Workspace", "Cognito", "Vonage",
+                      "QStash", "SaaS")
+CDN = re.compile(r"\bCDN\b")
+NO_CDN = re.compile(r"no public CDN|instead of a CDN")
+
+
+@pytest.mark.parametrize("systems", [[], ["Microsoft Entra ID (Azure AD)", "On-prem SQL Server 2019", "Microsoft 365"]])
+def test_air_gapped_stack_has_no_saas_or_cdn(systems):
     doc = load("P5")
-    doc["infrastructure"].update(deployment_model="air_gapped", cloud_preference="none", existing_systems=[])
+    doc["infrastructure"].update(deployment_model="air_gapped", cloud_preference="none", existing_systems=systems)
     out = run(doc)
     check_schema(out)
-    text = json.dumps({k: v for k, v in out["stack"].items()})
-    choices = [out["stack"][l]["choice"] for l in ("frontend", "backend", "database", "hosting")] + \
-              [s["choice"] for s in out["stack"]["supporting"]]
-    assert not [n for n in SAAS for c in choices if n in c], choices
-    assert "On-prem" in out["stack"]["hosting"]["choice"], text[:300]
+    parts = [out["stack"][l] for l in ("frontend", "backend", "database", "hosting")] + out["stack"]["supporting"]
+    for c in parts:
+        assert not [n for n in UNREACHABLE if n in c["choice"]], c["choice"]
+        assert not CDN.search(c["choice"]) or NO_CDN.search(c["choice"]), c["choice"]
+    watch = [s["choice"] for s in out["stack"]["supporting"] if s["layer"] == "observability"]
+    assert watch and all("self-hosted" in c for c in watch), watch
+    assert out["stack"]["hosting"]["choice"].startswith("On-prem")
+    unreachable = [w["message"] for w in out["warnings"] if w["code"] == "EXISTING_SYSTEM_UNREACHABLE"]
+    assert len(unreachable) == (2 if systems else 0), unreachable
 
 
 def test_air_gapped_payments_and_sms_are_flagged():

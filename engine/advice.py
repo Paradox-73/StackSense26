@@ -532,6 +532,13 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             tier_extra = max(0.0, typical - sso["free_mau"]) * sso["usd_per_mau"]
             out[-1]["tier_usage"] = (tier_extra, tier_extra, f"~{typical:,.0f} monthly SSO users, typical of the "
                                      f"{TIER_NAMES[d['compute_tier']]} scale tier")
+        elif env["air_gapped"]:  # cloud identity providers are unreachable; the directory inside the network is not
+            add("Enterprise SSO", "Keycloak (self-hosted) federating your on-premises directory (Active Directory or "
+                "another LDAP server) over LDAPS or Kerberos",
+                "An air-gapped network cannot reach a cloud identity provider (Entra ID, Okta, Google Workspace); Keycloak's "
+                "user federation reads the accounts and groups from the directory inside the network and gives your API "
+                "one OIDC token format.", "https://www.keycloak.org/docs/latest/server_admin/#_user-storage-federation",
+                system="keycloak")
         else:
             add("Enterprise SSO", "Keycloak identity brokering (self-hosted, free): each customer's Entra ID / Azure AD, "
                 "Okta or Google Workspace over SAML 2.0 or OIDC",
