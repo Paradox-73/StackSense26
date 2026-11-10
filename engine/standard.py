@@ -93,6 +93,11 @@ UI_POINTER = re.compile(r"; see the '[^']+' scenario under 'What would change'\.
 DRIVER_MIN_POINTS = 1.0
 DRIVERS_SCORED = 4
 DRIVERS_RULED = 3
+# What happens when an optional field with no fixed default is absent (the others use the default in FIELDS).
+ABSENT_NOTE = {"project.name": "the project is called 'Unnamed project'", "project.description": "no description",
+               "scale.peak_concurrent_users": "the engine estimates it from the users",
+               "scale.data_volume_gb_12_months": "the engine estimates it from the project type and the users",
+               "requirements.p95_latency_ms": "no latency target"}
 
 # Free-text existing systems: databases the engine keeps, identity providers it signs in through, and products past
 # their vendor's end of support. Each end-of-life row: (pattern, product, end date, source).
@@ -447,6 +452,16 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
                                    "One copy of the data cannot sit only in both places; the engine keeps both rules, "
                                    "so only providers with both regions remain.",
                                    ["compliance", "infrastructure.data_residency"]))
+    if "gdpr" in compliance:
+        notes.append("gdpr: sign a data processing agreement (DPA) with every vendor that stores or processes personal "
+                     "data (host, database, sign-in, payments, monitoring); "
+                     + ("infrastructure.data_residency eu keeps the data in EU regions" if residency == "eu" else
+                        "with no EU residency stated, personal data may leave the EU only under an adequacy decision or "
+                        "the vendor's Standard Contractual Clauses (GDPR Chapter V); set infrastructure.data_residency "
+                        "to eu to keep it in EU regions"))
+    if "iso27001" in compliance:
+        notes.append("iso27001: only hosts and managed services (backend-as-a-service, managed-only databases) that "
+                     "publish ISO/IEC 27001 certification are kept")
     if residency == "other":
         warns.append(_std_warn("RESIDENCY_UNVERIFIED", "warning",
                                "data_residency 'other' names no country, so the engine cannot check provider regions. "
@@ -683,7 +698,11 @@ def run(doc) -> dict:
     warnings += [_std_warn("UNKNOWN_FIELD", "info", f"{k} is not part of the standard schema and was ignored.", [k])
                  for k in unknown]
     warnings += extra + _warnings(result, origin)
-    assumptions = [f"{m} missing: used {fields[m]!r}" for m in missing] + notes + _assumptions(result)
+    absent = [path for path, _kind, required, *_ in FIELDS if not required and not _get(doc, path)[0]]
+    absent += [f"priorities.{k}" for k in PRIORITY_KEYS if k not in (doc.get("priorities") or {})]
+    assumptions = ([f"{m} missing: used {fields[m]!r}" for m in missing]
+                   + [f"{a} not given: {ABSENT_NOTE.get(a) or f'default {fields[a]!r}'}" for a in absent]
+                   + notes + _assumptions(result))
     for w in warnings:
         if w["severity"] == "critical" and w["code"] not in ("NO_FEASIBLE_OPTION",):
             assumptions.append(f"Relaxed or flagged ({w['code']}): {w['message']}")

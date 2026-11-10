@@ -303,3 +303,23 @@ def test_small_input_changes_give_local_changes(name, outputs):
     assert core(run(doc)) == base
     doc["scale"]["users_12_months"] = round(doc["scale"]["users_12_months"] * 1.05)
     assert core(run(doc)) == base
+
+
+def test_every_absent_optional_field_has_its_default_in_assumptions(outputs):
+    out = run({"scenario_id": "few", "project": {"type": "internal_tool", "platforms": ["web"]}, "priorities": {"cost": 5}})
+    given = [a for a in out["assumptions"] if " not given: " in a]
+    assert "scale.traffic_pattern not given: default 'steady'" in given
+    assert "infrastructure.deployment_model not given: default 'managed_cloud'" in given
+    assert "requirements.availability not given: default '99.9'" in given
+    assert "priorities.security not given: default 3" in given and not any(a.startswith("priorities.cost") for a in given)
+    assert "project.name not given: the project is called 'Unnamed project'" in given
+    assert len(given) == 23 + 5  # the 23 optional fields of table 3.1 and the five priorities not given
+    assert not [a for name, o in outputs.items() for a in o["assumptions"] if " not given: " in a]
+
+
+def test_each_regulation_gets_an_explicit_note(outputs):
+    def notes(name, rule):
+        return [a for a in outputs[name]["assumptions"] if a.startswith(f"{rule}:")]
+    assert notes("P3", "gdpr") and "Standard Contractual Clauses" in notes("P3", "gdpr")[0]
+    assert notes("P4", "iso27001") and notes("P5", "iso27001") and notes("P4", "rbi_localisation")
+    assert any("DPDP" in a for a in outputs["P2"]["assumptions"])
