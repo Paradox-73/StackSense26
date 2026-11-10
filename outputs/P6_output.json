@@ -285,9 +285,8 @@
     "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
     "How fast must the app answer? (slowest 1 in 20 requests, ms): Not provided; using default '300'.",
     "Architecture preference: Not provided; using default 'auto'.",
-    "Preferred cloud: Not provided; using default 'none'.",
     "Vendor lock-in tolerance: Not provided; using default 'medium'.",
-    "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies."
+    "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Set infrastructure.data_residency to india if a sector rule (e.g. RBI) applies."
   ],
   "validation_errors": []
 }

@@ -189,7 +189,6 @@
     "How fast must the app answer? (slowest 1 in 20 requests, ms): Not provided; using default '300'.",
     "Where are your users?: Not provided: no region is favoured when hosts are scored.",
     "Architecture preference: Not provided; using default 'auto'.",
-    "Preferred cloud: Not provided; using default 'none'.",
     "Vendor lock-in tolerance: Not provided; using default 'medium'.",
     "requirements.full_text_search is false, so no search service is recommended, although projects of this type usually add one"
   ],

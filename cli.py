@@ -70,6 +70,15 @@ def main(argv=None) -> int:
     return 0
 
 
+def read_text(path: Path) -> str:
+    """A scenario file as text: UTF-8 (with or without a byte-order mark) or UTF-16 with its mark, which Windows
+    PowerShell writes; other bytes are replaced, so a broken file becomes invalid_input instead of a crash."""
+    raw = path.read_bytes()
+    if raw[:2] in (b"\xff\xfe", b"\xfe\xff"):
+        return raw.decode("utf-16", errors="replace")
+    return raw.decode("utf-8-sig", errors="replace")
+
+
 def run_scenarios(src: Path, out: str | None) -> int:
     """Run each standard scenario file and write (or print) its section 4 output JSON."""
     from engine.standard import run_text
@@ -78,13 +87,17 @@ def run_scenarios(src: Path, out: str | None) -> int:
         print(f"no scenario files found at {src}", file=sys.stderr)
         return 1
     folder = out and (len(files) > 1 or src.is_dir() or not out.lower().endswith(".json"))
+    written: set[str] = set()
     for f in files:
-        result = run_text(f.read_text(encoding="utf-8-sig"))
+        result = run_text(read_text(f))
         text = json.dumps(result, indent=2, ensure_ascii=False) + "\n"
         if not out:
             sys.stdout.write(text)
             continue
         sid = re.sub(r"[^A-Za-z0-9_.-]", "_", str(result.get("scenario_id") or f.stem))
+        if sid in written:  # two files with one scenario_id must not overwrite each other's output
+            sid = f"{sid}_{re.sub(r'[^A-Za-z0-9_.-]', '_', f.stem)}"
+        written.add(sid)
         dest = Path(out) / f"{sid}_output.json" if folder else Path(out)
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(text, encoding="utf-8")

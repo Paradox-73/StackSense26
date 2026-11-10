@@ -25,11 +25,11 @@
           "why_not": "Swapping it in lowers the stack score by 5.5 points. Next.js (React) is stronger on SEO (5.0 vs 2.0), development speed (5.0 vs 4.0); React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), learning curve (4.0 vs 3.0); React SPA (Vite) takes a penalty: Client-side rendering is a liability when organic search is the business."
         },
         {
-          "choice": "React Native (Expo)",
+          "choice": "Flutter",
           "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
         },
         {
-          "choice": "Flutter",
+          "choice": "Native iOS + Android (Swift / Kotlin)",
           "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
         }
       ],
@@ -317,9 +317,8 @@
     "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",
     "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
     "Architecture preference: Not provided; using default 'auto'.",
-    "Preferred cloud: Not provided; using default 'none'.",
     "Vendor lock-in tolerance: Not provided; using default 'medium'.",
-    "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies."
+    "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Set infrastructure.data_residency to india if a sector rule (e.g. RBI) applies."
   ],
   "validation_errors": []
 }

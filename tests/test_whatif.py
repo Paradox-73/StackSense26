@@ -64,3 +64,10 @@ def test_relative_changes_scale_the_current_answer_without_a_key():
         change = propose_changes(question, now)["changes"][key]
         assert change["value"] == value and change["source"] == "rule", question
     assert propose_changes("What if nothing changes?", now)["changes"] == {}
+
+
+def test_the_what_if_box_never_asks_the_model(fake_llm):
+    """Statement 5.1 allows a model to read the project description only; what-if questions use the pattern reader."""
+    fake = fake_llm({"fields": {"dau": {"value": 10000, "quote": "ten times the audience"}}})
+    r = client.post("/api/whatif", json={"answers": {"dau": 1000}, "question": "What if we had ten times the audience?"}).json()
+    assert fake.calls == [] and all(c["source"] == "rule" for c in r["changes"].values())

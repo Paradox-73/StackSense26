@@ -135,8 +135,8 @@ async function runScenario() {
 }
 
 function load(doc, name) {
-  S.doc = doc && typeof doc === "object" && !Array.isArray(doc) ? doc : { scenario_id: name };
-  S.name = String(S.doc.scenario_id ?? name ?? "scenario").replace(/[^A-Za-z0-9_.-]/g, "_");
+  S.doc = doc;  /* kept as loaded, even when it is not an object: the engine then reports invalid_input */
+  S.name = String((S.doc && S.doc.scenario_id) ?? name ?? "scenario").replace(/[^A-Za-z0-9_.-]/g, "_");
   S.out = null;
   for (const b of document.querySelectorAll("#sc-ex button")) b.setAttribute("aria-pressed", String(b.dataset.name === name));
   renderForm(); renderOut();
@@ -162,7 +162,9 @@ async function init() {
   renderForm(); renderOut();
   $("#sc-form").addEventListener("change", (e) => {
     const el = e.target.closest("[data-path]");
-    if (el) setPath(S.doc, el.dataset.path, readControl(el));
+    if (!el) return;
+    if (!S.doc || typeof S.doc !== "object" || Array.isArray(S.doc)) S.doc = {};
+    setPath(S.doc, el.dataset.path, readControl(el));
   });
   $("#sc-ex").addEventListener("click", async (e) => {
     const b = e.target.closest("button[data-name]");

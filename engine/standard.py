@@ -115,11 +115,17 @@ LANGUAGE_ALIASES = {"js": "javascript", "ts": "typescript", "c#": "csharp", "cs"
                     "dotnet": "csharp", "golang": "go", "nodejs": "node", "node.js": "node", "py": "python",
                     "postgresql": "postgres", "html5": "html"}
 TOP_PRIORITIES = 3
+# Engine notes that name a control of the web app's form, restated for a scenario file.
+FORM_WORDS = [("Add 'Data must stay in India' if", "Set infrastructure.data_residency to india if"),
+              ("remove 'Data must stay in India' if", "set infrastructure.data_residency to none if"),
+              ("tick HIPAA if it applies", "add hipaa to compliance if it applies"),
+              ("add 'vector' if you do retrieval", "set requirements.ml_features to llm_rag if you do retrieval")]
 # Engine warnings that point at a panel of the web app; the exported output stands alone.
 UI_POINTER = re.compile(r"; see the '[^']+' scenario under 'What would change'\.")
 # driven_by lists the answers that moved a pick's score by at least this many points (most first, at most
 # DRIVERS_SCORED), then at most DRIVERS_RULED fields whose hard constraints ruled rival options out.
 DRIVER_MIN_POINTS = 1.0
+MAX_NUMBER = 1e12  # larger counts, gigabytes or dollars are typing mistakes, and overflow float arithmetic
 DRIVERS_SCORED = 4
 DRIVERS_RULED = 3
 # What happens when an optional field with no fixed default is absent (the others use the default in FIELDS).
@@ -133,9 +139,13 @@ ABSENT_NOTE = {"project.name": "the project is called 'Unnamed project'", "proje
 EXISTING_DATABASES = [(r"postgres", "postgres"), (r"\bmysql\b|mariadb", "mysql"), (r"mongo", "mongodb"),
                       (r"\bredis\b|valkey", "redis"), (r"sql ?server|mssql|azure sql", "sqlserver"),
                       (r"\boracle\b(?! cloud)", "oracle")]
-IDENTITY = [(r"entra|azure ad|active directory|\badfs\b", "Microsoft Entra ID"), (r"\bokta\b", "Okta"),
-            (r"google workspace|g ?suite", "Google Workspace"), (r"keycloak", "Keycloak"), (r"auth0", "Auth0"),
-            (r"cognito", "Amazon Cognito"), (r"\bldap\b", "LDAP directory")]
+IDENTITY = [(r"\bentra\b|\bazure ad\b|azure active directory", "Microsoft Entra ID"), (r"\bokta\b", "Okta"),
+            (r"google workspace|\bg ?suite\b", "Google Workspace"), (r"\bkeycloak\b", "Keycloak"), (r"\bauth0\b", "Auth0"),
+            (r"\bcognito\b", "Amazon Cognito"), (r"active directory|\badfs\b", "Active Directory"),
+            (r"\bldap\b", "LDAP directory")]
+# How sign-in reaches each one: cloud identity providers speak OpenID Connect; a directory needs a broker.
+IDENTITY_HOW = {"Active Directory": "AD FS or Keycloak user federation (LDAP/Kerberos), with OpenID Connect to the app",
+                "LDAP directory": "Keycloak user federation over LDAP, with OpenID Connect to the app"}
 IDENTITY_DOCS = {"Microsoft Entra ID": "https://learn.microsoft.com/entra/identity-platform/v2-protocols-oidc",
                  "Okta": "https://developer.okta.com/docs/concepts/oauth-openid/",
                  "Google Workspace": "https://developers.google.com/identity/openid-connect/openid-connect"}
@@ -146,33 +156,33 @@ INTEGRATIONS = [(r"microsoft 365|office 365|\bo365\b|outlook|\bteams\b|sharepoin
                 (r"salesforce", "Salesforce REST API"), (r"\bsap\b", "SAP OData services"),
                 (r"slack", "Slack Web API and incoming webhooks"), (r"tally", "Tally's XML over HTTP interface"),
                 (r"zoho", "Zoho REST APIs"), (r"jira", "Jira REST API")]
-END_OF_LIFE = [
-    (r"sql ?server ?(2008|2012|2014|2016)\b", "SQL Server {0}", "extended support ended (2016: 14 Jul 2026)",
+END_OF_LIFE = [  # the source page gives each product's end date
+    (r"sql ?server ?(2008|2012|2014|2016)\b", "SQL Server {0}", "extended support has ended",
      "https://learn.microsoft.com/lifecycle/products/?terms=sql%20server"),
-    (r"windows server ?(2008|2012)\b", "Windows Server {0}", "extended support ended",
+    (r"windows server ?(2008|2012)\b", "Windows Server {0}", "extended support has ended",
      "https://learn.microsoft.com/lifecycle/products/?terms=windows%20server"),
-    (r"centos ?(6|7|8)?\b", "CentOS Linux {0}", "end of life (CentOS Linux 7: 30 Jun 2024)", "https://endoflife.date/centos"),
-    (r"python ?(2(\.\d+)?|3\.[0-8])\b", "Python {0}", "end of life", "https://endoflife.date/python"),
-    (r"php ?([5-7](\.\d+)?|8\.0)\b", "PHP {0}", "end of life", "https://endoflife.date/php"),
-    (r"node(?:\.?js)? ?(1[0-8]|[4-9])\b", "Node.js {0}", "end of life", "https://endoflife.date/nodejs"),
-    (r"angularjs|angular ?1\.\d", "AngularJS", "end of life (31 Dec 2021)", "https://endoflife.date/angularjs"),
-    (r"mysql ?(5\.\d)\b", "MySQL {0}", "end of life (5.7: 21 Oct 2023)", "https://endoflife.date/mysql"),
-    (r"postgres(?:ql)? ?(9\.\d|1[0-3])\b", "PostgreSQL {0}", "end of life", "https://endoflife.date/postgresql"),
-    (r"\.net framework ?(4\.[0-5](\.\d)?|4\.6(\.1)?|[1-3]\.\d)\b", ".NET Framework {0}", "end of support",
+    (r"centos(?! ?stream) ?(6|7|8)?\b", "CentOS Linux {0}", "it has reached end of life", "https://endoflife.date/centos"),
+    (r"python ?(2(\.\d+)?|3\.[0-8])\b", "Python {0}", "it has reached end of life", "https://endoflife.date/python"),
+    (r"php ?([5-7](\.\d+)?|8\.[01])\b", "PHP {0}", "it has reached end of life", "https://endoflife.date/php"),
+    (r"node(?:\.?js)? ?(1\d|2[013]|[4-9])\b", "Node.js {0}", "it has reached end of life", "https://endoflife.date/nodejs"),
+    (r"angularjs|angular ?1\.\d", "AngularJS", "it has reached end of life", "https://endoflife.date/angularjs"),
+    (r"mysql ?(5\.\d|8\.0)\b", "MySQL {0}", "it has reached end of life", "https://endoflife.date/mysql"),
+    (r"postgres(?:ql)? ?(9\.\d|1[0-3])\b", "PostgreSQL {0}", "it has reached end of life", "https://endoflife.date/postgresql"),
+    (r"\.net framework ?(4\.[0-5](?:\.\d)?|4\.6(?:\.1)?|[1-3]\.\d)(?!\.?\d)", ".NET Framework {0}", "support has ended",
      "https://endoflife.date/dotnetfx"),
-    (r"\.net (core )?([1-7])(\.\d)?\b", ".NET {1}", "end of support", "https://endoflife.date/dotnet"),
-    (r"ubuntu ?(1[0-8]|20)\.04", "Ubuntu {0}.04", "standard support ended", "https://endoflife.date/ubuntu"),
-    (r"internet explorer|\bie ?11\b", "Internet Explorer", "retired (15 Jun 2022)", "https://endoflife.date/internet-explorer"),
-    (r"\bflash\b", "Adobe Flash", "end of life (31 Dec 2020)", "https://www.adobe.com/products/flashplayer/end-of-life.html"),
-    (r"mongodb ?([1-4]\.\d|5\.0)\b", "MongoDB {0}", "end of life", "https://endoflife.date/mongodb"),
-    (r"heroku free", "Heroku free plans", "retired (28 Nov 2022)", "https://blog.heroku.com/next-chapter"),
+    (r"\.net (?:core )?([1-3]\.\d|[5-7])(?:\.\d)?\b", ".NET {0}", "support has ended", "https://endoflife.date/dotnet"),
+    (r"ubuntu ?(1[0-8]|20)\.04", "Ubuntu {0}.04", "standard support has ended", "https://endoflife.date/ubuntu"),
+    (r"internet explorer|\bie ?11\b", "Internet Explorer", "it has been retired", "https://endoflife.date/internet-explorer"),
+    (r"adobe flash|flash player", "Adobe Flash", "it has reached end of life", "https://www.adobe.com/products/flashplayer/end-of-life.html"),
+    (r"mongodb ?([1-5]\.\d|6\.0)\b", "MongoDB {0}", "it has reached end of life", "https://endoflife.date/mongodb"),
+    (r"heroku free", "Heroku free plans", "they have been retired", "https://blog.heroku.com/next-chapter"),
 ]
 # Still supported, but only with security fixes: fine to keep and integrate with; plan the upgrade.
 EXTENDED_SUPPORT = [
-    (r"sql ?server ?2019\b", "SQL Server 2019", "mainstream support ended 28 Feb 2025; security updates continue "
-     "until 8 Jan 2030", "https://learn.microsoft.com/lifecycle/products/sql-server-2019"),
-    (r"sql ?server ?2017\b", "SQL Server 2017", "mainstream support ended 11 Oct 2022; security updates continue "
-     "until 12 Oct 2027", "https://learn.microsoft.com/lifecycle/products/sql-server-2017"),
+    (r"sql ?server ?2019\b", "SQL Server 2019", "is in extended support: security updates only, until 8 Jan 2030",
+     "https://learn.microsoft.com/lifecycle/products/sql-server-2019"),
+    (r"sql ?server ?2017\b", "SQL Server 2017", "is in extended support: security updates only, until 12 Oct 2027",
+     "https://learn.microsoft.com/lifecycle/products/sql-server-2017"),
 ]
 
 REGION = {  # where the data stays under a residency rule, per cloud
@@ -182,6 +192,13 @@ REGION = {  # where the data stays under a residency rule, per cloud
     ("aws", "us"): "us-east-1 (N. Virginia)", ("gcp", "us"): "us-central1 (Iowa)", ("azure", "us"): "East US",
     ("vercel", "india"): "bom1 (Mumbai) for functions", ("digitalocean", "india"): "BLR1 (Bangalore)",
     ("cloudflare", "india"): "Data Localization Suite with an India region",
+    ("digitalocean", "eu"): "FRA1 (Frankfurt) or AMS3 (Amsterdam)", ("digitalocean", "us"): "NYC3 (New York) or SFO3 (San Francisco)",
+    ("vercel", "eu"): "fra1 (Frankfurt) for functions", ("vercel", "us"): "iad1 (Washington, D.C.) for functions",
+    ("flyio", "eu"): "fra (Frankfurt)", ("flyio", "us"): "iad (Ashburn, Virginia)",
+    ("render", "eu"): "Frankfurt", ("render", "us"): "Oregon or Ohio",
+    ("railway", "eu"): "EU West (Amsterdam)", ("railway", "us"): "US East (Virginia)",
+    ("hetzner", "eu"): "Falkenstein, Nuremberg or Helsinki", ("hetzner", "us"): "Ashburn or Hillsboro",
+    ("cloudflare", "eu"): "Data Localization Suite with the EU region",
 }
 STYLE = [("Static site", "static"), ("BaaS-first, self-hosted", "other"), ("BaaS-first", "serverless"),
          ("Serverless", "serverless"), ("Service-oriented", "service_oriented"), ("Modular monolith", "modular_monolith"),
@@ -202,11 +219,13 @@ SERVICE_FIELDS = {
     "auth": ["requirements.auth"],
     "ml": ["requirements.ml_features"],
     "observability": ["requirements.availability"],
-    "other": ["project.description"],
+    "other": ["project.type"],
 }
 OTHER_FIELDS = {"Offline sync": ["requirements.offline_support"], "Push notifications": ["project.platforms"],
                 "Audit & security": ["compliance"], "Hybrid split": ["infrastructure.deployment_model"],
-                "Analytics": ["scale.workload", "project.type"]}
+                "Analytics": ["scale.workload", "project.type"],
+                "Collaboration sync": ["project.type", "requirements.realtime"], "Desktop app": ["project.platforms"],
+                "Notifications": ["project.platforms", "infrastructure.deployment_model"]}
 # Engine answers and the standard fields that stand behind them when no mapping recorded a more specific one.
 ENGINE_FIELDS = {"dau": ["scale.users_12_months"], "peak_rps": ["scale.users_12_months", "scale.traffic_pattern"],
                  "data_volume_gb": ["scale.data_volume_gb_12_months"], "data_growth_gb_month": ["scale.data_volume_gb_12_months"],
@@ -259,6 +278,8 @@ def _check(kind: str, value, allowed) -> tuple[object, str | None]:
         return None, "must be a finite number"
     if value < lo:
         return None, f"must be {lo} or more"
+    if value > MAX_NUMBER:
+        return None, f"must be at most {MAX_NUMBER:,.0f}"
     return (int(value) if kind != "num0" else value), None
 
 
@@ -275,7 +296,8 @@ def validate(doc) -> tuple[dict, list[dict], list[str], list[str]]:
             known = KNOWN_KEYS.get(sec, set(PRIORITY_KEYS))
             unknown += [f"{sec}.{k}" for k in doc[sec] if k not in known]
     unknown += [k for k in doc if k not in TOP_LEVEL]
-    if "scenario_id" in doc and not isinstance(doc["scenario_id"], (str, int)):
+    sid = doc.get("scenario_id")
+    if sid is not None and (isinstance(sid, bool) or not isinstance(sid, (str, int))):
         errors.append({"field": "scenario_id", "message": "must be a string"})
     for path, kind, required, default, allowed in FIELDS:
         present, value = _get(doc, path)
@@ -332,12 +354,12 @@ def _systems(texts: list[str]) -> tuple[list[str], list[str], list[tuple[str, st
             if re.search(pattern, low) and name not in idps:
                 idps.append(name)
                 hit = True
-        for pattern, product, status, source in END_OF_LIFE:
+        for pattern, product, status, source in END_OF_LIFE:  # one text can name several products
             m = re.search(pattern, low)
             if m:
-                groups = [g or "" for g in m.groups()]
-                eol.append((text, product.format(*groups).strip(), f"{status} ({source})"))
-                break
+                name = product.format(*[g or "" for g in m.groups()]).strip()
+                if not any(e[1] == name for e in eol):
+                    eol.append((text, name, f"{status} ({source})"))
         if not hit:
             other.append(text)
     return dbs, idps, eol, other
@@ -372,12 +394,15 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
     # specific (no answer set: the fields that kept it empty).
     actions = [(a, path) for a, path, on in (
         ("read", None, True), ("sign_in", "requirements.auth", auth != "none"),
-        ("post", "requirements.auth" if auth != "none" else "scale.workload",
-         auth != "none" or f["scale.workload"] != "read_heavy"),
+        ("post", "requirements.auth" if auth != "none" else "requirements.file_media_storage"
+         if f["requirements.file_media_storage"] else "requirements.offline_support"
+         if f["requirements.offline_support"] else "scale.workload",
+         auth != "none" or f["scale.workload"] != "read_heavy" or f["requirements.file_media_storage"]
+         or f["requirements.offline_support"]),
         ("pay", "requirements.payments", f["requirements.payments"])) if on]
     put("user_actions", [a for a, _ in actions],
         *([p for _, p in actions if p] or ["requirements.auth", "scale.workload"]))
-    if auth == "none" and f["scale.workload"] == "read_heavy":
+    if "post" not in [a for a, _ in actions]:
         notes.append("No sign-in and a read-heavy workload: visitors only read, so pre-built static pages are allowed")
 
     workloads = [(w, path) for w, path, on in (
@@ -395,10 +420,13 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
     put("tenancy", "shared" if f["requirements.multi_tenant"] else "single", "requirements.multi_tenant")
 
     users12, launch = f["scale.users_12_months"], f["scale.users_at_launch"]
-    dau = int(round(users12 * SSO_DAU_PER_MAU))
-    put("dau", dau, "scale.users_12_months")
-    notes.append(f"Sized for scale.users_12_months: {users12:,} users, about {dau:,} active on a day "
-                 f"({SSO_DAU_PER_MAU:.0%} daily-to-monthly ratio); scale.users_at_launch ({launch:,}) is the starting point")
+    sized, sized_path = (users12, "scale.users_12_months") if users12 >= launch else (launch, "scale.users_at_launch")
+    dau = int(round(sized * SSO_DAU_PER_MAU))
+    put("dau", dau, sized_path)
+    notes.append(f"Sized for {sized_path}: {sized:,} users, about {dau:,} active on a day ({SSO_DAU_PER_MAU:.0%} "
+                 "daily-to-monthly ratio); " + (f"scale.users_at_launch ({launch:,}) is the starting point" if sized_path ==
+                 "scale.users_12_months" else f"it is larger than scale.users_12_months ({users12:,}), so the stack is "
+                 "sized for the launch"))
     if f["scale.peak_concurrent_users"] is not None:
         put("peak_concurrent", f["scale.peak_concurrent_users"], "scale.peak_concurrent_users")
     pattern = f["scale.traffic_pattern"]
@@ -458,7 +486,9 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
     if cloud in ("aws", "gcp", "azure"):
         put("cloud_preference", cloud, "infrastructure.cloud_preference")
         put("cloud_required", True, "infrastructure.cloud_preference")
-    elif cloud == "none" and not onprem:
+    elif cloud == "any" or onprem:
+        put("cloud_preference", "none", "infrastructure.cloud_preference")  # the engine's word for no preference
+    elif cloud == "none":
         put("cloud_preference", "no_hyperscaler", "infrastructure.cloud_preference")
         put("cloud_required", True, "infrastructure.cloud_preference")
         notes.append("cloud_preference 'none' is read as: no AWS, Google Cloud or Azure account; independent "
@@ -476,10 +506,14 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
         notes.append("rbi_localisation: RBI's 2018 directive on storage of payment system data requires payment data "
                      "to be stored only in India, so every store must have an Indian region")
         if residency in ("eu", "us"):
+            notes.append(f"Relaxed: infrastructure.data_residency '{residency}' for payment data (rbi_localisation keeps "
+                         "it in India)")
             warns.append(_std_warn("RESIDENCY_CONFLICT", "critical",
                                    f"rbi_localisation keeps payment data in India, but data_residency is '{residency}'. "
-                                   "One copy of the data cannot sit only in both places; the engine keeps both rules, "
-                                   "so only providers with both regions remain.",
+                                   "One copy of the data cannot sit only in both places. Only providers with both regions "
+                                   f"remain, and the stack is placed in India for RBI; data_residency '{residency}' is "
+                                   f"relaxed for the payment data, so keep any other data that must stay in the "
+                                   f"{residency.upper()} in a separate deployment there.",
                                    ["compliance", "infrastructure.data_residency"]))
     if "gdpr" in compliance:
         notes.append("gdpr: sign a data processing agreement (DPA) with every vendor that stores or processes personal "
@@ -527,15 +561,15 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
                                        f"'{text}': {product} {status} ({source}). Keeping it is fine; schedule the "
                                        "upgrade before that date.", ["infrastructure.existing_systems"]))
     for name in idps:
-        notes.append(f"Existing identity provider {name}: sign-in reuses it over OpenID Connect or SAML instead of a "
-                     "new user store")
+        notes.append(f"Existing identity provider {name}: sign-in reuses it through "
+                     f"{IDENTITY_HOW.get(name, 'OpenID Connect or SAML')} instead of a new user store")
     names = {it["id"]: it["name"] for it in load_kb()["database"]}
     for text in f["infrastructure.existing_systems"]:
         dbid = next((d for pattern, d in EXISTING_DATABASES if re.search(pattern, text.lower())), None)
-        if dbid:
-            notes.append(f"Existing database '{text}': {names.get(dbid, dbid)} gets a bonus for staying; keep it by "
-                         "moving its data to the recommended offering with the vendor's migration tool, or reach it "
-                         "over a private link (site-to-site VPN) while it stays where it is")
+        if dbid in names:
+            notes.append(f"Existing database '{text}': {names[dbid]} is weighed with a bonus for keeping it; if it stays "
+                         "the pick, move its data to the recommended offering with the vendor's migration tool, or reach "
+                         "it over a private link (site-to-site VPN) while it stays where it is")
     for text in other:
         how = next((api for pattern, api in INTEGRATIONS if re.search(pattern, text.lower())), "its API")
         notes.append(f"Existing system '{text}': integrated through {how}; it stays the system of record for its own data")
@@ -589,7 +623,9 @@ def _component(layer: str, sl: dict, origin: dict, f: dict, result: dict) -> dic
     driven_by = list(dict.fromkeys(_paths([c["input"] for c in scored], origin)[:DRIVERS_SCORED]
                                    + ruled[:DRIVERS_RULED])) or ["project.type"]
     alternatives = [{"choice": w["name"], "why_not": w["text"]} for w in sl.get("why_not", [])][:3]
-    taken = {pick["name"]} | {x["choice"] for x in alternatives}
+    companion = result["companion"]["name"] if layer == "frontend" and result.get("companion") else None
+    alternatives = [x for x in alternatives if x["choice"] != companion]
+    taken = {pick["name"], companion} | {x["choice"] for x in alternatives}
     for x in sl.get("excluded", []):
         if len(alternatives) >= 4:
             break
@@ -608,6 +644,8 @@ def _supporting(result: dict, f: dict) -> list[dict]:
     services = [(s, False) for s in result.get("supporting_services", [])] + \
                [(s, True) for s in result.get("deferred_services", [])]
     for s, deferred in services:
+        if s["role"] == "Collaboration sync" and f["project.type"] == "gaming":
+            continue  # a game server owns the state; merging documents (CRDTs) is for co-editing tools
         if s["role"] == "Search" and not f["requirements.full_text_search"]:
             continue  # the engine adds search for shops and content sites; the scenario says it needs none
         layer = SERVICE_LAYER.get(s["role"], "other")
@@ -637,7 +675,7 @@ def _supporting(result: dict, f: dict) -> list[dict]:
 def _reuse_identity(idp: str, replaced: list[dict]) -> dict:
     alts = [{"choice": x["choice"], "why_not": f"A second identity system to run beside {idp}, which already holds "
              "the users"} for x in replaced][:2]
-    return {"layer": "auth", "choice": f"{idp} (existing), signed in over OpenID Connect",
+    return {"layer": "auth", "choice": f"{idp} (existing), signed in through {IDENTITY_HOW.get(idp, 'OpenID Connect')}",
             "justification": f"infrastructure.existing_systems lists {idp}: users sign in with the accounts it already "
                              "manages, so there is no new user store, MFA and password rules come from it, and "
                              "removing someone there removes their access here.",
@@ -675,6 +713,8 @@ def _warnings(result: dict, origin: dict) -> list[dict]:
     for w in result.get("warnings", []):
         message = " ".join(x.strip() for x in (w.get("title", "") + ".", w.get("detail", ""), w.get("resolution", "")) if x)
         message = UI_POINTER.sub(".", message)  # the output file has no app panels to point at
+        for app_words, file_words in FORM_WORDS:
+            message = message.replace(app_words, file_words)
         out.append(_std_warn(w["code"], w["severity"], message, _paths(w.get("fields", []), origin)))
     return out
 
@@ -683,7 +723,10 @@ def _assumptions(result: dict) -> list[str]:
     out = []
     for a in result.get("assumptions", []):
         label = a.get("label") or a.get("field", "")
-        out.append(f"{label}: {a.get('reason', '')}".strip())
+        reason = a.get("reason", "")
+        for app_words, file_words in FORM_WORDS:
+            reason = reason.replace(app_words, file_words)
+        out.append(f"{label}: {reason}".strip())
     return out
 
 
@@ -738,13 +781,14 @@ def run(doc) -> dict:
     warnings += [_std_warn("UNKNOWN_FIELD", "info", f"{k} is not part of the standard schema and was ignored.", [k])
                  for k in unknown]
     warnings += extra + _warnings(result, origin)
-    absent = [path for path, _kind, required, *_ in FIELDS if not required and not _get(doc, path)[0]]
-    absent += [f"priorities.{k}" for k in PRIORITY_KEYS if k not in (doc.get("priorities") or {})]
+    absent = [path for path, _kind, required, *_ in FIELDS if not required and _get(doc, path)[1] is None
+              and not (path == "requirements.p95_latency_ms" and _get(doc, path)[0])]
+    absent += [f"priorities.{k}" for k in PRIORITY_KEYS if (doc.get("priorities") or {}).get(k) is None]
     assumptions = ([f"{m} missing: used {fields[m]!r}" for m in missing]
                    + [f"{a} not given: {ABSENT_NOTE.get(a) or f'default {fields[a]!r}'}" for a in absent]
                    + notes + _assumptions(result))
     for w in warnings:
-        if w["severity"] == "critical" and w["code"] not in ("NO_FEASIBLE_OPTION",):
+        if (w["severity"] == "critical" or w["code"] == "RELAXED_CONSTRAINT") and w["code"] != "NO_FEASIBLE_OPTION":
             assumptions.append(f"Relaxed or flagged ({w['code']}): {w['message']}")
     if not result.get("feasible"):
         return dict(head, status="infeasible", summary="No stack meets every hard constraint; see the critical warnings.",

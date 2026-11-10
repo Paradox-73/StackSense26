@@ -81,3 +81,16 @@ def test_each_public_scenario_is_answered_well_within_ten_seconds():
         t = time.process_time()
         run(doc)
         assert time.process_time() - t < 5.0, p.stem
+
+
+def test_cli_reads_utf16_files_and_keeps_outputs_with_the_same_id_apart(tmp_path, capsys):
+    src = tmp_path / "in"
+    src.mkdir()
+    text = (ROOT / "scenarios" / "public" / "P2.json").read_text(encoding="utf-8")
+    (src / "a.json").write_bytes(text.encode("utf-16"))  # what Windows PowerShell's > writes
+    (src / "b.json").write_text(text, encoding="utf-8")
+    (src / "c.json").write_bytes(b'{"scenario_id": "x", "project": "caf\xe9"}')  # Latin-1 byte, not UTF-8
+    assert cli.main(["--scenario", str(src), "--out", str(tmp_path / "out")]) == 0
+    names = sorted(f.name for f in (tmp_path / "out").iterdir())
+    assert names == ["P2_b_output.json", "P2_output.json", "x_output.json"], names
+    assert json.loads((tmp_path / "out" / "x_output.json").read_text(encoding="utf-8"))["status"] == "invalid_input"

@@ -169,7 +169,7 @@
       },
       {
         "layer": "auth",
-        "choice": "Microsoft Entra ID (existing), signed in over OpenID Connect",
+        "choice": "Microsoft Entra ID (existing), signed in through OpenID Connect",
         "justification": "infrastructure.existing_systems lists Microsoft Entra ID: users sign in with the accounts it already manages, so there is no new user store, MFA and password rules come from it, and removing someone there removes their access here.",
         "driven_by": [
           "infrastructure.existing_systems",
@@ -238,7 +238,7 @@
     {
       "code": "EXISTING_SYSTEM_EXTENDED_SUPPORT",
       "severity": "info",
-      "message": "'On-prem SQL Server 2019': SQL Server 2019 mainstream support ended 28 Feb 2025; security updates continue until 8 Jan 2030 (https://learn.microsoft.com/lifecycle/products/sql-server-2019). Keeping it is fine; schedule the upgrade before that date.",
+      "message": "'On-prem SQL Server 2019': SQL Server 2019 is in extended support: security updates only, until 8 Jan 2030 (https://learn.microsoft.com/lifecycle/products/sql-server-2019). Keeping it is fine; schedule the upgrade before that date.",
       "fields": [
         "infrastructure.existing_systems"
       ]
@@ -250,8 +250,8 @@
     "iso27001: only hosts and managed services (backend-as-a-service, managed-only databases) that publish ISO/IEC 27001 certification are kept",
     "Priorities rated 4 or 5 raise their criteria's weights, strongest first: time_to_market (5), maintainability (5), security (4)",
     "Priorities rated 1 or 2 (scalability, performance) keep their criteria at the baseline weight",
-    "Existing identity provider Microsoft Entra ID: sign-in reuses it over OpenID Connect or SAML instead of a new user store",
-    "Existing database 'On-prem SQL Server 2019': Microsoft SQL Server / Azure SQL Database gets a bonus for staying; keep it by moving its data to the recommended offering with the vendor's migration tool, or reach it over a private link (site-to-site VPN) while it stays where it is",
+    "Existing identity provider Microsoft Entra ID: sign-in reuses it through OpenID Connect or SAML instead of a new user store",
+    "Existing database 'On-prem SQL Server 2019': Microsoft SQL Server / Azure SQL Database is weighed with a bonus for keeping it; if it stays the pick, move its data to the recommended offering with the vendor's migration tool, or reach it over a private link (site-to-site VPN) while it stays where it is",
     "Existing system 'Microsoft 365': integrated through Microsoft Graph API (mail, calendar and Teams notifications, files); it stays the system of record for its own data",
     "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",
     "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",

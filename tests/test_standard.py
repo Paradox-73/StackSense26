@@ -191,7 +191,7 @@ def test_end_of_life_existing_systems_are_warned():
     doc["infrastructure"]["existing_systems"] = ["SQL Server 2014 on Windows Server 2012 R2", "CentOS 7 file server"]
     out = run(doc)
     eol = [w for w in out["warnings"] if w["code"] == "EOL_EXISTING_SYSTEM"]
-    assert len(eol) == 2 and all(w["fields"] == ["infrastructure.existing_systems"] for w in eol)
+    assert len(eol) == 3 and all(w["fields"] == ["infrastructure.existing_systems"] for w in eol)  # SQL Server 2014, Windows Server 2012, CentOS 7
 
 
 def test_existing_sql_server_is_reused(outputs):
@@ -323,3 +323,75 @@ def test_each_regulation_gets_an_explicit_note(outputs):
     assert notes("P3", "gdpr") and "Standard Contractual Clauses" in notes("P3", "gdpr")[0]
     assert notes("P4", "iso27001") and notes("P5", "iso27001") and notes("P4", "rbi_localisation")
     assert any("DPDP" in a for a in outputs["P2"]["assumptions"])
+
+
+def test_no_component_credits_the_description_which_is_never_parsed():
+    files = sorted((ROOT / "scenarios").glob("*/*.json"))
+    for f in files:
+        out = run(json.loads(f.read_text(encoding="utf-8")))
+        if out["stack"] is None:
+            continue
+        parts = [out["stack"][l] for l in ("frontend", "backend", "database", "hosting")] + out["stack"]["supporting"]
+        assert not [c["choice"] for c in parts if "project.description" in c["driven_by"]], f.name
+
+
+def test_every_end_of_life_product_in_one_line_is_warned_without_past_dates():
+    doc = load("P5")
+    doc["infrastructure"]["existing_systems"] = ["SQL Server 2014 on Windows Server 2012 R2", "CentOS Stream 9 build box",
+                                                 "Node.js 20 API", "MySQL 8.0 reports"]
+    eol = [w["message"] for w in run(doc)["warnings"] if w["code"] == "EOL_EXISTING_SYSTEM"]
+    named = [m.split(": ", 1)[1].split(" is past")[0] for m in eol]
+    assert named == ["SQL Server 2014", "Windows Server 2012", "Node.js 20", "MySQL 8.0"], eol
+    assert not [m for m in eol if any(y in m for y in ("2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026"))
+                and "Server 2012" not in m and "Server 2014" not in m]
+
+
+def edit(name: str, **sections) -> dict:
+    doc = load(name)
+    for sec, values in sections.items():
+        if isinstance(doc.get(sec), dict):
+            doc[sec].update(values)
+        else:
+            doc[sec] = values
+    return doc
+
+
+def test_review_fixes_for_odd_but_valid_scenarios():
+    huge = run(edit("P2", scale={"users_12_months": 10 ** 309}))
+    assert huge["status"] == "invalid_input" and huge["validation_errors"][0]["field"] == "scale.users_12_months"
+    launch = run(edit("P2", scale={"users_at_launch": 2_000_000, "users_12_months": 30_000}))
+    assert any("sized for the launch" in a for a in launch["assumptions"])
+    uploads = run(edit("P1", requirements={"file_media_storage": True}))
+    assert uploads["stack"]["backend"]["choice"] != "None"
+    rbi = run(edit("P4", infrastructure={"data_residency": "us"}))
+    assert any(a.startswith("Relaxed: infrastructure.data_residency 'us'") for a in rbi["assumptions"])
+    assert "Frankfurt" in run(edit("P2", infrastructure={"data_residency": "eu"}))["stack"]["hosting"]["choice"]
+    assert not [a for a in run(load("P1"))["assumptions"] if a.startswith("Preferred cloud")]
+    assert not [a for a in run(load("P2"))["assumptions"] if "Data must stay in India" in a]
+    assert "Yjs" not in json.dumps(run(edit("P3", project={"type": "gaming", "platforms": ["android", "ios"]}))["stack"])
+    nulls = run(edit("P2", scale={"traffic_pattern": None}, priorities={"cost": None}))
+    assert {"scale.traffic_pattern not given: default 'steady'", "priorities.cost not given: default 3"} <= set(nulls["assumptions"])
+    assert run(edit("P1", scenario_id=None))["status"] == "ok"
+    assert run(edit("P1", scenario_id=True))["status"] == "invalid_input"
+
+
+def test_mobile_companion_is_not_listed_as_its_own_rival(outputs):
+    front = outputs["P2"]["stack"]["frontend"]
+    assert "React Native (Expo)" in front["choice"] and "React Native (Expo)" not in [a["choice"] for a in front["alternatives"]]
+
+
+def test_existing_system_patterns_match_whole_names():
+    out = run(edit("P2", requirements={"auth": "email_password"}, infrastructure={"existing_systems": [
+        "Central MySQL database", "ASP.NET 4.8 Web Forms portal", ".NET Framework 4.6.2 app", "Flash sale engine",
+        "Oracle Database 19c", "Active Directory"]}))
+    auth = [s["choice"] for s in out["stack"]["supporting"] if s["layer"] == "auth"]
+    assert not any("Entra" in a for a in auth) and any("Active Directory (existing)" in a and "Keycloak" in a for a in auth)
+    assert not [w for w in out["warnings"] if w["code"] == "EOL_EXISTING_SYSTEM"]
+    assert not [a for a in out["assumptions"] if "Oracle" in a and "bonus" in a]
+
+
+def test_a_relaxed_preference_is_named_in_assumptions():
+    out = run(edit("P4", project={"type": "healthtech", "platforms": ["web"]}, compliance=["hipaa", "gdpr", "pci_dss"],
+                   infrastructure={"cloud_preference": "none", "data_residency": "eu"}))
+    relaxed = [w for w in out["warnings"] if w["code"] == "RELAXED_CONSTRAINT"]
+    assert all(any(a.startswith("Relaxed or flagged (RELAXED_CONSTRAINT)") for a in out["assumptions"]) for _ in relaxed)

@@ -175,7 +175,8 @@
         "choice": "Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus or y-websocket as the sync server",
         "justification": "Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke.",
         "driven_by": [
-          "project.description"
+          "project.type",
+          "requirements.realtime"
         ],
         "alternatives": [],
         "tradeoffs": [],
@@ -295,7 +296,6 @@
     "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
     "Where are your users?: Not provided: no region is favoured when hosts are scored.",
     "Architecture preference: Not provided; using default 'auto'.",
-    "Preferred cloud: Not provided; using default 'none'.",
     "Vendor lock-in tolerance: Not provided; using default 'medium'."
   ],
   "validation_errors": []

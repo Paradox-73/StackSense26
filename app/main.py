@@ -9,6 +9,7 @@ from pathlib import Path
 from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.concurrency import run_in_threadpool
 
 from engine import __version__, llm, parallel, recommend
 from engine.brief import MAX_BRIEF_CHARS, parse_brief
@@ -177,7 +178,8 @@ async def api_scenario(request: Request):
     (frontend, backend, database, hosting, supporting), estimated_monthly_cost_usd, warnings, assumptions and
     validation_errors. Invalid input gives status invalid_input with field-level errors, not an HTTP error. No language
     model is involved, so the result is the same with the LLM-off switch set."""
-    return run_text((await request.body()).decode("utf-8-sig", errors="replace"))
+    text = (await request.body()).decode("utf-8-sig", errors="replace")
+    return await run_in_threadpool(run_text, text)  # the engine is CPU work: keep it off the event loop
 
 
 @app.get("/api/questions", summary="The questionnaire (input schema)", tags=["data"])
@@ -305,13 +307,14 @@ def api_summary(payload: dict = answers_body()):
     return summarize(recommend(payload, with_counterfactuals=False))
 
 
-@app.post("/api/whatif", summary="Map a plain-English what-if question to answer changes", tags=["llm"])
+@app.post("/api/whatif", summary="Map a plain-English what-if question to answer changes", tags=["engine"])
 def api_whatif(payload: dict = wrapped_body(
         'Body: {"answers": {...}, "question": "What if we had ten times the users?"}.', answers=_ANSWERS_REF,
         question={"type": "string", "maxLength": MAX_QUESTION_CHARS, "description": "The what-if question."})):
-    """Body: {"answers": {...}, "question": "..."}. Maps the question to changes of the answers (patterns first, then a language
-    model if a key is set). Each change is checked against the questionnaire and must quote the question. Returns the changes with
-    their previous values; re-run /api/recommend with the changed answers to see the effect."""
+    """Body: {"answers": {...}, "question": "..."}. Maps the question to changes of the answers with the pattern reader only:
+    the problem statement allows a language model to read the project description, not other text. Each change is checked
+    against the questionnaire and must quote the question. Returns the changes with their previous values; re-run
+    /api/recommend with the changed answers to see the effect."""
     answers = payload.get("answers") if isinstance(payload.get("answers"), dict) else {}
-    return propose_changes(_text_field(payload, "question", MAX_QUESTION_CHARS), answers)
+    return propose_changes(_text_field(payload, "question", MAX_QUESTION_CHARS), answers, use_llm=False)
 

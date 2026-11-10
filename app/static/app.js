@@ -1082,7 +1082,7 @@ function onSlide(e) {
 }
 
 /* ================================================================== language-model features (all optional)
-   The rules decide every pick. The model only reads free text (brief, what-if) and words the summary, and the
+   The rules decide every pick. The model only reads the project description and words the summary, and the
    server checks everything it returns, so each feature also works with no API key (rule reader / template text). */
 
 /** Which answers a quick question sets. "Must-haves" stands for four answers. */
