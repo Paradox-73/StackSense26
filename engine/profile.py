@@ -506,7 +506,9 @@ def derive(profile: dict, assumptions: list[dict], warnings: list[dict]) -> dict
         p["data_volume_gb"], p["data_growth_gb_month"] = vol, growth
     data_12mo = p["data_volume_gb"] + 12 * p["data_growth_gb_month"]
     files_12mo = 0.0
-    if p["data_includes_files"] and "media_uploads" in work and not estimated:
+    # Telemetry and event dashboards store mostly readings and events, not uploads, so their stated total stays rows.
+    if p["data_includes_files"] and "media_uploads" in work and not estimated and \
+            app not in ("iot_telemetry", "analytics_dashboard"):
         # The stated total holds the uploaded files as well: the database keeps the rows the per-user estimate gives
         # (at most the total) and the rest is files in object storage, priced there (engine/advice.py).
         vol, growth = estimated_data(p, compute_tier, ["data_volume_gb", "data_growth_gb_month"], anchor)

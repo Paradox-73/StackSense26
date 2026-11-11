@@ -57,3 +57,12 @@ def test_a_small_total_stays_in_the_database():
     out = _run(files=True, gb=2)
     assert _gb(_line(out, "Database:")) == 2
     assert not _line(out, "Object storage")
+
+
+def test_an_analytics_or_telemetry_volume_stays_database_data():
+    doc = json.loads((ROOT / "scenarios" / "public" / "P3.json").read_text(encoding="utf-8"))
+    doc["project"]["type"] = "data_analytics"  # events and readings, not uploads, make up the volume
+    doc["scale"]["data_volume_gb_12_months"] = 20_000
+    doc["requirements"]["file_media_storage"] = True
+    out = run(doc)
+    assert _gb(_line(out, "Database:")) == 20_000 and not _line(out, "Object storage")
