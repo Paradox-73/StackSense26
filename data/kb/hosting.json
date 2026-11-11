@@ -1178,7 +1178,8 @@
       "static_cost_note": "The load balancer that gives the bucket HTTPS on your domain costs $0.025 an hour (about $18 a month) with no traffic; Cloud CDN cache egress is $0.08 per GiB to North America and Europe ($0.09 in Asia Pacific) for the first 10 TiB.",
       "strengths": [
         "The bucket sits in the region you choose (asia-south1 Mumbai, europe-west3 Frankfurt, us-central1 Iowa), so the files stay there",
-        "Covered by Google Cloud's HIPAA BAA, with a 99.95% Cloud CDN SLA"
+        "A 99.95% Cloud CDN SLA",
+        {"text": "Covered by Google Cloud's HIPAA BAA", "when": {"compliance_any": ["hipaa"]}}
       ],
       "weaknesses": [
         "About $18 a month for the load balancer even with no traffic: Cloud Storage alone serves no HTTPS on a custom domain",
