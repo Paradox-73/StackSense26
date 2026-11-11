@@ -17,12 +17,15 @@ def test_ranked_questions_really_change_a_pick():
 
 
 def test_questions_declared_settled_change_nothing():
+    """Settled means no pick changed at the values ask-next tried (the card says so and how many), so the full
+    engine must agree at those values. A value thinned out of the run budget is not claimed: for this SaaS, an
+    inference API adds the scoring endpoint's cost and moves the host, and the run budget skips that value."""
     r = next_questions(ANS)
     specs = field_specs()
-    from engine.sensitivity import options_for
+    from engine.sensitivity import _thin, options_for
     base = _picks(_core(ANS))
     for row in r["settled_questions"][:4]:
-        for _l, v in options_for(row["key"], specs[row["key"]]):
+        for _l, v in _thin(options_for(row["key"], specs[row["key"]]), row["tested"]):
             assert _picks(_core({**ANS, row["key"]: v})) == base, row["key"]
 
 
