@@ -59,7 +59,9 @@ h2#at-a-glance { margin-top: 0; }
 .appx th, .appx td { padding: 1.5pt 3pt; }
 .appx p { margin-bottom: 4pt; }
 .appx li { margin-bottom: 1.5pt; }
-.appx td a { overflow-wrap: anywhere; } /* Appendix D prints source URLs in a narrow column */
+.appx td a, .refs a { overflow-wrap: anywhere; } /* Appendices D and G print source URLs in narrow columns */
+.refs { columns: 2; column-gap: 8mm; }
+.refs li { break-inside: avoid; }
 
 /* Appendix B: narrow numeric columns stay on one line */
 .appb table { font-size: 7.6pt; }

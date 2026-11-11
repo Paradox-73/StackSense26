@@ -9,7 +9,8 @@
 The PDF is made by turning report/report.md (plus the generated appendices) into HTML with markdown-it-py and
 printing it with Chrome headless; a second pass reads each heading's page with pypdf and fills the contents and
 the page numbers in the criteria map. Screenshots come from tools/capture_screenshots.py, tables from
-tools/build_assets.py, and the LLM-only baseline table (section 6.2) from benchmark/llm_baseline.json when that file exists.
+tools/build_assets.py, Appendix G from the links in sections 1-10, and the LLM-only baseline table (section 6.2) from
+benchmark/llm_baseline.json when that file exists.
 Build-only packages: requirements-dev.txt. Set CHROME to a browser path if Chrome is not found.
 """
 from __future__ import annotations
@@ -293,6 +294,19 @@ def _appendix_a() -> str:
             "`report/samples/hipaa_telehealth.md`. The source URLs behind the scores are in `report/sources.md`, not printed here.\n\n<div class=\"appx\">\n\n" + body + "\n\n</div>\n")
 
 
+def _source_list(src: str) -> str:
+    """Appendix G's generated items: the URL of every source that sections 1-10 link to without the report printing
+    that URL anywhere, in order of first citation, with the section that cites it."""
+    sec, seen, items = "", set(re.findall(r"<(https?://[^>\s]+)>", src)), []
+    for m in re.finditer(r"^#{2,3} (\d+(?:\.\d+)?)|(?<!!)\[([^\]]+)\]\((https?://[^)\s]+)\)", src[: src.index("## 11. ")], re.M):
+        if m.group(1):
+            sec = m.group(1)
+        elif m.group(3) not in seen:
+            seen.add(m.group(3))
+            items.append(f"- {m.group(2)}, section {sec}: <{m.group(3)}>")
+    return "\n".join(items)
+
+
 def _agreement_sentence(rates: dict, pct) -> str:
     """How the two rows compare against the key, worded from the numbers (top-1 and acceptable can point different ways)."""
     def frac(r):
@@ -386,6 +400,7 @@ def assemble(pages: dict[str, int], toc_pages: dict[str, int]) -> tuple[str, lis
     src = src.replace("<!-- INSERT appendix-a -->", _appendix_a())
     src = src.replace("<!-- INSERT appendix-b -->", inputs_md)
     src = src.replace("<!-- INSERT llm-baseline -->", _llm_baseline())
+    src = src.replace("<!-- INSERT sources -->", _source_list(src))
     body = _render(src)
     missing: list[str] = []
     body = _figures(body, [0], missing)

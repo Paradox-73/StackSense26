@@ -116,7 +116,7 @@ Quick mode asks seven questions; Refine opens all 42. "Describe your project" fi
 
 ### 5.1 How technologies are represented
 
-`data/kb/*.json` holds 70 technologies: 17 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region; Appendix D prints these facts and their sources for the public scenarios' hosts and databases. 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 378 URLs, and no end-of-life product is in the knowledge base.
+`data/kb/*.json` holds 70 technologies: 17 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region (Appendix D prints such facts for the public scenarios' hosts). 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 378 URLs, and no end-of-life product is in the knowledge base.
 
 ### 5.2 Scoring and filtering
 
@@ -140,7 +140,7 @@ Preference constraints such as lock-in are relaxed only if a layer would otherwi
 
 ### 5.4 Ties, conflicts and determinism
 
-Stacks within 1 stack point of the top count as tied, because the weights are planning estimates; a fixed order of preferences breaks the tie (Appendix A.4). The justification names the rival inside the margin and either the preference that decided, such as lower lock-in for P3's React SPA, or that the pick has the higher stack score. Contradictory inputs are resolved in a fixed order (compliance, deployment model, physics and team capacity, then budget and preferences) by the 22 contradiction checks in `engine/conflicts.py`. Nothing in the decision path samples, reads the clock or calls the network, and `tests/test_invariants.py` checks byte-identical repeats and no change from renaming the project or reordering a list.
+Stacks within 1 stack point of the top count as tied, because the weights are planning estimates; a fixed order of preferences breaks the tie (Appendix A.4), and the justification names the preference that decided, such as lower lock-in for P3's React SPA, or says the pick scored higher. Contradictory inputs are resolved in a fixed order (compliance, deployment model, physics and team capacity, then budget and preferences) by the 22 contradiction checks in `engine/conflicts.py`. Nothing in the decision path samples, reads the clock or calls the network, and `tests/test_invariants.py` checks byte-identical repeats and no change from renaming the project or reordering a list.
 
 ### 5.5 LLM usage declaration and the LLM-off switch
 
@@ -154,7 +154,7 @@ Requests go to Google's Gemini API through its OpenAI-compatible endpoint at tem
 
 ## 6. Sample recommendations
 
-Each screenshot is the top of the result on the Scenario file page of the running app after loading the public scenario file: the status, the architecture style, a summary naming the four picks and the cost band, and any warnings. `python cli.py --scenario scenarios/public --out outputs` writes the same results to `outputs/`.
+Each screenshot is the top of the result on the running app's Scenario file page after loading the public scenario: the status, the architecture style, a summary naming the four picks and the cost band, and any warnings. `python cli.py --scenario scenarios/public --out outputs` writes the same results to `outputs/`.
 
 ### 6.1 P1 DevFolio: personal portfolio and blog
 
@@ -172,7 +172,7 @@ Three intermediate engineers (JavaScript, TypeScript, Python) with nobody on ope
 - **Frontend.** Critical SEO needs finished HTML. Next.js (SEO 5/5, in the team's languages) leads Nuxt by 2.3 points, and a React SPA loses 5.5 with a client-side rendering penalty. React Native (Expo) is the Android companion, because a mobile toolkit cannot be primary when web is a target.
 - **Backend.** Django matches the team and runs one process for the WebSockets (Channels), jobs and connection pools. FastAPI is 0.1 behind, inside the tie margin, and the output says either is defensible; Spring Boot loses 10.5 because nobody knows Java. Trade-offs: realtime fit 2/5, a sync-first ORM.
 - **Database.** The unstated data shape and consistency default to relational and strong, as `assumptions` notes. PostgreSQL (fit 5/5) on DigitalOcean Managed PostgreSQL costs $75 to $150 for about 50 GB with a standby; MySQL ties (0.3), MongoDB loses 6.5, and eventually consistent stores and single-node SQLite are ruled out.
-- **Supporting services.** Celery with a Valkey broker; PostgreSQL full-text search, since 50 GB fits its own index; S3-compatible storage in India behind a CDN; MSG91 or Twilio Verify with the DLT-registered templates Indian operators require; Razorpay or Cashfree hosted checkout, keeping card data off the servers (PCI DSS SAQ A). A team of three runs at most two extra systems (Appendix A.5); this stack adds one, Valkey, and sign-in uses the framework's built-in accounts or a self-hosted Keycloak.
+- **Supporting services.** Celery with a Valkey broker; PostgreSQL full-text search, since 50 GB fits its own index; S3-compatible storage in India behind a CDN; MSG91 or Twilio Verify with the DLT-registered templates Indian operators require; Razorpay or Cashfree hosted checkout, keeping card data off the servers (PCI DSS SAQ A). A team of three runs at most two extra systems; this stack adds Valkey, and sign-in uses Django's own accounts or a self-hosted Keycloak.
 - **Cost.** $207 to $851 a month. The floor (hosting $75 with redundancy for 99.9%, database $75, Valkey $30, media $9, SMS $18) exceeds the $150 budget, so the output carries `BUDGET_STRETCH` and `ok_with_warnings`, stating that a cheaper stack scored lower on the stated priorities.
 
 ### 6.3 P3 BoardRoom: realtime collaborative whiteboard
@@ -198,7 +198,7 @@ P4 is the most constrained scenario: AWS required, RBI localisation, PCI DSS, IS
 
 ![P5 PeopleDesk: HTMX, ASP.NET Core, Microsoft SQL Server and Azure App Service, $44 to $375 a month](screenshots/s-P5.png)
 
-Two C# developers build a tool for 1,200 employees on Azure in India under ISO 27001, for $300 a month. Azure rules out every other host, and Supabase also lacks ISO 27001. ASP.NET Core leads Laravel by 3.7 points on the team's C# (skill match 4.5 against 3.5) and a 2.0-point compatibility rule for Microsoft's tooling on Azure; every backend the team writes itself takes the same identity-broker penalty for company sign-in, so the penalty does not separate them. HTMX leads a React SPA by 1.4. Existing systems are reused: sign-in through Microsoft Entra ID over OpenID Connect, SQL Server kept as Azure SQL Database, Microsoft 365 through the Graph API; an info warning notes that SQL Server 2019 security updates end on 8 January 2030.
+Two C# developers build a tool for 1,200 employees on Azure in India under ISO 27001, for $300 a month. Azure rules out every other host, and Supabase also lacks ISO 27001. ASP.NET Core leads Laravel by 3.7 points on the team's C# and a 2.0-point rule for Microsoft's tooling on Azure; both take the same identity-broker penalty for company sign-in. HTMX leads a React SPA by 1.4. Existing systems are reused: sign-in through Microsoft Entra ID over OpenID Connect, SQL Server kept as Azure SQL Database, Microsoft 365 through the Graph API; an info warning notes that SQL Server 2019 security updates end on 8 January 2030.
 
 ### 6.6 P6 KhetSurvey: offline-first crop survey app
 
@@ -208,7 +208,7 @@ Two developers (JavaScript, Python) build an Android-only survey app that must w
 
 ## 7. Edge-case handling
 
-The nine files in `scenarios/edge/` cover the nine categories of the statement's section 6. The screenshots after the table show each file's result on the Scenario file page, cut to the part that shows the handling.
+The nine files in `scenarios/edge/` cover the nine categories of the statement's section 6; the screenshots after the table show each result, cut to the handling.
 
 | Category and file | How it is detected | What the engine does | Screenshot |
 |---|---|---|---|
@@ -240,19 +240,17 @@ The nine files in `scenarios/edge/` cover the nine categories of the statement's
 
 ![E9 Deprecated technology: four EOL_EXISTING_SYSTEM warnings, each with its source](screenshots/e-E9.png)
 
-The adapter also raises `CLOUD_VS_DEPLOYMENT`, `RESIDENCY_CONFLICT` and `RESIDENCY_UNVERIFIED` (Section 5.3); a system on extended support, such as P5's SQL Server 2019, gets an info warning with its end date.
-
 ## 8. Validation
 
-I checked the recommendations with a test suite, an answer key, an LLM-only baseline, a random-input property test and pairs of projects one answer apart. Appendix F has the tables behind 8.1 to 8.3.
+Appendix F has the tables behind 8.1 to 8.3.
 
 ### 8.1 Tests
 
-The 1189 tests cover scoring, constraints and cost; explanations against the engine's numbers; inputs, edge cases and warnings; stability properties; the language-model checks and fallbacks; accuracy against the answer key; and the app, packaging and documents. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1131 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
-`python tools/bench.py` scores the engine on 40 project briefs against an answer key written before measurement: a best pick and an acceptable set per layer, labelled by a language model playing three architect personas, blind to the engine. Result: 82% top-1 (129 of the 158 layer picks that have a best pick) and 96% acceptable (154 of all 160 layer picks); on the ten briefs held out from tuning, 72% and 95%. No human architect has checked the key.
+`python tools/bench.py` scores the engine on 40 project briefs against an answer key written before measurement: a best pick and an acceptable set per layer, labelled by a language model playing three architect personas, blind to the engine. Result: 82% top-1 (129 of the 158 layer picks that have a best pick) and 96% acceptable (154 of all 160 layer picks); on the ten briefs held out from tuning, 72% and 95%.
 
 ### 8.3 LLM-only baseline
 
@@ -279,17 +277,11 @@ Next: an architect review of the answer key and the public outputs, scheduled re
 
 ## 10. References and third-party tools
 
-**Libraries.** [FastAPI](https://fastapi.tiangolo.com/) 0.142.2 (MIT), [Starlette](https://starlette.dev/) 1.7.0 (BSD-3), [Pydantic](https://docs.pydantic.dev/) 2.13.5 (MIT), [Uvicorn](https://uvicorn.dev/) 0.54.0 (BSD-3); tests: [pytest](https://docs.pytest.org/) 9.1.1 (MIT), [HTTPX](https://www.python-httpx.org/) 0.28.1 (BSD-3); report and screenshots only: [markdown-it-py](https://github.com/executablebooks/markdown-it-py) (MIT), [pypdf](https://github.com/py-pdf/pypdf) (BSD-3), [Playwright for Python](https://playwright.dev/python/) (Apache-2.0) and Google Chrome. The browser code uses no third-party JavaScript.
+**Libraries and fonts.** FastAPI 0.142.2 (MIT, <https://fastapi.tiangolo.com/>), Starlette 1.7.0 (BSD-3, <https://starlette.dev/>), Pydantic 2.13.5 (MIT, <https://docs.pydantic.dev/>) and Uvicorn 0.54.0 (BSD-3, <https://uvicorn.dev/>); tests: pytest 9.1.1 (MIT, <https://docs.pytest.org/>) and HTTPX 0.28.1 (BSD-3, <https://www.python-httpx.org/>); report and screenshots only: markdown-it-py (MIT, <https://github.com/executablebooks/markdown-it-py>), pypdf (BSD-3, <https://github.com/py-pdf/pypdf>), Playwright for Python (Apache-2.0, <https://playwright.dev/python/>) and Google Chrome (<https://www.google.com/chrome/>); in `app/static/fonts/`, Atkinson Hyperlegible Next and Mono (SIL Open Font License 1.1, <https://github.com/googlefonts/atkinson-hyperlegible-next>). The browser code uses no third-party JavaScript.
 
-**Fonts.** In `app/static/fonts/` under the SIL Open Font License 1.1: [Atkinson Hyperlegible Next and Mono](https://github.com/googlefonts/atkinson-hyperlegible-next).
+**APIs and datasets.** The optional Google Gemini API through its OpenAI-compatible endpoint (free tier, <https://ai.google.dev/gemini-api/docs/openai>); OpenRouter (<https://openrouter.ai/>) can be configured instead, and the client uses only the Python standard library. No dataset is shipped. The Stack Overflow Developer Survey 2025 (<https://survey.stackoverflow.co/2025/technology>) is the hiring-pool proxy, and INR budgets use a fixed planning rate of 96 INR to 1 USD from the FBIL reference rate (<https://www.fbil.org.in/>).
 
-**APIs.** The optional [Google Gemini API](https://ai.google.dev/gemini-api/docs/openai) through its OpenAI-compatible endpoint (free tier); [OpenRouter](https://openrouter.ai/) can be configured instead. The client uses only the Python standard library.
-
-**Datasets.** None shipped. The [Stack Overflow Developer Survey 2025](https://survey.stackoverflow.co/2025/technology) is the hiring-pool proxy; INR budgets use a fixed planning rate of 96 INR to 1 USD from the FBIL reference rate.
-
-**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 379 URLs is in `report/sources.md`. Main references: [expert systems](https://en.wikipedia.org/wiki/Expert_system), the [weighted sum model](https://en.wikipedia.org/wiki/Weighted_sum_model), counterfactual explanations ([Wachter, Mittelstadt and Russell, 2017](https://arxiv.org/abs/1711.00399)), [ISO/IEC 25010](https://www.iso.org/standard/78176.html), [AWS Well-Architected](https://aws.amazon.com/architecture/well-architected/), [ATAM](https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/), the Google SRE book ([availability table](https://sre.google/sre-book/availability-table/)), Fowler's [MonolithFirst](https://martinfowler.com/bliki/MonolithFirst.html), [Team Topologies](https://teamtopologies.com/key-concepts), [DORA research](https://dora.dev/research/), [HHS on HIPAA and cloud computing](https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html), the [PCI SSC library](https://www.pcisecuritystandards.org/document_library/), the [MeitY data protection framework](https://www.meity.gov.in/data-protection-framework), the [RBI directive on payment data storage (2018)](https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244), [endoflife.date](https://endoflife.date/) and the [Microsoft lifecycle pages](https://learn.microsoft.com/lifecycle/).
-
-**Repository.** <https://github.com/Paradox-73/StackSense26>. `python run.py` starts the app, `python -m pytest` runs the tests, `python tools/bench.py`, `tools/fuzz.py` and `tools/question_influence.py` rerun the studies, and `python tools/build_assets.py` then `tools/build_report.py` rebuild the tables and this PDF.
+**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 378 URLs is in `report/sources.md`. Appendix G prints the URL of every other source this report cites, from the methods behind the design to the HIPAA, PCI DSS, DPDP and RBI rules it encodes. The repository is <https://github.com/Paradox-73/StackSense26>; its README gives the commands that run the app, the tests and the studies, and rebuild this PDF.
 
 ## 11. AI assistance declaration
 - Claude Code (Anthropic), an AI coding assistant: used to write code and tests, to gather sources for the knowledge base and to draft documentation.
@@ -496,5 +488,31 @@ Top-1 is scored on 158 of the 160 layer picks, because the personas have no majo
 ### F.3 LLM-only baseline
 
 <!-- INSERT llm-baseline -->
+
+</div>
+
+## Appendix G. Sources and their URLs
+
+Section 10 prints the URLs of the libraries, fonts, APIs and datasets, and `report/sources.md` lists the 378 URLs behind the knowledge base, rules, questions and glossary. This appendix prints the URL of every other source: first the main references, then each source that sections 1 to 9 link to, with the section that first cites it.
+
+<div class="appx refs">
+
+- Expert systems: <https://en.wikipedia.org/wiki/Expert_system>
+- Weighted sum model: <https://en.wikipedia.org/wiki/Weighted_sum_model>
+- Counterfactual explanations (Wachter, Mittelstadt and Russell, 2017): <https://arxiv.org/abs/1711.00399>
+- ISO/IEC 25010: <https://www.iso.org/standard/78176.html>
+- AWS Well-Architected Framework: <https://aws.amazon.com/architecture/well-architected/>
+- ATAM: <https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/>
+- Google SRE book, availability table: <https://sre.google/sre-book/availability-table/>
+- Martin Fowler, MonolithFirst: <https://martinfowler.com/bliki/MonolithFirst.html>
+- Team Topologies: <https://teamtopologies.com/key-concepts>
+- DORA research: <https://dora.dev/research/>
+- HHS on HIPAA and cloud computing: <https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html>
+- PCI SSC document library: <https://www.pcisecuritystandards.org/document_library/>
+- MeitY data protection framework: <https://www.meity.gov.in/data-protection-framework>
+- RBI directive on storage of payment system data, 2018: <https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244>
+- endoflife.date: <https://endoflife.date/>
+- Microsoft lifecycle pages: <https://learn.microsoft.com/lifecycle/>
+<!-- INSERT sources -->
 
 </div>
