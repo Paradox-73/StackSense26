@@ -43,9 +43,7 @@ The engine (`engine/`) is pure Python. A FastAPI app (`app/main.py`) serves a JS
 8. `engine/advice.py` adds the style, supporting services and cost band; `engine/explain.py` writes justifications, alternatives and trade-offs.
 9. `engine/standard.py` assembles the section 4 output, and `cli.py` writes `outputs/<scenario_id>_output.json`.
 
-The questionnaire posts its answers to `POST /api/recommend` and joins at step 4.
-
-![The seven stages from answers to an explained recommendation, with the formula each scoring stage uses](../docs/pipeline.svg)
+The questionnaire posts its answers to `POST /api/recommend` and joins at step 4. Appendix A draws the seven stages with their formulas.
 
 ### 3.2 Technology used to build the engine
 
@@ -288,6 +286,8 @@ Next: an architect review of the answer key and the public outputs, scheduled re
 - Google's Gemini API (its OpenAI-compatible endpoint), inside the engine: used only to turn the free-text project description into suggested input fields that the user confirms or edits, and to reword explanations the engine has already produced. It never chooses a component: the stack comes from the engine's rules, scoring and decision tables (Section 5), and with the LLM-off switch the stack is identical.
 
 ## Appendix A. Decision rules in detail
+
+![The seven stages from answers to an explained recommendation, with the formula each scoring stage uses](../docs/pipeline.svg)
 
 <div class="appx">
 
