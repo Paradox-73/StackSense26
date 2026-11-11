@@ -1,6 +1,7 @@
 """Entry point: recommend(raw_input) -> fully explained stack recommendation (deterministic)."""
 from __future__ import annotations
 
+import re
 from copy import deepcopy
 
 from . import __version__
@@ -55,12 +56,44 @@ from .stack import (
     _returns,
     choose,
     combo_ids,
+    combo_score,
     layer_alternatives,
     matching_rules,
     search,
 )
 
 SINGLE_PRIMARY_SQL = ("postgres", "mysql", "timescaledb")
+# The languages a backend is written in, where its skills do not name them: the FaaS entry runs Node.js or Python.
+BACKEND_LANGUAGES = {"serverless_functions": {"javascript", "typescript", "node", "python"}}
+
+
+def _languages(item: dict) -> set:
+    return BACKEND_LANGUAGES.get(item["id"], set(item.get("skills", [])))
+
+
+def _unlisted_language_warning(p: dict, d: dict, best: dict, backends: list[dict], rules: list[dict]) -> dict | None:
+    """The pick is in a language the team did not list, and a backend in a listed language would have won but for a
+    rule that it cannot run on the chosen host (a function platform that runs only some languages)."""
+    skills = set(d["skills"])
+    be = best["picks"]["backend"]["item"]
+    if not skills or be.get("kind") not in ("server", "faas") or _languages(be) & skills:
+        return None
+    for cand in backends:
+        if cand["item"].get("kind") not in ("server", "faas") or not _languages(cand["item"]) & skills:
+            continue
+        picks = dict(best["picks"], backend=cand)
+        hits = matching_rules({l: c["item"] for l, c in picks.items()}, rules, p, d)
+        blocking = [r for r in hits if r["kind"] == "conflict" and {"backend", "hosting"} <= rule_layers(r)]
+        if blocking and combo_score({l: c["score"] for l, c in picks.items()},
+                                    [r for r in hits if r not in blocking]) > best["score"]:
+            host = best["picks"]["hosting"]["item"]
+            why = re.split(r"(?<=\.)\s+(?=[A-Z])", blocking[0]["note"])[0]  # the rule's first sentence: what the host runs
+            return _warn("BACKEND_LANGUAGE_NOT_LISTED", "warning", "Backend in a language the team did not list",
+                         f"{cand['name']} matches the team's skills, but {host['name']} cannot host it: {why}",
+                         f"The backend is {be['name']}, in a language nobody on the team listed: plan time for the team "
+                         f"to learn {short_name(be)}, or host the API on a container or PaaS service to keep "
+                         f"{cand['name']}.", ["team_skills"])
+    return None
 LAYER_TITLES = {"frontend": "Frontend", "backend": "Backend", "database": "Database", "hosting": "Hosting"}
 
 
@@ -629,6 +662,9 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
     split_why = api_host_reasons(p, d, stack_items)
     api_host = pick_api_host(stack_items, core["scored"]["hosting"], kb["rules"],
                              lambda items, rules: matching_rules(items, rules, p, d)) if split_why else None
+    language = None if api_host else _unlisted_language_warning(p, d, best, core["scored"]["backend"], kb["rules"])
+    if language:  # with an API host of its own, the function platform's language rule does not bind the API
+        result["warnings"].append(language)
     if api_host:
         # The frontend-platform caveats keep their points (two platforms to run is a cost too), but
         # their text now describes the split instead of functions-only hosting.

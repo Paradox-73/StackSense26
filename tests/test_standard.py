@@ -647,3 +647,20 @@ def test_hipaa_files_with_no_hyperscaler_stay_where_the_hosts_baa_reaches():
             assert store[0]["source"] == docs[host], (name, residency, host, store[0])
             seen.add(host)
     assert set(docs) <= seen, seen
+
+
+def test_a_hosting_rule_that_costs_the_team_its_language_says_so():
+    """No hyperscaler, EU residency, PCI DSS and HIPAA leave function platforms, and Vercel runs .NET only in its beta
+    Container runtime, so a C# team gets Go. Nothing else in the output says the team never listed Go (it counts as
+    related to C#), so BACKEND_LANGUAGE_NOT_LISTED does, with the rule that decided it."""
+    doc = edit("P4", team={"languages": ["csharp"]}, project={"type": "healthtech", "platforms": ["web"]},
+               compliance=["hipaa", "gdpr", "pci_dss"], infrastructure={"cloud_preference": "none", "data_residency": "eu"})
+    out = run(doc)
+    hit = [w for w in out["warnings"] if w["code"] == "BACKEND_LANGUAGE_NOT_LISTED"]
+    assert out["stack"]["backend"]["choice"].startswith("Go") and hit, [w["code"] for w in out["warnings"]]
+    assert "C# + ASP.NET Core" in hit[0]["message"] and "Container runtime" in hit[0]["message"], hit[0]
+    assert hit[0]["severity"] == "warning" and hit[0]["fields"] == ["team.languages"]
+    kept = edit("P4", project={"type": "healthtech", "platforms": ["web"]}, compliance=["hipaa", "gdpr", "pci_dss"],
+                infrastructure={"cloud_preference": "none", "data_residency": "eu"})  # TypeScript is listed: Express
+    for d in [kept] + [load(n) for n in ("P1", "P2", "P3", "P4", "P5", "P6")]:
+        assert not [w for w in run(d)["warnings"] if w["code"] == "BACKEND_LANGUAGE_NOT_LISTED"], d["scenario_id"]
