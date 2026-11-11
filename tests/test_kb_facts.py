@@ -128,3 +128,24 @@ def test_digitalocean_has_no_free_app_service():
         return tier_cost(do, 0, p, d)[0]
     assert floor({"app_type": "internal_tool", "dau": 50}) == 5
     assert floor({"app_type": "content_site", "dau": 50, "data_volume_gb": 0, "data_growth_gb_month": 0}) == 0
+
+
+def test_static_hosts_claim_only_the_audits_a_public_page_lists_them_for():
+    """Google's services-in-scope page lists Cloud Storage, Cloud CDN, Cloud Load Balancing and Firebase Hosting for
+    ISO 27001, SOC 2 and PCI DSS, and its HIPAA page lists the first three. No public Microsoft page lists Front Door or
+    Static Web Apps: Azure's per-service audit scope is an appendix in a Service Trust Portal document."""
+    import re
+    from engine.standard import run
+    kb = load_kb()
+    scope, hipaa = "https://cloud.google.com/security/compliance/services-in-scope", "https://cloud.google.com/security/compliance/hipaa"
+    for iid in ("gcp_storage_cdn", "firebase_hosting"):
+        c = kb["index"][iid]["compliance"]
+        assert c["pci"] and c["soc2"] and c["iso27001"] and {scope, hipaa} <= set(c["maturity_sources"]), iid
+    assert kb["index"]["gcp_storage_cdn"]["compliance"]["hipaa"] and not kb["index"]["firebase_hosting"]["compliance"]["hipaa"]
+    for iid in ("azure_blob_frontdoor", "azure_static_web_apps"):
+        c = kb["index"][iid]["compliance"]
+        assert not [k for k in ("hipaa", "pci", "soc2", "iso27001") if c[k]], iid
+    doc = json.loads((Path(__file__).resolve().parent.parent / "scenarios" / "public" / "P1.json").read_text(encoding="utf-8"))
+    doc["infrastructure"]["cloud_preference"], doc["compliance"] = "azure", ["pci_dss"]
+    out = run(doc)
+    assert not (out["stack"] and re.match(r"Azure (Blob Storage|Static Web Apps)", out["stack"]["hosting"]["choice"])), out["stack"]

@@ -1125,8 +1125,8 @@
         "iso27001": true,
         "gdpr_dpa": true,
         "maturity": 4,
-        "maturity_note": "ISO 27001 and SOC 1, 2 and 3; in Google Cloud's PCI DSS scope; not among the products Google Cloud's HIPAA BAA covers.",
-        "maturity_sources": ["https://firebase.google.com/support/privacy", "https://cloud.google.com/security/compliance/pci-dss", "https://cloud.google.com/security/compliance/hipaa"]
+        "maturity_note": "ISO 27001 and SOC 1, 2 and 3 (every Firebase service); Google lists Firebase Hosting in scope for its ISO 27001, SOC 2 and PCI DSS audits; not among the products Google Cloud's HIPAA BAA covers.",
+        "maturity_sources": ["https://firebase.google.com/support/privacy", "https://cloud.google.com/security/compliance/services-in-scope", "https://cloud.google.com/security/compliance/hipaa"]
       },
       "cost_usd": [[0, 3], [3, 45], [45, 450], [450, 4500], [4500, 45000], [45000, 150000]],
       "static_cost_note": "Spark (no-cost) plan: 10 GB stored and 360 MB a day of transfer; on the Blaze plan $0.026 per GB stored and $0.15 per GB transferred past those.",
@@ -1171,8 +1171,8 @@
         "iso27001": true,
         "gdpr_dpa": true,
         "maturity": 5,
-        "maturity_note": "Cloud Storage, Cloud CDN and Cloud Load Balancing are among the products Google Cloud's HIPAA BAA covers (do not cache PHI) and in its PCI DSS scope; Cloud Audit Logs record admin activity.",
-        "maturity_sources": ["https://cloud.google.com/security/compliance/hipaa", "https://cloud.google.com/security/compliance/pci-dss"]
+        "maturity_note": "Cloud Storage, Cloud CDN and Cloud Load Balancing are among the products Google Cloud's HIPAA BAA covers (do not cache PHI), and Google lists all three in scope for its ISO 27001, SOC 2 and PCI DSS audits; Cloud Audit Logs record admin activity.",
+        "maturity_sources": ["https://cloud.google.com/security/compliance/hipaa", "https://cloud.google.com/security/compliance/services-in-scope"]
       },
       "cost_usd": [[18, 21], [21, 45], [45, 290], [290, 2700], [2700, 25000], [25000, 100000]],
       "static_cost_note": "The load balancer that gives the bucket HTTPS on your domain costs $0.025 an hour (about $18 a month) with no traffic; Cloud CDN cache egress is $0.08 per GiB to North America and Europe ($0.09 in Asia Pacific) for the first 10 TiB.",
@@ -1259,15 +1259,14 @@
       "on_prem": false,
       "regions": ["north_america", "europe", "india", "southeast_asia", "global"],
       "compliance": {
-        "hipaa": true,
-        "hipaa_min_usd": 0,
-        "pci": true,
-        "soc2": true,
-        "iso27001": true,
+        "hipaa": false,
+        "pci": false,
+        "soc2": false,
+        "iso27001": false,
         "gdpr_dpa": true,
-        "maturity": 5,
-        "maturity_note": "Azure: HIPAA BAA in the product terms, PCI DSS Level 1, SOC 2 and ISO 27001 cover Azure Storage and Front Door; the Activity Log audits every control-plane change.",
-        "maturity_sources": ["https://learn.microsoft.com/azure/compliance/", "https://learn.microsoft.com/azure/compliance/offerings/offering-hipaa-us"]
+        "maturity": 2,
+        "maturity_note": "Microsoft's Azure Storage page puts Blobs in Azure's ISO, SOC and PCI DSS audits, but no public Microsoft page lists Front Door's audit scope, and the services the HIPAA BAA covers are listed only in a Service Trust Portal document; so the pairing is treated as holding none of them until checked.",
+        "maturity_sources": ["https://learn.microsoft.com/en-us/azure/storage/common/storage-compliance-offerings", "https://learn.microsoft.com/en-us/azure/compliance/offerings/cloud-services-in-audit-scope"]
       },
       "cost_usd": [[35, 38], [38, 60], [60, 290], [290, 2400], [2400, 12000], [12000, 40000]],
       "static_cost_note": "Front Door Standard costs $35 a month plus $0.0825 per GB out to North America and Europe for the first 10 TB; Blob storage for a site's files is cents a month.",
@@ -1283,7 +1282,6 @@
         "https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-static-website",
         "https://azure.microsoft.com/en-us/pricing/details/frontdoor/",
         "https://learn.microsoft.com/en-us/azure/cdn/classic-cdn-retirement-faq",
-        "https://learn.microsoft.com/azure/compliance/offerings/offering-hipaa-us",
         "https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services"
       ],
       "sla": {"percent": 99.99, "scope": "Azure Front Door Standard", "source": "https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services"},
