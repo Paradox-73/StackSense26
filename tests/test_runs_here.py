@@ -78,25 +78,26 @@ def test_spa_on_container_host_is_served_from_the_clouds_object_storage_and_cdn(
 
 CLOUD_SPA = {"aws": (["python", "react", "aws"], "aws_ecs", "Amazon S3 + CloudFront"),
              "gcp": (["python", "react", "gcp"], "gcp_cloud_run", "Cloud Storage bucket + Cloud CDN"),
-             "azure": (["csharp", "react", "azure"], "azure_apps", None)}
+             "azure": (["csharp", "react", "azure"], "azure_apps", "Azure Blob Storage static website + Azure Front Door Standard")}
 ATTESTATION_GAP = {"pci_dss": "No PCI-DSS attestation published", "iso27001": "No ISO/IEC 27001 certification published",
-                   "soc2": "No SOC 2 report available", "hipaa": "No HIPAA Business Associate Agreement available"}
+                   "soc2": "No SOC 2 report available", "hipaa": None}
 
 
 @pytest.mark.parametrize("rule", sorted(ATTESTATION_GAP))
 @pytest.mark.parametrize("cloud", sorted(CLOUD_SPA))
 def test_spa_files_go_to_the_clouds_cdn_only_if_it_holds_the_attestation(cloud, rule):
-    """The knowledge base records S3 + CloudFront and Cloud Storage + Cloud CDN as holding HIPAA, PCI DSS, SOC 2 and
-    ISO 27001, and Blob Storage + Front Door as holding none (no public Microsoft page lists Front Door's audit scope).
-    The hosting layer rules a host out for a missing one, so the built files may not go there either: on Azure they
-    stay on the app's own instances, and the hosting text says why."""
+    """The knowledge base records S3 + CloudFront and Cloud Storage + Cloud CDN as holding PCI DSS, SOC 2 and ISO 27001,
+    and Blob Storage + Front Door as holding none (no public Microsoft page lists Front Door's audit scope). The hosting
+    layer rules a host out for a missing one, so the built files may not go there either: on Azure they stay on the
+    app's own instances, and the hosting text says why. HIPAA does not bind them: the built files hold no health
+    information, and a CDN may serve public, non-PHI files."""
     skills, host, pairing = CLOUD_SPA[cloud]
     r = recommend({"app_type": "saas", "team_skills": skills, "cloud_preference": cloud, "cloud_required": True,
                    "dau": 20000, "budget_monthly": 2000, "seo": "none", "compliance": [rule]}, with_counterfactuals=False)
     assert (r["stack"]["frontend"]["pick"]["id"], r["stack"]["hosting"]["pick"]["id"]) == ("react_spa", host)
     static = [s["name"] for s in r["supporting_services"] if s["role"] == "Static frontend"]
     text, request = r["stack"]["hosting"]["runs_here"], r["architecture"]["how_parts_fit"][0]["text"]
-    if pairing:
+    if cloud != "azure" or not ATTESTATION_GAP[rule]:
         assert static == [pairing] and pairing in text and pairing in request, (static, text, request)
         return
     assert static == [] and not [x for x in r["cost"]["lines"] if x["component"].startswith("Static frontend")], static

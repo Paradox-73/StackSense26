@@ -163,7 +163,7 @@ BAA_PAGES = {"Amazon S3": "https://aws.amazon.com/compliance/hipaa-eligible-serv
              "Cloud Storage": "https://cloud.google.com/security/compliance/hipaa",
              "Blob Storage": "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-hipaa-us"}
 NO_RULES = {"onprem": False, "hybrid": False, "cloud": None, "hipaa": False, "self_managed": False, "no_hyperscaler": False,
-            "india": False, "eu": False, "us": False}
+            "india": False, "eu": False, "us": False, "audit_rules": []}
 
 
 @pytest.mark.parametrize("env,prov", [
@@ -181,3 +181,19 @@ def test_each_object_store_line_cites_the_store_it_names(env, prov):
     assert STORE_SITES[first] in urlparse(src).netloc, (name, src)
     if "BAA" in name and first in BAA_PAGES:
         assert src == BAA_PAGES[first] and "under Microsoft's BAA" not in name, (name, src)
+
+
+@pytest.mark.parametrize("rules,front_door", [([], True), (["hipaa"], True), (["pci_dss"], False), (["soc2"], False),
+                                              (["iso27001"], False), (["hipaa", "iso27001"], False)])
+def test_azure_uploads_skip_front_door_under_an_audit_it_does_not_publish(rules, front_door):
+    """The knowledge base records Blob Storage + Front Door with no PCI DSS, SOC 2 or ISO 27001 audit (no public Microsoft
+    page lists Front Door's scope), and Microsoft's Azure Storage page puts Blobs in all three: under any of them uploads
+    skip Front Door, citing that page. HIPAA alone keeps Front Door for public, non-PHI files."""
+    held = load_kb()["index"]["azure_blob_frontdoor"]["compliance"]
+    assert not (held["pci"] or held["soc2"] or held["iso27001"])
+    env = dict(NO_RULES, cloud="azure", hipaa="hipaa" in rules, audit_rules=[r for r in rules if r != "hipaa"])
+    name, src = _object_storage(env, "azure")
+    assert ("without Front Door" not in name) == front_door and "Front Door" in name, name
+    assert ("in scope for Microsoft's HIPAA BAA" in name) == ("hipaa" in rules), name
+    if not front_door and "hipaa" not in rules:
+        assert src == "https://learn.microsoft.com/en-us/azure/storage/common/storage-compliance-offerings", src

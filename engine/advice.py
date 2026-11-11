@@ -87,6 +87,8 @@ def _env(p: dict, host: dict) -> dict:
             "eu": "data_residency_eu" in p["compliance"],
             "us": "data_residency_us" in p["compliance"],
             "hipaa": "hipaa" in p["compliance"],
+            # Audits every host must be in (scoring.hard_constraints).
+            "audit_rules": [c for c in p["compliance"] if c in ("pci_dss", "soc2", "iso27001")],
             "hybrid": p["deployment"] == "hybrid",
             "air_gapped": bool(p.get("air_gapped")),
             # The team runs its own software on cloud VMs: no managed database, identity or monitoring service.
@@ -811,6 +813,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
 
 S3_DOCS = "https://aws.amazon.com/s3/"
 AWS_HIPAA_DOCS = "https://aws.amazon.com/compliance/hipaa-eligible-services-reference/"  # lists Amazon S3
+AZURE_HIPAA_DOCS = "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-hipaa-us"
 # Object storage a team runs itself; MinIO's repository is archived and no longer maintained (github.com/minio/minio).
 CEPH_RGW_DOCS = "https://docs.ceph.com/en/latest/radosgw/"
 # Where a HIPAA project's files go on a platform with no hyperscaler, from each host's own HIPAA page: Render has no
@@ -827,14 +830,20 @@ def _object_storage(env: dict, prov: str) -> tuple[str, str]:
     if env["hybrid"]:
         return ("S3 API everywhere: the cloud's object storage in the cloud, Ceph Object Gateway on-premises (same S3 "
                 "client code)"), CEPH_RGW_DOCS
+    if env["cloud"] == "azure" and env["audit_rules"]:
+        # Front Door holds none of these audits in data/kb/hosting.json (no public Microsoft page lists its scope);
+        # Microsoft's Azure Storage page puts Blobs in Azure's ISO, SOC and PCI DSS audits.
+        baa = ", after you confirm it is in scope for Microsoft's HIPAA BAA," if env["hipaa"] else ""
+        return (f"Blob Storage{baa} without Front Door (no public Microsoft page lists Front Door's audit scope)",
+                AZURE_HIPAA_DOCS if env["hipaa"] else
+                "https://learn.microsoft.com/en-us/azure/storage/common/storage-compliance-offerings")
     if env["cloud"] and env["hipaa"]:  # uploads hold health information: a CDN may carry only public files
         return {"aws": ("Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only)", AWS_HIPAA_DOCS),
                 "gcp": ("Cloud Storage under the Google Cloud BAA (Cloud CDN for public, non-PHI files only)",
                         "https://cloud.google.com/security/compliance/hipaa"),
                 # Microsoft lists the services its BAA covers only in a Service Trust Portal document.
                 "azure": ("Blob Storage, after you confirm it is in scope for Microsoft's HIPAA BAA (Front Door for "
-                          "public, non-PHI files only)",
-                          "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-hipaa-us")}[env["cloud"]]
+                          "public, non-PHI files only)", AZURE_HIPAA_DOCS)}[env["cloud"]]
     if env["cloud"]:
         return {"aws": ("Amazon S3 + CloudFront", S3_DOCS),
                 "gcp": ("Cloud Storage + Cloud CDN", "https://cloud.google.com/cdn/docs/setting-up-cdn-with-bucket"),
@@ -981,8 +990,10 @@ def spa_static_pairing(stack: dict) -> dict | None:
 
 def spa_static_gaps(p: dict, d: dict, pairing: dict) -> list[str]:
     """The compliance rules the pairing fails as a host (attestations, residency); with any, the app's own instances
-    serve the built files."""
-    return [r[0] for r in hard_constraints("hosting", pairing, p, d) if r[1] == "compliance"]
+    serve the built files. HIPAA is not one: the built files hold no health information, and a CDN may serve public,
+    non-PHI files (_object_storage)."""
+    rules = dict(p, compliance=[c for c in p["compliance"] if c != "hipaa"])
+    return [r[0] for r in hard_constraints("hosting", pairing, rules, d) if r[1] == "compliance"]
 
 
 def spa_static_home(p: dict, d: dict, stack: dict) -> tuple | None:
