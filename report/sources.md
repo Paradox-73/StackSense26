@@ -33,6 +33,15 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - frontend: Native iOS + Android (Swift / Kotlin): https://developer.apple.com/swift/
 - frontend: No frontend (API only): https://spec.openapis.org/oas/latest.html
 - frontend: No frontend (API only): https://swagger.io/docs/specification/v3_0/about/
+- frontend: Qt (C++): https://doc.qt.io/qt-6/
+- frontend: Qt (C++): https://doc.qt.io/qt-6/supported-platforms.html
+- frontend: Tauri (Rust): https://v2.tauri.app/start/
+- frontend: .NET MAUI (C#): https://learn.microsoft.com/dotnet/maui/what-is-maui
+- frontend: Electron (JavaScript): https://www.electronjs.org/docs/latest/
+- frontend: Unity (C#): https://docs.unity.com/en-us/engine/current/manual/platform-specific
+- frontend: Unity (C#): https://docs.unity.com/en-us/engine/current/manual/scripting
+- frontend: Unreal Engine (C++): https://dev.epicgames.com/documentation/en-us/unreal-engine/sharing-and-releasing-projects-for-unreal-engine
+- frontend: Unreal Engine (C++): https://dev.epicgames.com/documentation/en-us/unreal-engine/programming-with-cplusplus-in-unreal-engine
 - backend: Node.js + Express: https://expressjs.com/
 - backend: Node.js + Express: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
 - backend: Node.js + Express: https://socket.io/docs/v4/

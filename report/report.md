@@ -9,7 +9,7 @@ subtitle: "Synergy '26 · StackSense Challenge · Project report"
 
 ## 1. Abstract
 
-StackSense recommends a frontend, backend, database and hosting platform for a software project, plus supporting services such as a job queue, search, SMS sign-in or payments where needed. It reads a scenario file in the standard schema, validates every field and writes the section 4 output: a status, an architecture style, each component with its justification, driving input fields, alternatives and trade-offs, a monthly cost band, warnings with a severity and every assumption. Rules and weighted scoring over a cited knowledge base of 64 technologies make every choice, so the same file always gives the same stack. Data residency, compliance, deployment model and an explicit cloud remove options before any scoring. A language model is optional, never picks a component, and switching it off leaves every stack unchanged. A property test over 1,000 random projects found no violation of the eight hard constraints it checks.
+StackSense recommends a frontend, backend, database and hosting platform for a software project, plus supporting services such as a job queue, search, SMS sign-in or payments where needed. It reads a scenario file in the standard schema, validates every field and writes the section 4 output: a status, an architecture style, each component with its justification, driving input fields, alternatives and trade-offs, a monthly cost band, warnings with a severity and every assumption. Rules and weighted scoring over a cited knowledge base of 70 technologies make every choice, so the same file always gives the same stack. Data residency, compliance, deployment model and an explicit cloud remove options before any scoring. A language model is optional, never picks a component, and switching it off leaves every stack unchanged. A property test over 1,000 random projects found no violation of the eight hard constraints it checks.
 
 ## 2. Problem understanding
 
@@ -116,7 +116,7 @@ Quick mode asks seven questions; Refine opens all 42. "Describe your project" fi
 
 ### 5.1 How technologies are represented
 
-`data/kb/*.json` holds 64 technologies: 11 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region. 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 369 URLs, and no end-of-life product is in the knowledge base.
+`data/kb/*.json` holds 70 technologies: 17 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region. 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 378 URLs, and no end-of-life product is in the knowledge base.
 
 ### 5.2 Scoring and filtering
 
@@ -248,15 +248,15 @@ I checked the recommendations with a test suite, an answer key, an LLM-only base
 
 ### 8.1 Tests
 
-The 1061 tests cover scoring, constraints and cost; explanations against the engine's numbers; inputs, edge cases and warnings; stability properties; the language-model checks and fallbacks; accuracy against the answer key; and the app, packaging and documents. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1120 tests cover scoring, constraints and cost; explanations against the engine's numbers; inputs, edge cases and warnings; stability properties; the language-model checks and fallbacks; accuracy against the answer key; and the app, packaging and documents. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
-`python tools/bench.py` scores the engine on 40 project briefs against an answer key written before measurement: a best pick and an acceptable set per layer, labelled by a language model playing three architect personas, blind to the engine. Result: 81% top-1 (128 of the 158 layer picks that have a best pick) and 96% acceptable (154 of all 160 layer picks); on the ten briefs held out from tuning, 72% and 95%. No human architect has checked the key.
+`python tools/bench.py` scores the engine on 40 project briefs against an answer key written before measurement: a best pick and an acceptable set per layer, labelled by a language model playing three architect personas, blind to the engine. Result: 82% top-1 (129 of the 158 layer picks that have a best pick) and 96% acceptable (154 of all 160 layer picks); on the ten briefs held out from tuning, 72% and 95%. No human architect has checked the key.
 
 ### 8.3 LLM-only baseline
 
-A language model with no rule engine picked the four layers for the same briefs (`python tools/llm_baseline.py`, an offline experiment, not part of the engine). Its agreement with the key is close to the engine's (LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 81% and 96%), and the key's language-model origin may favour it. Graded by the rules, the model breaks a hard requirement in 7 of the 40 briefs, against none for the engine's picks graded the same way, and it gives no costs, reasons or sources.
+A language model with no rule engine picked the four layers for the same briefs (`python tools/llm_baseline.py`, an offline experiment, not part of the engine). Its agreement with the key is close to the engine's (LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 82% and 96%), and the key's language-model origin may favour it. Graded by the rules, the model breaks a hard requirement in 7 of the 40 briefs, against none for the engine's picks graded the same way, and it gives no costs, reasons or sources.
 
 ### 8.4 Random projects and the public scenarios
 
@@ -287,7 +287,7 @@ Next: an architect review of the answer key and the public outputs, scheduled re
 
 **Datasets.** None shipped. The [Stack Overflow Developer Survey 2025](https://survey.stackoverflow.co/2025/technology) is the hiring-pool proxy; INR budgets use a fixed planning rate of 96 INR to 1 USD from the FBIL reference rate.
 
-**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 369 URLs is in `report/sources.md`. Main references: [expert systems](https://en.wikipedia.org/wiki/Expert_system), the [weighted sum model](https://en.wikipedia.org/wiki/Weighted_sum_model), counterfactual explanations ([Wachter, Mittelstadt and Russell, 2017](https://arxiv.org/abs/1711.00399)), [ISO/IEC 25010](https://www.iso.org/standard/78176.html), [AWS Well-Architected](https://aws.amazon.com/architecture/well-architected/), [ATAM](https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/), the Google SRE book ([availability table](https://sre.google/sre-book/availability-table/)), Fowler's [MonolithFirst](https://martinfowler.com/bliki/MonolithFirst.html), [Team Topologies](https://teamtopologies.com/key-concepts), [DORA research](https://dora.dev/research/), [HHS on HIPAA and cloud computing](https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html), the [PCI SSC library](https://www.pcisecuritystandards.org/document_library/), the [MeitY data protection framework](https://www.meity.gov.in/data-protection-framework), the [RBI directive on payment data storage (2018)](https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244), [endoflife.date](https://endoflife.date/) and the [Microsoft lifecycle pages](https://learn.microsoft.com/lifecycle/).
+**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 378 URLs is in `report/sources.md`. Main references: [expert systems](https://en.wikipedia.org/wiki/Expert_system), the [weighted sum model](https://en.wikipedia.org/wiki/Weighted_sum_model), counterfactual explanations ([Wachter, Mittelstadt and Russell, 2017](https://arxiv.org/abs/1711.00399)), [ISO/IEC 25010](https://www.iso.org/standard/78176.html), [AWS Well-Architected](https://aws.amazon.com/architecture/well-architected/), [ATAM](https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/), the Google SRE book ([availability table](https://sre.google/sre-book/availability-table/)), Fowler's [MonolithFirst](https://martinfowler.com/bliki/MonolithFirst.html), [Team Topologies](https://teamtopologies.com/key-concepts), [DORA research](https://dora.dev/research/), [HHS on HIPAA and cloud computing](https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html), the [PCI SSC library](https://www.pcisecuritystandards.org/document_library/), the [MeitY data protection framework](https://www.meity.gov.in/data-protection-framework), the [RBI directive on payment data storage (2018)](https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244), [endoflife.date](https://endoflife.date/) and the [Microsoft lifecycle pages](https://learn.microsoft.com/lifecycle/).
 
 **Repository.** <https://github.com/Paradox-73/StackSense26>. `python run.py` starts the app, `python -m pytest` runs the tests, `python tools/bench.py`, `tools/fuzz.py` and `tools/question_influence.py` rerun the studies, and `python tools/build_assets.py` then `tools/build_report.py` rebuild the tables and this PDF.
 
@@ -463,14 +463,14 @@ Safety (new in 2023) is not scored: the four layers are infrastructure, and no o
 <!-- BEGIN validation -->
 | What is checked | Tests |
 |---|---|
-| Scoring, constraints and cost | 356 |
-| Explanations match the engine | 116 |
-| Inputs, edge cases and warnings | 223 |
+| Scoring, constraints and cost | 350 |
+| Explanations match the engine | 130 |
+| Inputs, edge cases and warnings | 274 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 189 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 92 |
-| **All** | **1061** |
+| **All** | **1120** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.
@@ -482,11 +482,11 @@ Safety (new in 2023) is not scored: the four layers are infrastructure, and no o
 
 | Layer | Tuning top-1 | Tuning acceptable | Held-out top-1 | Held-out acceptable |
 |---|---|---|---|---|
-| frontend | 97% (29/30) | 100% (30/30) | 80% (8/10) | 90% (9/10) |
+| frontend | 100% (30/30) | 100% (30/30) | 80% (8/10) | 90% (9/10) |
 | backend | 86% (25/29) | 93% (28/30) | 80% (8/10) | 100% (10/10) |
 | database | 80% (24/30) | 97% (29/30) | 70% (7/10) | 100% (10/10) |
 | hosting | 72% (21/29) | 97% (29/30) | 60% (6/10) | 90% (9/10) |
-| All layers | 84% (99/118) | 97% (116/120) | 72% (29/40) | 95% (38/40) |
+| All layers | 85% (100/118) | 97% (116/120) | 72% (29/40) | 95% (38/40) |
 
 Before the general rule fixes made on the 30 tuning briefs, the held-out briefs scored 60% (24/40) top-1 and 80% (32/40) acceptable. The picks outside the acceptable set are listed by `python tools/bench.py --briefs`.
 <!-- END bench -->

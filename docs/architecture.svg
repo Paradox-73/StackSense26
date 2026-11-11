@@ -62,7 +62,7 @@
 <rect x="576" y="140" width="128" height="124" rx="6" fill="#f6f1ea"/><rect x="576" y="140" width="128" height="124" rx="6" fill="#ffffff" stroke="#b8872b" stroke-width="1.4"/>
 <text x="584" y="160" font-family="'Geist Mono', Consolas, Menlo, monospace" font-size="14" fill="#241c2e" font-weight="600">data/</text>
 <text x="584" y="176" font-family="Geist, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b5266">All knowledge, cited:</text>
-<text x="584" y="192" font-family="Geist, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#241c2e">64 technologies</text>
+<text x="584" y="192" font-family="Geist, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#241c2e">70 technologies</text>
 <text x="584" y="207" font-family="Geist, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#241c2e">65 rules, glossary</text>
 <text x="584" y="222" font-family="Geist, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#241c2e">42 questions, defaults</text>
 <text x="584" y="237" font-family="Geist, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#241c2e">14 examples</text>

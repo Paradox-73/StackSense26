@@ -96,12 +96,18 @@ Next.js (React) is the frontend for an E-commerce / marketplace project with abo
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: Node.js + NestJS (88.4)
 
 Opinionated TypeScript framework (modules, DI, decorators) on top of Express/Fastify.
 
-Node.js + NestJS serves the API at about 6,944 requests/s at peak (Very large (1M-10M daily users)) for a team of 20. It runs as a few long-running Node.js services, one per team, each deployed on its own with its own background jobs, WebSockets and database connection pool. Realtime is core, and it scores 4.0/5 on realtime fit. Go (net/http, chi or Gin) is within 0.4 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+Node.js + NestJS serves the API at about 6,944 requests/s at peak (Very large (1M-10M daily users)) for a team of 20. The team lists nestjs and Node.js and TypeScript, so it needs no new server language (team skill match 5.0/5). It runs as a few long-running Node.js services, one per team, each deployed on its own with its own background jobs, WebSockets and database connection pools. Realtime is core, and it scores 4.0/5 on realtime fit. Go (net/http, chi or Gin) is within 0.4 stack points, inside the tie margin (stacks this close count as tied); the tie went to Node.js + NestJS on adjacent team skills (19 vs 18.5, summed skill fit).
 
 **Why**
 - Structure for large teams: 5.0/5 vs 3.2 average for this layer - weighted up because: 20 engineers need enforced conventions.
@@ -149,7 +155,7 @@ Node.js + NestJS serves the API at about 6,944 requests/s at peak (Very large (1
 - Node.js + Express (stack 87.9, -0.7): Scores 85.5 on its own; its stack is 0.7 stack points behind the pick.
 
 **Why not the others?**
-- Why not Go (net/http, chi or Gin)? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.4 points higher; either is defensible. Node.js + NestJS is stronger on structure for large teams (5.0 vs 2.0), team skill match (5.0 vs 4.5); Go (net/http, chi or Gin) is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0).
+- Why not Go (net/http, chi or Gin)? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.4 points higher; the tie went to Node.js + NestJS on adjacent team skills (19 vs 18.5, summed skill fit); either is defensible. Node.js + NestJS is stronger on structure for large teams (5.0 vs 2.0), team skill match (5.0 vs 4.5); Go (net/http, chi or Gin) is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0).
 - Why not Node.js + Express? (popular choice) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.7 points lower; either is defensible. Node.js + NestJS is stronger on structure for large teams (5.0 vs 1.0); Node.js + Express is stronger on ecosystem maturity (5.0 vs 4.0), hiring pool (5.0 vs 4.0).
 - Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 7.4 points. Node.js + NestJS is stronger on team skill match (5.0 vs 1.5), realtime fit (4.0 vs 2.0); Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), development speed (5.0 vs 4.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn.
 - Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 5.2 points. Node.js + NestJS is stronger on team skill match (5.0 vs 1.5), realtime fit (4.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on scalability (5.0 vs 4.0), performance / latency (4.0 vs 3.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
@@ -227,7 +233,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 Managed Kubernetes control plane on AWS.
 
-AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Node.js + NestJS API as long-running processes with WebSockets, sized for ~6,944 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is ₹480,000-₹2,304,000 a month, against a total budget of ₹4,000,000 a month. AWS ECS on Fargate is within less than 0.05 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Node.js + NestJS API as long-running processes with WebSockets, sized for ~6,944 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is ₹480,000-₹2,304,000 a month, against a total budget of ₹4,000,000 a month. AWS ECS on Fargate is within less than 0.05 stack points, inside the tie margin (stacks this close count as tied); the tie went to AWS EKS (Kubernetes) on lower vendor lock-in (6 vs 7, summed lock-in).
 
 Runs here: Next.js (server rendering + static files), the Node.js + NestJS API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -336,6 +342,8 @@ About ₹2,352,000-₹12,000,000 per month. Budget status: **stretch**. Planning
 - **A solo developer**: backend: Node.js + NestJS -> Go (net/http, chi or Gin); hosting: AWS EKS (Kubernetes) -> AWS ECS on Fargate
   - Why backend changes: Low ops burden moved the gap 2.2 points toward Go (net/http, chi or Gin) (Go (net/http, chi or Gin) 5.0/5 vs Node.js + NestJS 4.0/5, weight 1.0 -> 3.5).
   - Why hosting changes: AWS EKS (Kubernetes) now takes a penalty (Usually needs a team of 4+ to operate), moving the gap 12.0 points toward AWS ECS on Fargate; low ops burden moved the gap 4.3 points toward AWS ECS on Fargate (AWS ECS on Fargate 3.0/5 vs AWS EKS (Kubernetes) 1.0/5, weight 1.0 -> 3.5).
+- **4-week deadline**: frontend: Next.js (React) -> React Native (Expo)
+  - Why frontend changes: Next.js (React) is now ruled out: Does not build android, ios: the timeline leaves room for one codebase that builds every platform.
 - **Must run on-premises**: hosting: AWS EKS (Kubernetes) -> On-prem Kubernetes (k3s / RKE2 / OpenShift)
   - Why hosting changes: AWS EKS (Kubernetes) is now ruled out: Public-cloud service; deployment must be on-premises.
 - **Team has no relevant prior skills**: backend: Node.js + NestJS -> Java/Kotlin + Spring Boot; hosting: AWS EKS (Kubernetes) -> AWS ECS on Fargate

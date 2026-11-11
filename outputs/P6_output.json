@@ -2,12 +2,12 @@
   "scenario_id": "P6",
   "engine_version": "1.0.0",
   "status": "ok",
-  "summary": "A modular monolith build: React Native on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean. About $69-488 a month. With 2 engineer(s), one deployable with strict internal module boundaries is the fastest and cheapest to run; modules can be extracted into services later.",
+  "summary": "A modular monolith build: React Native on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $69-488 a month. It keeps data in India under DPDP, builds on the team's Python, keeps working offline, and ships as one deployable that a team of 2 can build in 10 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
       "choice": "React Native (Expo)",
-      "justification": "React Native (Expo) is the app for a Mobile-first consumer app project with about 400 daily users (~8.3 requests/s at peak), built by a team of 2 in 10 weeks. One codebase builds both the iOS and the Android app, which halves the work for a team of 2. It leads the runner-up, Flutter, by 3.5 stack points (points of the overall stack score, the average of the four layer scores).",
+      "justification": "React Native (Expo) is the app for a Mobile-first app project with about 400 daily users (~8.3 requests/s at peak), built by a team of 2 in 10 weeks. It builds the Android app now, and the same code can ship an iOS app later without a rewrite. It leads the runner-up, Flutter, by 3.5 stack points (points of the overall stack score, the average of the four layer scores).",
       "driven_by": [
         "requirements.offline_support",
         "team.languages",
@@ -40,7 +40,7 @@
     },
     "backend": {
       "choice": "Python + Django",
-      "justification": "Python + Django serves the API at about 8.3 requests/s at peak (Small (50-500 users online at once)) for a team of 2. It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + FastAPI is within 0.5 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).",
+      "justification": "Python + Django serves the API at about 8.3 requests/s at peak (Small (50-500 users online at once)) for a team of 2. The team lists Python, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Python service, so background jobs and database connection pools live in one deployable process. Python + FastAPI is within 0.5 stack points, inside the tie margin (stacks this close count as tied); Python + Django has the higher stack score.",
       "driven_by": [
         "priorities.cost",
         "priorities.time_to_market",
@@ -59,7 +59,7 @@
         },
         {
           "choice": "Java/Kotlin + Spring Boot",
-          "why_not": "Swapping it in lowers the stack score by 10.7 points. Python + Django is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 2.0); Java/Kotlin + Spring Boot is stronger on performance / latency (4.0 vs 3.0), scalability (5.0 vs 4.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn."
+          "why_not": "Swapping it in lowers the stack score by 10.7 points. Python + Django is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 2.0); Java/Kotlin + Spring Boot is stronger on performance / latency (4.0 vs 3.0), scalability (5.0 vs 4.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn. 1.0 of the 10.7 points come from a stack compatibility rule: Git-push deploys with managed database add-ons are the shortest path to production for a monolith."
         },
         {
           "choice": "No server code (static site)",
@@ -72,7 +72,7 @@
     },
     "database": {
       "choice": "PostgreSQL: DigitalOcean Managed PostgreSQL",
-      "justification": "Your data is mainly relational and reaches about 100 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $50-$400 a month, against a total budget of $100 a month. It leads the runner-up, MySQL, by 1.0 stack points.",
+      "justification": "Your data is mainly relational and reaches about 100 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $50-$400 a month, against a total budget of $100 a month. It leads the runner-up, MySQL, by 1.0 stack points.",
       "driven_by": [
         "priorities.cost",
         "priorities.time_to_market",
@@ -105,13 +105,13 @@
         "Team skill match is only 1.5/5 (weight 2.5).",
         "Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless",
         "Connection-per-process model needs PgBouncer/RDS Proxy under serverless",
-        "Minimum ~$50/month uses most of the budget (-1.3).",
+        "Minimum ~$50/month uses most of the budget.",
         "Nobody on the team listed PostgreSQL or a closely related skill; plan 2-4 weeks to learn it."
       ]
     },
     "hosting": {
       "choice": "DigitalOcean (App Platform + Managed DBs), region BLR1 (Bangalore)",
-      "justification": "DigitalOcean (App Platform + Managed DBs) hosts the stack for users in India at a 99% availability target. It runs the Python + Django API as long-running processes, sized for ~8.3 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is $12-$50 a month, against a total budget of $100 a month. Google Cloud Run is within 0.6 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).",
+      "justification": "DigitalOcean (App Platform + Managed DBs) hosts the stack for users in India at a 99% availability target. It runs the Python + Django API as long-running processes, sized for ~8.3 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is $12-$50 a month, against a total budget of $100 a month. Google Cloud Run is within 0.6 stack points, inside the tie margin (stacks this close count as tied); DigitalOcean (App Platform + Managed DBs) has the higher stack score.",
       "driven_by": [
         "priorities.cost",
         "priorities.time_to_market",
@@ -124,11 +124,11 @@
       "alternatives": [
         {
           "choice": "Google Cloud Run",
-          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.6 points lower; either is defensible. DigitalOcean (App Platform + Managed DBs) is stronger on cost at your scale (4.5 vs 4.5), realtime fit (4.0 vs 3.0); Google Cloud Run is stronger on performance / latency (4.0 vs 3.0), scalability (5.0 vs 4.0)."
+          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.6 points lower; either is defensible. DigitalOcean (App Platform + Managed DBs) is stronger on realtime fit (4.0 vs 3.0); Google Cloud Run is stronger on performance / latency (4.0 vs 3.0), scalability (5.0 vs 4.0)."
         },
         {
           "choice": "Vercel",
-          "why_not": "Swapping it in lowers the stack score by 7.6 points. DigitalOcean (App Platform + Managed DBs) is stronger on portability (low lock-in) (4.0 vs 3.0), realtime fit (4.0 vs 2.0); Vercel is stronger on learning curve (5.0 vs 4.0), performance / latency (5.0 vs 3.0)."
+          "why_not": "Swapping it in lowers the stack score by 7.6 points. DigitalOcean (App Platform + Managed DBs) is stronger on portability (low lock-in) (4.0 vs 3.0), realtime fit (4.0 vs 2.0); Vercel is stronger on learning curve (5.0 vs 4.0), performance / latency (5.0 vs 3.0). A stack compatibility rule costs it 9.0 points, more than the whole gap, while on this layer's own criteria it is 1.4 points ahead: Frontend platforms run code only as short-lived functions; this framework expects a long-running server. Host the API on a container/PaaS service instead."
         },
         {
           "choice": "AWS ECS on Fargate",
@@ -283,7 +283,6 @@
     "Priorities rated 1 or 2 (scalability) keep their criteria at the baseline weight",
     "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",
     "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
-    "How fast must the app answer? (slowest 1 in 20 requests, ms): Not provided; using default '300'.",
     "Architecture preference: Not provided; using default 'auto'.",
     "Vendor lock-in tolerance: Not provided; using default 'medium'.",
     "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Set infrastructure.data_residency to india if a sector rule (e.g. RBI) applies."

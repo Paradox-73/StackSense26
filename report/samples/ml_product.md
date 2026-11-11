@@ -95,12 +95,18 @@ Next.js (React) is the frontend for an ML / AI product project with about 30,000
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: Python + FastAPI (90.0)
 
 Async Python API framework with type-hint validation (Pydantic) and automatic OpenAPI docs.
 
-Python + FastAPI serves the API at about 69 requests/s at peak (Medium (10k-100k daily users)) for a team of 4. It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + Django is within 0.7 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+Python + FastAPI serves the API at about 69 requests/s at peak (Medium (10k-100k daily users)) for a team of 4. The team lists fastapi and Python, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + Django is within 0.7 stack points, inside the tie margin (stacks this close count as tied); the tie went to Python + FastAPI on adjacent team skills (19 vs 18.5, summed skill fit).
 
 **Why**
 - Development speed: 5.0/5 vs 4.3 average for this layer - weighted up because: 12-week MVP; Fast iteration on models.
@@ -149,8 +155,8 @@ Python + FastAPI serves the API at about 69 requests/s at peak (Medium (10k-100k
 
 **Why not the others?**
 - Why not Python + Django? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.7 points lower; either is defensible. Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), team skill match (5.0 vs 4.5); Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0).
-- Why not Node.js + Express? (popular choice) Swapping it in lowers the stack score by 5.0 points. Python + FastAPI is stronger on development speed (5.0 vs 4.0), team skill match (5.0 vs 4.5); Node.js + Express is stronger on realtime fit (4.0 vs 3.0), ecosystem maturity (5.0 vs 4.0).
-- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 12.0 points. Python + FastAPI is stronger on team skill match (5.0 vs 1.5), development speed (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on ecosystem maturity (5.0 vs 4.0), scalability (5.0 vs 4.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
+- Why not Node.js + Express? (popular choice) Swapping it in lowers the stack score by 5.0 points. Python + FastAPI is stronger on development speed (5.0 vs 4.0), team skill match (5.0 vs 4.5); Node.js + Express is stronger on realtime fit (4.0 vs 3.0), ecosystem maturity (5.0 vs 4.0). 3.0 of the 5.0 points come from a stack compatibility rule: Model inference and pipelines stay in Python (PyTorch, Hugging Face, scikit-learn), so no second runtime is needed.
+- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 12.0 points. Python + FastAPI is stronger on team skill match (5.0 vs 1.5), development speed (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on ecosystem maturity (5.0 vs 4.0), scalability (5.0 vs 4.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn. 3.0 of the 12.0 points come from a stack compatibility rule: Model inference and pipelines stay in Python (PyTorch, Hugging Face, scikit-learn), so no second runtime is needed.
 
 **Excluded by hard constraints**
 - No server code (static site): Only for read-only sites; your users sign in, post or pay
@@ -273,7 +279,7 @@ Runs here: Next.js (server rendering + static files), the Python + FastAPI API a
 
 **Why not the others?**
 - Why not DigitalOcean (App Platform + Managed DBs)? (runner-up) Swapping it in lowers the stack score by 2.8 points. Google Cloud Run is stronger on scalability (5.0 vs 4.0), team skill match (5.0 vs 4.5); DigitalOcean (App Platform + Managed DBs) is stronger on realtime fit (4.0 vs 3.0), cost at your scale (4.8 vs 4.7).
-- Why not Vercel? (popular choice) Swapping it in lowers the stack score by 6.5 points. Google Cloud Run is stronger on team skill match (5.0 vs 4.0), realtime fit (3.0 vs 2.0); Vercel is stronger on performance / latency (5.0 vs 4.0), cost at your scale (4.8 vs 4.7).
+- Why not Vercel? (popular choice) Swapping it in lowers the stack score by 6.5 points. Google Cloud Run is stronger on team skill match (5.0 vs 4.0), realtime fit (3.0 vs 2.0); Vercel is stronger on performance / latency (5.0 vs 4.0), cost at your scale (4.8 vs 4.7). 1.7 of the 6.5 points come from a stack compatibility rule: This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets.
 - Why not AWS ECS on Fargate? (popular choice) Swapping it in lowers the stack score by 6.0 points. Google Cloud Run is stronger on team skill match (5.0 vs 2.5), low ops burden (5.0 vs 3.0); AWS ECS on Fargate is stronger on realtime fit (4.0 vs 3.0), ecosystem maturity (5.0 vs 4.0).
 - Why not Render? (popular choice) Swapping it in lowers the stack score by 3.5 points. Google Cloud Run is stronger on scalability (5.0 vs 4.0), ecosystem maturity (4.0 vs 3.0); Render is stronger on realtime fit (4.0 vs 3.0), cost at your scale (4.8 vs 4.7).
 

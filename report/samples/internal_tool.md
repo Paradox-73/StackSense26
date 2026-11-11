@@ -88,21 +88,27 @@ Server-rendered HTML + HTMX is the frontend for an Internal tool / admin panel p
 - React SPA (Vite) (stack 83.3, -4.4): Loses: The backend renders HTML fragments directly: one codebase, no API layer or SPA build.
 
 **Why not the others?**
-- Why not Astro? (runner-up) Swapping it in lowers the stack score by 3.3 points. Server-rendered HTML + HTMX is stronger on team skill match (4.5 vs 3.5), learning curve (5.0 vs 4.0); Astro is stronger on performance / latency (5.0 vs 4.0), structure for large teams (3.0 vs 2.0).
-- Why not Next.js (React)? (popular choice) Swapping it in lowers the stack score by 7.5 points. Server-rendered HTML + HTMX is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 3.0); Next.js (React) is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Next.js (React) takes a penalty: No search visibility needed: server rendering adds a Node.js server for pages that React SPA (Vite) serves as static files.
-- Why not React SPA (Vite)? (popular choice) Swapping it in lowers the stack score by 4.4 points. Server-rendered HTML + HTMX is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 4.0); React SPA (Vite) is stronger on ecosystem maturity (5.0 vs 3.0), rich client interactivity (5.0 vs 2.0).
+- Why not Astro? (runner-up) Swapping it in lowers the stack score by 3.3 points. Server-rendered HTML + HTMX is stronger on team skill match (4.5 vs 3.5), learning curve (5.0 vs 4.0); Astro is stronger on performance / latency (5.0 vs 4.0), structure for large teams (3.0 vs 2.0). 1.2 of the 3.3 points come from a stack compatibility rule: The backend renders HTML fragments directly: one codebase, no API layer or SPA build.
+- Why not Next.js (React)? (popular choice) Swapping it in lowers the stack score by 7.5 points. Server-rendered HTML + HTMX is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 3.0); Next.js (React) is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Next.js (React) takes a penalty: No search visibility needed: server rendering adds a Node.js server for pages that React SPA (Vite) serves as static files. 1.3 of the 7.5 points come from a stack compatibility rule: The backend renders HTML fragments directly: one codebase, no API layer or SPA build.
+- Why not React SPA (Vite)? (popular choice) Swapping it in lowers the stack score by 4.4 points. Server-rendered HTML + HTMX is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 4.0); React SPA (Vite) is stronger on ecosystem maturity (5.0 vs 3.0), rich client interactivity (5.0 vs 2.0). 1.2 of the 4.4 points come from a stack compatibility rule: The backend renders HTML fragments directly: one codebase, no API layer or SPA build.
 
 **Excluded by hard constraints**
 - React Native (Expo): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: Python + Django (100.0)
 
 Batteries-included Python web framework: ORM, migrations, admin, auth, forms, templates.
 
-Python + Django serves the API at about 1.7 requests/s at peak (Hobby (<1k daily users)) for a solo developer. It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + FastAPI is within 0.8 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+Python + Django serves the API at about 1.7 requests/s at peak (Hobby (<1k daily users)) for a solo developer. The team lists Django and Python, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Python service, so background jobs and database connection pools live in one deployable process. Python + FastAPI is within 0.8 stack points, inside the tie margin (stacks this close count as tied); the tie went to Python + Django on adjacent team skills (18.5 vs 18, summed skill fit).
 
 **Why**
 - Learning curve: 5.0/5 vs 3.7 average for this layer - weighted up because: 3-week MVP: no time to learn new tools; Solo developer.
@@ -211,9 +217,9 @@ Suggested offering: SQLite file on local disk with Litestream backups
 - MySQL (stack 84.3, -3.4): Loses: A persistent volume plus Litestream/LiteFS gives backups and replicas for SQLite.
 
 **Why not the others?**
-- Why not PostgreSQL? (runner-up) Swapping it in lowers the stack score by 3.4 points. SQLite (+ Litestream backups) is stronger on cost at your scale (5.0 vs 4.1), low ops burden (5.0 vs 4.0); PostgreSQL is stronger on data-model fit (5.0 vs 4.0), scalability (4.0 vs 1.0); PostgreSQL takes a penalty: No free option at your scale (from ~$5/month).
-- Why not MySQL? (popular choice) Swapping it in lowers the stack score by 3.4 points. SQLite (+ Litestream backups) is stronger on cost at your scale (5.0 vs 4.1), low ops burden (5.0 vs 4.0); MySQL is stronger on data-model fit (5.0 vs 4.0), scalability (4.0 vs 1.0); MySQL takes a penalty: No free option at your scale (from ~$5/month).
-- Why not MongoDB? (popular choice) Swapping it in lowers the stack score by 15.6 points. SQLite (+ Litestream backups) is stronger on team skill match (4.5 vs 1.5), data-model fit (4.0 vs 2.0); MongoDB is stronger on scalability (5.0 vs 1.0), realtime fit (4.0 vs 1.0); MongoDB takes a penalty: No free option at your scale (from ~$8/month).
+- Why not PostgreSQL? (runner-up) Swapping it in lowers the stack score by 3.4 points. SQLite (+ Litestream backups) is stronger on cost at your scale (5.0 vs 4.1), low ops burden (5.0 vs 4.0); PostgreSQL is stronger on data-model fit (5.0 vs 4.0), scalability (4.0 vs 1.0); PostgreSQL takes a penalty: No free option at your scale (from ~$5/month). 1.5 of the 3.4 points come from a stack compatibility rule: A persistent volume plus Litestream/LiteFS gives backups and replicas for SQLite.
+- Why not MySQL? (popular choice) Swapping it in lowers the stack score by 3.4 points. SQLite (+ Litestream backups) is stronger on cost at your scale (5.0 vs 4.1), low ops burden (5.0 vs 4.0); MySQL is stronger on data-model fit (5.0 vs 4.0), scalability (4.0 vs 1.0); MySQL takes a penalty: No free option at your scale (from ~$5/month). 1.5 of the 3.4 points come from a stack compatibility rule: A persistent volume plus Litestream/LiteFS gives backups and replicas for SQLite.
+- Why not MongoDB? (popular choice) Swapping it in lowers the stack score by 15.6 points. SQLite (+ Litestream backups) is stronger on team skill match (4.5 vs 1.5), data-model fit (4.0 vs 2.0); MongoDB is stronger on scalability (5.0 vs 1.0), realtime fit (4.0 vs 1.0); MongoDB takes a penalty: No free option at your scale (from ~$8/month). 1.5 of the 15.6 points come from a stack compatibility rule: A persistent volume plus Litestream/LiteFS gives backups and replicas for SQLite.
 
 **Excluded by hard constraints**
 - Amazon DynamoDB: Managed-only cloud database cannot run on-premises; Poor fit for 'relational' data as the primary store (1/5); Proprietary API with the highest lock-in; you asked for low lock-in
@@ -278,7 +284,7 @@ Runs here: Server-rendered HTML + HTMX (server rendering + static files), the Py
 - On-prem Kubernetes (k3s / RKE2 / OpenShift) (stack 64.1, -23.5): Loses: A persistent volume plus Litestream/LiteFS gives backups and replicas for SQLite. Note: SQLite is a single local file; ephemeral or multi-instance platforms lose or fork it. Use a hosted SQLite service (Turso, Cloudflare D1) or a server database.
 
 **Why not the others?**
-- Why not On-prem Kubernetes (k3s / RKE2 / OpenShift)? (runner-up) Swapping it in lowers the stack score by 23.5 points. On-prem VMs + Docker Compose is stronger on learning curve (5.0 vs 1.0), cost at your scale (2.0 vs 1.0); On-prem Kubernetes (k3s / RKE2 / OpenShift) is stronger on scalability (4.0 vs 2.0); On-prem Kubernetes (k3s / RKE2 / OpenShift) takes a penalty: Usually needs a team of 5+ to operate.
+- Why not On-prem Kubernetes (k3s / RKE2 / OpenShift)? (runner-up) Swapping it in lowers the stack score by 23.5 points. On-prem VMs + Docker Compose is stronger on learning curve (5.0 vs 1.0), cost at your scale (2.0 vs 1.0); On-prem Kubernetes (k3s / RKE2 / OpenShift) is stronger on scalability (4.0 vs 2.0); On-prem Kubernetes (k3s / RKE2 / OpenShift) takes a penalty: Usually needs a team of 5+ to operate. 7.5 of the 23.5 points come from a stack compatibility rule: SQLite is a single local file; ephemeral or multi-instance platforms lose or fork it. Use a hosted SQLite service (Turso, Cloudflare D1) or a server database.
 - Why not Vercel? (popular choice) Ruled out for your answers: Public-cloud service; deployment must be on-premises.
 - Why not AWS ECS on Fargate? (popular choice) Ruled out for your answers: Public-cloud service; deployment must be on-premises.
 - Why not Render? (popular choice) Ruled out for your answers: Public-cloud service; deployment must be on-premises.

@@ -2,12 +2,12 @@
   "scenario_id": "P4",
   "engine_version": "1.0.0",
   "status": "ok",
-  "summary": "A modular monolith build: React SPA on the frontend, Java/Kotlin + Spring Boot for the backend, PostgreSQL for data, hosted on AWS ECS on Fargate. About $1,960-7,240 a month. With 8 engineer(s), one deployable with strict internal module boundaries is the fastest and cheapest to run; modules can be extracted into services later.",
+  "summary": "A modular monolith build: React SPA on the frontend, Java/Kotlin + Spring Boot for the backend, PostgreSQL for data, hosted on AWS ECS on Fargate for about $1,960-7,240 a month. It stays on AWS and keeps data in India under RBI localisation and PCI DSS, builds on the team's Java, and ships as one deployable that a team of 8 can build in 16 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
       "choice": "React SPA (Vite) + Native iOS + Android (Swift / Kotlin) for the Android/iOS app",
-      "justification": "React SPA (Vite) is the frontend for a Fintech / payments / ledger project with about 60,000 daily users (~833 requests/s at peak), built by a team of 8 in 16 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. Angular is within 0.8 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note). You also target iOS/Android. Native iOS + Android (Swift / Kotlin) scored best among mobile toolkits with the same weights and backend.",
+      "justification": "React SPA (Vite) is the frontend for a Fintech / payments / ledger project with about 60,000 daily users (~833 requests/s at peak), built by a team of 8 in 16 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. Angular is within 0.8 stack points, inside the tie margin (stacks this close count as tied); the tie went to React SPA (Vite) on lower vendor lock-in (6 vs 7, summed lock-in). You also target iOS/Android. Native iOS + Android (Swift / Kotlin) scored best among mobile toolkits with the same weights and backend.",
       "driven_by": [
         "team.languages",
         "priorities.security",
@@ -18,7 +18,7 @@
       "alternatives": [
         {
           "choice": "Angular",
-          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.8 points higher; either is defensible. React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), development speed (4.0 vs 3.0); Angular is stronger on structure for large teams (5.0 vs 2.0), team skill match (4.0 vs 3.5)."
+          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.8 points higher; the tie went to React SPA (Vite) on lower vendor lock-in (6 vs 7, summed lock-in); either is defensible. React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), development speed (4.0 vs 3.0); Angular is stronger on structure for large teams (5.0 vs 2.0), team skill match (4.0 vs 3.5)."
         },
         {
           "choice": "Next.js (React)",
@@ -40,7 +40,7 @@
     },
     "backend": {
       "choice": "Java/Kotlin + Spring Boot",
-      "justification": "Java/Kotlin + Spring Boot serves the API at about 833 requests/s at peak (Large (5,000-50,000 users online at once)) for a team of 8. It runs as a long-running Java/Kotlin service, so background jobs, WebSockets and database connection pools live in one deployable process. It leads the runner-up, Go (net/http, chi or Gin), by 3.0 stack points (points of the overall stack score, the average of the four layer scores).",
+      "justification": "Java/Kotlin + Spring Boot serves the API at about 833 requests/s at peak (Large (5,000-50,000 users online at once)) for a team of 8. The team lists Java and Kotlin, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Java/Kotlin service, so background jobs and database connection pools live in one deployable process. It leads the runner-up, Go (net/http, chi or Gin), by 3.0 stack points (points of the overall stack score, the average of the four layer scores).",
       "driven_by": [
         "priorities.security",
         "priorities.scalability",
@@ -74,8 +74,8 @@
       ]
     },
     "database": {
-      "choice": "PostgreSQL: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)",
-      "justification": "Your data is mainly relational and reaches about 500 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $800-$1,600 a month, against a total budget of $6,000 a month. MySQL is within 0.1 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).",
+      "choice": "PostgreSQL: Amazon RDS / Aurora PostgreSQL",
+      "justification": "Your data is mainly relational and reaches about 500 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $800-$1,600 a month, against a total budget of $6,000 a month. MySQL is within 0.1 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.",
       "driven_by": [
         "project.type",
         "priorities.security",
@@ -124,7 +124,7 @@
       "alternatives": [
         {
           "choice": "AWS Lambda + API Gateway",
-          "why_not": "Swapping it in lowers the stack score by 2.9 points. AWS ECS on Fargate is stronger on performance / latency (4.0 vs 3.0), portability (low lock-in) (3.0 vs 2.0); AWS Lambda + API Gateway is stronger on team skill match (3.5 vs 1.5), low ops burden (5.0 vs 3.0)."
+          "why_not": "Swapping it in lowers the stack score by 2.9 points. AWS ECS on Fargate is stronger on performance / latency (4.0 vs 3.0), portability (low lock-in) (3.0 vs 2.0); AWS Lambda + API Gateway is stronger on team skill match (3.5 vs 1.5), low ops burden (5.0 vs 3.0). A stack compatibility rule costs it 4.5 points, more than the whole gap, while on this layer's own criteria it is 1.6 points ahead: Large frameworks suffer cold starts on Lambda (SnapStart helps Java); containers on ECS/Cloud Run fit better."
         },
         {
           "choice": "Vercel",

@@ -2,7 +2,7 @@
   "scenario_id": "P2",
   "engine_version": "1.0.0",
   "status": "ok_with_warnings",
-  "summary": "A modular monolith build: Next.js on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean. About $207-851 a month. With 3 engineer(s), one deployable with strict internal module boundaries is the fastest and cheapest to run; modules can be extracted into services later.",
+  "summary": "A modular monolith build: Next.js on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $207-851 a month. It keeps data in India under DPDP, builds on the team's Python, pushes live updates, and ships as one deployable that a team of 3 can build in 8 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -40,7 +40,7 @@
     },
     "backend": {
       "choice": "Python + Django",
-      "justification": "Python + Django serves the API at about 12 requests/s at peak (Medium (500-5,000 users online at once)) for a team of 3. It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + FastAPI is within 0.1 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).",
+      "justification": "Python + Django serves the API at about 12 requests/s at peak (Medium (500-5,000 users online at once)) for a team of 3. The team lists Python, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + FastAPI is within 0.1 stack points, inside the tie margin (stacks this close count as tied); Python + Django has the higher stack score.",
       "driven_by": [
         "team.languages",
         "priorities.time_to_market",
@@ -75,7 +75,7 @@
     },
     "database": {
       "choice": "PostgreSQL: DigitalOcean Managed PostgreSQL",
-      "justification": "Your data is mainly relational and reaches about 50 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $75-$150 a month, against a total budget of $150 a month. MySQL is within 0.3 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).",
+      "justification": "Your data is mainly relational and reaches about 50 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $75-$150 a month, against a total budget of $150 a month. MySQL is within 0.3 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.",
       "driven_by": [
         "priorities.time_to_market",
         "priorities.cost",
@@ -87,7 +87,7 @@
       "alternatives": [
         {
           "choice": "MySQL",
-          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.3 points lower; either is defensible. PostgreSQL is stronger on realtime fit (3.0 vs 2.0), cost at your scale (4.2 vs 4.2)."
+          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.3 points lower; either is defensible. PostgreSQL is stronger on realtime fit (3.0 vs 2.0)."
         },
         {
           "choice": "MongoDB",
@@ -128,11 +128,11 @@
         },
         {
           "choice": "Vercel",
-          "why_not": "Swapping it in lowers the stack score by 5.1 points. DigitalOcean (App Platform + Managed DBs) is stronger on realtime fit (4.0 vs 2.0), portability (low lock-in) (4.0 vs 3.0); Vercel is stronger on learning curve (5.0 vs 4.0), performance / latency (5.0 vs 3.0)."
+          "why_not": "Swapping it in lowers the stack score by 5.1 points. DigitalOcean (App Platform + Managed DBs) is stronger on realtime fit (4.0 vs 2.0), portability (low lock-in) (4.0 vs 3.0); Vercel is stronger on learning curve (5.0 vs 4.0), performance / latency (5.0 vs 3.0). A stack compatibility rule costs it 6.2 points, more than the whole gap, while on this layer's own criteria it is 1.2 points ahead: Frontend platforms run code only as short-lived functions; this framework expects a long-running server. Host the API on a container/PaaS service instead."
         },
         {
           "choice": "AWS ECS on Fargate",
-          "why_not": "Swapping it in lowers the stack score by 5.5 points. DigitalOcean (App Platform + Managed DBs) is stronger on team skill match (3.5 vs 1.5), low ops burden (5.0 vs 3.0); AWS ECS on Fargate is stronger on ecosystem maturity (5.0 vs 4.0), scalability (5.0 vs 4.0)."
+          "why_not": "Swapping it in lowers the stack score by 5.5 points. DigitalOcean (App Platform + Managed DBs) is stronger on team skill match (3.5 vs 1.5), low ops burden (5.0 vs 3.0); AWS ECS on Fargate is stronger on ecosystem maturity (5.0 vs 4.0), scalability (5.0 vs 4.0). 1.0 of the 5.5 points come from a stack compatibility rule: Git-push deploys with managed database add-ons are the shortest path to production for a monolith."
         },
         {
           "choice": "Netlify",

@@ -101,6 +101,12 @@ React Native (Expo) is the app for a Social network / UGC feed project with abou
 - Astro: Web-only framework; you target iOS/Android only
 - Server-rendered HTML + HTMX: Web-only framework; you target iOS/Android only
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: Firebase (BaaS on Google Cloud) (96.2)
 
@@ -158,9 +164,9 @@ Firebase (BaaS on Google Cloud) serves the API at about 1,389 requests/s at peak
 - Node.js + NestJS (stack 76.1, -12.1): Loses: Firebase SDKs give Firestore realtime listeners, offline cache and security rules end-to-end. Note: Firestore outside Google Cloud adds cross-cloud latency and egress costs.
 
 **Why not the others?**
-- Why not Node.js + Express? (runner-up) Swapping it in lowers the stack score by 11.5 points. Firebase (BaaS on Google Cloud) is stronger on realtime fit (5.0 vs 4.0), scalability (5.0 vs 4.0); Node.js + Express is stronger on cost at your scale (5.0 vs 3.4), team skill match (5.0 vs 4.5).
-- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 25.4 points. Firebase (BaaS on Google Cloud) is stronger on realtime fit (5.0 vs 2.0), team skill match (4.5 vs 1.5); Python + Django is stronger on cost at your scale (5.0 vs 3.4), structure for large teams (4.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn.
-- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 41.8 points. Firebase (BaaS on Google Cloud) is stronger on team skill match (4.5 vs 1.5), realtime fit (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on cost at your scale (5.0 vs 3.4), structure for large teams (5.0 vs 1.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
+- Why not Node.js + Express? (runner-up) Swapping it in lowers the stack score by 11.5 points. Firebase (BaaS on Google Cloud) is stronger on realtime fit (5.0 vs 4.0), scalability (5.0 vs 4.0); Node.js + Express is stronger on cost at your scale (5.0 vs 3.4), team skill match (5.0 vs 4.5). 7.5 of the 11.5 points come from a stack compatibility rule: Firestore outside Google Cloud adds cross-cloud latency and egress costs.
+- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 25.4 points. Firebase (BaaS on Google Cloud) is stronger on realtime fit (5.0 vs 2.0), team skill match (4.5 vs 1.5); Python + Django is stronger on cost at your scale (5.0 vs 3.4), structure for large teams (4.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn. 15.0 of the 25.4 points come from a stack compatibility rule: Frontend platforms run code only as short-lived functions; this framework expects a long-running server. Host the API on a container/PaaS service instead.
+- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 41.8 points. Firebase (BaaS on Google Cloud) is stronger on team skill match (4.5 vs 1.5), realtime fit (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on cost at your scale (5.0 vs 3.4), structure for large teams (5.0 vs 1.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn. 31.5 of the 41.8 points come from a stack compatibility rule: Cloudflare Workers run JavaScript, TypeScript, Python and Rust; other languages, Go among them, run only compiled to WebAssembly, so a Go (net/http, chi or Gin), Java, .NET, PHP, Elixir or Ruby server needs Cloudflare Containers instead, a separate product on the Workers Paid plan without autoscaling yet.
 
 **Excluded by hard constraints**
 - No server code (static site): Only for read-only sites; your users sign in, post or pay
@@ -219,9 +225,9 @@ Suggested offering: Included with Firebase (BaaS on Google Cloud)
 - MongoDB (stack 71.3, -16.9): Loses: Firebase SDKs give Firestore realtime listeners, offline cache and security rules end-to-end. Note: Firebase is designed around Firestore/Realtime Database; pairing it with another primary DB needs a separate server tier.
 
 **Why not the others?**
-- Why not MongoDB? (runner-up) Swapping it in lowers the stack score by 16.9 points. Cloud Firestore is stronger on offline support (5.0 vs 2.0), realtime fit (5.0 vs 4.0); MongoDB is stronger on ecosystem maturity (5.0 vs 4.0), portability (low lock-in) (4.0 vs 1.0).
-- Why not PostgreSQL? (popular choice) Swapping it in lowers the stack score by 21.6 points. Cloud Firestore is stronger on offline support (5.0 vs 1.0), team skill match (4.5 vs 1.5); PostgreSQL is stronger on ecosystem maturity (5.0 vs 4.0), hiring pool (5.0 vs 3.0).
-- Why not MySQL? (popular choice) Swapping it in lowers the stack score by 26.6 points. Cloud Firestore is stronger on offline support (5.0 vs 1.0), realtime fit (5.0 vs 2.0); MySQL is stronger on ecosystem maturity (5.0 vs 4.0), hiring pool (5.0 vs 3.0); MySQL takes a penalty: Only 3/5 fit for your primary 'document' data.
+- Why not MongoDB? (runner-up) Swapping it in lowers the stack score by 16.9 points. Cloud Firestore is stronger on offline support (5.0 vs 2.0), realtime fit (5.0 vs 4.0); MongoDB is stronger on ecosystem maturity (5.0 vs 4.0), portability (low lock-in) (4.0 vs 1.0). 13.5 of the 16.9 points come from a stack compatibility rule: Firebase is designed around Firestore/Realtime Database; pairing it with another primary DB needs a separate server tier.
+- Why not PostgreSQL? (popular choice) Swapping it in lowers the stack score by 21.6 points. Cloud Firestore is stronger on offline support (5.0 vs 1.0), team skill match (4.5 vs 1.5); PostgreSQL is stronger on ecosystem maturity (5.0 vs 4.0), hiring pool (5.0 vs 3.0). 14.0 of the 21.6 points come from a stack compatibility rule: Firebase is designed around Firestore/Realtime Database; pairing it with another primary DB needs a separate server tier.
+- Why not MySQL? (popular choice) Swapping it in lowers the stack score by 26.6 points. Cloud Firestore is stronger on offline support (5.0 vs 1.0), realtime fit (5.0 vs 2.0); MySQL is stronger on ecosystem maturity (5.0 vs 4.0), hiring pool (5.0 vs 3.0); MySQL takes a penalty: Only 3/5 fit for your primary 'document' data. 14.0 of the 26.6 points come from a stack compatibility rule: Firebase is designed around Firestore/Realtime Database; pairing it with another primary DB needs a separate server tier.
 
 **Excluded by hard constraints**
 - Redis / Valkey: Poor fit for 'document' data as the primary store (2/5); In-memory store: ~290 GB within 12 months cannot sensibly live in RAM as the system of record (use it as a cache); In-memory store: with the default append-only-file setting (fsync every second) a crash loses up to the last second of writes, and snapshots alone lose minutes; it holds key-value data but not tables of records: your document, graph data needs a durable general-purpose primary store, with Redis / Valkey beside it as a supporting store

@@ -99,12 +99,18 @@ React SPA (Vite) is the frontend for an IoT / telemetry ingestion project with a
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: Go (net/http, chi or Gin) (92.9)
 
 Compiled, statically typed language with built-in concurrency; ships as a single static binary.
 
-Go (net/http, chi or Gin) serves the API at about 4,000 requests/s at peak (Large (500-5,000 req/s at peak)) for a team of 6. It runs as a long-running Go service, so background jobs, WebSockets and database connection pools live in one deployable process. It leads the runner-up, Python + FastAPI, by 2.0 stack points.
+Go (net/http, chi or Gin) serves the API at about 4,000 requests/s at peak (Large (500-5,000 req/s at peak)) for a team of 6. The team lists Go, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Go service, so background jobs, WebSockets and database connection pools live in one deployable process. It leads the runner-up, Python + FastAPI, by 2.0 stack points.
 
 **Why**
 - Scalability: 5.0/5 vs 4.3 average for this layer - weighted up because: Large (500-5,000 req/s at peak); Continuous device ingestion.
@@ -277,7 +283,7 @@ Runs here: the Go API as long-running processes. React SPA is built to static fi
 
 **Why not the others?**
 - Why not Fly.io? (runner-up) Swapping it in lowers the stack score by 3.1 points. AWS ECS on Fargate is stronger on scalability (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Fly.io is stronger on low ops burden (4.0 vs 3.0), realtime fit (5.0 vs 4.0).
-- Why not Vercel? (popular choice) Swapping it in lowers the stack score by 7.8 points. AWS ECS on Fargate is stronger on team skill match (5.0 vs 1.5), realtime fit (4.0 vs 2.0); Vercel is stronger on low ops burden (5.0 vs 3.0), performance / latency (5.0 vs 4.0).
+- Why not Vercel? (popular choice) Swapping it in lowers the stack score by 7.8 points. AWS ECS on Fargate is stronger on team skill match (5.0 vs 1.5), realtime fit (4.0 vs 2.0); Vercel is stronger on low ops burden (5.0 vs 3.0), performance / latency (5.0 vs 4.0). 1.5 of the 7.8 points come from a stack compatibility rule: This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets.
 - Why not Render? (popular choice) Swapping it in lowers the stack score by 4.9 points. AWS ECS on Fargate is stronger on scalability (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Render is stronger on low ops burden (5.0 vs 3.0), portability (low lock-in) (4.0 vs 3.0).
 
 **Excluded by hard constraints**

@@ -97,12 +97,18 @@ Next.js (React) is the frontend for an E-commerce / marketplace project with abo
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: Java/Kotlin + Spring Boot (97.1)
 
 Enterprise JVM framework: DI, Spring Data, Spring Security, transactions, observability.
 
-Java/Kotlin + Spring Boot serves the API at about 25,000 requests/s at peak (Very large (1M-10M daily users)) for a team of 25. It runs as a few long-running Java/Kotlin services, one per team, each deployed on its own with its own background jobs, WebSockets and database connection pool. It leads the runner-up, Node.js + NestJS, by 3.9 stack points.
+Java/Kotlin + Spring Boot serves the API at about 25,000 requests/s at peak (Very large (1M-10M daily users)) for a team of 25. The team lists Java and Spring, so it needs no new server language (team skill match 5.0/5). It runs as a few long-running Java/Kotlin services, one per team, each deployed on its own with its own background jobs, WebSockets and database connection pools. It leads the runner-up, Node.js + NestJS, by 3.9 stack points.
 
 **Why**
 - Structure for large teams: 5.0/5 vs 3.2 average for this layer - weighted up because: 25 engineers need enforced conventions.
@@ -161,7 +167,7 @@ Java/Kotlin + Spring Boot serves the API at about 25,000 requests/s at peak (Ver
 
 Widely deployed relational database; horizontally shardable with Vitess.
 
-Your data is mainly relational and reaches about 1,520 GB within 12 months; MySQL fits relational data 5/5. You need strong consistency, and MySQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹576,000 a month, against a total budget of ₹2,500,000 a month. PostgreSQL is within 0.3 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+Your data is mainly relational and reaches about 1,520 GB within 12 months; MySQL fits relational data 5/5. You need strong consistency, and MySQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹576,000 a month, against a total budget of ₹2,500,000 a month. PostgreSQL is within 0.3 stack points, inside the tie margin (stacks this close count as tied); the tie went to MySQL on adjacent team skills (19.5 vs 19, summed skill fit).
 
 Suggested offering: Amazon RDS / Aurora MySQL
 
@@ -209,7 +215,7 @@ Suggested offering: Amazon RDS / Aurora MySQL
 - Microsoft SQL Server (stack 92.6, -1.0): Scores 81.1 on its own; its stack is 1.0 stack points behind the pick.
 
 **Why not the others?**
-- Why not PostgreSQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.3 points higher; either is defensible. MySQL is stronger on team skill match (5.0 vs 4.5); PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0).
+- Why not PostgreSQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.3 points higher; the tie went to MySQL on adjacent team skills (19.5 vs 19, summed skill fit); either is defensible. MySQL is stronger on team skill match (5.0 vs 4.5); PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0).
 - Why not MongoDB? (popular choice) Swapping it in lowers the stack score by 6.2 points. MySQL is stronger on data-model fit (4.3 vs 3.0), team skill match (5.0 vs 3.5); MongoDB is stronger on scalability (5.0 vs 4.0), realtime fit (4.0 vs 2.0); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data.
 
 **Excluded by hard constraints**
@@ -279,7 +285,7 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 - Azure App Service / Container Apps (stack 88.8, -4.9): Loses: Kubernetes earns its complexity when running many independently deployed services.
 
 **Why not the others?**
-- Why not AWS ECS on Fargate? (runner-up) Swapping it in lowers the stack score by 1.5 points. AWS EKS (Kubernetes) is stronger on portability (low lock-in) (4.0 vs 3.0); AWS ECS on Fargate is stronger on low ops burden (3.0 vs 1.0).
+- Why not AWS ECS on Fargate? (runner-up) Swapping it in lowers the stack score by 1.5 points. AWS EKS (Kubernetes) is stronger on portability (low lock-in) (4.0 vs 3.0); AWS ECS on Fargate is stronger on low ops burden (3.0 vs 1.0). 1.5 of the 1.5 points come from a stack compatibility rule: Kubernetes earns its complexity when running many independently deployed services.
 - Why not Vercel? (popular choice) Ruled out for your answers: No published SLA, so nothing backs your 99.95% availability target.
 - Why not Render? (popular choice) Ruled out for your answers: No PCI-DSS attestation published.
 
@@ -340,6 +346,8 @@ About ₹1,036,800-₹5,472,000 per month. Budget status: **stretch**. Planning 
 
 - **A solo developer**: hosting: AWS EKS (Kubernetes) -> AWS ECS on Fargate
   - Why hosting changes: AWS EKS (Kubernetes) now takes a penalty (Usually needs a team of 4+ to operate), moving the gap 14.0 points toward AWS ECS on Fargate; low ops burden moved the gap 4.6 points toward AWS ECS on Fargate (AWS ECS on Fargate 3.0/5 vs AWS EKS (Kubernetes) 1.0/5, weight 1.0 -> 3.5).
+- **4-week deadline**: frontend: Next.js (React) -> React Native (Expo)
+  - Why frontend changes: Next.js (React) is now ruled out: Does not build android, ios: the timeline leaves room for one codebase that builds every platform.
 - **Must run on-premises**: hosting: AWS EKS (Kubernetes) -> On-prem Kubernetes (k3s / RKE2 / OpenShift)
   - Why hosting changes: AWS EKS (Kubernetes) is now ruled out: Public-cloud service; deployment must be on-premises.
 - **Team has no relevant prior skills**: database: MySQL -> PostgreSQL

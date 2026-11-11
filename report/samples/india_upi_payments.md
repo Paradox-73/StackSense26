@@ -99,12 +99,18 @@ Native iOS + Android (Swift / Kotlin) is the app for a Fintech / payments / ledg
 - Astro: Web-only framework; you target iOS/Android only
 - Server-rendered HTML + HTMX: Web-only framework; you target iOS/Android only
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: Java/Kotlin + Spring Boot (95.9)
 
 Enterprise JVM framework: DI, Spring Data, Spring Security, transactions, observability.
 
-Java/Kotlin + Spring Boot serves the API at about 2,315 requests/s at peak (Large (100k-1M daily users)) for a team of 12. It runs as a long-running Java/Kotlin service, so background jobs, WebSockets and database connection pools live in one deployable process. It leads the runner-up, Node.js + NestJS, by 5.4 stack points.
+Java/Kotlin + Spring Boot serves the API at about 2,315 requests/s at peak (Large (100k-1M daily users)) for a team of 12. The team lists Java and Kotlin and Spring, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Java/Kotlin service, so background jobs, WebSockets and database connection pools live in one deployable process. It leads the runner-up, Node.js + NestJS, by 5.4 stack points.
 
 **Why**
 - Structure for large teams: 5.0/5 vs 3.2 average for this layer - weighted up because: 12 engineers need enforced conventions.
@@ -162,7 +168,7 @@ Java/Kotlin + Spring Boot serves the API at about 2,315 requests/s at peak (Larg
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 1,460 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹576,000 a month, against a total budget of ₹1,500,000 a month. MySQL is within 0.7 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+Your data is mainly relational and reaches about 1,460 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹576,000 a month, against a total budget of ₹1,500,000 a month. MySQL is within 0.7 stack points, inside the tie margin (stacks this close count as tied); the tie went to PostgreSQL on adjacent team skills (19.5 vs 19, summed skill fit).
 
 Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
@@ -228,7 +234,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 Managed Kubernetes control plane on AWS.
 
-AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes with WebSockets, sized for ~2,315 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is ₹134,400-₹480,000 a month, against a total budget of ₹1,500,000 a month. AWS ECS on Fargate is within less than 0.05 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes with WebSockets, sized for ~2,315 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is ₹134,400-₹480,000 a month, against a total budget of ₹1,500,000 a month. AWS ECS on Fargate is within less than 0.05 stack points, inside the tie margin (stacks this close count as tied); the tie went to AWS EKS (Kubernetes) on lower vendor lock-in (5 vs 6, summed lock-in).
 
 Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The database runs as a separate managed service (see Database).
 

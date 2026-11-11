@@ -42,7 +42,7 @@ Availability approach: The CDN serves the pre-built pages from many locations; t
 
 React meta-framework with server rendering, static generation, React Server Components and file-based routing.
 
-Next.js (React) is the frontend for a Content / blog / marketing (SEO) project with about 20,000 daily users (~5.6 requests/s at peak), built by a solo developer in 4 weeks. Search visibility is marked critical (organic traffic is the business), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. Astro is within 0.5 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+Next.js (React) is the frontend for a Content / blog / marketing (SEO) project with about 20,000 daily users (~5.6 requests/s at peak), built by a solo developer in 4 weeks. Search visibility is marked critical (organic traffic is the business), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. Astro is within 0.5 stack points, inside the tie margin (stacks this close count as tied); the tie went to Next.js (React) on team skill match (3 vs 2, layers the team already uses).
 
 **Why**
 - Development speed: 5.0/5 vs 4.0 average for this layer - weighted up because: 4-week MVP: speed dominates.
@@ -95,6 +95,12 @@ Next.js (React) is the frontend for a Content / blog / marketing (SEO) project w
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: No server code (static site) (100.0)
 
@@ -147,9 +153,9 @@ The site serves about 20,000 daily users read-only, so the pages are built once 
 
 **Why not the others?**
 - Why not Serverless functions (Node/Python FaaS)? (runner-up) Swapping it in lowers the stack score by 3.0 points. No server code (static site) is stronger on performance / latency (5.0 vs 3.0), team skill match (4.5 vs 3.5).
-- Why not Node.js + Express? (popular choice) Swapping it in lowers the stack score by 7.6 points. No server code (static site) is stronger on performance / latency (5.0 vs 3.0), low ops burden (5.0 vs 4.0); Node.js + Express is stronger on realtime fit (4.0 vs 1.0).
-- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 42.4 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), performance / latency (5.0 vs 3.0); Python + Django is stronger on structure for large teams (4.0 vs 3.0), realtime fit (2.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn.
-- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 39.2 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 2.0); Java/Kotlin + Spring Boot is stronger on structure for large teams (5.0 vs 3.0), realtime fit (3.0 vs 1.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
+- Why not Node.js + Express? (popular choice) Swapping it in lowers the stack score by 7.6 points. No server code (static site) is stronger on performance / latency (5.0 vs 3.0), low ops burden (5.0 vs 4.0); Node.js + Express is stronger on realtime fit (4.0 vs 1.0). 3.5 of the 7.6 points come from a stack compatibility rule: This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets.
+- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 42.4 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), performance / latency (5.0 vs 3.0); Python + Django is stronger on structure for large teams (4.0 vs 3.0), realtime fit (2.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn. 33.5 of the 42.4 points come from a stack compatibility rule: Netlify Functions run TypeScript and JavaScript; Go runs only in the deprecated Lambda-compatible mode, which accepts no deploys after 1 July 2027, and no other language runs there, so this API cannot run on Netlify. Host it on a container or PaaS service.
+- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 39.2 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 2.0); Java/Kotlin + Spring Boot is stronger on structure for large teams (5.0 vs 3.0), realtime fit (3.0 vs 1.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn. 27.5 of the 39.2 points come from a stack compatibility rule: Netlify Functions run TypeScript and JavaScript; Go runs only in the deprecated Lambda-compatible mode, which accepts no deploys after 1 July 2027, and no other language runs there, so this API cannot run on Netlify. Host it on a container or PaaS service.
 
 ### Database: No database (content files in git) (91.9)
 
@@ -201,9 +207,9 @@ Suggested offering: Content files in the git repository, built into static pages
 - Cloud Firestore (stack 83.0, -10.1): Note: Firestore outside Google Cloud adds cross-cloud latency and egress costs.
 
 **Why not the others?**
-- Why not MongoDB? (runner-up) Swapping it in lowers the stack score by 8.5 points. No database (content files in git) is stronger on cost at your scale (5.0 vs 3.1), team skill match (4.5 vs 3.5); MongoDB is stronger on data-model fit (5.0 vs 4.0), realtime fit (4.0 vs 1.0).
-- Why not PostgreSQL? (popular choice) Swapping it in lowers the stack score by 11.9 points. No database (content files in git) is stronger on team skill match (4.5 vs 1.5), cost at your scale (5.0 vs 3.3); PostgreSQL is stronger on realtime fit (3.0 vs 1.0).
-- Why not MySQL? (popular choice) Swapping it in lowers the stack score by 16.7 points. No database (content files in git) is stronger on team skill match (4.5 vs 1.5), cost at your scale (5.0 vs 3.3); MySQL is stronger on realtime fit (2.0 vs 1.0); MySQL takes a penalty: Only 3/5 fit for your primary 'document' data.
+- Why not MongoDB? (runner-up) Swapping it in lowers the stack score by 8.5 points. No database (content files in git) is stronger on cost at your scale (5.0 vs 3.1), team skill match (4.5 vs 3.5); MongoDB is stronger on data-model fit (5.0 vs 4.0), realtime fit (4.0 vs 1.0). 5.0 of the 8.5 points come from a stack compatibility rule: With no server code, nothing can query a database at request time; a static site reads content files at build time.
+- Why not PostgreSQL? (popular choice) Swapping it in lowers the stack score by 11.9 points. No database (content files in git) is stronger on team skill match (4.5 vs 1.5), cost at your scale (5.0 vs 3.3); PostgreSQL is stronger on realtime fit (3.0 vs 1.0). 5.5 of the 11.9 points come from a stack compatibility rule: With no server code, nothing can query a database at request time; a static site reads content files at build time.
+- Why not MySQL? (popular choice) Swapping it in lowers the stack score by 16.7 points. No database (content files in git) is stronger on team skill match (4.5 vs 1.5), cost at your scale (5.0 vs 3.3); MySQL is stronger on realtime fit (2.0 vs 1.0); MySQL takes a penalty: Only 3/5 fit for your primary 'document' data. 5.5 of the 16.7 points come from a stack compatibility rule: With no server code, nothing can query a database at request time; a static site reads content files at build time.
 
 **Excluded by hard constraints**
 - Redis / Valkey: In-memory store: with the default append-only-file setting (fsync every second) a crash loses up to the last second of writes, and snapshots alone lose minutes; it holds key-value data but not tables of records: your document data needs a durable general-purpose primary store, with Redis / Valkey beside it as a supporting store
@@ -262,7 +268,7 @@ Runs here: Next.js as pre-built static pages. No server code and no database: co
 **Why not the others?**
 - Why not Cloudflare Pages + Workers? (runner-up) Swapping it in lowers the stack score by 1.2 points. Netlify is stronger on learning curve (5.0 vs 4.0); Cloudflare Pages + Workers is stronger on team skill match (4.0 vs 3.5), realtime fit (3.0 vs 1.0).
 - Why not Vercel? (popular choice) Swapping it in lowers the stack score by 3.7 points. Netlify is stronger on cost at your scale (5.0 vs 1.8); Vercel is stronger on team skill match (4.0 vs 3.5), realtime fit (2.0 vs 1.0); Vercel takes a penalty: Minimum ~$40/month is 2.0x the whole budget.
-- Why not AWS ECS on Fargate? (popular choice) Swapping it in lowers the stack score by 17.3 points. Netlify is stronger on cost at your scale (5.0 vs 1.4), team skill match (3.5 vs 1.5); AWS ECS on Fargate is stronger on ecosystem maturity (5.0 vs 4.0), realtime fit (4.0 vs 1.0); AWS ECS on Fargate takes a penalty: Usually needs a team of 2+ to operate.
+- Why not AWS ECS on Fargate? (popular choice) Swapping it in lowers the stack score by 17.3 points. Netlify is stronger on cost at your scale (5.0 vs 1.4), team skill match (3.5 vs 1.5); AWS ECS on Fargate is stronger on ecosystem maturity (5.0 vs 4.0), realtime fit (4.0 vs 1.0); AWS ECS on Fargate takes a penalty: Usually needs a team of 2+ to operate. 2.0 of the 17.3 points come from a stack compatibility rule: Pre-built pages need only a static file host and its CDN; serving them from containers, functions or a server means building and patching a web-server image and paying for instances to hand out files.
 - Why not Render? (popular choice) Swapping it in lowers the stack score by 10.9 points. Netlify is stronger on cost at your scale (5.0 vs 1.8), team skill match (3.5 vs 1.5); Render is stronger on realtime fit (4.0 vs 1.0), portability (low lock-in) (4.0 vs 3.0); Render takes a penalty: Minimum ~$50/month is 2.5x the whole budget.
 
 **Excluded by hard constraints**

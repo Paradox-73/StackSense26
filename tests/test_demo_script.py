@@ -252,7 +252,7 @@ def test_evidence_numbers_match_the_files_and_the_benchmark():
     assert "38 of 40 picks are acceptable: 95 percent" in say and "96 percent" in say and "ten held-out briefs" in say
     assert round(100 * held[0] / held[1]) == 95 and round(100 * allr[0] / allr[1]) == 96
     assert "all 29/40 = 72% 38/40 = 95%" in SCRIPT and "154/160 = 96%" in SCRIPT
-    assert sr["held_out"]["all"]["top1"] == (29, 40) and sr["all"]["all"]["top1"] == (128, 158)
+    assert sr["held_out"]["all"]["top1"] == (29, 40) and sr["all"]["all"]["top1"] == (129, 158)
 
 
 def test_shot_times_are_continuous_and_inside_the_limits():

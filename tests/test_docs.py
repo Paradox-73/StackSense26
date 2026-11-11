@@ -82,7 +82,7 @@ def test_stale_benchmark_sentences_in_the_readme_would_be_caught(facts):
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     stale = re.sub(r"acceptable \(\d+ of all", "acceptable (152 of all", text, count=1)
     stale = re.sub(r"breaks a hard requirement in \d+ of", "breaks a hard requirement in 6 of", stale, count=1)
-    stale = re.sub(r"on 160, against the engine's 81% and \d+%", "on 160, against the engine's 81% and 95%", stale, count=1)
+    stale = re.sub(r"on 160, against the engine's (\d+)% and \d+%", r"on 160, against the engine's \1% and 95%", stale, count=1)
     assert stale != text
     tmp = ROOT / "report" / "_stale_readme_bench.md"
     original = build_report.DOCS

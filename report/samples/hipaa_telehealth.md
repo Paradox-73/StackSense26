@@ -95,12 +95,18 @@ React SPA (Vite) is the frontend for a Healthcare / telehealth project with abou
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: Python + Django (88.6)
 
 Batteries-included Python web framework: ORM, migrations, admin, auth, forms, templates.
 
-Python + Django serves the API at about 69 requests/s at peak (Medium (10k-100k daily users)) for a team of 5. It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + FastAPI is within 0.6 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+Python + Django serves the API at about 69 requests/s at peak (Medium (10k-100k daily users)) for a team of 5. The team lists Python, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + FastAPI is within 0.6 stack points, inside the tie margin (stacks this close count as tied); Python + Django has the higher stack score.
 
 **Why**
 - Ecosystem maturity: 5.0/5 vs 4.4 average for this layer - weighted up because: Clinical systems favour proven tech; 99.95% target.
@@ -161,7 +167,7 @@ Python + Django serves the API at about 69 requests/s at peak (Medium (10k-100k 
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 280 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $100-$800 a month, against a total budget of $3,000 a month. MySQL is within 0.8 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+Your data is mainly relational and reaches about 280 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $100-$800 a month, against a total budget of $3,000 a month. MySQL is within 0.8 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
 
 Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
@@ -324,6 +330,8 @@ About ₹35,520-₹174,240 per month. Budget status: **within**. Planning estima
 
 ## What would change the recommendation
 
+- **4-week deadline**: frontend: React SPA (Vite) -> React Native (Expo)
+  - Why frontend changes: React SPA (Vite) is now ruled out: Does not build android, ios: the timeline leaves room for one codebase that builds every platform.
 - **Realtime becomes core**: backend: Python + Django -> Python + FastAPI
   - Why backend changes: Realtime fit moved the gap 2.5 points toward Python + FastAPI (Python + FastAPI 3.0/5 vs Python + Django 2.0/5, weight 1.2 -> 3.2).
 - **SEO becomes critical**: frontend: React SPA (Vite) -> Next.js (React)

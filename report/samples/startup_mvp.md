@@ -42,7 +42,7 @@ Availability approach: Supabase runs the backend on a paid plan; turn on point-i
 
 React meta-framework with server rendering, static generation, React Server Components and file-based routing.
 
-Next.js (React) is the frontend for a B2B / B2C SaaS project with about 500 daily users (~4.3 requests/s at peak), built by a team of 2 in 8 weeks. Search visibility is marked important (landing/product pages), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. React SPA (Vite) is within 0.4 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+Next.js (React) is the frontend for a B2B / B2C SaaS project with about 500 daily users (~4.3 requests/s at peak), built by a team of 2 in 8 weeks. Search visibility is marked important (landing/product pages), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. React SPA (Vite) is within 0.4 stack points, inside the tie margin (stacks this close count as tied); the tie went to Next.js (React) on your most important inputs (SEO need: 2.7 vs 0.7 stack points, the heaviest answer on which they differ).
 
 **Why**
 - Development speed: 5.0/5 vs 4.0 average for this layer - weighted up because: 8-week MVP.
@@ -97,6 +97,12 @@ Next.js (React) is the frontend for a B2B / B2C SaaS project with about 500 dail
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: Supabase (BaaS on Postgres) (79.9)
 
@@ -149,9 +155,9 @@ Supabase (BaaS on Postgres) serves the API at about 4.3 requests/s at peak (Hobb
 
 **Why not the others?**
 - Why not Serverless functions (Node/Python FaaS)? (runner-up) Swapping it in lowers the stack score by 1.0 points. Supabase (BaaS on Postgres) is stronger on realtime fit (4.0 vs 1.0), development speed (5.0 vs 4.0); Serverless functions (Node/Python FaaS) is stronger on team skill match (3.5 vs 3.0), hiring pool (4.0 vs 3.0).
-- Why not Node.js + Express? (highest score in this layer) Swapping it in lowers the stack score by 1.5 points. Supabase (BaaS on Postgres) is stronger on low ops burden (5.0 vs 4.0), development speed (5.0 vs 4.0); Node.js + Express is stronger on team skill match (4.5 vs 3.0), ecosystem maturity (5.0 vs 4.0).
-- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 12.8 points. Supabase (BaaS on Postgres) is stronger on team skill match (3.0 vs 1.5), low ops burden (5.0 vs 4.0); Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn.
-- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 33.9 points. Supabase (BaaS on Postgres) is stronger on team skill match (3.0 vs 1.5), low ops burden (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on ecosystem maturity (5.0 vs 4.0), hiring pool (5.0 vs 3.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
+- Why not Node.js + Express? (highest score in this layer) Swapping it in lowers the stack score by 1.5 points. Supabase (BaaS on Postgres) is stronger on low ops burden (5.0 vs 4.0), development speed (5.0 vs 4.0); Node.js + Express is stronger on team skill match (4.5 vs 3.0), ecosystem maturity (5.0 vs 4.0). A stack compatibility rule costs it 2.5 points, more than the whole gap, while on this layer's own criteria it is 1.0 points ahead: This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets.
+- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 12.8 points. Supabase (BaaS on Postgres) is stronger on team skill match (3.0 vs 1.5), low ops burden (5.0 vs 4.0); Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn. 7.5 of the 12.8 points come from a stack compatibility rule: Frontend platforms run code only as short-lived functions; this framework expects a long-running server. Host the API on a container/PaaS service instead.
+- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 33.9 points. Supabase (BaaS on Postgres) is stronger on team skill match (3.0 vs 1.5), low ops burden (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on ecosystem maturity (5.0 vs 4.0), hiring pool (5.0 vs 3.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn. 26.5 of the 33.9 points come from a stack compatibility rule: Cloudflare Workers run JavaScript, TypeScript, Python and Rust; other languages, Go among them, run only compiled to WebAssembly, so a Go (net/http, chi or Gin), Java, .NET, PHP, Elixir or Ruby server needs Cloudflare Containers instead, a separate product on the Workers Paid plan without autoscaling yet.
 
 **Excluded by hard constraints**
 - No server code (static site): Only for read-only sites; your users sign in, post or pay
@@ -208,8 +214,8 @@ Suggested offering: Included with Supabase (BaaS on Postgres)
 - Microsoft SQL Server (stack 70.2, -14.8): Loses: Supabase is a managed Postgres: auth, row-level security, storage and realtime come with the database. Note: Supabase's value comes from its bundled Postgres; a different primary database removes most of its benefits.
 
 **Why not the others?**
-- Why not MySQL? (runner-up) Swapping it in lowers the stack score by 13.8 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0).
-- Why not MongoDB? (popular choice) Swapping it in lowers the stack score by 23.4 points. PostgreSQL is stronger on data-model fit (5.0 vs 2.0), consistency fit (5.0 vs 3.5); MongoDB is stronger on realtime fit (4.0 vs 3.0), scalability (5.0 vs 4.0); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data.
+- Why not MySQL? (runner-up) Swapping it in lowers the stack score by 13.8 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0). 13.5 of the 13.8 points come from a stack compatibility rule: Supabase's value comes from its bundled Postgres; a different primary database removes most of its benefits.
+- Why not MongoDB? (popular choice) Swapping it in lowers the stack score by 23.4 points. PostgreSQL is stronger on data-model fit (5.0 vs 2.0), consistency fit (5.0 vs 3.5); MongoDB is stronger on realtime fit (4.0 vs 3.0), scalability (5.0 vs 4.0); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data. 13.5 of the 23.4 points come from a stack compatibility rule: Supabase's value comes from its bundled Postgres; a different primary database removes most of its benefits.
 
 **Excluded by hard constraints**
 - Amazon DynamoDB: Poor fit for 'relational' data as the primary store (1/5)
@@ -275,7 +281,7 @@ Runs here: Next.js (server rendering + static files). Supabase runs the API, aut
 - Netlify (stack 85.0, -0.1): Scores 80.0 on its own; its stack is 0.1 stack points behind the pick.
 
 **Why not the others?**
-- Why not Vercel? (runner-up) Swapped into this stack it scores 1.8 points higher, but the pick was kept by the whole-stack choice (see the tie-break note). Cloudflare Pages + Workers is stronger on cost at your scale (5.0 vs 4.4), realtime fit (3.0 vs 2.0); Vercel is stronger on learning curve (5.0 vs 4.0).
+- Why not Vercel? (runner-up) Swapped into this stack it scores 1.8 points higher, but Cloudflare Pages + Workers stays as part of the stack chosen by the budget rule (a stack whose minimum bill fits your budget is preferred when it scores only a few points lower). Cloudflare Pages + Workers is stronger on cost at your scale (5.0 vs 4.4), realtime fit (3.0 vs 2.0); Vercel is stronger on learning curve (5.0 vs 4.0).
 - Why not AWS ECS on Fargate? (popular choice) Swapping it in lowers the stack score by 5.3 points. Cloudflare Pages + Workers is stronger on team skill match (4.0 vs 1.5), low ops burden (5.0 vs 3.0); AWS ECS on Fargate is stronger on ecosystem maturity (5.0 vs 4.0), realtime fit (4.0 vs 3.0).
 - Why not Render? (popular choice) Swapping it in lowers the stack score by 2.9 points. Cloudflare Pages + Workers is stronger on team skill match (4.0 vs 1.5), performance / latency (5.0 vs 3.0); Render is stronger on learning curve (5.0 vs 4.0), realtime fit (4.0 vs 3.0).
 

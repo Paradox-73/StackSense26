@@ -98,12 +98,18 @@ React SPA (Vite) is the frontend for a Realtime chat / collaboration / multiplay
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: Go (net/http, chi or Gin) (94.0)
 
 Compiled, statically typed language with built-in concurrency; ships as a single static binary.
 
-Go (net/http, chi or Gin) serves the API at about 3,472 requests/s at peak (Large (100k-1M daily users)) for a team of 4. It runs as a long-running Go service, so background jobs, WebSockets and database connection pools live in one deployable process. Realtime is core, and it scores 4.0/5 on realtime fit. It leads the runner-up, Node.js + Express, by 5.2 stack points.
+Go (net/http, chi or Gin) serves the API at about 3,472 requests/s at peak (Large (100k-1M daily users)) for a team of 4. The team lists Go, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Go service, so background jobs, WebSockets and database connection pools live in one deployable process. Realtime is core, and it scores 4.0/5 on realtime fit. It leads the runner-up, Node.js + Express, by 5.2 stack points.
 
 **Why**
 - Performance / latency: 5.0/5 vs 3.7 average for this layer - weighted up because: p95 target 50 ms; Large (100k-1M daily users).
@@ -151,9 +157,9 @@ Go (net/http, chi or Gin) serves the API at about 3,472 requests/s at peak (Larg
 - Node.js + NestJS (stack 80.9, -5.3): Loses: Tiny static binaries give near-instant cold starts on scale-to-zero platforms.
 
 **Why not the others?**
-- Why not Node.js + Express? (runner-up) Swapping it in lowers the stack score by 5.2 points. Go (net/http, chi or Gin) is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0); Node.js + Express is stronger on hiring pool (5.0 vs 3.0), ecosystem maturity (5.0 vs 4.0).
-- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 11.6 points. Go (net/http, chi or Gin) is stronger on realtime fit (4.0 vs 2.0), performance / latency (5.0 vs 3.0); Python + Django is stronger on development speed (5.0 vs 3.0), ecosystem maturity (5.0 vs 4.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn.
-- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 9.5 points. Go (net/http, chi or Gin) is stronger on team skill match (4.5 vs 1.5), realtime fit (4.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on hiring pool (5.0 vs 3.0), ecosystem maturity (5.0 vs 4.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
+- Why not Node.js + Express? (runner-up) Swapping it in lowers the stack score by 5.2 points. Go (net/http, chi or Gin) is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0); Node.js + Express is stronger on hiring pool (5.0 vs 3.0), ecosystem maturity (5.0 vs 4.0). 1.0 of the 5.2 points come from a stack compatibility rule: Tiny static binaries give near-instant cold starts on scale-to-zero platforms.
+- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 11.6 points. Go (net/http, chi or Gin) is stronger on realtime fit (4.0 vs 2.0), performance / latency (5.0 vs 3.0); Python + Django is stronger on development speed (5.0 vs 3.0), ecosystem maturity (5.0 vs 4.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn. 1.0 of the 11.6 points come from a stack compatibility rule: Tiny static binaries give near-instant cold starts on scale-to-zero platforms.
+- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 9.5 points. Go (net/http, chi or Gin) is stronger on team skill match (4.5 vs 1.5), realtime fit (4.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on hiring pool (5.0 vs 3.0), ecosystem maturity (5.0 vs 4.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn. 1.0 of the 9.5 points come from a stack compatibility rule: Tiny static binaries give near-instant cold starts on scale-to-zero platforms.
 
 **Excluded by hard constraints**
 - Firebase (BaaS on Google Cloud): Proprietary API with the highest lock-in; you asked for low lock-in
@@ -268,9 +274,9 @@ Runs here: React SPA (static files), the Go API as long-running processes. The d
 - Azure App Service / Container Apps (stack 81.5, -4.7): Loses: Anycast + multi-region VMs keep websocket round-trips short for global users.
 
 **Why not the others?**
-- Why not AWS ECS on Fargate? (runner-up) Swapping it in lowers the stack score by 4.2 points. Fly.io is stronger on realtime fit (5.0 vs 4.0), performance / latency (5.0 vs 4.0); AWS ECS on Fargate is stronger on scalability (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0).
-- Why not Vercel? (popular choice) Swapping it in lowers the stack score by 8.3 points. Fly.io is stronger on realtime fit (5.0 vs 2.0), portability (low lock-in) (4.0 vs 3.0); Vercel is stronger on scalability (5.0 vs 4.0), low ops burden (5.0 vs 4.0).
-- Why not Render? (popular choice) Swapping it in lowers the stack score by 7.2 points. Fly.io is stronger on performance / latency (5.0 vs 3.0), region coverage (5.0 vs 2.0); Render is stronger on low ops burden (5.0 vs 4.0).
+- Why not AWS ECS on Fargate? (runner-up) Swapping it in lowers the stack score by 4.2 points. Fly.io is stronger on realtime fit (5.0 vs 4.0), performance / latency (5.0 vs 4.0); AWS ECS on Fargate is stronger on scalability (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0). 2.0 of the 4.2 points come from a stack compatibility rule: Anycast + multi-region VMs keep websocket round-trips short for global users.
+- Why not Vercel? (popular choice) Swapping it in lowers the stack score by 8.3 points. Fly.io is stronger on realtime fit (5.0 vs 2.0), portability (low lock-in) (4.0 vs 3.0); Vercel is stronger on scalability (5.0 vs 4.0), low ops burden (5.0 vs 4.0). 5.0 of the 8.3 points come from a stack compatibility rule: This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets.
+- Why not Render? (popular choice) Swapping it in lowers the stack score by 7.2 points. Fly.io is stronger on performance / latency (5.0 vs 3.0), region coverage (5.0 vs 2.0); Render is stronger on low ops burden (5.0 vs 4.0). 2.0 of the 7.2 points come from a stack compatibility rule: Anycast + multi-region VMs keep websocket round-trips short for global users.
 
 **Excluded by hard constraints**
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay

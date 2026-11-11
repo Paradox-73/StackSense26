@@ -39,14 +39,14 @@ Availability approach: Multi-AZ everywhere + multi-region failover drills, 24x7 
 ## Warnings and how they were resolved
 
 - **[WARNING] Peak RPS inconsistent with DAU**: You entered 5 req/s but 10,000,000 DAU of a 'healthcare' app implies about 34,722 req/s (60 req/user/day, peak x5). *Resolution:* Planned for the larger figure (34,722 req/s), the safer choice for capacity.
-- **[WARNING] Microservices with 1 engineer(s)**: Microservices pay off when several teams need independent deploys; with a small team they multiply deploy pipelines, network failure modes and on-call load (Fowler, 'MonolithFirst'). *Resolution:* Recommending a modular monolith with clear module boundaries that can be split later.
+- **[WARNING] Microservices with 1 engineer**: Microservices pay off when several teams need independent deploys; with a small team they multiply deploy pipelines, network failure modes and on-call load (Fowler, 'MonolithFirst'). *Resolution:* Recommending a modular monolith with clear module boundaries that can be split later.
 - **[CRITICAL] HIPAA on a free-tier budget**: HIPAA requires a signed Business Associate Agreement (BAA); vendors offer BAAs only on paid plans or eligible paid services. *Resolution:* Compliance is kept as a hard filter; the budget is treated as soft and the real minimum cost is shown.
-- **[WARNING] 99.99% availability with 1 engineer(s)**: 99.99% allows ~4.4 minutes of downtime a month; that needs 24x7 on-call and multi-AZ/multi-region failover. A sustainable on-call rotation needs about 6 people; 1 cannot staff it. *Resolution:* Weighted towards fully managed services; consider 99.9% as a realistic SLO.
+- **[WARNING] 99.99% availability with 1 engineer**: 99.99% allows ~4.4 minutes of downtime a month; that needs 24x7 on-call and multi-AZ/multi-region failover. A sustainable on-call rotation needs about 6 people; 1 cannot staff it. *Resolution:* Weighted towards fully managed services; consider 99.9% as a realistic SLO.
 - **[WARNING] 99.99% availability with a zero budget**: Your budget is ₹0/month, but the cheapest stack that meets your requirements costs about ₹8,544,000/month (see Cost). Only free plans fit a zero budget, and free plans carry no uptime guarantee (no SLA); many pause or throttle idle projects. *Resolution:* Budget for the paid plans in the estimate to get a written SLA, or treat the target as a goal.
 - **[WARNING] Compliance on a very short timeline**: BAAs, risk assessments, audit logging and access reviews typically take longer than a few weeks. *Resolution:* Recommending managed, pre-certified services to shorten the path.
 - **[WARNING] 20 ms target across regions**: Light in fibre needs roughly 70+ ms for an intercontinental round trip; a single origin cannot meet this globally. *Resolution:* Favouring edge/multi-region platforms; treat the target as per-region latency.
 - **[WARNING] Very large scale with a tiny team**: Hyperscale (>10M daily users) traffic is usually run by dedicated platform engineers. *Resolution:* Strongly favouring managed/serverless services with low ops burden.
-- **[CRITICAL] Budget below estimated cost**: Estimated minimum spend ₹8,544,000/month exceeds your budget of ₹0/month at Hyperscale (>10M daily users) scale. *Resolution:* No feasible combination fits: the cheapest compliant hosting + database alone costs about ₹2,400,000/month. Cost was weighted up; the stack shown is the cheapest that still meets the hard constraints. Raise the budget or reduce scale/compliance scope.
+- **[CRITICAL] Budget below estimated cost**: Estimated minimum spend ₹8,544,000/month exceeds your budget of ₹0/month at Hyperscale (>10M daily users) scale. *Resolution:* No feasible combination fits: the cheapest compliant hosting + database alone costs about ₹2,400,000/month. The stack shown starts at ₹8,544,000/month, ₹7,776,000/month of it for its hosting and database, which scored higher on your other priorities than the cheapest pair. Cost was weighted up. Raise the budget or reduce scale/compliance scope.
 - **[WARNING] 11 TB on one PostgreSQL primary**: PostgreSQL writes through one primary server; at ~11,000 GB within 12 months, backups, restores, index builds and vacuum take hours, and managed instances stop at 64 TiB (Amazon RDS: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html). *Resolution:* Plan sharding before you need it: pick a shard key (tenant or customer id), then use Citus for PostgreSQL (https://docs.citusdata.com/en/stable/get_started/what_is_citus.html) or Vitess for MySQL (https://vitess.io/docs/overview/), or a distributed SQL database (CockroachDB, YugabyteDB, Spanner; not scored by StackSense). Move old rows to cheaper storage if they are rarely read.
 
 ## Per-layer reasoning
@@ -107,12 +107,18 @@ Next.js (React) is the frontend for a Healthcare / telehealth project with about
 - Flutter: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - Native iOS + Android (Swift / Kotlin): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
 - No frontend (API only): You target a user interface, so a frontend is needed
+- Qt (C++): Desktop toolkit; you do not target desktop
+- Tauri (Rust): Desktop toolkit; you do not target desktop
+- .NET MAUI (C#): Desktop toolkit; you do not target desktop
+- Electron (JavaScript): Desktop toolkit; you do not target desktop
+- Unity (C#): Game engine; the project is not a game
+- Unreal Engine (C++): Game engine; the project is not a game
 
 ### Backend: Node.js + Express (84.7)
 
 Minimal, unopinionated HTTP framework on Node.js.
 
-Node.js + Express serves the API at about 34,722 requests/s at peak (Hyperscale (>10M daily users)) for a solo developer. It runs as a long-running Node.js service, so background jobs, WebSockets and database connection pools live in one deployable process. Realtime is core, and it scores 4.0/5 on realtime fit. C# + ASP.NET Core is within 0.6 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+Node.js + Express serves the API at about 34,722 requests/s at peak (Hyperscale (>10M daily users)) for a solo developer. It runs as a long-running Node.js service, so background jobs, WebSockets and database connection pools live in one deployable process. Realtime is core, and it scores 4.0/5 on realtime fit. C# + ASP.NET Core is within 0.6 stack points, inside the tie margin (stacks this close count as tied); the tie went to Node.js + Express on hiring pool (18 vs 17, summed across layers).
 
 **Why**
 - Hiring pool: 5.0/5 vs 3.6 average for this layer - weighted up because: No team skills listed: you will hire for this stack, so the hiring pool counts.
@@ -157,9 +163,9 @@ Node.js + Express serves the API at about 34,722 requests/s at peak (Hyperscale 
 - Go (net/http, chi or Gin) (stack 49.7, -1.5): Loses: One language across the stack: shared types, shared validation, any developer can work on any layer.
 
 **Why not the others?**
-- Why not C# + ASP.NET Core? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.6 points lower; either is defensible. Node.js + Express is stronger on learning curve (5.0 vs 3.0), hiring pool (5.0 vs 4.0); C# + ASP.NET Core is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0).
-- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 2.8 points. Node.js + Express is stronger on realtime fit (4.0 vs 2.0), hiring pool (5.0 vs 4.0); Python + Django is stronger on development speed (5.0 vs 4.0), structure for large teams (4.0 vs 1.0).
-- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 2.8 points. Node.js + Express is stronger on learning curve (5.0 vs 2.0), low ops burden (4.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on scalability (5.0 vs 4.0), performance / latency (4.0 vs 3.0).
+- Why not C# + ASP.NET Core? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.6 points lower; either is defensible. Node.js + Express is stronger on learning curve (5.0 vs 3.0), hiring pool (5.0 vs 4.0); C# + ASP.NET Core is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0). A stack compatibility rule costs it 1.5 points, more than the whole gap, while on this layer's own criteria it is 0.9 points ahead: One language across the stack: shared types, shared validation, any developer can work on any layer.
+- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 2.8 points. Node.js + Express is stronger on realtime fit (4.0 vs 2.0), hiring pool (5.0 vs 4.0); Python + Django is stronger on development speed (5.0 vs 4.0), structure for large teams (4.0 vs 1.0). 1.5 of the 2.8 points come from a stack compatibility rule: One language across the stack: shared types, shared validation, any developer can work on any layer.
+- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 2.8 points. Node.js + Express is stronger on learning curve (5.0 vs 2.0), low ops burden (4.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on scalability (5.0 vs 4.0), performance / latency (4.0 vs 3.0). 1.5 of the 2.8 points come from a stack compatibility rule: One language across the stack: shared types, shared validation, any developer can work on any layer.
 
 **Excluded by hard constraints**
 - Firebase (BaaS on Google Cloud): No HIPAA Business Associate Agreement available; Proprietary API with the highest lock-in; you asked for low lock-in
@@ -169,7 +175,7 @@ Node.js + Express serves the API at about 34,722 requests/s at peak (Hyperscale 
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 11,000 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹4,320,000-₹8,640,000 a month, against a total budget of ₹0 a month. MySQL is within 0.5 stack points, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note).
+Your data is mainly relational and reaches about 11,000 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹4,320,000-₹8,640,000 a month, against a total budget of ₹0 a month. MySQL is within 0.5 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
 
 Suggested offering: Azure Database for PostgreSQL Flexible Server
 
@@ -187,8 +193,8 @@ Suggested offering: Azure Database for PostgreSQL Flexible Server
 - Connection-per-process model needs PgBouncer/RDS Proxy under serverless
 
 **Risks**
-- Near its practical scale ceiling at your traffic/data size (needs sharding or re-architecture) (-12).
-- No free option at your scale (from ~$15,000/month) (-53.9).
+- Near its practical scale ceiling at your traffic/data size (needs sharding or re-architecture).
+- No free option at your scale (from ~$15,000/month).
 - PostgreSQL has one writable primary: across regions at 99.99% with strong consistency, a region failover loses or delays writes. If writes must survive a region outage, evaluate a distributed SQL database (Google Spanner, CockroachDB or YugabyteDB; not scored by StackSense).
 
 **Versus runner-up:** PostgreSQL and MySQL are within 0.5 stack points of each other, inside the 1-point tie margin, so they count as tied. PostgreSQL is stronger on realtime fit (3.0 vs 2.0). PostgreSQL has the higher stack score. Either is defensible.
@@ -259,7 +265,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 - Portal/config complexity; pricing tiers are confusing
 
 **Risks**
-- No free option at your scale (from ~$12,000/month) (-52.5).
+- No free option at your scale (from ~$12,000/month).
 
 **Versus runner-up:** Azure App Service / Container Apps beats AWS ECS on Fargate by 2.4 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team size (+2.1), general quality (baseline weights) (+0.2), time to mvp (+0.2). AWS ECS on Fargate is stronger on monthly budget (+0.3).
 
@@ -292,7 +298,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 
 **Why not the others?**
 - Why not AWS ECS on Fargate? (runner-up) Swapping it in lowers the stack score by 2.4 points. Azure App Service / Container Apps is stronger on low ops burden (4.0 vs 3.0), learning curve (4.0 vs 3.0); AWS ECS on Fargate takes a penalty: Usually needs a team of 2+ to operate.
-- Why not Vercel? (popular choice) Swapping it in lowers the stack score by 7.4 points. Azure App Service / Container Apps is stronger on compliance maturity (audit, isolation) (5.0 vs 3.0), realtime fit (4.0 vs 2.0); Vercel is stronger on performance / latency (5.0 vs 4.0), low ops burden (5.0 vs 4.0); Vercel takes a penalty: No free option at your scale (from ~$12,000/month).
+- Why not Vercel? (popular choice) Swapping it in lowers the stack score by 7.4 points. Azure App Service / Container Apps is stronger on compliance maturity (audit, isolation) (5.0 vs 3.0), realtime fit (4.0 vs 2.0); Vercel is stronger on performance / latency (5.0 vs 4.0), low ops burden (5.0 vs 4.0); Vercel takes a penalty: No free option at your scale (from ~$12,000/month). 5.7 of the 7.4 points come from a stack compatibility rule: This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets.
 - Why not Render? (popular choice) Ruled out for your answers: No India region; data must stay in India.
 
 **Excluded by hard constraints**

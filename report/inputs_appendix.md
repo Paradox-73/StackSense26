@@ -12,7 +12,7 @@ Every question the app asks, generated from `data/questions.json`. The last five
 | 2 | Application type<br>`app_type` | One of 13; default B2B / B2C SaaS | yes | 28% | 10% | 13% | 3% | 6% |
 | 3 | Client platforms<br>`platforms` | Any of 5; default Web | yes | 49% | 49% | 3% | 1% | 1% |
 | 4 | What do users do?<br>`user_actions` | Any of 4; default Read or browse published content, Sign in to their own account, Create or upload things | - | 9% | 0% | 8% | 5% | 3% |
-| 5 | Special workloads<br>`special_workloads` | Any of 7; default none | - | 5% | 0% | 2% | 0% | 4% |
+| 5 | Special workloads<br>`special_workloads` | Any of 8; default none | - | 5% | 0% | 2% | 0% | 4% |
 | 6 | Work that runs in the background<br>`background_work` | One of 3; default None, or short jobs of a few minutes | - | 17% | 0% | 4% | 0% | 17% |
 | 7 | Machine-learning features<br>`ml_features` | One of 4; default None | - | 1% | 0% | 0% | 0% | 1% |
 | 8 | Do several customer organisations share the app?<br>`tenancy` | One of 3; default No: one organisation, or a consumer app | - | 11% | 1% | 2% | 8% | 2% |
@@ -52,7 +52,7 @@ Every question the app asks, generated from `data/questions.json`. The last five
 | 25 | Engineering team size<br>`team_size` | Number (engineers), 1 to 5,000; default 3 | yes | 36% | 7% | 27% | 2% | 7% |
 | 26 | Team experience<br>`team_experience` | One of 4; default Intermediate | - | 14% | 3% | 10% | 1% | 3% |
 | 27 | Someone can operate infrastructure<br>`has_devops` | Yes or no; default no | - | 5% | 1% | 3% | 0% | 3% |
-| 28 | Existing team skills<br>`team_skills` | Any of 33; default none | yes | 90% | 42% | 82% | 10% | 19% |
+| 28 | Existing team skills<br>`team_skills` | Any of 39; default none | yes | 90% | 42% | 82% | 10% | 19% |
 | 29 | Time to MVP<br>`timeline_weeks` | Number (weeks), 1 to 520; default 12 | - | 11% | 3% | 7% | 1% | 2% |
 | 30 | Architecture preference<br>`architecture` | One of 4; default Decide for me | - | 7% | 1% | 4% | 1% | 4% |
 
