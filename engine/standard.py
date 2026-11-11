@@ -155,8 +155,10 @@ CLOUD_IDENTITY = ("Microsoft Entra ID", "Okta", "Google Workspace", "Auth0", "Am
 # Well-known business systems and the interface the stack integrates through; True marks a cloud-only service.
 INTEGRATIONS = [(r"microsoft 365|office 365|\bo365\b|\bteams\b|sharepoint online|exchange online|outlook\.com",
                  "Microsoft Graph API (mail, calendar and Teams notifications, files)", True),
-                # Exchange only as the mail server: "NSE stock exchange feed" or "exchange rates API" is not it.
-                (r"sharepoint|outlook|\b(?:microsoft|ms|on-?prem\w*|hybrid) exchange\b|(?<!stock )\bexchange (?:server|20\d\d)\b"
+                # Exchange only as the mail server: "NSE stock exchange feed" or "exchange rates API" is not it; Outlook
+                # only as the mail program: "weather outlook feed" is not it.
+                (r"sharepoint|\b(?:microsoft|ms) outlook\b|\boutlook 20\d\d\b|^\s*outlook\b(?!.*\b(?:weather|forecasts?|markets?)\b)"
+                 r"|\b(?:microsoft|ms|on-?prem\w*|hybrid) exchange\b|(?<!stock )\bexchange (?:server|20\d\d)\b"
                  r"|^\s*exchange\b(?!.*\b(?:rates?|market|feed|trading|fix|prices?)\b)",
                  "the SharePoint or Exchange server's REST API", False),
                 (r"google workspace|gmail|google drive", "Google Workspace APIs (Gmail, Calendar, Drive)", True),

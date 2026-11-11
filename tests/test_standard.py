@@ -585,9 +585,17 @@ def test_an_on_premises_sharepoint_server_is_reachable_from_an_air_gapped_site()
     ("MS Exchange", "the SharePoint or Exchange server's REST API"),
     ("Exchange 2016 mail server", "the SharePoint or Exchange server's REST API"),
     ("Exchange", "the SharePoint or Exchange server's REST API"),
-    ("Exchange Online", "Microsoft Graph API (mail, calendar and Teams notifications, files)")])
+    ("Exchange Online", "Microsoft Graph API (mail, calendar and Teams notifications, files)"),
+    ("Weather outlook feed", "its API"), ("Market outlook report", "its API"),
+    ("Outlook weather forecast API", "its API"), ("Outlook for commodity markets", "its API"),
+    ("Microsoft Outlook", "the SharePoint or Exchange server's REST API"),
+    ("MS Outlook", "the SharePoint or Exchange server's REST API"),
+    ("Office Outlook 2019", "the SharePoint or Exchange server's REST API"),
+    ("Outlook", "the SharePoint or Exchange server's REST API"),
+    ("Outlook.com", "Microsoft Graph API (mail, calendar and Teams notifications, files)")])
 def test_only_the_mail_server_reads_as_exchange(text, how):
-    """'exchange' alone is a stock exchange or a currency rate as often as Microsoft's mail server."""
+    """'exchange' alone is a stock exchange or a currency rate as often as Microsoft's mail server, and 'outlook' a
+    weather or market forecast as often as Microsoft's mail program."""
     doc = edit("P5", infrastructure={"existing_systems": [text]})
     notes = [a for a in run(doc)["assumptions"] if a.startswith(f"Existing system '{text}'")]
     assert notes == [f"Existing system '{text}': integrated through {how}; it stays the system of record for its own data"], notes
