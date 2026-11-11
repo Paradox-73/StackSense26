@@ -573,3 +573,17 @@ def test_an_on_premises_sharepoint_server_is_reachable_from_an_air_gapped_site()
     doc = edit("P5", infrastructure={"deployment_model": "air_gapped", "cloud_preference": "none",
                                      "existing_systems": ["SharePoint Server 2019", "Active Directory"]})
     assert not [w for w in run(doc)["warnings"] if w["code"] == "EXISTING_SYSTEM_UNREACHABLE"]
+
+
+@pytest.mark.parametrize("text,how", [
+    ("NSE stock exchange feed", "its API"), ("Currency exchange rates API", "its API"), ("Exchange rate feed", "its API"),
+    ("Microsoft Exchange Server 2019", "the SharePoint or Exchange server's REST API"),
+    ("MS Exchange", "the SharePoint or Exchange server's REST API"),
+    ("Exchange 2016 mail server", "the SharePoint or Exchange server's REST API"),
+    ("Exchange", "the SharePoint or Exchange server's REST API"),
+    ("Exchange Online", "Microsoft Graph API (mail, calendar and Teams notifications, files)")])
+def test_only_the_mail_server_reads_as_exchange(text, how):
+    """'exchange' alone is a stock exchange or a currency rate as often as Microsoft's mail server."""
+    doc = edit("P5", infrastructure={"existing_systems": [text]})
+    notes = [a for a in run(doc)["assumptions"] if a.startswith(f"Existing system '{text}'")]
+    assert notes == [f"Existing system '{text}': integrated through {how}; it stays the system of record for its own data"], notes
