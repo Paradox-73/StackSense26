@@ -301,10 +301,10 @@
       "kind": "conflict",
       "delta": -100,
       "when": {
-        "backend": ["spring_boot", "dotnet", "laravel", "phoenix", "rails"],
+        "backend": ["spring_boot", "dotnet", "laravel", "phoenix", "rails", "go"],
         "hosting": ["cloudflare"]
       },
-      "note": "Cloudflare Workers run JavaScript, TypeScript, Python and Rust (other languages only compiled to WebAssembly); a Java, .NET, PHP, Elixir or Ruby server needs Cloudflare Containers instead, a separate product on the Workers Paid plan without autoscaling yet.",
+      "note": "Cloudflare Workers run JavaScript, TypeScript, Python and Rust; other languages, Go among them, run only compiled to WebAssembly, so a Go (net/http, chi or Gin), Java, .NET, PHP, Elixir or Ruby server needs Cloudflare Containers instead, a separate product on the Workers Paid plan without autoscaling yet.",
       "source": "https://developers.cloudflare.com/workers/languages/"
     },
     {

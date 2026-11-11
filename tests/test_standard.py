@@ -587,3 +587,12 @@ def test_only_the_mail_server_reads_as_exchange(text, how):
     doc = edit("P5", infrastructure={"existing_systems": [text]})
     notes = [a for a in run(doc)["assumptions"] if a.startswith(f"Existing system '{text}'")]
     assert notes == [f"Existing system '{text}': integrated through {how}; it stays the system of record for its own data"], notes
+
+
+@pytest.mark.parametrize("langs", [["go"], ["go", "typescript"]])
+def test_a_go_server_never_runs_on_cloudflare_workers(langs):
+    """Workers run JavaScript, TypeScript, Python and Rust, and Go only compiled to WebAssembly
+    (developers.cloudflare.com/workers/languages/), so a net/http, chi or Gin server needs another host."""
+    out = run(edit("P3", team={"languages": langs}, compliance=["gdpr", "pci_dss"], infrastructure={"cloud_preference": "none"}))
+    host, backend = out["stack"]["hosting"]["choice"], out["stack"]["backend"]["choice"]
+    assert not (host.startswith("Cloudflare") and "for the API" not in host and backend.startswith("Go")), (backend, host)
