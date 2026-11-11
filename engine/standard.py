@@ -185,6 +185,9 @@ END_OF_LIFE = [  # the source page gives each product's end date
     (r"adobe flash|flash player", "Adobe Flash", "it has reached end of life", "https://www.adobe.com/products/flashplayer/end-of-life.html"),
     (r"mongodb ?([1-5]\.\d|6\.0)\b", "MongoDB {0}", "it has reached end of life", "https://endoflife.date/mongodb"),
     (r"heroku free", "Heroku free plans", "they have been retired", "https://blog.heroku.com/next-chapter"),
+    # The repository names MinIO's AIStor editions as the alternatives, so a system that says AIStor is not flagged.
+    (r"^(?!.*\baistor\b).*\bminio\b", "MinIO", "its open-source repository was archived on 25 Apr 2026 and is no "
+     "longer maintained", "https://github.com/minio/minio"),
 ]
 # Still supported, but only with security fixes: fine to keep and integrate with; plan the upgrade.
 EXTENDED_SUPPORT = [

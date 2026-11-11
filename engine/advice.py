@@ -738,7 +738,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
                    f"~{gb:,.0f} GB served a month ({MEDIA_GB_PER_USER_DAY * 1000:.0f} MB per active user a day) "
                    f"at ${EGRESS_USD_PER_GB[0]}-{EGRESS_USD_PER_GB[1]}/GB"))
     if "video_on_demand" in work:
-        name = ("FFmpeg transcoding workers + MinIO + an HLS-serving web server (self-hosted)" if env["onprem"] else
+        name = ("FFmpeg transcoding workers + Ceph Object Gateway + an HLS-serving web server (self-hosted)" if env["onprem"] else
                 "S3 + AWS Elemental MediaConvert + CloudFront under the AWS BAA" if env["hipaa"] else
                 "S3 + AWS Elemental MediaConvert + CloudFront" if env["cloud"] == "aws" else
                 "Transcoder API + Cloud Storage + Cloud CDN" if env["cloud"] == "gcp" else
@@ -810,6 +810,8 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
 
 
 S3_DOCS = "https://aws.amazon.com/s3/"
+# Object storage a team runs itself; MinIO's repository is archived and no longer maintained (github.com/minio/minio).
+CEPH_RGW_DOCS = "https://docs.ceph.com/en/latest/radosgw/"
 # Where a HIPAA project's files go on a platform with no hyperscaler, from each host's own HIPAA page: Render has no
 # object store and lists persistent disks as fit for PHI; Fly.io offers a BAA for Tigris; Vercel's BAA lists its CDN,
 # functions and build pipeline, not a file store.
@@ -820,9 +822,10 @@ HIPAA_HOST_DOCS = {"render": "https://render.com/docs/hipaa-compliance", "flyio"
 def _object_storage(env: dict, prov: str) -> tuple[str, str]:
     """The object store for uploaded files, and its source."""
     if env["onprem"]:
-        return "MinIO or Ceph (S3-compatible, self-hosted)", S3_DOCS
+        return "Ceph Object Gateway (S3-compatible, self-hosted)", CEPH_RGW_DOCS
     if env["hybrid"]:
-        return "S3 API everywhere: the cloud's object storage in the cloud, MinIO on-premises (same client code)", S3_DOCS
+        return ("S3 API everywhere: the cloud's object storage in the cloud, Ceph Object Gateway on-premises (same S3 "
+                "client code)"), CEPH_RGW_DOCS
     if env["cloud"] and env["hipaa"]:  # uploads hold health information: a CDN may carry only public files
         return {"aws": "Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only)",
                 "gcp": "Cloud Storage under the Google Cloud BAA (Cloud CDN for public, non-PHI files only)",
@@ -833,7 +836,7 @@ def _object_storage(env: dict, prov: str) -> tuple[str, str]:
         where = (" in an Indian region" if env["india"] else " in an EU region" if env["eu"] else
                  " in a US region" if env["us"] else "")
         if env["self_managed"]:  # the team runs its own servers
-            return f"MinIO on your BAA-covered servers{where} (no public CDN for PHI)", S3_DOCS
+            return f"Ceph Object Gateway on your BAA-covered servers{where} (no public CDN for PHI)", CEPH_RGW_DOCS
         if not env["no_hyperscaler"]:
             return f"Amazon S3 or Google Cloud Storage{where} under a signed BAA (+ CDN for public, non-PHI files only)", S3_DOCS
         src = HIPAA_HOST_DOCS.get(prov, S3_DOCS)
@@ -844,7 +847,8 @@ def _object_storage(env: dict, prov: str) -> tuple[str, str]:
                  "vercel": "; Vercel's BAA lists its CDN and functions, not a file store"}.get(prov, "")
         return f"Object storage{where} from a vendor that signs a BAA covering it{lists} (no public CDN for PHI)", src
     if env["india"]:
-        return ("S3-compatible storage in an Indian region (DigitalOcean Spaces BLR1 or MinIO on your servers) + CDN"
+        return ("S3-compatible storage in an Indian region (DigitalOcean Spaces BLR1 or Ceph Object Gateway on your "
+                "servers) + CDN"
                 if env["no_hyperscaler"] else
                 "S3-compatible storage in an Indian region (Amazon S3 Mumbai or Google Cloud Storage asia-south1) + CDN"), S3_DOCS
     if env["eu"]:

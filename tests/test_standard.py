@@ -601,6 +601,21 @@ def test_only_the_mail_server_reads_as_exchange(text, how):
     assert notes == [f"Existing system '{text}': integrated through {how}; it stays the system of record for its own data"], notes
 
 
+@pytest.mark.parametrize("text,warned", [("MinIO object store", True), ("On-prem minio cluster", True),
+                                         ("MinIO AIStor", False), ("AIStor (MinIO)", False)])
+def test_an_existing_minio_server_is_flagged_as_unmaintained(text, warned):
+    """MinIO's repository was archived on 25 Apr 2026 and says it is no longer maintained (github.com/minio/minio); it
+    names MinIO's AIStor editions as the alternatives, so a system that says AIStor is not flagged."""
+    out = run(edit("P5", infrastructure={"existing_systems": [text]}))
+    eol = [w["message"] for w in out["warnings"] if w["code"] == "EOL_EXISTING_SYSTEM"]
+    if not warned:
+        assert eol == [], eol
+        return
+    assert eol == [f"'{text}': MinIO is past its vendor's support: its open-source repository was archived on 25 Apr 2026 "
+                   "and is no longer maintained (https://github.com/minio/minio). Integrate with it through an API or a "
+                   "migration, never build new parts on it; plan the upgrade before go-live."], eol
+
+
 @pytest.mark.parametrize("langs", [["go"], ["go", "typescript"]])
 def test_a_go_server_never_runs_on_cloudflare_workers(langs):
     """Workers run JavaScript, TypeScript, Python and Rust, and Go only compiled to WebAssembly
@@ -637,8 +652,34 @@ def test_a_scoring_model_beside_functions_or_a_static_site_gets_a_service_of_its
     assert "inside" not in ml[0] and cost and "used as a reference" in cost[0], (ml, cost)
 
 
+def test_self_run_object_storage_is_ceph_not_the_archived_minio():
+    """MinIO's repository was archived on 25 Apr 2026 and says it is no longer maintained (github.com/minio/minio), so no
+    recommended component names it: storage a team runs itself is Ceph Object Gateway, on-premises, in a hybrid setup,
+    beside DigitalOcean Spaces in India, under on-premises video and on a self-managed HIPAA team's own servers."""
+    from engine import recommend
+    from engine.advice import _object_storage
+    docs = {p.stem: json.loads(p.read_text(encoding="utf-8"))
+            for p in PUBLIC + sorted((ROOT / "scenarios" / "edge").glob("E*.json"))}
+    hipaa = edit("P4", infrastructure={"deployment_model": "self_hosted_cloud_vm"})
+    hipaa["compliance"] = hipaa["compliance"] + ["hipaa"]
+    hipaa["requirements"]["file_media_storage"] = True
+    docs.update({"P4 self-managed HIPAA": hipaa, "P2 no hyperscaler": edit("P2", infrastructure={"cloud_preference": "none"})})
+    named = {k: json.dumps(run(doc)["stack"]) for k, doc in docs.items()}
+    media = {"app_type": "social_network", "dau": 5000, "special_workloads": ["media_uploads", "video_on_demand"]}
+    for deployment in ("hybrid", "on_prem"):
+        r = recommend(dict(media, deployment=deployment), with_counterfactuals=False)
+        named[deployment] = json.dumps(r["supporting_services"])
+    # No scenario reaches this line (a HIPAA team on its own VMs gets a hyperscaler's BAA storage), so it is read directly.
+    env = {"onprem": False, "hybrid": False, "cloud": None, "hipaa": True, "self_managed": True, "no_hyperscaler": True,
+           "india": False, "eu": False, "us": False}
+    named["self-managed HIPAA line"] = _object_storage(env, "hetzner")[0]
+    assert [k for k, text in named.items() if "minio" in text.lower()] == []
+    assert {"E7_air_gapped", "P2 no hyperscaler", "hybrid", "on_prem", "self-managed HIPAA line"} <= \
+        {k for k, text in named.items() if "Ceph Object Gateway" in text}
+
+
 def test_hipaa_files_with_no_hyperscaler_stay_where_the_hosts_baa_reaches():
-    """A team on a managed platform runs no servers, so 'MinIO on your BAA-covered servers' does not apply. Each host's
+    """A team on a managed platform runs no servers, so 'storage on your BAA-covered servers' does not apply. Each host's
     HIPAA page says what holds PHI: Render lists persistent disks, Fly.io offers a BAA for Tigris, and Vercel's BAA
     lists its CDN and functions, not a file store."""
     docs = {"Render": "https://render.com/docs/hipaa-compliance", "Fly.io": "https://fly.io/compliance/",
@@ -654,7 +695,7 @@ def test_hipaa_files_with_no_hyperscaler_stay_where_the_hosts_baa_reaches():
                 continue
             host = out["stack"]["hosting"]["choice"].split(",")[0]
             store = [s for s in out["stack"]["supporting"] if s["layer"] == "storage"]
-            assert store and not [s for s in store if "MinIO" in s["choice"]], (name, residency, host, store)
+            assert store and not [s for s in store if "your BAA-covered servers" in s["choice"]], (name, residency, host, store)
             assert store[0]["source"] == docs[host], (name, residency, host, store[0])
             seen.add(host)
     assert set(docs) <= seen, seen
