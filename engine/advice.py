@@ -1073,8 +1073,9 @@ MODEL_USD_PER_M_TOKENS = (0.15, 2.5)
 # one ml.c5.large ($0.102 an hour) to two ml.m5.large ($0.121 an hour in Mumbai), about 730 hours a month.
 SCORING_ENDPOINT_USD = (75.0, 180.0)
 # Project types whose model is usually a trained classifier or regressor of their own (credit, fraud, risk, demand,
-# anomaly scores); for other types an inference API is a hosted model, priced per call.
-SCORING_APP_TYPES = ("fintech", "ecommerce", "healthcare", "iot_telemetry", "analytics_dashboard")
+# churn, anomaly scores); for content sites, social apps, live collaboration, internal tools and phone-first apps an
+# inference API is a hosted model, priced per call.
+SCORING_APP_TYPES = ("fintech", "ecommerce", "healthcare", "iot_telemetry", "analytics_dashboard", "saas")
 SCORING_SERVING = {
     "aws": ("Amazon SageMaker real-time endpoint for your own model (Amazon Bedrock for a hosted one)",
             "https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html"),
