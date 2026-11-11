@@ -85,6 +85,7 @@ def _env(p: dict, host: dict) -> dict:
     return {"onprem": p["deployment"] == "on_prem" or host.get("kind") == "onprem",
             "india": "data_residency_india" in p["compliance"],
             "eu": "data_residency_eu" in p["compliance"],
+            "us": "data_residency_us" in p["compliance"],
             "hipaa": "hipaa" in p["compliance"],
             "hybrid": p["deployment"] == "hybrid",
             "air_gapped": bool(p.get("air_gapped")),
@@ -518,8 +519,8 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
                 "Media and documents belong in object storage, not the database; row-level security policies cover both.",
                 "https://supabase.com/docs/guides/storage")
         elif not any(x["role"] == "Object storage" for x in out):
-            add("Object storage", _object_storage(env, prov), "Media and documents belong in object storage, not the database.",
-                "https://aws.amazon.com/s3/")
+            store, src = _object_storage(env, prov)
+            add("Object storage", store, "Media and documents belong in object storage, not the database.", src)
 
     if be.get("kind") != "baas" and "sign_in" in d["user_actions"]:
         add("Authentication", _auth(env), "Do not hand-roll password storage, MFA or SSO.",
@@ -717,8 +718,8 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
     work = set(p.get("special_workloads") or [])
     dau30 = p["dau"] * 30
     if work & {"media_uploads", "video_on_demand"} and not has_storage():
-        add("Object storage", storage(), "Uploaded files and video belong in object storage, not the database.",
-            "https://aws.amazon.com/s3/")
+        store, src = storage()
+        add("Object storage", store, "Uploaded files and video belong in object storage, not the database.", src)
     if "media_uploads" in work and p["app_type"] != "internal_tool":  # staff files: the app serves them, no CDN
         gb = dau30 * MEDIA_GB_PER_USER_DAY
         add("Media delivery", "Your reverse proxy (nginx) serving files from the object store, images resized by "
@@ -808,32 +809,52 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
             "network limits on machines that hold no secrets.", "https://gvisor.dev/docs/", system="sandbox")
 
 
-def _object_storage(env: dict, prov: str) -> str:
+S3_DOCS = "https://aws.amazon.com/s3/"
+# Where a HIPAA project's files go on a platform with no hyperscaler, from each host's own HIPAA page: Render has no
+# object store and lists persistent disks as fit for PHI; Fly.io offers a BAA for Tigris; Vercel's BAA lists its CDN,
+# functions and build pipeline, not a file store.
+HIPAA_HOST_DOCS = {"render": "https://render.com/docs/hipaa-compliance", "flyio": "https://fly.io/compliance/",
+                   "vercel": "https://vercel.com/kb/guide/hipaa-compliance-guide-vercel"}
+
+
+def _object_storage(env: dict, prov: str) -> tuple[str, str]:
+    """The object store for uploaded files, and its source."""
     if env["onprem"]:
-        return "MinIO or Ceph (S3-compatible, self-hosted)"
+        return "MinIO or Ceph (S3-compatible, self-hosted)", S3_DOCS
     if env["hybrid"]:
-        return "S3 API everywhere: the cloud's object storage in the cloud, MinIO on-premises (same client code)"
+        return "S3 API everywhere: the cloud's object storage in the cloud, MinIO on-premises (same client code)", S3_DOCS
     if env["cloud"] and env["hipaa"]:  # uploads hold health information: a CDN may carry only public files
         return {"aws": "Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only)",
                 "gcp": "Cloud Storage under the Google Cloud BAA (Cloud CDN for public, non-PHI files only)",
-                "azure": "Blob Storage under Microsoft's BAA (Front Door for public, non-PHI files only)"}[env["cloud"]]
+                "azure": "Blob Storage under Microsoft's BAA (Front Door for public, non-PHI files only)"}[env["cloud"]], S3_DOCS
     if env["cloud"]:
-        return {"aws": "Amazon S3 + CloudFront", "gcp": "Cloud Storage + Cloud CDN", "azure": "Blob Storage + Front Door"}[env["cloud"]]
+        return {"aws": "Amazon S3 + CloudFront", "gcp": "Cloud Storage + Cloud CDN", "azure": "Blob Storage + Front Door"}[env["cloud"]], S3_DOCS
     if env["hipaa"]:
-        where = " in an Indian region" if env["india"] else ""
-        return (f"MinIO on your BAA-covered servers{where} (no public CDN for PHI)" if env["no_hyperscaler"] else
-                f"Amazon S3 or Google Cloud Storage{where} under a signed BAA (+ CDN for public, non-PHI files only)")
+        where = (" in an Indian region" if env["india"] else " in an EU region" if env["eu"] else
+                 " in a US region" if env["us"] else "")
+        if env["self_managed"]:  # the team runs its own servers
+            return f"MinIO on your BAA-covered servers{where} (no public CDN for PHI)", S3_DOCS
+        if not env["no_hyperscaler"]:
+            return f"Amazon S3 or Google Cloud Storage{where} under a signed BAA (+ CDN for public, non-PHI files only)", S3_DOCS
+        src = HIPAA_HOST_DOCS.get(prov, S3_DOCS)
+        if prov == "render":  # the disk sits in the service's region
+            return ("Files on a persistent disk of the HIPAA-enabled Render service (a disk keeps that service to one "
+                    "instance; no public CDN for PHI)", src)
+        if prov == "flyio" and not where:  # where Tigris keeps data is not checked here, so not under a residency rule
+            return "Tigris object storage under the BAA for Tigris that Fly.io offers (no public CDN for PHI)", src
+        lists = "; Vercel's BAA lists its CDN and functions, not a file store" if prov == "vercel" else ""
+        return f"Object storage{where} from a vendor that signs a BAA covering it{lists} (no public CDN for PHI)", src
     if env["india"]:
         return ("S3-compatible storage in an Indian region (DigitalOcean Spaces BLR1 or MinIO on your servers) + CDN"
                 if env["no_hyperscaler"] else
-                "S3-compatible storage in an Indian region (Amazon S3 Mumbai or Google Cloud Storage asia-south1) + CDN")
+                "S3-compatible storage in an Indian region (Amazon S3 Mumbai or Google Cloud Storage asia-south1) + CDN"), S3_DOCS
     if env["eu"]:
-        return "S3-compatible storage in an EU jurisdiction (Cloudflare R2 EU or Backblaze B2 EU Central) + CDN"
+        return "S3-compatible storage in an EU jurisdiction (Cloudflare R2 EU or Backblaze B2 EU Central) + CDN", S3_DOCS
     if prov == "cloudflare":
-        return "Cloudflare R2 (+ Cloudflare CDN)"
+        return "Cloudflare R2 (+ Cloudflare CDN)", S3_DOCS
     if prov == "digitalocean":
-        return "DigitalOcean Spaces + built-in CDN"
-    return "S3-compatible storage (Cloudflare R2 / Backblaze B2) + CDN"
+        return "DigitalOcean Spaces + built-in CDN", S3_DOCS
+    return "S3-compatible storage (Cloudflare R2 / Backblaze B2) + CDN", S3_DOCS
 
 
 def _auth(env: dict) -> str:

@@ -624,3 +624,26 @@ def test_a_scoring_model_beside_functions_or_a_static_site_gets_a_service_of_its
     cost = [a for a in out["estimated_monthly_cost_usd"]["assumptions"] if a.startswith("Model serving: CPU endpoint")]
     assert out["architecture_style"] == style and ml and "service of its own" in ml[0], ml
     assert "inside" not in ml[0] and cost and "used as a reference" in cost[0], (ml, cost)
+
+
+def test_hipaa_files_with_no_hyperscaler_stay_where_the_hosts_baa_reaches():
+    """A team on a managed platform runs no servers, so 'MinIO on your BAA-covered servers' does not apply. Each host's
+    HIPAA page says what holds PHI: Render lists persistent disks, Fly.io offers a BAA for Tigris, and Vercel's BAA
+    lists its CDN and functions, not a file store."""
+    docs = {"Render": "https://render.com/docs/hipaa-compliance", "Fly.io": "https://fly.io/compliance/",
+            "Vercel": "https://vercel.com/kb/guide/hipaa-compliance-guide-vercel"}
+    seen = set()
+    for name in ("P1", "P2", "P3", "P4", "P5", "P6"):
+        for residency in ("none", "eu", "india"):
+            doc = edit(name, infrastructure={"cloud_preference": "none", "data_residency": residency})
+            doc["compliance"].append("hipaa")
+            doc["requirements"]["file_media_storage"] = True
+            out = run(doc)
+            if not out["stack"]:
+                continue
+            host = out["stack"]["hosting"]["choice"].split(",")[0]
+            store = [s for s in out["stack"]["supporting"] if s["layer"] == "storage"]
+            assert store and not [s for s in store if "MinIO" in s["choice"]], (name, residency, host, store)
+            assert store[0]["source"] == docs[host], (name, residency, host, store[0])
+            seen.add(host)
+    assert set(docs) <= seen, seen
