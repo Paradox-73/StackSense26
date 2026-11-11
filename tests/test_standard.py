@@ -567,3 +567,9 @@ def test_a_read_only_project_with_a_real_database_is_not_held_to_the_static_rule
                infrastructure={"cloud_preference": "none", "data_residency": "india", "existing_systems": []},
                requirements={"auth": "none", "payments": False, "realtime": False, "file_media_storage": False})
     assert run(doc)["status"] != "infeasible"
+
+
+def test_an_on_premises_sharepoint_server_is_reachable_from_an_air_gapped_site():
+    doc = edit("P5", infrastructure={"deployment_model": "air_gapped", "cloud_preference": "none",
+                                     "existing_systems": ["SharePoint Server 2019", "Active Directory"]})
+    assert not [w for w in run(doc)["warnings"] if w["code"] == "EXISTING_SYSTEM_UNREACHABLE"]
