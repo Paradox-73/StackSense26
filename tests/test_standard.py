@@ -807,3 +807,14 @@ def test_unverified_residency_advice_follows_the_deployment(deploy, cloud, said,
     out = edited("P2", infrastructure={"data_residency": "other", "deployment_model": deploy, "cloud_preference": cloud})
     message = next(w["message"] for w in out["warnings"] if w["code"] == "RESIDENCY_UNVERIFIED")
     assert said in message and unsaid not in message, message
+
+
+@pytest.mark.parametrize("system,product", [
+    ("Python 3.9 data scripts", "Python 3.9"), ("Python 3.10 batch jobs", "Python 3.10"), ("Vue 2 admin panel", "Vue 2"),
+    ("Windows 7 office PCs", "Windows 7"), ("Oracle 11g ERP", "Oracle Database 11g"),
+    ("Oracle Database 12c", "Oracle Database 12c"), (None, None)])
+def test_more_end_of_life_systems_are_warned(system, product):
+    systems = [system] if system else ["Python 3.12 scripts", "Vue 3 portal", "Windows 11 laptops", "Oracle 19c ledger"]
+    out = edited("P5", infrastructure={"existing_systems": systems})
+    eol = [w["message"] for w in out["warnings"] if w["code"] == "EOL_EXISTING_SYSTEM"]
+    assert (len(eol) == 1 and f"{product} is past its vendor's support" in eol[0]) if system else not eol, eol
