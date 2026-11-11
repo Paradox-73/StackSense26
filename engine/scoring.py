@@ -691,6 +691,12 @@ def hard_constraints(layer: str, item: dict, p: dict, d: dict) -> list[tuple[str
                 out.append(("API only: there is no user interface to build" if d.get("api_only") else
                             "You target a user interface, so a frontend is needed", "platforms", 0))
             return out
+        if d.get("one_codebase"):
+            missing = [x for x in d["one_codebase"] if x not in item.get("platforms", [])]
+            if missing:
+                out.append((f"Does not build {', '.join(missing)}: the timeline leaves room for one codebase that "
+                            "builds every platform", "platforms", 0))
+            return out
         if not d["web"] and kind != "mobile":
             out.append(("Web-only framework; you target iOS/Android only", "platforms", 0))
         # A mobile-first app is built around the store app, so a mobile toolkit may be its primary frontend

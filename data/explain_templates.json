@@ -88,7 +88,18 @@
             "react_native",
             "flutter"
           ],
-          "both_phones": 1
+          "one": 1
+        },
+        "text": "One codebase builds the {targets} apps, so {team_phrase} writes each feature once; ship the platform most users need first."
+      },
+      {
+        "when": {
+          "stack_any": [
+            "react_native",
+            "flutter"
+          ],
+          "both_phones": 1,
+          "one": 0
         },
         "text": "One codebase builds both the iOS and the Android app, which halves the work for {team_phrase}."
       },
@@ -98,7 +109,8 @@
             "react_native",
             "flutter"
           ],
-          "both_phones": 0
+          "both_phones": 0,
+          "one": 0
         },
         "text": "It builds the {phones} app now, and the same code can ship an {other_phone} app later without a rewrite."
       },

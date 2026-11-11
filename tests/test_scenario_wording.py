@@ -106,3 +106,9 @@ def test_backend_states_the_team_language_and_its_skill_score(outs):
     assert "C#" in p5 and "Entra ID" in p5 and "SQL Server" in p5, p5
     for name in ("P4", "P5", "P6"):  # realtime is false in all three
         assert "WebSockets" not in outs[name]["stack"]["backend"]["justification"], name
+
+
+def test_counts_are_worded_as_singular_or_plural():
+    out = run(dict(load("P1"), timeline={"mvp_weeks": 1}, project=dict(load("P1")["project"], platforms=["web", "android", "ios"])))
+    assert not found({"x": out}, r"\(s\)"), found({"x": out}, r"\(s\)")
+    assert any("1 week is not enough to ship all of them with 1 engineer." in t for t in texts(out))

@@ -346,6 +346,10 @@ NATIVE_NAMES = {("ios",): "Native iOS (Swift)", ("android",): "Native Android (K
 PHONE_NAMES = {"ios": "iOS", "android": "Android"}
 
 
+def _and(xs: list[str]) -> str:
+    return ", ".join(xs[:-1]) + f" and {xs[-1]}" if len(xs) > 1 else "".join(xs)
+
+
 def mobile_name(item_id: str, name: str, platforms) -> str:
     """The native toolkit named for the phone platforms the project targets: one platform is one app, not two."""
     if item_id != "native_mobile":
@@ -443,6 +447,8 @@ def _ctx(layer: str, s: dict, items: dict, p: dict, d: dict, cost: dict, provide
         "kept": _lower_first(vs["kept"]) if vs and vs.get("kept") else None,
         "assumed": 1 if "consistency" in d.get("defaulted", ()) else 0, "static": 1 if kind == "static" else 0,
         "phones": " and ".join(PHONE_NAMES[x] for x in phones) or None, "both_phones": 1 if len(phones) == 2 else 0,
+        "one": 1 if d.get("one_codebase") else 0,
+        "targets": _and([PHONE_NAMES.get(x, x) for x in d.get("one_codebase") or []]) or None,
         "other_phone": PHONE_NAMES[({"ios", "android"} - set(phones)).pop()] if len(phones) == 1 else None,
         "native_lang": {"ios": "Swift", "android": "Kotlin"}[phones[0]] if len(phones) == 1 else None,
         "skill_sentence": _skill_sentence(it, raw.get("skill_fit"), set(p.get("team_skills", []))) if layer == "backend" else None,
@@ -469,7 +475,7 @@ def _applies(t: dict, c: dict, stack: set, p: dict) -> bool:
         if k in ("kind", "seo", "consistency", "read_write"):
             if c[k] not in v:
                 return False
-        elif k in ("provided", "tie", "functions", "services", "assumed", "static", "both_phones"):
+        elif k in ("provided", "tie", "functions", "services", "assumed", "static", "both_phones", "one"):
             if c[k] != v:
                 return False
         elif k in LINE_CONDITIONS:

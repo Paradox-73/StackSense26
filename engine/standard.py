@@ -545,10 +545,18 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
         notes.append("iso27001: only hosts and managed services (backend-as-a-service, managed-only databases) that "
                      "publish ISO/IEC 27001 certification are kept")
     if residency == "other":
+        where = ("The servers are your own, so keep them, their backups and any replica in a data centre inside the "
+                 "required country." if onprem else
+                 f"Pick {'an' if CLOUD_NAMES[cloud][0] in 'AEIOU' else 'a'} {CLOUD_NAMES[cloud]} region inside the required country "
+                 "before you deploy." if cloud in CLOUD_NAMES else
+                 "Pick a provider region inside the required country before you deploy, from independent hosts only "
+                 "(cloud_preference 'none')." if cloud == "none" else
+                 "Pick a region inside the required country before you deploy; AWS, Google Cloud and Azure cover the "
+                 "most countries.")
         warns.append(_std_warn("RESIDENCY_UNVERIFIED", "warning",
                                "data_residency 'other' names no country, so the engine cannot check provider regions. "
-                               "Pick a region inside the required country before you deploy; AWS, Google Cloud and Azure "
-                               "cover the most countries.", ["infrastructure.data_residency"]))
+                               + where, ["infrastructure.data_residency", "infrastructure.deployment_model"]
+                               if onprem else ["infrastructure.data_residency"]))
     put("compliance", list(dict.fromkeys(comp)), "compliance", "infrastructure.data_residency")
     put("enterprise_sso", auth == "enterprise_sso", "requirements.auth")
 

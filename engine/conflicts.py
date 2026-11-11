@@ -17,6 +17,10 @@ SLA_ONCALL_MIN_TEAM = 6
 MANY_PLATFORMS_MIN_WEEKS = 4
 
 
+def _n(count, noun: str) -> str:
+    return f"{count:g} {noun}" + ("" if count == 1 else "s")
+
+
 def detect(p: dict, d: dict) -> list[dict]:
     w: list[dict] = []
     team = p["team_size"]
@@ -25,7 +29,7 @@ def detect(p: dict, d: dict) -> list[dict]:
 
     if p["architecture"] == "microservices" and team < 6:
         d["architecture"] = "monolith"
-        w.append(_warn("MICROSERVICES_SMALL_TEAM", "warning", f"Microservices with {team} engineer(s)",
+        w.append(_warn("MICROSERVICES_SMALL_TEAM", "warning", f"Microservices with {_n(team, 'engineer')}",
                        "Microservices pay off when several teams need independent deploys; with a small team they multiply deploy pipelines, network failure modes and on-call load (Fowler, 'MonolithFirst').",
                        "Recommending a modular monolith with clear module boundaries that can be split later.",
                        ["architecture", "team_size"]))
@@ -44,7 +48,7 @@ def detect(p: dict, d: dict) -> list[dict]:
                        "Compliance is kept as a hard filter; the budget is treated as soft and the real minimum cost is shown.",
                        ["compliance", "budget_monthly"]))
     if d["availability"] >= 99.99 and team < SLA_ONCALL_MIN_TEAM:
-        w.append(_warn("SLA_SMALL_TEAM", "warning", f"{p['availability']}% availability with {team} engineer(s)",
+        w.append(_warn("SLA_SMALL_TEAM", "warning", f"{p['availability']}% availability with {_n(team, 'engineer')}",
                        f"99.99% allows ~4.4 minutes of downtime a month; that needs 24x7 on-call and multi-AZ/multi-region "
                        f"failover. A sustainable on-call rotation needs about {SLA_ONCALL_MIN_TEAM} people; {team} cannot staff it.",
                        "Weighted towards fully managed services; consider 99.9% as a realistic SLO.",
@@ -113,10 +117,12 @@ def detect(p: dict, d: dict) -> list[dict]:
                        ["availability", "team_experience", "team_size"]))
     clients = [x for x in p["platforms"] if x != "api_only"]
     if len(clients) >= 3 and p["timeline_weeks"] <= MANY_PLATFORMS_MIN_WEEKS:
+        # The relaxation below, made binding: the frontend must be one toolkit that builds every web and phone target.
+        d["one_codebase"] = [x for x in ("web", "android", "ios") if x in clients]
         w.append(_warn("MANY_PLATFORMS_SHORT_TIMELINE", "critical",
-                       f"{len(clients)} client platforms in {p['timeline_weeks']} week(s)",
+                       f"{len(clients)} client platforms in {_n(p['timeline_weeks'], 'week')}",
                        f"Each of {', '.join(clients)} needs its own build, testing and store or release work; "
-                       f"{p['timeline_weeks']} week(s) is not enough to ship all of them with {team} engineer(s).",
+                       f"{_n(p['timeline_weeks'], 'week')} is not enough to ship all of them with {_n(team, 'engineer')}.",
                        "Relaxed: one shared codebase is recommended, and the first release should ship one platform "
                        "(the one most users need), with the others after the MVP.",
                        ["platforms", "timeline_weeks", "team_size"]))

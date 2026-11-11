@@ -780,3 +780,30 @@ def test_r_carries_over_to_the_python_backends():
     python = [b for b in backends if b.get("language") == "python"]
     others = [b for b in backends if b.get("kind") == "server" and b.get("language") != "python"]
     assert python and all(skill_fit(b, {"r"}) > max(skill_fit(o, {"r"}) for o in others) for b in python)
+
+
+@pytest.mark.parametrize("languages", [["python"], ["javascript"]])
+def test_many_platforms_on_a_short_timeline_get_one_toolkit_for_every_target(languages):
+    out = edited("P2", project={"platforms": ["web", "android", "ios"]}, timeline={"mvp_weeks": 3},
+                 team={"size": 1, "experience": "beginner", "languages": languages})
+    front = out["stack"]["frontend"]
+    assert codes(out)["MANY_PLATFORMS_SHORT_TIMELINE"] == "critical"
+    assert front["choice"] in ("Flutter", "React Native (Expo)"), front["choice"]
+    assert "One codebase builds the web, Android and iOS apps" in front["justification"], front["justification"]
+
+
+def test_budget_infeasible_describes_the_stack_shown():
+    out = edited("P3", budget={"monthly_infra_usd": 0})
+    message = next(w["message"] for w in out["warnings"] if w["code"] == "BUDGET_INFEASIBLE")
+    assert "the stack shown is the cheapest" not in message, message
+    assert f"The stack shown starts at ${out['estimated_monthly_cost_usd']['min']:,}" in message, message
+
+
+@pytest.mark.parametrize("deploy,cloud,said,unsaid", [
+    ("air_gapped", "none", "The servers are your own", "AWS"), ("on_premise", "any", "The servers are your own", "Azure"),
+    ("managed_cloud", "none", "independent hosts only", "AWS"), ("managed_cloud", "azure", "Pick an Azure region", "Google"),
+    ("managed_cloud", "any", "AWS, Google Cloud and Azure cover the most countries", "your own")])
+def test_unverified_residency_advice_follows_the_deployment(deploy, cloud, said, unsaid):
+    out = edited("P2", infrastructure={"data_residency": "other", "deployment_model": deploy, "cloud_preference": cloud})
+    message = next(w["message"] for w in out["warnings"] if w["code"] == "RESIDENCY_UNVERIFIED")
+    assert said in message and unsaid not in message, message
