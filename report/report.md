@@ -99,7 +99,7 @@ Architecture preference (7%, [MonolithFirst](https://martinfowler.com/bliki/Mono
 
 ### 4.4 Validation rules
 
-- **Types, values and ranges.** Every field has its table 3.1 type, and enum values are lower-case strings exactly as written, so `availability: 99.9` as a number is an error that names the allowed strings. Counts are 0 or more, team size and weeks 1 or more, latency above 0 or null, priorities 1 to 5, numbers finite and the platform list non-empty; the description may be any length, since it is not parsed.
+- **Types, values and ranges.** Every field has its table 3.1 type, and enum values are lower-case strings exactly as written, so `availability: 99.9` as a number is an error that names the allowed strings. Counts are 0 or more, team size and weeks 1 or more, latency above 0 or null, priorities 1 to 5, numbers finite, the description any length and the platform list non-empty.
 - **Required fields.** `project.type`, `project.platforms`, `scale.users_at_launch`, `scale.users_12_months`, `team.size`, `team.experience`, `team.languages` (may be empty), `budget.monthly_infra_usd` and `timeline.mvp_weeks`. In an otherwise valid file a missing one takes its documented default with a `MISSING_REQUIRED_FIELD` warning; a missing optional field takes its default, noted in `assumptions`.
 - **Unknown keys.** An unknown enum value or priority key is an error; any other unknown key raises an `UNKNOWN_FIELD` info warning and is ignored.
 - **Result.** Any error gives `invalid_input`, `stack` null and every problem in `validation_errors`; nothing raises. The questionnaire clamps a bad value with a warning instead (`VALUE_CLAMPED`).
@@ -179,7 +179,7 @@ Three intermediate engineers (JavaScript, TypeScript, Python) with nobody on ope
 
 ![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io, $1,190 to $4,635 a month](screenshots/s-P3.png)
 
-Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1. PostgreSQL leads Microsoft SQL Server by 2.1 on realtime fit and portability; MySQL takes a penalty because tenants share one database and its privileges stop at table and column level. Supporting services add Yjs shared documents (CRDTs), Redis pub/sub across instances, a cache, hosted checkout and social sign-in.
+Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1. PostgreSQL leads Microsoft SQL Server by 2.1; MySQL takes a penalty because tenants share one database and its privileges stop at table and column level. Supporting services add Yjs shared documents (CRDTs), Redis pub/sub across instances, a cache, hosted checkout and social sign-in.
 
 ### 6.4 P4 QuickCredit: digital lending in India (in depth)
 
@@ -191,12 +191,12 @@ P4 is the most constrained scenario: AWS required, RBI localisation, PCI DSS, IS
 - **Backend.** Spring Boot matches the team and scores 5/5 on scalability, maturity and structure, which the load, the 99.95% target and the scalability and maintainability priorities weight up; Go is 3.0 behind on skill match. Supabase (not on AWS, no ISO 27001) and Firebase (not on AWS) are ruled out.
 - **Database.** A double-entry ledger needs ACID, so eventually consistent stores are out; Firestore is off AWS and SQLite has no failover. PostgreSQL on Amazon RDS or Aurora in Mumbai costs $800 to $1,600 for about 500 GB with a standby; MySQL ties (0.1).
 - **Frontend.** Behind a login SEO does not matter, so a React SPA ships as static files on S3 and CloudFront; Angular ties (0.8) and Next.js loses 1.2 for adding a Node.js server. Native iOS and Android apps (Swift, Kotlin) score best among mobile toolkits.
-- **Supporting services.** The credit-scoring model on an Amazon SageMaker endpoint in Mumbai ($75 to $180, one or two CPU instances); Cognito in Mumbai with an SMS gateway; hosted checkout; KYC files in a separate S3 bucket; KMS, audit logging, least-privilege IAM and a WAF for PCI DSS.
+- **Supporting services.** The credit-scoring model on an Amazon SageMaker endpoint in Mumbai ($75 to $180, CPU); Cognito in Mumbai with an SMS gateway; hosted checkout; KYC files in a separate S3 bucket; KMS, audit logging, least-privilege IAM and a WAF for PCI DSS.
 - **Cost.** $1,960 to $7,240 against $6,000, with hosting and the database doubled for 99.95%; the floor fits the budget, so the status is `ok` and the budget check reads "stretch".
 
 ### 6.5 P5 PeopleDesk: internal HR tool
 
-![P5 PeopleDesk: HTMX, ASP.NET Core, Microsoft SQL Server on Azure SQL Database and Azure App Service, $44 to $375 a month](screenshots/s-P5.png)
+![P5 PeopleDesk: HTMX, ASP.NET Core, Microsoft SQL Server and Azure App Service, $44 to $375 a month](screenshots/s-P5.png)
 
 Two C# developers build a tool for 1,200 employees on Azure in India under ISO 27001, for $300 a month. Azure rules out every other host, and Supabase also lacks ISO 27001. ASP.NET Core leads Laravel by 3.7 points (Laravel and Express would need an identity broker for company sign-in), and HTMX leads a React SPA by 1.4. Existing systems are reused: sign-in through Microsoft Entra ID over OpenID Connect, SQL Server kept as Azure SQL Database, Microsoft 365 through the Graph API; an info warning notes that SQL Server 2019 security updates end on 8 January 2030.
 
@@ -232,7 +232,7 @@ The nine files in `scenarios/edge/` cover the nine categories of the statement's
 
 ![E5 Regulatory constraints: Cloud Run in Frankfurt under a HIPAA BAA, with Vercel and Netlify ruled out](screenshots/e-E5.png)
 
-![E6 Existing systems: SQL Server kept as Azure SQL Database, and two end-of-life warnings](screenshots/e-E6.png)
+![E6 Existing systems: Microsoft SQL Server kept for the data, and two end-of-life warnings](screenshots/e-E6.png)
 
 ![E7 Restricted deployment: on-premises VMs, and a critical warning for the outside services an air-gapped network cannot reach](screenshots/e-E7.png)
 
