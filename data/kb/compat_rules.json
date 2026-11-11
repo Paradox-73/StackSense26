@@ -276,7 +276,6 @@
       "delta": -24,
       "when": {
         "backend": [
-          "rails",
           "django"
         ],
         "hosting_kind": [
@@ -289,18 +288,18 @@
     {
       "id": "container_only_language_on_vercel",
       "kind": "conflict",
-      "delta": -30,
+      "delta": -100,
       "when": {
-        "backend": ["spring_boot", "dotnet", "laravel", "phoenix"],
+        "backend": ["spring_boot", "dotnet", "laravel", "phoenix", "rails"],
         "hosting": ["vercel"]
       },
-      "note": "Vercel runs Java, .NET, PHP and Elixir only through its Container runtime, which is in beta, inside the Functions limits: each request is a function invocation, so there is no long-running process, background work or in-memory state, and a JVM or .NET container starts cold. Host this API on a container or PaaS service instead.",
+      "note": "Vercel runs Ruby only on its Ruby runtime and Java, .NET, PHP and Elixir only through its Container runtime, both in beta, inside the Functions limits: requests run as function invocations on instances that stop when idle, so there is no always-on process, scheduled work or lasting in-memory state, and a JVM or .NET container starts cold. Host this API on a container or PaaS service instead.",
       "source": "https://vercel.com/docs/functions/runtimes/container"
     },
     {
       "id": "container_only_language_on_workers",
       "kind": "conflict",
-      "delta": -30,
+      "delta": -100,
       "when": {
         "backend": ["spring_boot", "dotnet", "laravel", "phoenix", "rails"],
         "hosting": ["cloudflare"]

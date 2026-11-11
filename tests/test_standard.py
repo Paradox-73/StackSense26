@@ -521,3 +521,19 @@ def test_hipaa_uploads_are_never_put_behind_a_public_cdn(cloud, residency):
     storage = [s["choice"] for s in out["stack"]["supporting"] if s["layer"] in ("storage", "cdn")
                and "is built to static files" not in s["justification"]]  # the app's own bundle may use a CDN
     assert storage and not [s for s in storage if CDN.search(s) and not re.search(r"non-PHI|no public CDN", s)], storage
+
+
+@pytest.mark.parametrize("base,langs,comp", [("P3", ["elixir"], ["pci_dss"]), ("P4", ["ruby"], ["pci_dss"]),
+                                             ("P4", ["csharp"], ["hipaa", "gdpr", "pci_dss"])])
+def test_a_function_platform_never_hosts_a_framework_it_runs_only_in_beta(base, langs, comp):
+    """With no hyperscaler, an EU residency and PCI DSS only function platforms remain; Vercel runs Ruby only on a beta
+    runtime and Java, .NET, PHP and Elixir only in its beta Container runtime, so the backend must be one it runs."""
+    doc = edit(base, team={"languages": langs}, compliance=comp, infrastructure={"cloud_preference": "none", "data_residency": "eu"})
+    if base == "P4":
+        doc["project"].update(type="healthtech", platforms=["web"])
+    else:
+        doc["requirements"]["availability"] = "99.9"
+    out = run(doc)
+    host, backend = out["stack"]["hosting"]["choice"], out["stack"]["backend"]["choice"]
+    if host.startswith(("Vercel", "Netlify", "Cloudflare")) and "for the API" not in host:
+        assert not re.search(r"Phoenix|Rails|ASP\.NET|Spring|Laravel", backend), (backend, host)
