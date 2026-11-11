@@ -6,10 +6,10 @@
   <title>StackSense: a tech stack you can defend</title>
   <meta name="description" content="Answer a few questions (or say Not sure) and StackSense picks a frontend, backend, database and hosting platform with a deterministic, source-cited engine. The rules decide every pick, so the same answers always give the same stack.">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#faf7f2" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#140d18" media="(prefers-color-scheme: dark)">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233a1546'/%3E%3Cpath d='M8 10h16M8 16h12M8 22h8' stroke='%23d6ab55' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
-  <link rel="preload" href="/static/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <meta name="theme-color" content="#2a313d" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#181d24" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233eede7'/%3E%3Cpath d='M8 10h16M8 16h12M8 22h8' stroke='%232a313d' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preload" href="/static/fonts/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/static/fonts/fonts.css">
   <link rel="stylesheet" href="/static/styles.css">
   <script>
@@ -61,7 +61,7 @@
             <h3 id="brief-h">Describe your project</h3>
             <label for="brief-text" class="sr-only">Project description</label>
             <textarea id="brief-text" rows="4" maxlength="4000" placeholder="e.g. We are 3 students building a ticketing site for our college fest, about 20,000 visitors a day, ₹5,000 a month for hosting. We know React and Node."></textarea>
-            <div class="brief-row"><button type="button" id="brief-btn" class="ex">Fill from description</button><span id="brief-llm" class="muted small"></span></div>
+            <div class="brief-row"><button type="button" id="brief-btn" class="btn">Fill from description</button><span id="brief-llm" class="muted small"></span></div>
             <div id="brief-out" hidden aria-live="polite"></div>
           </section>
           <form id="quick" autocomplete="off" novalidate></form>
@@ -102,6 +102,7 @@
     <a href="/docs" target="_blank" rel="noopener">API docs</a>
   </footer>
   <script src="/static/share.js"></script>
+  <script src="/static/theme.js"></script>
   <script src="/static/app.js"></script>
 </body>
 </html>

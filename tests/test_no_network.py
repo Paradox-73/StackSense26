@@ -9,7 +9,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 STATIC = Path(__file__).resolve().parent.parent / "app" / "static"
-TEXT_FILES = [STATIC / "index.html", STATIC / "styles.css", STATIC / "app.js", STATIC / "fonts" / "fonts.css"]
+TEXT_FILES = [STATIC / "index.html", STATIC / "styles.css", STATIC / "app.js", STATIC / "fonts" / "fonts.css",
+              STATIC / "scenario.html", STATIC / "scenario.css", STATIC / "scenario.js", STATIC / "theme.js"]
 
 # Constructs that make the browser load something: <link href>, <script src>, <img src>, CSS url()/@import, fetch().
 LOADERS = [
@@ -44,7 +45,9 @@ def test_every_local_resource_is_served():
 
 def test_font_licence_shipped():
     text = (STATIC / "fonts" / "OFL.txt").read_text(encoding="utf-8")
-    assert "SIL Open Font License" in text and "Fraunces" in text and "Geist" in text
+    assert "SIL Open Font License" in text and "Atkinson Hyperlegible Next" in text and "Atkinson Hyperlegible Mono" in text
+    report = (STATIC.parent.parent / "report" / "fonts" / "OFL.txt").read_text(encoding="utf-8")
+    assert "SIL Open Font License" in report and "Fraunces" in report and "Geist" in report
 
 
 @pytest.fixture

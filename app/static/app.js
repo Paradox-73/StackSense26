@@ -84,21 +84,6 @@ async function api(path, body, signal) {
   return (r.headers.get("content-type") || "").includes("json") ? r.json() : r.text();
 }
 
-/* ================================================================== theme: 3-way segmented toggle */
-function initTheme() {
-  let t = "auto";
-  try { t = new URLSearchParams(location.search).get("theme") || localStorage.getItem("ss-theme") || "auto"; } catch (e) { /* storage blocked */ }
-  if (!["light", "dark"].includes(t)) t = "auto";
-  $$('.theme input[name="theme"]').forEach((r) => {
-    r.checked = r.value === t;
-    r.onchange = () => {
-      if (r.value === "auto") document.documentElement.removeAttribute("data-theme");
-      else document.documentElement.setAttribute("data-theme", r.value);
-      try { localStorage.setItem("ss-theme", r.value); } catch (e) { /* storage blocked */ }
-    };
-  });
-}
-
 /* ================================================================== questions model */
 const allFields = () => S.questions.steps.flatMap((s) => s.fields);
 const fieldByKey = (k) => allFields().find((f) => f.key === k);
@@ -270,8 +255,9 @@ function syncQuick() {
   const other = comp.filter((c) => !COMP.some((x) => x[0] === c)).length;
   ro("comp", U.has("compliance") ? "not sure · none" : other ? `+${other} more` : "");
   $$("#quick .q").forEach((fs) => {
-    const Q = QUICK.find((x) => `q-${x.id}` === fs.id);
-    fs.classList.toggle("unsure", !!Q && (U.has(Q.key) || (Q.key2 && U.has(Q.key2))));
+    const Q = QUICK.find((x) => `q-${x.id}` === fs.id), unsure = !!Q && quickKeys(Q).some((k) => U.has(k));
+    fs.classList.toggle("unsure", unsure);
+    fs.classList.toggle("set", !!Q && !unsure && quickKeys(Q).some((k) => S.touched.has(k))); /* a filled station: answered */
   });
   paintBriefMarks();
 }
@@ -807,7 +793,7 @@ function renderHead(prev) {
   const r = S.result, pr = r.profile || {}, d = r.derived || {};
   const name = pr.project_name && pr.project_name !== "My project" ? pr.project_name : "Your stack";
   if (!r.feasible) {
-    $("#res-head").innerHTML = `<header class="rh"><div class="rh-t"><p class="kicker">No feasible stack</p><h2 id="res-title" tabindex="-1">${esc(name)}</h2></div></header>`;
+    $("#res-head").innerHTML = `<header class="rh"><div class="rh-t"><h2 id="res-title" tabindex="-1">${esc(name)}</h2><p class="rh-meta">No feasible stack</p></div></header>`;
     return;
   }
   const c = r.cost;
@@ -815,8 +801,8 @@ function renderHead(prev) {
   const inr = pr.currency === "INR";
   $("#res-head").innerHTML = `<header class="rh">
     <div class="rh-score">${dial(r.stack_score)}<span>fit score</span></div>
-    <div class="rh-t"><p class="kicker">${esc(r.architecture.style)} · ${esc(d.tier_label || "")}</p>
-      <h2 id="res-title" tabindex="-1">${esc(name)}</h2></div>
+    <div class="rh-t"><h2 id="res-title" tabindex="-1">${esc(name)}</h2>
+      <p class="rh-meta">${esc(r.architecture.style)} · ${esc(d.tier_label || "")}</p></div>
     <div class="rh-cost"><span class="k">Monthly cost</span>
       <b class="mono" id="cost-num">${costText(r)}</b>
       <span class="st st-${esc(c.status)}">${esc(status)} · ${inr ? `₹${fmt(pr.budget_monthly)}` : usd(c.budget_usd)}</span></div>
@@ -872,7 +858,7 @@ function renderPicks(prev, change) {
       <button type="button" class="pick-b" data-open="why" data-layer="${l}" aria-label="${esc(cap(l))}: ${esc(s.pick.name)}${changed ? `, changed from ${esc(was)}` : ""}, fit ${s.pick.score.toFixed(0)} of 100. Show reasoning">
         <span class="p-l">${esc(s.title)}</span><span class="p-s mono">${s.pick.score.toFixed(0)}</span>
         <span class="p-n">${esc(short(s.pick.name))}${s.api_host ? ` <small>+ API on ${esc(short(s.api_host.name))}</small>` : ""}</span>
-        ${changed ? `<span class="p-was">was ${esc(short(was))}</span>` : ""}
+        ${changed ? `<span class="p-was">was <s>${esc(short(was))}</s></span>` : ""}
         <span class="p-r">${oneLine(s)}</span>
         <span class="p-dep" data-dep="${l}" hidden></span>
       </button></li>`;
@@ -1199,7 +1185,7 @@ function renderWhatIfText() {
   if (!box || $(".wq", box)) return;
   box.innerHTML = `<form class="wq" id="wq-form"><label for="wq-in">Or ask in words</label>
     <div class="wq-row"><input type="text" id="wq-in" maxlength="400" placeholder="What if we had ten times the users?" autocomplete="off">
-    <button type="submit" class="ex" id="wq-go">Ask</button></div>
+    <button type="submit" class="btn" id="wq-go">Ask</button></div>
     <div id="wq-out" class="muted small" aria-live="polite"></div></form>`;
   $("#wq-form").onsubmit = (e) => { e.preventDefault(); askWhatIf(); };
 }
@@ -1272,7 +1258,7 @@ function openPanel(id, { keep = false, layer = null, focus = false } = {}) {
   if (layer) S.whyLayer = layer;
   $$(".drawer-b").forEach((b) => b.setAttribute("aria-expanded", String(b.dataset.open === id)));
   $$(".panel").forEach((p) => (p.hidden = p.id !== `panel-${id}`));
-  if (id === "why") selectWhy(S.whyLayer);
+  if (id === "why") selectWhy(S.whyLayer); else markOpenPick();
   if (id === "growth") showGrowth();
   if (id && !keep) {
     const p = $(`#panel-${id}`);
@@ -1309,7 +1295,7 @@ function whyPanel() {
         .map((b) => ({ html: `${esc(b.label)} <small class="mono">${b.score.toFixed(1)}/5 × w${fmt(b.weight, 1)}</small>`, value: b.points }));
       const srcs = [...new Set(p.sources.concat(r.compatibility.filter((c) => (c.layers || []).includes(l) && c.source).map((c) => c.source)))];
       return `<article class="why-l" id="why-${l}-p" role="tabpanel" data-layer="${l}" hidden>
-        <header class="wl-h"><div><p class="kicker">${esc(s.title)}</p><h3>${esc(p.name)}</h3>
+        <header class="wl-h"><div><p class="wl-layer">${esc(s.title)}</p><h3>${esc(p.name)}</h3>
           ${s.managed_offering ? `<p class="muted small">Offering: ${esc(s.managed_offering)}</p>` : ""}
           ${s.runs_here && !s.optional_host ? `<p class="muted small">${esc(s.runs_here)}</p>` : ""}
           ${s.api_host ? `<p class="muted small">API host: <b>${esc(s.api_host.name)}</b> (${s.api_host.score.toFixed(1)}). ${esc(s.api_host.why)}</p>` : ""}</div>
@@ -1389,7 +1375,10 @@ function selectWhy(l) {
   S.whyLayer = l;
   $$("[data-why-layer]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.whyLayer === l)));
   $$(".why-l").forEach((a) => (a.hidden = a.dataset.layer !== l));
+  markOpenPick();
 }
+/** While the Why drawer is open, the pick it explains carries an interchange ring. */
+const markOpenPick = () => $$("#picks .pick").forEach((p) => p.classList.toggle("open", S.panel === "why" && p.dataset.layer === S.whyLayer));
 
 /* cost */
 function costPanel() {
@@ -1714,7 +1703,6 @@ async function settled() { /* deep links: wait for the debounce, the live run an
 }
 
 (async function boot() {
-  initTheme();
   try {
     [S.questions, S.presets] = await Promise.all([api("/api/questions"), api("/api/presets")]);
   } catch (e) {

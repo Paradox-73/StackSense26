@@ -138,7 +138,8 @@ Libraries (open source):
 - [FastAPI](https://fastapi.tiangolo.com/) (MIT), [Starlette](https://starlette.dev/) (BSD-3), [Pydantic](https://docs.pydantic.dev/) (MIT), [Uvicorn](https://uvicorn.dev/) (BSD-3): the web app
 - [pytest](https://docs.pytest.org/) (MIT) and [HTTPX](https://www.python-httpx.org/) (BSD-3): the tests
 - Build tools only, not needed to run the app: [markdown-it-py](https://github.com/executablebooks/markdown-it-py) (MIT), [pypdf](https://github.com/py-pdf/pypdf) (BSD-3), [Playwright for Python](https://playwright.dev/python/) (Apache-2.0) and Google Chrome, for the report PDF and the screenshots
-- Fonts bundled in `app/static/fonts/`: [Fraunces](https://github.com/undercasetype/Fraunces) and [Geist and Geist Mono](https://github.com/vercel/geist-font), SIL Open Font License 1.1 ([`OFL.txt`](app/static/fonts/OFL.txt))
+- Fonts bundled in `app/static/fonts/`: [Atkinson Hyperlegible Next](https://github.com/googlefonts/atkinson-hyperlegible-next) and [Atkinson Hyperlegible Mono](https://github.com/googlefonts/atkinson-hyperlegible-next-mono) by the Braille Institute, via [Fontsource](https://fontsource.org/), SIL Open Font License 1.1 ([`OFL.txt`](app/static/fonts/OFL.txt))
+- Fonts bundled in `report/fonts/` for the report PDF: [Fraunces](https://github.com/undercasetype/Fraunces) and [Geist and Geist Mono](https://github.com/vercel/geist-font), SIL Open Font License 1.1 ([`OFL.txt`](report/fonts/OFL.txt))
 
 APIs:
 

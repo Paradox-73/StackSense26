@@ -215,7 +215,7 @@ def test_opening_why_not_netlify_is_what_the_script_shows():
     link = re.search(r"`(#preset=hipaa_telehealth&whynot=hosting:netlify&at=wn-out-hosting)`", SCRIPT)
     assert link, "the opening link is missing"
     assert 'id="wn-out-${l}"' in APP_JS and 'h.get("at")' in APP_JS and 'h.get("whynot")' in APP_JS
-    assert 'get("theme")' in APP_JS, "?theme=light is used in the checklist"
+    assert 'get("theme")' in (ROOT / "app" / "static" / "theme.js").read_text(encoding="utf-8"), "?theme=light is used in the checklist"
 
 
 def test_every_deep_link_in_the_script_is_supported():
