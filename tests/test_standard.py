@@ -663,6 +663,10 @@ def test_a_hosting_rule_that_costs_the_team_its_language_says_so():
     assert out["stack"]["backend"]["choice"].startswith("Go") and hit, [w["code"] for w in out["warnings"]]
     assert "C# + ASP.NET Core" in hit[0]["message"] and "Container runtime" in hit[0]["message"], hit[0]
     assert hit[0]["severity"] == "warning" and hit[0]["fields"] == ["team.languages"]
+    # No long-running host passes PCI DSS here, so the warning does not offer one.
+    assert "no host that runs C# + ASP.NET Core passed the other constraints" in hit[0]["message"], hit[0]
+    from engine.recommender import _team_languages  # a framework the team lists stands for its language
+    assert _team_languages({"django"}) == {"python"} and _team_languages({"spring"}) == {"java", "kotlin"}
     kept = edit("P4", project={"type": "healthtech", "platforms": ["web"]}, compliance=["hipaa", "gdpr", "pci_dss"],
                 infrastructure={"cloud_preference": "none", "data_residency": "eu"})  # TypeScript is listed: Express
     for d in [kept] + [load(n) for n in ("P1", "P2", "P3", "P4", "P5", "P6")]:

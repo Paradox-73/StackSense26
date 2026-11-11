@@ -64,36 +64,56 @@ from .stack import (
 
 SINGLE_PRIMARY_SQL = ("postgres", "mysql", "timescaledb")
 LAYER_TITLES = {"frontend": "Frontend", "backend": "Backend", "database": "Database", "hosting": "Hosting"}
-# The languages a backend is written in, where its skills do not name them: the FaaS entry runs Node.js or Python.
+# Backend skills name frameworks as well as languages; only these count as the language a backend is written in.
+LANGUAGES = {"javascript", "typescript", "node", "python", "go", "java", "kotlin", "csharp", "ruby", "php", "elixir",
+             "erlang"}
+# Where a backend's skills do not name its languages: the FaaS entry runs Node.js or Python.
 BACKEND_LANGUAGES = {"serverless_functions": {"javascript", "typescript", "node", "python"}}
 
 
 def _languages(item: dict) -> set:
-    return BACKEND_LANGUAGES.get(item["id"], set(item.get("skills", [])))
+    return BACKEND_LANGUAGES.get(item["id"], set(item.get("skills", []))) & LANGUAGES
 
 
-def _unlisted_language_warning(p: dict, d: dict, best: dict, backends: list[dict], rules: list[dict]) -> dict | None:
+def _team_languages(skills: set) -> set:
+    """The languages the team writes: those it lists, and those of each backend framework it lists (django: python)."""
+    return (skills & LANGUAGES) | {lang for b in load_kb()["backend"] if skills & set(b.get("skills", []))
+                                   for lang in _languages(b)}
+
+
+def _host_conflicts(picks: dict, rules: list[dict], p: dict, d: dict) -> tuple[list[dict], list[dict]]:
+    """(every rule this stack matches, the conflicts between its backend and its host)."""
+    hits = matching_rules({l: c["item"] for l, c in picks.items()}, rules, p, d)
+    return hits, [r for r in hits if r["kind"] == "conflict" and {"backend", "hosting"} <= rule_layers(r)]
+
+
+def _unlisted_language_warning(p: dict, d: dict, best: dict, scored: dict, rules: list[dict]) -> dict | None:
     """The pick is in a language the team did not list, and a backend in a listed language would have won but for a
     rule that it cannot run on the chosen host (a function platform that runs only some languages)."""
-    skills = set(d["skills"])
+    team = _team_languages(set(d["skills"]))
     be = best["picks"]["backend"]["item"]
-    if not skills or be.get("kind") not in ("server", "faas") or _languages(be) & skills:
+    if not team or be.get("kind") not in ("server", "faas") or _languages(be) & team:
         return None
-    for cand in backends:
-        if cand["item"].get("kind") not in ("server", "faas") or not _languages(cand["item"]) & skills:
+    on_pick = {r["id"] for r in best["rules"]}
+    for cand in scored["backend"]:
+        if cand["item"].get("kind") not in ("server", "faas") or not _languages(cand["item"]) & team:
             continue
         picks = dict(best["picks"], backend=cand)
-        hits = matching_rules({l: c["item"] for l, c in picks.items()}, rules, p, d)
-        blocking = [r for r in hits if r["kind"] == "conflict" and {"backend", "hosting"} <= rule_layers(r)]
-        if blocking and combo_score({l: c["score"] for l, c in picks.items()},
-                                    [r for r in hits if r not in blocking]) > best["score"]:
-            host = best["picks"]["hosting"]["item"]
-            why = re.split(r"(?<=\.)\s+(?=[A-Z])", blocking[0]["note"])[0]  # the rule's first sentence: what the host runs
-            return _warn("BACKEND_LANGUAGE_NOT_LISTED", "warning", "Backend in a language the team did not list",
-                         f"{cand['name']} matches the team's skills, but {host['name']} cannot host it: {why}",
-                         f"The backend is {be['name']}, in a language nobody on the team listed: plan time for the team "
-                         f"to learn {short_name(be)}, or host the API on a container or PaaS service to keep "
-                         f"{cand['name']}.", ["team_skills"])
+        hits, conflicts = _host_conflicts(picks, rules, p, d)
+        blocking = [r for r in conflicts if r["id"] not in on_pick]  # a rule that hits the pick too is no reason
+        if not blocking or combo_score({l: c["score"] for l, c in picks.items()},
+                                       [r for r in hits if r not in blocking]) <= best["score"]:
+            continue
+        host = best["picks"]["hosting"]["item"]
+        why = re.split(r"(?<=\.)\s+(?=[A-Z])", blocking[0]["note"])[0]  # the rule's first sentence: what the host runs
+        other = next((h["name"] for h in scored["hosting"] if (h["item"].get("runs") or {}).get("long_running")
+                      and not _host_conflicts(dict(picks, hosting=h), rules, p, d)[1]), None)
+        keep = (f"or host the API on {other}, which runs it, to keep {cand['name']}" if other else
+                f"no host that runs {cand['name']} passed the other constraints, so keeping it means relaxing one of them")
+        return _warn("BACKEND_LANGUAGE_NOT_LISTED", "warning", "Backend in a language the team did not list",
+                     f"{cand['name']} matches the team's skills, but {host['name']} cannot host it: {why}",
+                     f"The backend is {be['name']}, in a language nobody on the team listed: plan time for the team to "
+                     f"learn {short_name(be)}; {keep}.", ["team_skills"])
     return None
 
 
@@ -662,7 +682,7 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
     split_why = api_host_reasons(p, d, stack_items)
     api_host = pick_api_host(stack_items, core["scored"]["hosting"], kb["rules"],
                              lambda items, rules: matching_rules(items, rules, p, d)) if split_why else None
-    language = None if api_host else _unlisted_language_warning(p, d, best, core["scored"]["backend"], kb["rules"])
+    language = None if api_host else _unlisted_language_warning(p, d, best, core["scored"], kb["rules"])
     if language:  # with an API host of its own, the function platform's language rule does not bind the API
         result["warnings"].append(language)
     if api_host:
