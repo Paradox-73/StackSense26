@@ -1040,14 +1040,21 @@ def _auth(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None]:
             return (*cloud, None)
         if env["india"] and keycloak_ok:
             return "Keycloak self-hosted in your Indian region (on BAA-covered servers)", KEYCLOAK_DOCS, "keycloak"
-        return "Auth0 with a signed BAA" + (" and enterprise connections (SAML or OIDC)" if sso else ""), AUTH0_ENTERPRISE, None
+        return ("Auth0 with a signed BAA" + (" and enterprise connections (SAML or OIDC)" if sso else ""),
+                AUTH0_ENTERPRISE if sso else AUTH_DOCS, None)
     if env["india"]:
         if env["cloud"] != "aws" and be.get("id") == "django" and not sso:
             # The users stay in the app's own database in India, with no second vendor to hold them.
             return ("Django's built-in authentication (django.contrib.auth), with the users in your database in India",
                     "https://docs.djangoproject.com/en/stable/topics/auth/", None)
-        return ("Amazon Cognito in the Mumbai region (ap-south-1)" + (", federated with your SAML or OIDC identity provider"
-                                                                      if sso else ""), COGNITO_FEDERATION, None)
+        if env["cloud"] == "aws" or not (env["cloud"] or env["no_hyperscaler"]):  # never an AWS service on GCP or Azure
+            return ("Amazon Cognito in the Mumbai region (ap-south-1)" + (", federated with your SAML or OIDC identity "
+                                                                          "provider" if sso else ""), COGNITO_FEDERATION, None)
+        if keycloak_ok:
+            return "Keycloak self-hosted in your Indian region", KEYCLOAK_DOCS, "keycloak"
+        # shortcut: names no library for frameworks other than Django; add one per backend if this case gets common.
+        return ("Your backend framework's built-in authentication, with the users in your database in India", AUTH_DOCS,
+                None)
     if sso:
         return {"aws": ("Amazon Cognito federated with your SAML or OIDC identity provider", COGNITO_FEDERATION, None),
                 "gcp": ("Identity Platform with SAML or OIDC sign-in", IDENTITY_PLATFORM_SAML, None)}.get(
@@ -1188,7 +1195,7 @@ def service_notes(s: dict, compliance=()) -> tuple[list[tuple[str, str]], list[s
         extra.append(("Keycloak (self-hosted)", "A server to run, patch and back up, for no feature this project needs"))
     elif name.startswith("DigitalOcean Spaces in BLR1"):
         extra.append(("Ceph Object Gateway on your own servers", "A storage cluster to run yourself"))
-    elif s["role"] == "Search" and "Meilisearch" not in name:
+    elif s["role"] == "Search" and not s.get("system") and "Meilisearch" not in name:  # the database's own index
         extra.append(("Meilisearch", "A second system to run before the data needs it"))
     return extra + alts, trade
 

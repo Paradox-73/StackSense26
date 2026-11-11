@@ -87,3 +87,11 @@ def test_azure_caches_are_azure_managed_redis():
     kb = load_kb()["index"]
     assert portable_offering(kb["redis"], kb["azure_apps"], False, False) == "Azure Managed Redis"
     assert "https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/retirement-faq" in kb["redis"]["sources"]
+
+
+def test_sign_in_under_india_residency_stays_on_the_required_cloud():
+    for cloud in ("gcp", "azure"):
+        doc = _doc("P4")  # Spring Boot, data_residency india, has_devops true
+        doc["infrastructure"]["cloud_preference"] = cloud
+        auth = [s["choice"] for s in _sup(run(doc), "auth")]
+        assert auth and not [a for a in auth if "Amazon" in a or "Cognito" in a], (cloud, auth)

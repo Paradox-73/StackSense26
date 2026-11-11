@@ -80,7 +80,7 @@ def test_firebase_app_names_firebase_hosting():
 def test_large_document_corpus_gets_a_search_engine():
     r = recommend(_audit("E18"), with_counterfactuals=False)
     search = next(s for s in r["supporting_services"] if s["role"] == "Search")
-    assert "OpenSearch" in search["name"] or "Meilisearch" in search["name"] or "AI Search" in search["name"]
+    assert any(engine in search["name"] for engine in ("OpenSearch", "Meilisearch", "AI Search", "Elastic Cloud"))
 
 
 def test_global_four_nines_sql_names_distributed_sql():
