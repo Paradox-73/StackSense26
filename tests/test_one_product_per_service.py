@@ -78,3 +78,12 @@ def test_no_cache_when_no_app_code_runs_on_the_cloud():
     stack["backend"] = kb["index"]["express"]
     stack["hosting"] = kb["index"]["aws_ecs"]
     assert "Cache" in [s["role"] for s in supporting_services(p, d, stack, [])]
+
+
+def test_azure_caches_are_azure_managed_redis():
+    """Azure Cache for Redis retires (Basic, Standard and Premium on 30 Sep 2028, Enterprise on 31 Mar 2027) and
+    Microsoft's retirement FAQ points new caches to Azure Managed Redis."""
+    from engine.advice import portable_offering
+    kb = load_kb()["index"]
+    assert portable_offering(kb["redis"], kb["azure_apps"], False, False) == "Azure Managed Redis"
+    assert "https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/retirement-faq" in kb["redis"]["sources"]

@@ -548,7 +548,7 @@
       "managed_offerings": {
         "aws": "ElastiCache (Valkey)",
         "gcp": "Memorystore",
-        "azure": "Azure Cache for Redis",
+        "azure": "Azure Managed Redis",
         "vercel": "Upstash Redis",
         "netlify": "Upstash Redis",
         "render": "Render Key Value",
@@ -569,7 +569,8 @@
       "sources": [
         "https://redis.io/docs/latest/",
         "https://valkey.io/docs/",
-        "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/"
+        "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/",
+        "https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/retirement-faq"
       ],
       "memory_bound": true,
       "system_of_record": {
