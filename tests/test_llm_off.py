@@ -148,3 +148,15 @@ def test_no_text_says_the_what_if_box_uses_the_model():
     js = (ROOT / "app" / "static" / "app.js").read_text(encoding="utf-8")
     what_if = js[js.index("async function askWhatIf"):js.index("S.cause = `your what-if")]
     assert "language model" not in what_if and "API key" not in what_if
+
+
+def test_cli_runs_an_array_file_past_the_api_cap(tmp_path, capsys):
+    """MAX_SCENARIOS_PER_FILE bounds the work of one API request; a file on the command line runs every element."""
+    from engine.standard import MAX_SCENARIOS_PER_FILE, run_text
+    text = json.dumps([1] * (MAX_SCENARIOS_PER_FILE + 1))  # each element is invalid input, which runs fast
+    assert run_text(text)["validation_errors"][0]["field"] == "(file)"
+    src = tmp_path / "many.json"
+    src.write_text(text, encoding="utf-8")
+    assert cli.main(["--scenario", str(src)]) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert isinstance(out, list) and len(out) == MAX_SCENARIOS_PER_FILE + 1 and out[0] == run(1)

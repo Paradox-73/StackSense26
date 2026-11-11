@@ -778,16 +778,16 @@ def _summary(result: dict, stack: dict, style: str, cost: dict) -> str:
     return f"{first} About {money} a month. {why.split('. ')[0].rstrip('.')}."
 
 
-def run_text(text: str) -> dict | list[dict]:
+def run_text(text: str, capped: bool = True) -> dict | list[dict]:
     """run() on the text of a scenario file. A JSON array holds several scenarios (the organisers share the public ones
-    that way), and gives a list with one output per element. Text that is not JSON is one invalid_input result, not
-    an exception."""
+    that way), and gives a list with one output per element; capped (the API) runs at most MAX_SCENARIOS_PER_FILE of
+    them, the command line any number. Text that is not JSON is one invalid_input result, not an exception."""
     try:
         doc = json.loads(text)
     except (ValueError, RecursionError) as e:  # RecursionError: arrays or objects nested past Python's limit
         return _file_error(f"not valid JSON: {e}" if isinstance(e, ValueError) else "nested too deeply to be a scenario file")
     if isinstance(doc, list) and doc:
-        if len(doc) > MAX_SCENARIOS_PER_FILE:
+        if capped and len(doc) > MAX_SCENARIOS_PER_FILE:
             return _file_error(f"holds {len(doc):,} scenarios; one file runs at most {MAX_SCENARIOS_PER_FILE}")
         return [run(x) for x in doc]
     return run(doc)

@@ -97,7 +97,7 @@ python cli.py --scenario scenarios/public --out outputs                 # every 
 ```
 
 - With a folder, or an `--out` that is not a `.json` file name, each output is written to `<out>/<scenario_id>_output.json`, for example `outputs/P2_output.json`. The command prints one line per scenario: its status, the four choices and the file written.
-- A file may hold a JSON array of scenarios, as the organisers' `stacksense_public_scenarios.json` does: each element is run on its own and gets its own `<scenario_id>_output.json` (printed, or written to an `--out` `.json` file, the outputs are one JSON array), and `POST /api/scenario` with an array returns an array of outputs.
+- A file may hold a JSON array of scenarios, as the organisers' `stacksense_public_scenarios.json` does: each element is run on its own and gets its own `<scenario_id>_output.json` (printed, or written to an `--out` `.json` file, the outputs are one JSON array), and `POST /api/scenario` with an array returns an array of outputs. The command line runs any number of scenarios; one API request runs at most 100.
 - Use the same Python as the app: `.venv/bin/python cli.py ...` (Windows: `.venv\Scripts\python cli.py ...`) after the first `run.py`, or any Python 3.9+ (the command line needs no packages).
 - In the browser: **Scenario file** (`/scenario`) loads a JSON file or a public example, shows the result and downloads it with **Download output JSON**.
 - Over HTTP: `POST /api/scenario` with the scenario as the body returns the output JSON.

@@ -92,7 +92,7 @@ def run_scenarios(src: Path, out: str | None) -> int:
     failed = 0
     for f in files:
         try:
-            result = run_text(read_text(f))
+            result = run_text(read_text(f), capped=False)  # the API's cap guards a server, not a local run
         except Exception as e:  # a file the engine cannot handle must not stop the rest of a folder
             print(f"{f}: not run ({type(e).__name__}: {e})", file=sys.stderr)
             failed += 1
