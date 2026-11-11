@@ -140,7 +140,29 @@ ABSENT_NOTE = {"project.name": "the project is called 'Unnamed project'", "proje
 # their vendor's end of support. Each end-of-life row: (pattern, product, end date, source).
 EXISTING_DATABASES = [(r"postgres", "postgres"), (r"\bmysql\b|mariadb", "mysql"), (r"mongo", "mongodb"),
                       (r"\bredis\b|valkey", "redis"), (r"sql ?server|mssql|azure sql", "sqlserver"),
-                      (r"\boracle\b(?! cloud)", "oracle")]
+                      (r"\boracle\b(?! cloud)", "oracle"), (r"\bdb2\b", "db2")]
+# Databases the engine does not score: they stay the system of record and the new app integrates with them.
+UNSCORED_DATABASES = {"oracle": "Oracle Database", "db2": "IBM Db2"}
+# Existing platforms each kept in its own layer: (pattern, name, kind, source). A message system carries the new
+# background jobs and events, a warehouse the analytics; a content or commerce platform keeps its content.
+EXISTING_PLATFORMS = [
+    (r"\bkafka\b", "Apache Kafka", "queue", "https://kafka.apache.org/intro"),
+    (r"rabbit ?mq", "RabbitMQ", "queue", "https://www.rabbitmq.com/docs"),
+    (r"\bibm mq\b|websphere mq", "IBM MQ", "queue", "https://www.ibm.com/products/mq"),
+    (r"snowflake", "Snowflake", "warehouse", "https://docs.snowflake.com/en/user-guide/intro-key-concepts"),
+    (r"databricks", "Databricks", "warehouse", "https://docs.databricks.com/"),
+    (r"bigquery", "BigQuery", "warehouse", "https://docs.cloud.google.com/bigquery/docs"),
+    (r"redshift", "Amazon Redshift", "warehouse", "https://docs.aws.amazon.com/redshift/"),
+    (r"wordpress", "WordPress", "cms", "https://developer.wordpress.org/rest-api/"),
+    (r"drupal", "Drupal", "cms", "https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module"),
+    (r"shopify", "Shopify", "commerce", "https://shopify.dev/docs/api/storefront"),
+    (r"magento|adobe commerce", "Adobe Commerce (Magento)", "commerce", "https://developer.adobe.com/commerce/webapi/"),
+]
+PLATFORM_API = {"WordPress": "the WordPress REST API", "Drupal": "Drupal's core JSON:API module",
+                "Shopify": "the Shopify Storefront API", "Adobe Commerce (Magento)": "Adobe Commerce's REST or GraphQL API"}
+# The engine services an existing platform replaces, by the platform's kind.
+PLATFORM_ROLES = {"queue": ("Background jobs", "Ingestion buffer"), "warehouse": ("Analytics",)}
+BEING_REPLACED = re.compile(r"being replaced|to be replaced|replacing|migrat|retir|sunset|decommission")
 IDENTITY = [(r"\bentra\b|\bazure ad\b|azure active directory", "Microsoft Entra ID"), (r"\bokta\b", "Okta"),
             (r"google workspace|\bg ?suite\b", "Google Workspace"), (r"\bkeycloak\b", "Keycloak"), (r"\bauth0\b", "Auth0"),
             (r"\bcognito\b", "Amazon Cognito"), (r"active directory|\badfs\b", "Active Directory"),
@@ -373,6 +395,7 @@ def _systems(texts: list[str]) -> tuple[list[str], list[str], list[tuple[str, st
             if re.search(pattern, low) and name not in idps:
                 idps.append(name)
                 hit = True
+        hit = hit or any(re.search(pattern, low) for pattern, *_ in EXISTING_PLATFORMS)
         for pattern, product, status, source in END_OF_LIFE:  # one text can name several products
             m = re.search(pattern, low)
             if m:
@@ -612,9 +635,19 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
             notes.append(f"Existing database '{text}': {names[dbid]} is weighed with a bonus for keeping it; if it stays "
                          "the pick, move its data to the recommended offering with the vendor's migration tool, or reach "
                          "it over a private link (site-to-site VPN) while it stays where it is")
+        elif dbid in UNSCORED_DATABASES:
+            notes.append(f"Existing database '{text}': {UNSCORED_DATABASES[dbid]} stays the system of record and is "
+                         "integrated, not migrated: the new app keeps its own data in the recommended database and reaches "
+                         f"{UNSCORED_DATABASES[dbid]} through its client drivers or a change-data-capture feed")
+    _platform_notes(f, notes, warns)
     for text in other:
         how, cloud_only = next(((api, c) for pattern, api, c in INTEGRATIONS if re.search(pattern, text.lower())),
-                               ("its API", False))
+                               (None, False))
+        if how is None:
+            notes.append(f"Existing system '{text}': no known integration path. StackSense has no interface on record "
+                         "for it, so find out how it shares data (an API, a database, file exports) before planning the "
+                         "integration; it stays the system of record for its own data")
+            continue
         if cloud_only and deploy == "air_gapped":
             warns.append(_std_warn("EXISTING_SYSTEM_UNREACHABLE", "warning",
                                    f"'{text}' is a cloud service, and {unreachable} through {how}. Move its data across "
@@ -624,6 +657,69 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
             continue
         notes.append(f"Existing system '{text}': integrated through {how}; it stays the system of record for its own data")
     return a, origin, notes, warns
+
+
+def _platforms(texts: list[str]) -> list[tuple[str, str, str, str]]:
+    """Existing platforms named in free text: (text, name, kind, source), the first text per platform."""
+    out = []
+    for text in texts:
+        for pattern, name, kind, source in EXISTING_PLATFORMS:
+            if re.search(pattern, text.lower()) and name not in [x[1] for x in out]:
+                out.append((text, name, kind, source))
+    return out
+
+
+def _reuse_services(result: dict, f: dict) -> dict:
+    """The engine's result with each service an existing platform covers replaced by that platform, and the replaced
+    services' cost lines removed: the existing broker carries the queue, the existing warehouse the analytics."""
+    services, deferred = list(result.get("supporting_services", [])), list(result.get("deferred_services", []))
+    gone = set()
+    for text, name, kind, source in _platforms(f["infrastructure.existing_systems"]):
+        hit = [s for s in services + deferred if s["role"] in PLATFORM_ROLES.get(kind, ())]
+        if not hit:
+            continue
+        was = " and ".join(dict.fromkeys(s["name"].split(" (")[0] for s in hit))
+        why = (f"infrastructure.existing_systems lists '{text}': the new app's background jobs and events go through it "
+               f"as new topics or queues instead of {was}, so there is no second message system to run, secure and "
+               "monitor." if kind == "queue" else
+               f"infrastructure.existing_systems lists '{text}': analytics queries run there, fed by a continuous copy of "
+               f"the app database's changes, instead of a new {was} store beside it.")
+        first, new = hit[0], {"role": hit[0]["role"], "name": f"{name} (existing)", "why": why, "source": source}
+        services = [new if s is first else s for s in services if s is first or s not in hit]
+        if first in deferred:  # the platform already runs, so nothing waits on the operations budget
+            services.insert(0, new)
+        deferred = [s for s in deferred if s not in hit]
+        gone |= {s["role"] for s in hit}
+    if not gone:
+        return result
+    cost = dict(result["cost"])
+    dropped = [x for x in cost.get("lines", []) if x["component"].split(":")[0] in gone]
+    cost["lines"] = [x for x in cost.get("lines", []) if x not in dropped]
+    cost["total_low"] = cost["total_low"] - sum(x["low"] for x in dropped)
+    cost["total_high"] = cost["total_high"] - sum(x["high"] for x in dropped)
+    return dict(result, supporting_services=services, deferred_services=deferred, cost=cost)
+
+
+def _platform_notes(f: dict, notes: list[str], warns: list[dict]) -> None:
+    """How each existing platform is kept, and a warning when a running content or commerce platform would be
+    rebuilt by the stack shown instead of kept."""
+    for text, name, kind, source in _platforms(f["infrastructure.existing_systems"]):
+        if kind == "queue":
+            notes.append(f"Existing message system '{text}': {name} carries the new app's background jobs and events, "
+                         "so no second broker is added")
+        elif kind == "warehouse":
+            notes.append(f"Existing warehouse '{text}': analytics run in {name}, so no second analytics store is added")
+        elif BEING_REPLACED.search(text.lower()):
+            notes.append(f"Existing {name} '{text}' is being replaced: move its data across through {PLATFORM_API[name]} "
+                         f"({source})")
+        else:
+            what = "content" if kind == "cms" else "catalogue, orders and customers"
+            warns.append(_std_warn("EXISTING_PLATFORM_REBUILT", "warning",
+                                   f"'{text}' is a running {name} system, and the stack shown is a new build beside it. "
+                                   f"Keep {name} for the {what}, as it is or headless behind the new frontend through "
+                                   f"{PLATFORM_API[name]} ({source}), unless replacing it is the goal: a rebuild moves "
+                                   f"every record of the {what} and every URL across.",
+                                   ["infrastructure.existing_systems"]))
 
 
 def _relax_contradictions(f: dict, notes: list[str], warns: list[dict]) -> None:
@@ -853,6 +949,10 @@ def _warnings(result: dict, origin: dict) -> list[dict]:
     for w in result.get("warnings", []):
         message = " ".join(x.strip() for x in (w.get("title", "") + ".", w.get("detail", ""), w.get("resolution", "")) if x)
         message = UI_POINTER.sub(".", message)  # the output file has no app panels to point at
+        message = message.replace(  # a database the engine does not score is a system of record to integrate with
+            "Recommending the closest open database; plan a migration or keep a sync from your existing one.",
+            "It stays the system of record and is integrated, not migrated: the new app keeps its own data in the "
+            "recommended database and reaches the existing one through its client drivers or a change-data-capture feed.")
         for app_words, file_words in FORM_WORDS:
             message = message.replace(app_words, file_words)
         out.append(_std_warn(w["code"], w["severity"], message, _paths(w.get("fields", []), origin)))
@@ -1006,6 +1106,7 @@ def run(doc) -> dict:
             s["role"] == "Search" for s in result.get("supporting_services", []) + result.get("deferred_services", [])):
         assumptions.append("requirements.full_text_search is false, so no search service is recommended, although "
                            "projects of this type usually add one")
+    result = _reuse_services(result, fields)
     stack = {l: _component(l, result["stack"][l], origin, fields, result) for l in LAYERS}
     stack["supporting"] = _supporting(result, fields)
     style = _style(result)

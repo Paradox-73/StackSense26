@@ -631,6 +631,9 @@ def test_only_the_mail_server_reads_as_exchange(text, how):
     weather or market forecast as often as Microsoft's mail program."""
     doc = edit("P5", infrastructure={"existing_systems": [text]})
     notes = [a for a in run(doc)["assumptions"] if a.startswith(f"Existing system '{text}'")]
+    if how == "its API":  # no interface on record: the note says so instead of inventing one
+        assert len(notes) == 1 and notes[0].startswith(f"Existing system '{text}': no known integration path"), notes
+        return
     assert notes == [f"Existing system '{text}': integrated through {how}; it stays the system of record for its own data"], notes
 
 
@@ -818,3 +821,39 @@ def test_more_end_of_life_systems_are_warned(system, product):
     out = edited("P5", infrastructure={"existing_systems": systems})
     eol = [w["message"] for w in out["warnings"] if w["code"] == "EOL_EXISTING_SYSTEM"]
     assert (len(eol) == 1 and f"{product} is past its vendor's support" in eol[0]) if system else not eol, eol
+
+
+def test_an_existing_message_broker_carries_the_queue():
+    base = [s["choice"] for s in edited("P2")["stack"]["supporting"] if s["layer"] == "queue"]
+    out = edited("P2", infrastructure={"existing_systems": ["Apache Kafka 3.6 cluster"]})
+    queues = [s for s in out["stack"]["supporting"] if s["layer"] == "queue"]
+    assert base and [s["choice"] for s in queues] == ["Apache Kafka (existing)"], (base, queues)
+    assert base[0].split(" (")[0] in queues[0]["justification"] and queues[0]["source"].startswith("https://kafka.apache.org")
+
+
+def test_an_existing_warehouse_carries_the_analytics_and_its_cost():
+    sections = dict(project={"type": "data_analytics"}, scale={"data_volume_gb_12_months": 20000},
+                    budget={"monthly_infra_usd": 40000})
+    base = edited("P5", **sections)
+    out = edited("P5", infrastructure={"existing_systems": ["Snowflake (EU) data warehouse"]}, **sections)
+    analytics = lambda o: [s["choice"] for s in o["stack"]["supporting"] if "ClickHouse" in s["choice"]  # noqa: E731
+                           or "(existing)" in s["choice"]]
+    assert [c for c in analytics(base) if "ClickHouse" in c], analytics(base)
+    assert analytics(out) == ["Snowflake (existing)"], analytics(out)
+    assert out["estimated_monthly_cost_usd"]["min"] < base["estimated_monthly_cost_usd"]["min"]
+    assert not [a for a in out["estimated_monthly_cost_usd"]["assumptions"] if a.startswith("Analytics:")]
+
+
+def test_an_unscored_database_is_integrated_not_migrated():
+    out = edited("P4", infrastructure={"existing_systems": ["Oracle Database 19c (core ledger)", "IBM Db2 on z/OS"]})
+    texts = [w["message"] for w in out["warnings"]] + out["assumptions"]
+    assert not [t for t in texts if "plan a migration" in t], texts
+    said = [t for t in texts if "stays the system of record and is integrated, not migrated" in t]
+    assert any("Oracle" in t for t in said) and any("Db2" in t for t in said), said
+
+
+def test_systems_with_no_known_interface_say_so():
+    out = edited("P5", infrastructure={"existing_systems": ["WhatsApp groups", "Windows 7 office PCs"]})
+    for name in ("WhatsApp groups", "Windows 7 office PCs"):
+        assert any(a.startswith(f"Existing system '{name}': no known integration path") for a in out["assumptions"])
+    assert not [a for a in out["assumptions"] if "integrated through its API" in a]

@@ -182,3 +182,13 @@ def test_seo_on_a_network_without_the_internet_is_a_contradiction():
     on_prem = scenario(infrastructure={"deployment_model": "on_premise", "cloud_preference": "none"},
                        requirements={"seo_critical": True})
     assert severities(on_prem).get("SEO_RESTRICTED_DEPLOYMENT") == "warning"
+
+
+def test_a_running_content_or_commerce_platform_is_kept_or_its_rebuild_is_warned():
+    out = scenario(infrastructure={"existing_systems": ["WordPress 6.4 (self-hosted, 40,000 articles)"]})
+    assert severities(out).get("EXISTING_PLATFORM_REBUILT") == "warning"
+    message = next(w["message"] for w in out["warnings"] if w["code"] == "EXISTING_PLATFORM_REBUILT")
+    assert "WordPress REST API" in message and "https://developer.wordpress.org/rest-api/" in message, message
+    replaced = scenario(infrastructure={"existing_systems": ["Shopify Plus store (being replaced)"]})
+    assert "EXISTING_PLATFORM_REBUILT" not in severities(replaced)
+    assert any("is being replaced" in a for a in replaced["assumptions"])
