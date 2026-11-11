@@ -580,7 +580,7 @@ details.sub > summary { cursor: pointer; color: var(--plum-2); font-weight: 500;
   .nav-b { padding: 7px 8px; font-size: 13.5px; }
   .theme { margin-left: auto; }
   .top-in { flex-wrap: wrap; row-gap: 4px; }  /* brand and theme on one row, the two views below: no horizontal scroll at 320 to 400 px */
-  .nav { order: 3; flex: 1 0 100%; justify-content: flex-start; }
+  .nav { order: 3; flex: 1 0 100%; justify-content: flex-start; flex-wrap: wrap; }  /* three links outgrow 320 px */
   .intro { padding-top: 18px; }
   .examples { flex-direction: column; gap: 6px; }
   .examples:not(.all) .ex:nth-child(n+5):not(.more) { display: none; }
