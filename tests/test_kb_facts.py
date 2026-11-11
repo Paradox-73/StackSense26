@@ -1,8 +1,12 @@
 """Hard-filter facts from the vendors' own pages (each entry whose facts were corrected cites the page it rests on)."""
 import json
 from pathlib import Path
+from urllib.parse import urlparse
+
+import pytest
 
 from engine import recommend
+from engine.advice import _object_storage
 from engine.kb import load_kb
 from engine.profile import INR_PER_USD
 
@@ -149,3 +153,31 @@ def test_static_hosts_claim_only_the_audits_a_public_page_lists_them_for():
     doc["infrastructure"]["cloud_preference"], doc["compliance"] = "azure", ["pci_dss"]
     out = run(doc)
     assert not (out["stack"] and re.match(r"Azure (Blob Storage|Static Web Apps)", out["stack"]["hosting"]["choice"])), out["stack"]
+
+
+# The site of each object store's own documentation; a line is sourced to the first store it names.
+STORE_SITES = {"Ceph Object Gateway": "docs.ceph.com", "Amazon S3": "amazon.com", "Cloud Storage": "cloud.google.com",
+               "Blob Storage": "learn.microsoft.com", "DigitalOcean Spaces": "docs.digitalocean.com",
+               "Cloudflare R2": "developers.cloudflare.com", "Tigris": "fly.io"}
+BAA_PAGES = {"Amazon S3": "https://aws.amazon.com/compliance/hipaa-eligible-services-reference/",
+             "Cloud Storage": "https://cloud.google.com/security/compliance/hipaa",
+             "Blob Storage": "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-hipaa-us"}
+NO_RULES = {"onprem": False, "hybrid": False, "cloud": None, "hipaa": False, "self_managed": False, "no_hyperscaler": False,
+            "india": False, "eu": False, "us": False}
+
+
+@pytest.mark.parametrize("env,prov", [
+    ({"onprem": True}, "onprem"), ({"hybrid": True}, "aws"), *[({"cloud": c}, c) for c in ("aws", "gcp", "azure")],
+    *[({"cloud": c, "hipaa": True}, c) for c in ("aws", "gcp", "azure")], ({"hipaa": True, "self_managed": True}, "hetzner"),
+    ({"hipaa": True}, "render"), ({"hipaa": True, "no_hyperscaler": True}, "flyio"),
+    ({"india": True, "no_hyperscaler": True}, "digitalocean"), ({"india": True}, "render"), ({"eu": True}, "render"),
+    ({}, "cloudflare"), ({}, "digitalocean"), ({}, "render")])
+def test_each_object_store_line_cites_the_store_it_names(env, prov):
+    """Every line cited Amazon S3's product page, Google Cloud Storage and Azure Blob Storage included. A line cites
+    the first store it names, and a HIPAA line that names a cloud's store cites that cloud's HIPAA page; no public
+    Microsoft page lists the services its BAA covers, so the Azure line does not say Blob Storage is under it."""
+    name, src = _object_storage(dict(NO_RULES, **env), prov)
+    first = min((name.index(k), k) for k in STORE_SITES if k in name)[1]
+    assert STORE_SITES[first] in urlparse(src).netloc, (name, src)
+    if "BAA" in name and first in BAA_PAGES:
+        assert src == BAA_PAGES[first] and "under Microsoft's BAA" not in name, (name, src)

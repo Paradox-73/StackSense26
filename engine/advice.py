@@ -810,6 +810,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
 
 
 S3_DOCS = "https://aws.amazon.com/s3/"
+AWS_HIPAA_DOCS = "https://aws.amazon.com/compliance/hipaa-eligible-services-reference/"  # lists Amazon S3
 # Object storage a team runs itself; MinIO's repository is archived and no longer maintained (github.com/minio/minio).
 CEPH_RGW_DOCS = "https://docs.ceph.com/en/latest/radosgw/"
 # Where a HIPAA project's files go on a platform with no hyperscaler, from each host's own HIPAA page: Render has no
@@ -827,37 +828,48 @@ def _object_storage(env: dict, prov: str) -> tuple[str, str]:
         return ("S3 API everywhere: the cloud's object storage in the cloud, Ceph Object Gateway on-premises (same S3 "
                 "client code)"), CEPH_RGW_DOCS
     if env["cloud"] and env["hipaa"]:  # uploads hold health information: a CDN may carry only public files
-        return {"aws": "Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only)",
-                "gcp": "Cloud Storage under the Google Cloud BAA (Cloud CDN for public, non-PHI files only)",
-                "azure": "Blob Storage under Microsoft's BAA (Front Door for public, non-PHI files only)"}[env["cloud"]], S3_DOCS
+        return {"aws": ("Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only)", AWS_HIPAA_DOCS),
+                "gcp": ("Cloud Storage under the Google Cloud BAA (Cloud CDN for public, non-PHI files only)",
+                        "https://cloud.google.com/security/compliance/hipaa"),
+                # Microsoft lists the services its BAA covers only in a Service Trust Portal document.
+                "azure": ("Blob Storage, after you confirm it is in scope for Microsoft's HIPAA BAA (Front Door for "
+                          "public, non-PHI files only)",
+                          "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-hipaa-us")}[env["cloud"]]
     if env["cloud"]:
-        return {"aws": "Amazon S3 + CloudFront", "gcp": "Cloud Storage + Cloud CDN", "azure": "Blob Storage + Front Door"}[env["cloud"]], S3_DOCS
+        return {"aws": ("Amazon S3 + CloudFront", S3_DOCS),
+                "gcp": ("Cloud Storage + Cloud CDN", "https://cloud.google.com/cdn/docs/setting-up-cdn-with-bucket"),
+                "azure": ("Blob Storage + Front Door",
+                          "https://learn.microsoft.com/en-us/azure/frontdoor/integrate-storage-account")}[env["cloud"]]
     if env["hipaa"]:
         where = (" in an Indian region" if env["india"] else " in an EU region" if env["eu"] else
                  " in a US region" if env["us"] else "")
         if env["self_managed"]:  # the team runs its own servers
             return f"Ceph Object Gateway on your BAA-covered servers{where} (no public CDN for PHI)", CEPH_RGW_DOCS
         if not env["no_hyperscaler"]:
-            return f"Amazon S3 or Google Cloud Storage{where} under a signed BAA (+ CDN for public, non-PHI files only)", S3_DOCS
-        src = HIPAA_HOST_DOCS.get(prov, S3_DOCS)
+            return (f"Amazon S3 or Google Cloud Storage{where} under a signed BAA (+ CDN for public, non-PHI files only)",
+                    AWS_HIPAA_DOCS)
+        # The Security Rule's business associate clause, for a host with no HIPAA page listed above.
+        src = HIPAA_HOST_DOCS.get(prov, "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C/section-164.308")
         if prov == "flyio" and not where:  # where Tigris keeps data is not checked here, so not under a residency rule
             return "Tigris object storage under the BAA for Tigris that Fly.io offers (no public CDN for PHI)", src
         # A Render disk holds PHI but keeps its service to one instance and serves no signed URLs, so it is not offered.
         lists = {"render": "; Render's HIPAA page lists no object store",
                  "vercel": "; Vercel's BAA lists its CDN and functions, not a file store"}.get(prov, "")
         return f"Object storage{where} from a vendor that signs a BAA covering it{lists} (no public CDN for PHI)", src
-    if env["india"]:
+    if env["india"] and env["no_hyperscaler"]:
         return ("S3-compatible storage in an Indian region (DigitalOcean Spaces BLR1 or Ceph Object Gateway on your "
-                "servers) + CDN"
-                if env["no_hyperscaler"] else
-                "S3-compatible storage in an Indian region (Amazon S3 Mumbai or Google Cloud Storage asia-south1) + CDN"), S3_DOCS
+                "servers) + CDN", "https://docs.digitalocean.com/products/spaces/details/availability/")
+    if env["india"]:
+        return ("S3-compatible storage in an Indian region (Amazon S3 Mumbai or Google Cloud Storage asia-south1) + CDN",
+                "https://docs.aws.amazon.com/general/latest/gr/s3.html")
     if env["eu"]:
-        return "S3-compatible storage in an EU jurisdiction (Cloudflare R2 EU or Backblaze B2 EU Central) + CDN", S3_DOCS
+        return ("S3-compatible storage in an EU jurisdiction (Cloudflare R2 EU or Backblaze B2 EU Central) + CDN",
+                "https://developers.cloudflare.com/r2/reference/data-location/")
     if prov == "cloudflare":
-        return "Cloudflare R2 (+ Cloudflare CDN)", S3_DOCS
+        return "Cloudflare R2 (+ Cloudflare CDN)", "https://developers.cloudflare.com/r2/buckets/public-buckets/"
     if prov == "digitalocean":
-        return "DigitalOcean Spaces + built-in CDN", S3_DOCS
-    return "S3-compatible storage (Cloudflare R2 / Backblaze B2) + CDN", S3_DOCS
+        return "DigitalOcean Spaces + built-in CDN", "https://docs.digitalocean.com/products/spaces/"
+    return "S3-compatible storage (Cloudflare R2 / Backblaze B2) + CDN", "https://developers.cloudflare.com/r2/api/s3/api/"
 
 
 def _auth(env: dict) -> str:
