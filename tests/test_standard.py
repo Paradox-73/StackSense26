@@ -38,30 +38,36 @@ def check_component(c: dict, core: bool) -> None:
         assert alt["choice"].strip() and alt["why_not"].strip()
 
 
+def sentences(text: str) -> list[str]:
+    return [s for s in re.split(r"(?<=[.!?])\s+(?=[A-Z$])", text.strip()) if s]
+
+
 def check_schema(out: dict) -> None:
     assert out["status"] in STATUSES
-    assert isinstance(out["summary"], str) and out["summary"]
+    assert isinstance(out["summary"], str) and 1 <= len(sentences(out["summary"])) <= 2, out["summary"]
     assert isinstance(out["warnings"], list) and isinstance(out["assumptions"], list)
     assert isinstance(out["validation_errors"], list)
     for w in out["warnings"]:
         assert w["severity"] in ("info", "warning", "critical") and w["code"] and w["message"]
         assert set(w["fields"]) <= set(FIELD_PATHS), w
     assert all(isinstance(a, str) and a for a in out["assumptions"])
+    # Section 4: only the stack may be null; the style is always one of the enum strings and the cost always an object.
+    assert out["architecture_style"] in STYLES, out["architecture_style"]
+    cost = out["estimated_monthly_cost_usd"]
+    assert isinstance(cost, dict) and 0 <= cost["min"] <= cost["max"] and cost["assumptions"], cost
+    assert all(isinstance(a, str) and a for a in cost["assumptions"])
     if out["status"] == "invalid_input":
         assert out["stack"] is None and out["validation_errors"]
         return
     assert not out["validation_errors"]
     if out["status"] == "infeasible":
-        assert any(w["severity"] == "critical" for w in out["warnings"])
+        assert out["stack"] is None and any(w["severity"] == "critical" for w in out["warnings"])
         return
-    assert out["architecture_style"] in STYLES
     for layer in ("frontend", "backend", "database", "hosting"):
         check_component(out["stack"][layer], core=True)
     for s in out["stack"]["supporting"]:
         assert s["layer"] in SUPPORT
         check_component(s, core=False)
-    cost = out["estimated_monthly_cost_usd"]
-    assert 0 <= cost["min"] <= cost["max"] and cost["assumptions"]
 
 
 def test_six_public_scenarios_are_present():
@@ -73,6 +79,32 @@ def test_public_output_follows_the_schema(outputs, name):
     out = outputs[name]
     check_schema(out)
     assert out["status"] in ("ok", "ok_with_warnings") and out["scenario_id"] == name
+
+
+@pytest.mark.parametrize("doc", [
+    None, {"project": "web"},
+    {"project": {"type": "healthtech", "platforms": ["web"]}, "scale": {"users_at_launch": 2000, "users_12_months": 20000},
+     "team": {"size": 6, "experience": "intermediate", "languages": ["csharp"], "has_devops": True},
+     "budget": {"monthly_infra_usd": 2500}, "timeline": {"mvp_weeks": 20},
+     "infrastructure": {"cloud_preference": "none", "deployment_model": "self_hosted_cloud_vm", "data_residency": "other"},
+     "compliance": ["hipaa", "iso27001"]},
+])
+def test_outputs_without_a_stack_keep_the_style_and_cost_types(doc):
+    out = run(doc)
+    assert out["status"] in ("invalid_input", "infeasible") and out["stack"] is None
+    check_schema(out)
+
+
+def test_summaries_are_two_sentences_specific_to_each_scenario(outputs):
+    seconds = {}
+    for name, out in outputs.items():
+        parts = sentences(out["summary"])
+        assert len(parts) == 2 and "engineer(s)" not in out["summary"], out["summary"]
+        seconds[name] = parts[1]
+    assert len(set(seconds.values())) == len(seconds), seconds
+    assert "Python" in seconds["P2"] and "India" in seconds["P2"], seconds["P2"]
+    assert "SQL Server" in seconds["P5"] and "Entra ID" in seconds["P5"], seconds["P5"]
+    assert "offline" in seconds["P6"], seconds["P6"]
 
 
 def test_explicit_cloud_and_residency_hold(outputs):

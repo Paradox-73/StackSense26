@@ -772,16 +772,64 @@ def _cost(result: dict, f: dict) -> dict:
                             f"Budget check: ${budget:,.0f}/month stated, status '{c.get('status', '')}'"] + lines}
 
 
-def _summary(result: dict, stack: dict, style: str, cost: dict) -> str:
+COMPLIANCE_NAMES = {"gdpr": "GDPR", "dpdp": "DPDP", "hipaa": "HIPAA", "pci_dss": "PCI DSS",
+                    "rbi_localisation": "RBI localisation", "soc2": "SOC 2", "iso27001": "ISO 27001"}
+RESIDENCY_NAMES = {"india": "India", "eu": "the EU", "us": "the US"}
+CLOUD_NAMES = {"aws": "AWS", "gcp": "Google Cloud", "azure": "Azure"}
+
+
+def _summary(result: dict, stack: dict, style: str, cost: dict, f: dict, a: dict) -> str:
+    """Two sentences (section 4 allows one or two): the stack with its monthly band, then the inputs that shaped it
+    for this scenario: systems it keeps, hard constraints, the team's language, a key requirement, and the build."""
     names = {l: re.split(r" \(|,|: ", stack[l]["choice"])[0] for l in LAYERS}
     roles = {"frontend": "on the frontend", "backend": "for the backend", "database": "for data"}
     used = [f"{names[l]} {role}" for l, role in roles.items() if names[l] != "None"]
     unused = [l for l in roles if names[l] == "None"]
-    first = (f"A {style.replace('_', ' ')} build: {', '.join(used)}, hosted on {names['hosting']}"
-             + (f"; no {' or '.join(unused)} is needed" if unused else "") + ".")
     money = f"${cost['min']:,}" if cost["min"] == cost["max"] else f"${cost['min']:,}-{cost['max']:,}"
-    why = result.get("architecture", {}).get("why", "")
-    return f"{first} About {money} a month. {why.split('. ')[0].rstrip('.')}."
+    label = (result.get("architecture", {}).get("style", "").split(" (")[0] if style == "other"
+             else style.replace("_", " ").replace("service oriented", "service-oriented"))
+    host = names["hosting"]
+    host = f"with hosting {host[0].lower()}{host[1:]}" if host.startswith("Provided by") else f"hosted on {host}"
+    first = (f"A {label} build: {', '.join(used)}, {host} for about {money} a month"
+             + (f"; no {' or '.join(unused)} is needed" if unused else "") + ".")
+    items = {l: load_kb()["index"].get(result["stack"][l]["pick"]["id"], {}) for l in LAYERS}
+    reasons = []
+    kept = [names["database"]] if items["database"].get("id") in a.get("existing_systems", []) else []
+    idps = [i for i in _systems(f["infrastructure.existing_systems"])[1]
+            if i not in _cloud_only_identity([i], f)] if f["requirements.auth"] != "none" else []
+    kept += [f"{idps[0]} sign-in"] if idps else []
+    if kept:
+        reasons.append(f"keeps the existing {' and '.join(kept)}")
+    cloud, deploy = f["infrastructure.cloud_preference"], f["infrastructure.deployment_model"]
+    where = ("runs inside the air-gapped network" if deploy == "air_gapped" else "runs on your own servers"
+             if deploy == "on_premise" else f"stays on {CLOUD_NAMES[cloud]}" if cloud in CLOUD_NAMES else "")
+    residency = "india" if "rbi_localisation" in f["compliance"] else f["infrastructure.data_residency"]
+    rules = [COMPLIANCE_NAMES[c] for c in f["compliance"]][:2]
+    if residency in RESIDENCY_NAMES:
+        where = (f"{where} and " if where else "") + f"keeps data in {RESIDENCY_NAMES[residency]}"
+    if where or rules:
+        reasons.append(f"{where} under {' and '.join(rules)}" if where and rules else where or f"plans for {' and '.join(rules)}")
+    skills = set(a.get("team_skills", []))
+    mine = [s for s in items["backend"].get("skills", []) if s in skills] if items["backend"].get("kind") != "none" else []
+    if mine:
+        label_of = {o["value"]: o["label"] for o in field_specs()["team_skills"]["options"]}
+        reasons.append(f"builds on the team's {label_of.get(mine[0], mine[0])}")
+    need = [text for on, text in ((f["requirements.offline_support"], "keeps working offline"),
+                                  (f["requirements.realtime"], "pushes live updates"),
+                                  (f["requirements.seo_critical"], "gives search engines full HTML pages")) if on]
+    reasons += need[:1]
+    team = "a solo developer" if f["team.size"] == 1 else f"a team of {f['team.size']}"
+    build = {"static": f"serves pre-built files, so there is no server for {team} to run",
+             "monolith": f"ships as one deployable that {team} can build in {f['timeline.mvp_weeks']} weeks",
+             "modular_monolith": f"ships as one deployable that {team} can build in {f['timeline.mvp_weeks']} weeks",
+             "serverless": f"leaves the servers to the platform, so {team} writes only the product's own logic",
+             "service_oriented": f"splits into a few services, one per team, for {team}",
+             "microservices": f"splits into independently deployed services for {team}"}.get(style)
+    reasons = reasons[:3] + ([build] if build else [])
+    if not reasons:
+        return first
+    joined = reasons[0] if len(reasons) == 1 else f"{', '.join(reasons[:-1])}{',' if len(reasons) > 2 else ''} and {reasons[-1]}"
+    return f"{first} It {joined}."
 
 
 def run_text(text: str, capped: bool = True) -> dict | list[dict]:
@@ -800,6 +848,11 @@ def run_text(text: str, capped: bool = True) -> dict | list[dict]:
     return run(doc)
 
 
+def _no_cost(reason: str) -> dict:
+    """Section 4 keeps estimated_monthly_cost_usd an object even when there is no stack to price."""
+    return {"min": 0, "max": 0, "assumptions": [f"No stack was produced ({reason}), so there is no bill to estimate"]}
+
+
 def _file_error(message: str) -> dict:
     out = run(None)
     out["validation_errors"] = [{"field": "(file)", "message": message}]
@@ -814,7 +867,8 @@ def run(doc) -> dict:
     if errors:
         errors += [{"field": m, "message": "required field is missing"} for m in missing]
         return dict(head, status="invalid_input", summary="The scenario has invalid fields; no stack was produced.",
-                    architecture_style=None, stack=None, estimated_monthly_cost_usd=None, warnings=[],
+                    architecture_style="other", stack=None,
+                    estimated_monthly_cost_usd=_no_cost("the scenario has invalid fields"), warnings=[],
                     assumptions=[], validation_errors=errors)
 
     answers, origin, notes, extra = to_answers(fields)
@@ -836,7 +890,8 @@ def run(doc) -> dict:
             assumptions.append(f"Relaxed or flagged ({w['code']}): {w['message']}")
     if not result.get("feasible"):
         return dict(head, status="infeasible", summary="No stack meets every hard constraint; see the critical warnings.",
-                    architecture_style=None, stack=None, estimated_monthly_cost_usd=None, warnings=warnings,
+                    architecture_style="other", stack=None,
+                    estimated_monthly_cost_usd=_no_cost("no stack meets every hard constraint"), warnings=warnings,
                     assumptions=assumptions, validation_errors=[])
     if not fields["requirements.full_text_search"] and any(
             s["role"] == "Search" for s in result.get("supporting_services", []) + result.get("deferred_services", [])):
@@ -848,6 +903,6 @@ def run(doc) -> dict:
     cost = _cost(result, fields)
     worst = {w["severity"] for w in warnings}
     status = "ok_with_warnings" if worst & {"warning", "critical"} else "ok"
-    return dict(head, status=status, summary=_summary(result, stack, style, cost), architecture_style=style,
+    return dict(head, status=status, summary=_summary(result, stack, style, cost, fields, answers), architecture_style=style,
                 stack=stack, estimated_monthly_cost_usd=cost, warnings=warnings, assumptions=assumptions,
                 validation_errors=[])
