@@ -38,7 +38,7 @@ Availability approach: The platform runs the functions across zones, with no ins
 
 ## Warnings and how they were resolved
 
-- **[INFO] Cloudflare Pages + Workers publishes no uptime SLA**: Your 99% target rests on the app alone: Cloudflare Pages + Workers commits to no uptime figure and owes no credit when it is down. *Resolution:* Run two or more instances in separate regions or zones and alert on an external uptime check; pick a host with a published SLA if the target is contractual.
+- **[INFO] Cloudflare Pages + Workers publishes no uptime SLA**: Your 99% target rests on the app alone: Cloudflare Pages + Workers commits to no uptime figure and owes no credit when it is down. *Resolution:* Alert on an external uptime check and keep a fallback ready (a second region or provider); pick a host with a published SLA if the target is contractual.
 
 ## Per-layer reasoning
 

@@ -37,10 +37,6 @@ Availability approach: Firebase runs the backend on a paid plan; turn on point-i
 - Assumption: compliance = dpdp: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies.
 - Defaults used (1): Special workloads = none
 
-## Warnings and how they were resolved
-
-- **[INFO] Cloudflare Pages + Workers publishes no uptime SLA**: Your 99.9% target rests on the app alone: Cloudflare Pages + Workers commits to no uptime figure and owes no credit when it is down. *Resolution:* Run two or more instances in separate regions or zones and alert on an external uptime check; pick a host with a published SLA if the target is contractual.
-
 ## Per-layer reasoning
 
 ### Frontend: React Native (Expo) (74.6)

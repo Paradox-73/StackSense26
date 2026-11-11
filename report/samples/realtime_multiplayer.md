@@ -39,7 +39,7 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 ## Warnings and how they were resolved
 
 - **[WARNING] 50 ms target for users worldwide**: The stack as shown runs its API and MongoDB in one region. A round trip between continents alone takes ~85 ms (US East - West Europe) to ~170-225 ms (Southeast Asia - Europe or US East), measured between cloud regions (https://learn.microsoft.com/en-us/azure/networking/azure-network-latency), so users far from that region miss a 50 ms target before any work is done. *Resolution:* Deploy the API in a region per continent with read replicas (or a multi-region database for writes), cache reads at the edge (CDN or edge functions), or treat the target as per-region.
-- **[INFO] Fly.io publishes no uptime SLA**: Your 99.9% target rests on the app alone: Fly.io commits to no uptime figure and owes no credit when it is down. *Resolution:* Run two or more instances in separate regions or zones and alert on an external uptime check; pick a host with a published SLA if the target is contractual.
+- **[INFO] Fly.io publishes no uptime SLA**: Your 99.9% target rests on the app alone: Fly.io commits to no uptime figure and owes no credit when it is down. *Resolution:* Alert on an external uptime check and keep a fallback ready (a second region or provider); pick a host with a published SLA if the target is contractual.
 
 ## Per-layer reasoning
 

@@ -38,7 +38,7 @@ Availability approach: The CDN serves the pre-built pages from many locations; t
 
 ## Warnings and how they were resolved
 
-- **[INFO] Netlify publishes no uptime SLA**: Your 99.9% target rests on the app alone: Netlify commits to no uptime figure and owes no credit when it is down. *Resolution:* Run two or more instances in separate regions or zones and alert on an external uptime check; pick a host with a published SLA if the target is contractual.
+- **[INFO] Netlify publishes no uptime SLA**: Your 99.9% target rests on the app alone: Netlify commits to no uptime figure and owes no credit when it is down. *Resolution:* Alert on an external uptime check and keep a fallback ready (a second region or provider); pick a host with a published SLA if the target is contractual.
 
 ## Per-layer reasoning
 
