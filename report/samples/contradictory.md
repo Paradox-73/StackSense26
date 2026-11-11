@@ -27,7 +27,7 @@ Availability approach: Multi-AZ everywhere + multi-region failover drills, 24x7 
 
 1. **Request path**: The browser loads Next.js (React) from Azure App Service / Container Apps; it sends API calls to the Node.js + Express service on Azure App Service / Container Apps (~34,722 requests/s at peak), which queries PostgreSQL.
 2. **Sign-in**: Sign-in uses Microsoft Entra External ID; the Node.js + Express API checks the session or token on every request.
-3. **Data**: PostgreSQL is the system of record (about 11,000 GB within 12 months); uploaded files go to Blob Storage under Microsoft's BAA (Front Door for public, non-PHI files only). PHI (protected health information) stays in the database and object storage, encrypted at rest, on services covered by a signed BAA; keep it out of logs, analytics and push notification text. Every store above is placed in the region your residency rule requires.
+3. **Data**: PostgreSQL is the system of record (about 11,000 GB within 12 months); uploaded files go to Blob Storage, after you confirm it is in scope for Microsoft's HIPAA BAA (Front Door for public, non-PHI files only). PHI (protected health information) stays in the database and object storage, encrypted at rest, on services covered by a signed BAA; keep it out of logs, analytics and push notification text. Every store above is placed in the region your residency rule requires.
 4. **Deploy**: CI builds a container image and rolls it out on Azure App Service / Container Apps with health checks and zero-downtime restarts. Database schema changes run as versioned migrations before the new code serves traffic.
 
 ## Inputs used
@@ -326,7 +326,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 - **Cache**: Redis/Valkey (Azure Cache for Redis): Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database.
 - **Realtime**: Redis pub/sub for cross-instance fan-out (Azure Cache for Redis): With several app instances, a message published on one must reach sockets on all others.
 - **Background jobs**: BullMQ (Redis): Send emails, process uploads and call slow APIs outside the request path. BullMQ keeps its jobs in Redis, so the app needs a Redis/Valkey instance (the one already listed above).
-- **Object storage**: Blob Storage under Microsoft's BAA (Front Door for public, non-PHI files only): Media and documents belong in object storage, not the database.
+- **Object storage**: Blob Storage, after you confirm it is in scope for Microsoft's HIPAA BAA (Front Door for public, non-PHI files only): Media and documents belong in object storage, not the database.
 - **Authentication**: Microsoft Entra External ID: Do not hand-roll password storage, MFA or SSO.
 - **Observability**: OpenTelemetry instrumentation -> Azure Monitor / App Insights: Traces, metrics and error tracking from day one; required to defend an availability target.
 - **Audit & security**: Encrypted storage (KMS), audit logging, least-privilege IAM, WAF: The HIPAA Security Rule requires access controls, audit trails and encryption.

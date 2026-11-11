@@ -190,7 +190,7 @@
         ],
         "alternatives": [],
         "tradeoffs": [],
-        "source": "https://aws.amazon.com/s3/"
+        "source": "https://docs.aws.amazon.com/general/latest/gr/s3.html"
       },
       {
         "layer": "cdn",

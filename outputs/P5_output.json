@@ -165,7 +165,7 @@
         ],
         "alternatives": [],
         "tradeoffs": [],
-        "source": "https://aws.amazon.com/s3/"
+        "source": "https://learn.microsoft.com/en-us/azure/frontdoor/integrate-storage-account"
       },
       {
         "layer": "auth",

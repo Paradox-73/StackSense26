@@ -203,7 +203,7 @@
         ],
         "alternatives": [],
         "tradeoffs": [],
-        "source": "https://aws.amazon.com/s3/"
+        "source": "https://developers.cloudflare.com/r2/api/s3/api/"
       },
       {
         "layer": "cdn",
