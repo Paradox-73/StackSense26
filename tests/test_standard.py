@@ -488,7 +488,7 @@ def test_an_inference_api_is_a_cpu_scoring_endpoint_only_where_a_scoring_model_f
     hosted, cost = ml(edited("P3", requirements={"ml_features": "inference_api"}))  # a whiteboard calls a hosted model
     assert "endpoint for your own model" not in hosted[0] and cost[0].startswith("Model serving: inference")
     apart, cost = ml(edited("P4", infrastructure={"cloud_preference": "none"}))  # functions only: a service apart
-    assert "service of its own that the API's functions call" in apart[0] and cost[0].startswith(
+    assert "service of its own" in apart[0] and "called over HTTPS" in apart[0] and cost[0].startswith(
         "Model serving: CPU endpoint: $75-180"), (apart, cost)
 
 

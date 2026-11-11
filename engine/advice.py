@@ -1109,9 +1109,8 @@ SCORING_SERVING = {
               "https://learn.microsoft.com/azure/machine-learning/concept-endpoints-online"),
     "self": ("Your own model in a CPU container beside the API (BentoML, or ONNX Runtime behind a small HTTP service)",
              "https://docs.bentoml.com/"),
-    "functions": ("Your own model as a small CPU container service of its own that the API's functions call (BentoML, or "
-                  "ONNX Runtime behind a small HTTP service), in the stack's region",
-                  "https://vercel.com/docs/functions/limitations"),
+    "functions": ("Your own model as a small CPU container service of its own (BentoML, or ONNX Runtime behind a small "
+                  "HTTP service), in the stack's region, called over HTTPS", "https://vercel.com/docs/functions/limitations"),
     "static": ("Your own model as a small CPU container service of its own (BentoML, or ONNX Runtime behind a small HTTP "
                "service), in the stack's region: the site runs no server code", "https://docs.bentoml.com/"),
 }

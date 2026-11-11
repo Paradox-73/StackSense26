@@ -63,6 +63,7 @@ from .stack import (
 )
 
 SINGLE_PRIMARY_SQL = ("postgres", "mysql", "timescaledb")
+LAYER_TITLES = {"frontend": "Frontend", "backend": "Backend", "database": "Database", "hosting": "Hosting"}
 # The languages a backend is written in, where its skills do not name them: the FaaS entry runs Node.js or Python.
 BACKEND_LANGUAGES = {"serverless_functions": {"javascript", "typescript", "node", "python"}}
 
@@ -94,7 +95,6 @@ def _unlisted_language_warning(p: dict, d: dict, best: dict, backends: list[dict
                          f"to learn {short_name(be)}, or host the API on a container or PaaS service to keep "
                          f"{cand['name']}.", ["team_skills"])
     return None
-LAYER_TITLES = {"frontend": "Frontend", "backend": "Backend", "database": "Database", "hosting": "Hosting"}
 
 
 def _score_layers(kb: dict, p: dict, d: dict, w, light: bool = False) -> tuple[dict, dict, dict]:
