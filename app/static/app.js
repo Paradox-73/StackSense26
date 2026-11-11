@@ -1083,7 +1083,8 @@ const offWhy = () => (S.health && S.health.llm_switched_off ? "switched off by S
 function setLlmNote(llm) {
   const el = $("#brief-llm");
   if (!el) return;
-  el.textContent = !llm.enabled ? `Language model: off (${offWhy()}), so only the rule reader runs.`
+  el.title = llm.enabled ? "" : offWhy(); /* the reason, such as the STACKSENSE_LLM switch, shows on hover */
+  el.textContent = !llm.enabled ? `Language model ${S.health && S.health.llm_switched_off ? "switched off" : "off"}: only the rule reader runs.`
     : llm.error ? `Language model: on, but it did not answer (${llm.error}). Rule reader only.`
     : llm.used ? `Language model: on (${llm.model}).` : "Language model: on.";
 }
@@ -1151,8 +1152,7 @@ function renderSummary() {
   const s = S.summary && S.summary.key === summaryKey() ? S.summary.data : null;
   if (!s) {
     box.innerHTML = `<div class="sum"><div class="sum-h"><h3>Plain-English summary</h3>
-      <button type="button" class="link-btn" id="sum-go">Write summary</button></div>
-      <p class="muted small" id="sum-note">A language model rewords the engine's facts. If its text names a technology or number the facts lack, the template text shows instead.</p></div>`;
+      <button type="button" class="link-btn" id="sum-go">Write summary</button></div></div>`;
     return;
   }
   const ok = s.source === "llm" && s.checked;
@@ -1167,9 +1167,9 @@ function renderSummary() {
 }
 
 async function loadSummary() {
-  const key = summaryKey(), btn = $("#sum-go"), note = $("#sum-note");
+  const key = summaryKey(), btn = $("#sum-go");
   if (btn) { btn.disabled = true; btn.textContent = "Writing..."; }
-  if (note) note.outerHTML = skLines(4, "Writing the summary");
+  $("#summary .sum")?.insertAdjacentHTML("beforeend", skLines(4, "Writing the summary"));
   try {
     S.summary = { key, data: await api("/api/summary", sent()) };
   } catch (e) {
@@ -1672,6 +1672,7 @@ function show(view) {
   $$(".view").forEach((v) => v.classList.toggle("active", v.id === `view-${view}`));
   $$(".nav-b").forEach((t) => (t.dataset.view === view ? t.setAttribute("aria-current", "page") : t.removeAttribute("aria-current")));
   if (view === "kb" && !$("#view-kb").innerHTML) renderKb();
+  if (view === "app" && !S.result && !S.ctl && S.questions) run({ compare: false }); /* opened on #view=kb, so nothing has run yet */
   $("#sumbar")?.classList.toggle("off", view !== "app");
   window.scrollTo(0, 0);
 }

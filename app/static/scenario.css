@@ -26,7 +26,6 @@
 
 /* the output */
 .sc-out { min-width: 0; transition: opacity var(--t); }
-.sc-out[aria-busy="true"] { opacity: 0.93; }
 .sc-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
 .sc-status, .sc-style { font: 700 13px var(--font-mono); padding: 3px 10px; border-radius: var(--r-pill); background: var(--surface-2); color: var(--ink); }
 .sc-status.ok { background: var(--pos-soft); color: var(--pos); }
@@ -39,6 +38,7 @@
 .sc-core, .sc-sup { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding-left: 26px; }
 .sc-c { position: relative; min-width: 0; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); padding: 12px 14px; }
 .sc-out code { overflow-wrap: anywhere; }
+#sc-out .sc-btn { white-space: normal; text-align: left; } /* a scenario's id and project name can outgrow a phone */
 .sc-c::before { content: ""; position: absolute; left: -27px; top: 15px; width: var(--stn); height: var(--stn); border-radius: 50%; background: var(--accent); box-shadow: inset 0 0 0 2px var(--route); z-index: 1; }
 .sc-c:not(:last-child)::after { content: ""; position: absolute; left: -21px; top: 22px; width: 2px; height: calc(100% + 12px); background: var(--route); }
 .sc-sup > .sc-c::before { background: var(--surface); }

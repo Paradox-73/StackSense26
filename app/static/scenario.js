@@ -224,4 +224,4 @@ async function init() {
   if (want && ex.some((x) => x.name === want)) load(await api(`/api/scenario/examples/${encodeURIComponent(want)}`), want);
 }
 
-init().catch((e) => say(`Could not start: ${e.message}.`));
+init().catch((e) => { $("#sc-form").innerHTML = ""; say(`Could not start: ${e.message}.`); });
