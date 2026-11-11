@@ -678,12 +678,13 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
 
 
 def _platforms(texts: list[str]) -> list[tuple[str, str, str, str]]:
-    """Existing platforms named in free text: (text, name, kind, source), the first text per platform."""
+    """Existing platforms named in free text, in EXISTING_PLATFORMS order: (text, name, kind, source), the first text
+    per platform. Of two of one kind, the first carries the new app's work and the other is kept as it is."""
     out = []
-    for text in texts:
-        for pattern, name, kind, source in EXISTING_PLATFORMS:
-            if re.search(pattern, text.lower()) and name not in [x[1] for x in out]:
-                out.append((text, name, kind, source))
+    for pattern, name, kind, source in EXISTING_PLATFORMS:
+        text = next((t for t in texts if re.search(pattern, t.lower())), None)
+        if text is not None:
+            out.append((text, name, kind, source))
     return out
 
 
@@ -694,8 +695,8 @@ def _reuse_services(result: dict, f: dict) -> dict:
     gone = set()
     for text, name, kind, source in _platforms(f["infrastructure.existing_systems"]):
         hit = [s for s in services + deferred if s["role"] in PLATFORM_ROLES.get(kind, ())]
-        if not hit:
-            continue
+        if not hit or any(s["name"].endswith("(existing)") for s in hit):
+            continue  # nothing to replace, or an earlier platform of this kind already carries it
         was = " and ".join(dict.fromkeys(s["name"].split(" (")[0] for s in hit))
         why = (f"infrastructure.existing_systems lists '{text}': the new app's background jobs and events go through it "
                f"as new topics or queues instead of {was}, so there is no second message system to run, secure and "
@@ -740,8 +741,13 @@ def _store_billing(result: dict, f: dict) -> dict:
 def _platform_notes(f: dict, notes: list[str], warns: list[dict]) -> None:
     """How each existing platform is kept, and a warning when a running content or commerce platform would be
     rebuilt by the stack shown instead of kept."""
+    first = {}
     for text, name, kind, source in _platforms(f["infrastructure.existing_systems"]):
-        if kind == "queue":
+        if kind in ("queue", "warehouse") and kind in first:
+            notes.append(f"Existing {'message system' if kind == 'queue' else 'warehouse'} '{text}': {name} is kept as it "
+                         f"is for the systems that use it; the new app's {'jobs and events' if kind == 'queue' else 'analytics'} "
+                         f"go through {first[kind]}")
+        elif kind == "queue":
             notes.append(f"Existing message system '{text}': {name} carries the new app's background jobs and events, "
                          "so no second broker is added")
         elif kind == "warehouse":
@@ -757,6 +763,7 @@ def _platform_notes(f: dict, notes: list[str], warns: list[dict]) -> None:
                                    f"{PLATFORM_API[name]} ({source}), unless replacing it is the goal: a rebuild moves "
                                    f"every record of the {what} and every URL across.",
                                    ["infrastructure.existing_systems"]))
+        first.setdefault(kind, name)
 
 
 def _relax_contradictions(f: dict, notes: list[str], warns: list[dict]) -> None:

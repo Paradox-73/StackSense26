@@ -552,7 +552,7 @@ def _lower_first(s: str) -> str:
 def _rule_gap_text(best: dict, hits: list[dict], gap: float, rule_gap: float) -> str | None:
     """The stack rules behind a swap's gap, when they move it by a point or more: without this a 12-point gap is
     explained by 1-point criterion differences only."""
-    if rule_gap < 1:
+    if rule_gap < 1 or gap <= 0:
         return None
     mine = {r["id"]: r for r in best.get("rules", [])}
     theirs = {r["id"]: r for r in hits}

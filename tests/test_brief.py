@@ -217,3 +217,12 @@ def test_concurrent_users_are_concurrency_not_daily_users():
     v = values("about 5k users online at once and 100k daily users")
     assert v["peak_concurrent"] == 5000 and v["dau"] == 100000
     assert values("must hold 10k open WebSockets")["peak_concurrent"] == 10000
+
+
+@pytest.mark.parametrize("text,skills", [("Two R programmers and a C developer", {"r", "c"}),
+                                         ("we r 2 frnds, plan c is a website", set()),
+                                         ("Rust and C++ engineers", {"rust", "cpp"})])
+def test_one_letter_language_names_need_a_language_context(text, skills):
+    from engine.brief_rules import read_skills
+    found = set(read_skills(text).get("team_skills").value) if read_skills(text) else set()
+    assert found == skills, found

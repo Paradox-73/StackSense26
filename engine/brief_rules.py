@@ -272,7 +272,8 @@ def usd_note(amount: float, currency: str) -> str | None:
 
 # ------------------------------------------------------------------ skills
 
-NOT_SKILLS = {"data_engineering", "devops", "functional", "git", "markdown", "nosql", "serverless", "render", "cypher", "go"}
+NOT_SKILLS = {"data_engineering", "devops", "functional", "git", "markdown", "nosql", "serverless", "render", "cypher", "go",
+              "r", "c", "other_language"}
 SKILL_ALIASES = {
     "javascript": ["javascript", "js"], "node": ["node.js", "nodejs", "node"], "nextjs": ["next.js", "nextjs", "next js"],
     "react": ["react", "react.js", "reactjs"], "react_native": ["react native"], "vue": ["vue", "vue.js", "vuejs"],
@@ -284,7 +285,10 @@ SKILL_ALIASES = {
     "kubernetes": ["kubernetes", "k8s"], "html": ["html", "html5"], "scylladb": ["scylladb", "scylla"],
 }
 # Names that are also ordinary words are matched only in their capitalised form.
-CASE_SENSITIVE_SKILLS = {"go": [r"\bGo\b(?=\s*(?:,|and\b|/|\)|\.|$|developers?|backend|lang))", r"\bGolang\b"]}
+CASE_SENSITIVE_SKILLS = {"go": [r"\bGo\b(?=\s*(?:,|and\b|/|\)|\.|$|developers?|backend|lang))", r"\bGolang\b"],
+                         # one-letter language names: capitalised and followed by a list mark or a language word
+                         "r": [r"\bR\b(?=\s*(?:,|and\b|/|\)|\.|$|developers?|programmers?|language|scripts?))"],
+                         "c": [r"\bC\b(?=\s*(?:,|and\b|/|\)|\.|$|developers?|programmers?|language))"]}
 NEGATION = _flags(r"\b(?:no|not|nobody|none|without|avoid|never|unfamiliar|hate|dislike)\b|n(?:'|’)t\b")
 
 

@@ -980,3 +980,11 @@ def test_the_web_frontend_shares_code_with_the_mobile_app_when_they_tie():
     choice = out["stack"]["frontend"]["choice"]
     assert choice == "Next.js (React) + React Native (Expo) for the Android app", choice
     assert "sharing code with the mobile app" in out["stack"]["frontend"]["justification"] or "higher stack score" in         out["stack"]["frontend"]["justification"], out["stack"]["frontend"]["justification"]
+
+
+def test_of_two_existing_brokers_one_carries_the_queue_and_the_other_is_kept():
+    out = edited("P2", infrastructure={"existing_systems": ["IBM MQ", "Apache Kafka 2.8"]})
+    queues = [s["choice"] for s in out["stack"]["supporting"] if s["layer"] == "queue"]
+    assert queues == ["Apache Kafka (existing)"], queues
+    notes = [a for a in out["assumptions"] if a.startswith("Existing message system")]
+    assert len(notes) == 2 and any("IBM MQ is kept as it is" in a and "go through Apache Kafka" in a for a in notes), notes
