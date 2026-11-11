@@ -588,6 +588,7 @@ def test_an_on_premises_sharepoint_server_is_reachable_from_an_air_gapped_site()
     ("Exchange Online", "Microsoft Graph API (mail, calendar and Teams notifications, files)"),
     ("Weather outlook feed", "its API"), ("Market outlook report", "its API"),
     ("Outlook weather forecast API", "its API"), ("Outlook for commodity markets", "its API"),
+    ("Outlook forecasting service", "its API"),
     ("Microsoft Outlook", "the SharePoint or Exchange server's REST API"),
     ("MS Outlook", "the SharePoint or Exchange server's REST API"),
     ("Office Outlook 2019", "the SharePoint or Exchange server's REST API"),

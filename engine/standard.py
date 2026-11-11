@@ -157,7 +157,7 @@ INTEGRATIONS = [(r"microsoft 365|office 365|\bo365\b|\bteams\b|sharepoint online
                  "Microsoft Graph API (mail, calendar and Teams notifications, files)", True),
                 # Exchange only as the mail server: "NSE stock exchange feed" or "exchange rates API" is not it; Outlook
                 # only as the mail program: "weather outlook feed" is not it.
-                (r"sharepoint|\b(?:microsoft|ms) outlook\b|\boutlook 20\d\d\b|^\s*outlook\b(?!.*\b(?:weather|forecasts?|markets?)\b)"
+                (r"sharepoint|\b(?:microsoft|ms) outlook\b|\boutlook 20\d\d\b|^\s*outlook\b(?!.*\b(?:weather|forecast\w*|markets?)\b)"
                  r"|\b(?:microsoft|ms|on-?prem\w*|hybrid) exchange\b|(?<!stock )\bexchange (?:server|20\d\d)\b"
                  r"|^\s*exchange\b(?!.*\b(?:rates?|market|feed|trading|fix|prices?)\b)",
                  "the SharePoint or Exchange server's REST API", False),
