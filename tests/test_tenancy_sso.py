@@ -81,9 +81,11 @@ def test_sso_on_a_server_backend_is_part_of_the_one_sign_in_product():
 
 def test_sso_counts_against_backends_that_need_a_broker():
     kb = load_kb()["index"]
-    p, d = _pd(dict(BASE, enterprise_sso=True))
+    p, d = _pd(dict(BASE, enterprise_sso=True, tenancy="shared", has_devops=True))  # a Keycloak broker to run
     pts = lambda i: sum(x["delta"] for x in adjustments("backend", kb[i], p, d) if x["input"] == "enterprise_sso")
     assert pts("express") < 0 and pts("django") < 0 and pts("supabase") == 0 and pts("firebase") == 0
+    p1, d1 = _pd(dict(BASE, enterprise_sso=True))  # one customer: a hosted identity service federates it for any backend
+    assert sum(x["delta"] for x in adjustments("backend", kb["express"], p1, d1) if x["input"] == "enterprise_sso") == 0
 
 
 def test_the_budget_check_counts_sso_users_at_the_scale_tier():
@@ -112,4 +114,6 @@ def test_an_identity_provider_already_run_adds_no_broker_penalty():
     assert "broker" not in json.dumps(out["stack"]["backend"]), out["stack"]["backend"]["tradeoffs"]
     assert out["stack"]["backend"]["choice"].startswith("C# + ASP.NET Core")
     doc["infrastructure"]["existing_systems"] = []
-    assert "identity broker" in json.dumps(run(doc)["stack"]["backend"])  # without it, the broker is still a cost
+    doc["requirements"]["multi_tenant"] = True
+    doc["team"]["has_devops"] = True
+    assert "identity broker" in json.dumps(run(doc)["stack"]["backend"])  # many tenants' directories: a broker to run

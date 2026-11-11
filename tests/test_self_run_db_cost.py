@@ -32,3 +32,15 @@ def test_a_database_on_premises_is_priced_at_the_on_premises_server_band():
 def test_a_managed_database_keeps_its_managed_price():
     line, p, d = _db_line("aws_ecs")
     assert "server of its own" not in line["basis"], line["basis"]
+
+
+def test_a_file_database_or_content_files_take_no_server_of_their_own():
+    from engine.advice import self_run_db
+    kb = load_kb()["index"]
+    for db in ("sqlite", "none_static"):
+        assert not self_run_db(kb[db], kb["onprem_docker"], ""), db
+
+
+def test_any_database_on_self_managed_vms_is_priced_as_a_server():
+    line, p, d = _db_line("aws_ec2", "mongodb", self_managed=True)
+    assert "server of its own" in line["basis"], line["basis"]

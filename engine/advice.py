@@ -496,6 +496,8 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     big_corpus = doc_gb >= SEARCH_CORPUS_GB
     builtin = BUILTIN_SEARCH.get(db["id"])
     small_search = "text_search" in work and not big_corpus and builtin and d["data_12mo_gb"] < SEARCH_CORPUS_GB
+    # Teams on their own servers, and HIPAA or residency rules no hosted search service is checked against, run it.
+    self_run_search = env["self_managed"] or env["hybrid"] or env["hipaa"] or residency(env)
     if search_served:
         pass  # the stack already has its search engine
     elif not static and small_search:
@@ -506,7 +508,8 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     elif not static and ("text_search" in work or big_corpus):
         engine = ("OpenSearch (self-hosted)" if env["onprem"] or env["hybrid"] else
                   {"aws": "Amazon OpenSearch Service", "gcp": "Elastic Cloud on Google Cloud",
-                   "azure": "Azure AI Search"}.get(env["cloud"] or "", "Meilisearch Cloud"))
+                   "azure": "Azure AI Search"}.get(env["cloud"] or "", SELF_RUN_SEARCH if self_run_search else
+                                                   "Meilisearch Cloud"))
         if big_corpus:
             size = (f"~{doc_gb:,.0f} GB of documents" if doc_gb >= d["data_12mo_gb"] else
                     f"~{doc_gb:,.0f} GB of documents (an estimate: the document share of your ~{d['data_12mo_gb']:,.0f} GB "
@@ -525,7 +528,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
                 "Catalogue/content search with relevance tuning outgrows LIKE queries quickly; the database's own text "
                 "index starts it, and Meilisearch takes over when facets and typo tolerance matter.", "https://www.meilisearch.com/docs")
         else:
-            engine = ("Meilisearch (self-hosted)" if env["onprem"] else
+            engine = (SELF_RUN_SEARCH if self_run_search or env["onprem"] else
                       "Algolia, synced from Firestore by its Firebase extension" if db["id"] == "firestore" else
                       "Meilisearch Cloud")
             add("Search", engine, f"{db['name']} has no full-text search, so text search needs a separate index.",
@@ -537,7 +540,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
                    " Firebase security rules cover both.") if be["id"] == "firebase" else
                   ("Supabase Storage (included, with a CDN)", "https://supabase.com/docs/guides/storage",
                    " Row-level security policies cover both.") if be["id"] == "supabase" and not env["onprem"] else None)
-    _special_workloads(p, d, env, add, prov=prov, has_storage=lambda: any(x["role"] == "Object storage" for x in out),
+    _special_workloads(p, d, env, add, prov=prov, baas=be.get("kind") == "baas", has_storage=lambda: any(x["role"] == "Object storage" for x in out),
                        storage=lambda: baas_store[:2] if baas_store else _object_storage(env, prov))
 
     takes_money = "pay" in d["user_actions"] or (p["app_type"] in ("ecommerce", "fintech") and "user_actions" in d["defaulted"])
@@ -582,7 +585,8 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
 
     if static and d["data_12mo_gb"] > STATIC_CONTENT_MAX_GB:
         # Pages stay in git; media past the size git handles well go to object storage and are linked from the pages.
-        store, src = SITE_MEDIA_STORE[env["cloud"]] if env["cloud"] else _object_storage(env, prov)
+        # Public site media: a plain bucket in the required region (no backend exists to sign URLs).
+        store, src = SITE_MEDIA_STORE[env["cloud"]] if env["cloud"] else _object_storage(env, prov, private=False)
         lo, hi, price_src = FILE_STORE_USD_PER_GB.get(env["cloud"] or "", FILE_STORE_USD_PER_GB[""])
         gb = d["data_12mo_gb"]
         usage = ((0.0, 0.0, f"~{gb:,.0f} GB of site media on your own disks: the hardware is outside this estimate")
@@ -658,6 +662,10 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             "Firebase Cloud Messaging (+ APNs)", why,
             "https://docs.expo.dev/push-notifications/overview/" if expo else "https://firebase.google.com/docs/cloud-messaging")
 
+    if d.get("gpu") and host.get("gpu_runs_on"):  # the host's GPUs are a sibling product of the one that runs the app
+        add("GPU workers", host["gpu_runs_on"], f"GPU training and inference run as jobs on {host['gpu_runs_on']} beside "
+            f"the {host['name']} app, in the same cloud and region; GPU hours are billed on top of the estimate shown.",
+            host["gpu_source"])
     if scoring_model(p):
         # A trained scoring or classification model (credit score, fraud score): a CPU endpoint, not an LLM service.
         where = "" if env["hybrid"] or env["self_managed"] else env["cloud"] or ""
@@ -794,7 +802,7 @@ MSG91_RESIDENCY = (" MSG91 stores its data only in India (Google Cloud, Mumbai) 
                    "be processed and stored outside India.")
 
 
-def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, prov: str = "") -> None:
+def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, prov: str = "", baas: bool = False) -> None:
     """Services for workloads the four main picks do not cover, each with a usage-based cost."""
     work = set(p.get("special_workloads") or [])
     dau30 = p["dau"] * 30
@@ -889,7 +897,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, p
         price = OTP_USD["india" if india else "other"]
         sms = dau30 * OTP_PER_USER_DAY
         # Cognito sends its own codes, so an AWS stack signing in with it needs no second SMS vendor.
-        cognito = env["cloud"] == "aws" and not env["self_managed"] and not env["hybrid"] and not india
+        cognito = env["cloud"] == "aws" and not env["self_managed"] and not env["hybrid"] and not india and not baas
         add("Phone login (SMS OTP)", "An SMS gateway inside your network: a GSM modem driven by the Gammu SMS daemon"
             if env["air_gapped"] else
             "MSG91, with DLT-registered SMS templates" if india or env["india"] else
@@ -920,6 +928,7 @@ FILE_STORE_USD_PER_GB = {"aws": (0.023, 0.025, "https://aws.amazon.com/s3/pricin
                          "": (0.015, 0.025, "https://developers.cloudflare.com/r2/pricing/ and "
                                             "https://aws.amazon.com/s3/pricing/")}
 S3_DOCS = "https://aws.amazon.com/s3/"
+SELF_RUN_SEARCH = "Meilisearch (self-hosted)"
 # The CDN each provider pairs with its object storage.
 CDN_BY_PROVIDER = {"aws": "Amazon CloudFront", "gcp": "Cloud CDN", "azure": "Azure Front Door",
                    "cloudflare": "Cloudflare CDN", "digitalocean": "DigitalOcean Spaces CDN"}
@@ -943,8 +952,10 @@ def residency(env: dict) -> bool:
     return env["india"] or env["eu"] or env["us"]
 
 
-def _object_storage(env: dict, prov: str) -> tuple[str, str]:
-    """The object store for uploaded files, and its source."""
+def _object_storage(env: dict, prov: str, private: bool = True) -> tuple[str, str]:
+    """The object store for uploaded files, and its source. private=False names a public bucket in the same place (a
+    static site's media, which nothing signs)."""
+    lock = ", a private bucket with short-lived signed URLs (no public CDN)" if private else ""
     if env["onprem"]:
         return "Ceph Object Gateway (S3-compatible, self-hosted)", CEPH_RGW_DOCS
     if env["hybrid"]:
@@ -992,13 +1003,13 @@ def _object_storage(env: dict, prov: str) -> tuple[str, str]:
                  "vercel": "; Vercel's BAA lists its CDN and functions, not a file store"}.get(prov, "")
         return f"Object storage{where} from a vendor that signs a BAA covering it{lists} (no public CDN for PHI)", src
     if env["india"] and (env["no_hyperscaler"] or prov == "digitalocean"):
-        return ("DigitalOcean Spaces in BLR1 (Bangalore), a private bucket with short-lived signed URLs (no public CDN)",
+        return ("DigitalOcean Spaces in BLR1 (Bangalore)" + lock,
                 "https://docs.digitalocean.com/products/spaces/details/availability/")
     if env["india"]:
-        return ("Amazon S3 in Mumbai (ap-south-1), a private bucket with short-lived signed URLs (no public CDN)",
+        return ("Amazon S3 in Mumbai (ap-south-1)" + lock,
                 "https://docs.aws.amazon.com/general/latest/gr/s3.html")
     if env["eu"]:
-        return ("Cloudflare R2 in its EU jurisdiction, a private bucket with short-lived signed URLs (no public CDN)",
+        return ("Cloudflare R2 in its EU jurisdiction" + lock,
                 "https://developers.cloudflare.com/r2/reference/data-location/")
     if prov == "cloudflare":
         return "Cloudflare R2 (+ Cloudflare CDN)", "https://developers.cloudflare.com/r2/buckets/public-buckets/"
@@ -1040,6 +1051,9 @@ def _auth(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None]:
             return (*cloud, None)
         if env["india"] and keycloak_ok:
             return "Keycloak self-hosted in your Indian region (on BAA-covered servers)", KEYCLOAK_DOCS, "keycloak"
+        if env["india"]:  # no hosted identity service here both signs a BAA and keeps the users in India
+            return ("Your backend framework's built-in authentication, with the users in your database in India (on "
+                    "BAA-covered servers)", AUTH_DOCS, None)
         return ("Auth0 with a signed BAA" + (" and enterprise connections (SAML or OIDC)" if sso else ""),
                 AUTH0_ENTERPRISE if sso else AUTH_DOCS, None)
     if env["india"]:
@@ -1151,6 +1165,8 @@ SERVICE_NOTES = {
     "Maps & live location": ([("Polling positions from the database", "Every map view queries again, and positions lag by "
                                "the poll interval")],
                              ["Map loads are billed per view past the free quota"]),
+    "GPU workers": ([("GPU virtual machines", "Machines your team would patch and keep busy, paid for while idle")],
+                    ["GPU capacity in a region can run short, so long jobs need retries and checkpoints"]),
     "Code sandbox": ([("Running submissions in the web server's process", "One submission could read secrets or take the "
                        "server down")],
                      ["Sandboxed workers start slower and need their own capacity"]),
@@ -1621,7 +1637,7 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
             basis.append(f"x{SELF_MANAGED_COST_FACTOR:g} planning allowance: no {'compliant ' if gaps else ''}managed "
                          f"{db['name']} on {CLOUD_NAMES.get(dbhost['provider'], dbhost['provider'])}, "
                          "so backup storage, monitoring and a tested failover are yours to build")
-        if self_run_db(db, dbhost, offer) and not db.get("single_node"):
+        if self_run_db(db, dbhost, offer):
             # On the team's own servers the managed band, its storage floor and allowance do not apply.
             lo, hi, basis = self_run_db_cost(p, d, db, dbhost)
         lic = db.get("self_managed_licence") if _env(p, host)["onprem"] else None
@@ -1691,8 +1707,12 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
 
 def self_run_db(db: dict, host: dict, offer: str) -> bool:
     """The database runs on the team's own servers (on-premises, or a VPS host with no managed service for it), so it
-    costs one more server of that host, not a managed service's price."""
-    return host.get("kind") == "onprem" or (host.get("kind") == "vps" and offer.lower().startswith("self-managed"))
+    costs one more server of that host, not a managed service's price. A file database or content files in git
+    take no server of their own."""
+    if db.get("single_node") or db.get("static_only"):
+        return False
+    own = offer == (db.get("managed_offerings") or {}).get("onprem") or offer.lower().startswith("self-managed")
+    return host.get("kind") == "onprem" or (host.get("kind") == "vps" and own)
 
 
 def self_run_db_cost(p: dict, d: dict, db: dict, host: dict) -> tuple[float, float, list[str]]:

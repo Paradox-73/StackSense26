@@ -95,3 +95,13 @@ def test_sign_in_under_india_residency_stays_on_the_required_cloud():
         doc["infrastructure"]["cloud_preference"] = cloud
         auth = [s["choice"] for s in _sup(run(doc), "auth")]
         assert auth and not [a for a in auth if "Amazon" in a or "Cognito" in a], (cloud, auth)
+
+
+def test_gpu_work_beside_azure_app_service_is_named_on_container_apps():
+    """The Azure host is named App Service; its GPU work runs on Container Apps serverless GPUs, named on its own line."""
+    doc = _doc("P3")
+    doc["infrastructure"]["cloud_preference"] = "azure"
+    doc["requirements"]["ml_features"] = "training"
+    out = run(doc)
+    assert out["stack"]["hosting"]["choice"].startswith("Azure App Service"), out["stack"]["hosting"]["choice"]
+    assert "Azure Container Apps serverless GPUs" in _choices(out), _choices(out)

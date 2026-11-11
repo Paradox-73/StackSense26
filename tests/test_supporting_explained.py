@@ -36,5 +36,8 @@ def test_each_supporting_service_has_an_alternative_a_tradeoff_and_a_scenario_nu
     for s in out["stack"]["supporting"]:
         assert s["alternatives"] and all(a["choice"] and a["why_not"] for a in s["alternatives"]), s
         assert s["tradeoffs"], s
-        quoted = {float(n.replace(",", "")) for n in re.findall(r"\d[\d,]*(?:\.\d+)?", s["justification"])}
-        assert quoted & given or not given, (s["layer"], s["choice"], s["justification"][-160:])  # E1 states none
+        # The quoted number names the scenario field it comes from, e.g. "300,000 users ... (scale.users_12_months)".
+        cited = re.findall(r"(\d[\d,]*(?:\.\d+)?)[^.(]*\(((?:scale|requirements|team|infrastructure)\.[a-z0-9_]+)\)",
+                           s["justification"])
+        quoted = {float(n.replace(",", "")) for n, _ in cited}
+        assert cited and (quoted & given or not given), (s["layer"], s["choice"], s["justification"][-160:])

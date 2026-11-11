@@ -55,3 +55,26 @@ def test_a_host_with_no_published_sla_gets_an_info_warning_for_a_stated_target()
     assert sla and sla[0]["severity"] == "info" and "requirements.availability" in sla[0]["fields"], out["warnings"]
     free = _site(budget=0)  # a $0 budget is on free plans, which FREE_TIER_NO_SLA already covers
     assert not [w for w in free["warnings"] if w["code"] == "NO_PUBLISHED_SLA"], free["warnings"]
+
+
+def test_a_large_static_site_is_held_to_its_hosts_static_residency_and_its_media_stay_public():
+    out = _site(gb=40, budget=50)
+    doc = json.loads((ROOT / "scenarios" / "public" / "P1.json").read_text(encoding="utf-8"))
+    doc["scale"]["data_volume_gb_12_months"] = 40
+    doc["infrastructure"]["data_residency"] = "eu"
+    doc["budget"]["monthly_infra_usd"] = 50
+    eu = run(doc)
+    host = eu["stack"]["hosting"]["choice"] if eu.get("stack") else ""
+    for global_cdn in ("Netlify", "Vercel", "Render", "Firebase Hosting", "Azure Static Web Apps"):
+        assert not host.startswith(global_cdn), host  # their static files sit on CDN edges outside the EU
+    media = [s["choice"] for s in (eu.get("stack") or {}).get("supporting", []) if s["layer"] == "storage"]
+    assert not [m for m in media if "signed URL" in m], media  # a static site has no backend to sign URLs
+    assert out["stack"]["backend"]["choice"] == "None"
+
+
+def test_no_sla_warning_names_only_a_host_that_runs_the_app():
+    from engine import recommend
+    r = recommend({"app_type": "mobile_first", "platforms": ["android", "ios"], "dau": 2000, "availability": "99.9",
+                   "budget_monthly": 300, "team_skills": ["javascript", "firebase"]}, with_counterfactuals=False)
+    if r["stack"]["backend"]["pick"].get("kind") == "baas":
+        assert not [w for w in r["warnings"] if w["code"] == "NO_PUBLISHED_SLA"], r["warnings"]

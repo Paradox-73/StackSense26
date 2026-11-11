@@ -306,7 +306,7 @@ def sla_warnings(p: dict, d: dict, host: dict) -> list[dict]:
         return [_warn("NO_PUBLISHED_SLA", "info", f"{host['name']} publishes no uptime SLA",
                       f"Your {d['availability']:g}% target rests on the app alone: {host['name']} commits to no uptime "
                       "figure and owes no credit when it is down.",
-                      "Run two or more instances in separate regions or zones and alert on an external uptime check; "
+                      "Alert on an external uptime check and keep a fallback ready (a second region or provider); "
                       "pick a host with a published SLA if the target is contractual.", ["availability"])]
     if not sla or sla["percent"] >= d["availability"] or not host.get("static_only"):
         return []
@@ -814,10 +814,9 @@ def hard_constraints(layer: str, item: dict, p: dict, d: dict) -> list[tuple[str
             out.append(("No ISO/IEC 27001 certification published", "compliance", 0))
         regions = item.get("residency_regions", item.get("regions"))
         note = item.get("residency_note")
-        if layer == "hosting" and "static_regions" in item and static_site(p) and d["data_12mo_gb"] <= STATIC_CONTENT_MAX_GB:
+        if layer == "hosting" and "static_regions" in item and static_site(p):
             # A static site's data is its files and their logs: where the host stores those, not where functions run.
-            # Past STATIC_CONTENT_MAX_GB the media sit in object storage in the required region, so the host is
-            # judged by its function regions.
+            # The site stays static at any size (its media past STATIC_CONTENT_MAX_GB go to object storage).
             regions, note = item["static_regions"], item.get("static_residency_note")
         if regions is not None:
             for rule, region in RESIDENCY_RULES.items():
@@ -1235,10 +1234,15 @@ def adjustments(layer: str, item: dict, p: dict, d: dict, best_fit: tuple | None
         else:
             a(-TENANT_ISOLATION_POINTS, "tenancy", f"Customers share one database and in {item['name']} {iso['how']}")
 
-    if layer == "backend" and p.get("enterprise_sso") and kind in ("server", "faas") and not p.get("identity_reused"):
-        # A BaaS that sells SAML/OIDC sign-in (item field `sso`) handles it; a backend of your own needs an identity
-        # broker (Keycloak) to run, patch and back up beside it (engine/advice.py, "Enterprise SSO"). An identity
-        # provider the project already runs (Entra ID, Okta) signs users in directly, so no broker is added.
+    # The sign-in product is a Keycloak the team runs (engine/advice.py, _auth) on its own servers, or as the broker of a
+    # multi-tenant B2B app whose team can run it; otherwise a hosted identity service federates the SSO for any backend.
+    runs_broker = (p["deployment"] in ("on_prem", "hybrid") or p.get("self_managed")
+                   or (p.get("tenancy") in ("shared", "isolated") and p.get("has_devops") and d["budget_usd"] > 0
+                       and "hipaa" not in p["compliance"]))
+    if layer == "backend" and p.get("enterprise_sso") and kind in ("server", "faas") and not p.get("identity_reused") \
+            and runs_broker:
+        # A BaaS that sells SAML/OIDC sign-in (item field `sso`) handles it; a backend of your own needs the broker
+        # to run, patch and back up beside it. An identity provider the project already runs signs users in directly.
         a(-SSO_BROKER_POINTS, "enterprise_sso", "Company-account sign-in (SSO) needs an identity broker such as Keycloak "
           "that you run beside this backend")
 

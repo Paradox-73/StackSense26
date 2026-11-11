@@ -360,7 +360,7 @@
     {
       "code": "NO_PUBLISHED_SLA",
       "severity": "info",
-      "message": "Fly.io publishes no uptime SLA. Your 99.9% target rests on the app alone: Fly.io commits to no uptime figure and owes no credit when it is down. Run two or more instances in separate regions or zones and alert on an external uptime check; pick a host with a published SLA if the target is contractual.",
+      "message": "Fly.io publishes no uptime SLA. Your 99.9% target rests on the app alone: Fly.io commits to no uptime figure and owes no credit when it is down. Alert on an external uptime check and keep a fallback ready (a second region or provider); pick a host with a published SLA if the target is contractual.",
       "fields": [
         "requirements.availability"
       ]

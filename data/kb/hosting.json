@@ -1526,6 +1526,7 @@
         "gpu": true
       },
       "gpu_source": "https://learn.microsoft.com/en-us/azure/container-apps/gpu-serverless-overview",
+      "gpu_runs_on": "Azure Container Apps serverless GPUs",
       "skills": [
         "azure"
       ],

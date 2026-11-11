@@ -596,12 +596,17 @@ def test_self_run_vms_never_get_a_managed_model_service(ptype):
     assert ml and not [m for m in ml if re.search(r"Bedrock|SageMaker|Vertex|Azure AI", m)], ml
 
 
-def test_a_read_only_project_with_a_real_database_is_not_held_to_the_static_rule():
-    """Over ~5 GB of content needs a database and code that reads it, so the host runs functions, not a static site."""
+def test_a_read_only_site_past_5_gb_is_held_to_where_its_static_host_keeps_files():
+    """A read-only site stays static at any size (media past ~5 GB go to object storage), so its host is judged by
+    where it keeps the site's files, not by where its functions run: with no AWS, Google Cloud or Azure and data kept
+    in India, no static host qualifies, and the engine says so instead of naming one whose CDN copies files abroad."""
     doc = edit("P5", project={"type": "content_site"}, compliance=["iso27001"],
                infrastructure={"cloud_preference": "none", "data_residency": "india", "existing_systems": []},
                requirements={"auth": "none", "payments": False, "realtime": False, "file_media_storage": False})
-    assert run(doc)["status"] != "infeasible"
+    out = run(doc)
+    assert out["status"] == "infeasible" and any(w["code"] == "NO_FEASIBLE_OPTION" for w in out["warnings"]), out["status"]
+    doc["infrastructure"]["cloud_preference"] = "any"  # a bucket in Mumbai behind CloudFront keeps them in India
+    assert run(doc)["stack"]["hosting"]["choice"].startswith("AWS S3 + CloudFront")
 
 
 def test_an_on_premises_sharepoint_server_is_reachable_from_an_air_gapped_site():

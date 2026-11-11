@@ -49,5 +49,34 @@ def test_offline_sync_under_hipaa_names_the_plan_and_the_baa():
                    "regions": ["north_america"], "dau": 2000})
     sync = [s for s in r["supporting_services"] if s["role"] == "Offline sync"]
     assert sync and "ElectricSQL" not in sync[0]["name"], sync
-    if "PowerSync" in sync[0]["name"]:
-        assert "BAA" in sync[0]["name"] and "HIPAA" in sync[0]["name"], sync
+    assert "PowerSync" in sync[0]["name"] and "BAA" in sync[0]["name"] and "HIPAA" in sync[0]["name"], sync
+
+
+def test_hipaa_in_india_without_a_devops_team_keeps_sign_in_in_india():
+    from engine.advice import _auth
+    env = {"onprem": False, "self_managed": False, "hybrid": False, "air_gapped": False, "hipaa": True, "india": True,
+           "eu": False, "us": False, "cloud": None, "no_hyperscaler": True}
+    p = {"enterprise_sso": False, "tenancy": "single", "has_devops": False}
+    name = _auth(env, p, {"budget_usd": 500}, {"id": "express"})[0]
+    assert "Auth0" not in name and "India" in name, name  # Auth0 keeps no data in India
+
+
+def test_teams_on_their_own_servers_run_their_search_engine():
+    doc = json.loads((ROOT / "scenarios" / "public" / "P3.json").read_text(encoding="utf-8"))
+    doc["infrastructure"].update(cloud_preference="none", deployment_model="self_hosted_cloud_vm")
+    doc["requirements"]["full_text_search"] = True
+    search = [s["choice"] for s in run(doc)["stack"]["supporting"] if s["layer"] == "search"]
+    assert search and not [s for s in search if "Cloud" in s], search
+
+
+def test_phone_codes_beside_a_backend_as_a_service_are_not_cognitos():
+    from engine.advice import supporting_services
+    from engine.profile import derive, normalize
+    kb = load_kb()["index"]
+    p, a, w = normalize({"app_type": "mobile_first", "platforms": ["android"], "special_workloads": ["phone_otp"],
+                         "dau": 2000})
+    d = derive(p, a, w)
+    stack = {"frontend": kb["react_native"], "backend": kb["supabase"], "database": kb["postgres"],
+             "hosting": kb["aws_s3_cloudfront"]}
+    sms = [s["name"] for s in supporting_services(p, d, stack, []) if s["role"] == "Phone login (SMS OTP)"]
+    assert sms and "Cognito" not in sms[0], sms
