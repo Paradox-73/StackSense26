@@ -301,7 +301,7 @@ Runs here: React SPA (static files). Firebase runs the API, auth and database as
 ## Supporting services
 
 - **Realtime**: Built-in realtime of Firebase (BaaS on Google Cloud): Subscriptions/listeners are provided by the BaaS; no socket server needed.
-- **Observability**: OpenTelemetry instrumentation -> Grafana Cloud / Sentry: Traces, metrics and error tracking from day one; required to defend an availability target.
+- **Observability**: OpenTelemetry instrumentation -> Grafana Cloud: Traces, metrics and error tracking from day one; required to defend an availability target.
 
 ## Estimated monthly cost
 

@@ -13,7 +13,7 @@ For a 'Healthcare / telehealth' project at Medium (10k-100k daily users) scale (
 | Frontend | **React SPA (Vite)** | 84.0 | 1.6, solid (1.5-4 points) | Next.js (React) (-1.6) |
 | Backend | **Python + Django** | 88.6 | 0.6, close call (under 1.5) | Python + FastAPI (-0.6, tie) |
 | Database | **PostgreSQL** | 88.7 | 0.8, close call (under 1.5) | MySQL (-0.8, tie) |
-| Hosting | **AWS ECS on Fargate** | 93.0 | 3.0, solid (1.5-4 points) | Azure App Service / Container Apps (-3.0) |
+| Hosting | **AWS ECS on Fargate** | 93.0 | 3.0, solid (1.5-4 points) | Azure App Service (-3.0) |
 | Mobile app (iOS/Android) | React Native (Expo) | 75.8 | - | - |
 
 Stack score: **88.6** / 100 (average of layer scores plus compatibility adjustments).
@@ -233,7 +233,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 Serverless containers on AWS: no nodes to manage, integrates with ALB, RDS, IAM, CloudWatch.
 
-AWS ECS on Fargate hosts the stack for users in North America at a 99.95% availability target. It runs the Python + Django API as long-running processes with WebSockets, sized for ~69 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is $240-$800 a month, against a total budget of $3,000 a month. It leads the runner-up, Azure App Service / Container Apps, by 3.0 stack points.
+AWS ECS on Fargate hosts the stack for users in North America at a 99.95% availability target. It runs the Python + Django API as long-running processes with WebSockets, sized for ~69 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is $240-$800 a month, against a total budget of $3,000 a month. It leads the runner-up, Azure App Service, by 3.0 stack points.
 
 Runs here: the Python + Django API as long-running processes. React SPA is built to static files that are served from Amazon S3 + CloudFront, not from these instances (see Supporting services). The database runs as a separate managed service (see Database).
 
@@ -250,7 +250,7 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 - AWS networking/IAM learning curve
 - ALB + NAT gateway base costs even when idle
 
-**Versus runner-up:** AWS ECS on Fargate beats Azure App Service / Container Apps by 3.0 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team skills (+3.4). Azure App Service / Container Apps is stronger on team size (+0.2), general quality (baseline weights) (+0.2).
+**Versus runner-up:** AWS ECS on Fargate beats Azure App Service by 3.0 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team skills (+3.4). Azure App Service is stronger on team size (+0.2), general quality (baseline weights) (+0.2).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +37.7
@@ -276,11 +276,11 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 | Adjustment: Your team already operates AWS (listed in team skills) | | | +3.5 |
 
 **Alternatives**
-- Azure App Service / Container Apps (stack 85.5, -3.0): Scores 80.9 on its own; its stack is 3.0 stack points behind the pick.
+- Azure App Service (stack 85.5, -3.0): Scores 80.9 on its own; its stack is 3.0 stack points behind the pick.
 - AWS EKS (Kubernetes) (stack 85.0, -3.6): Scores 78.7 on its own; its stack is 3.6 stack points behind the pick.
 
 **Why not the others?**
-- Why not Azure App Service / Container Apps? (runner-up) Swapping it in lowers the stack score by 3.0 points. AWS ECS on Fargate is stronger on team skill match (5.0 vs 2.5), learning curve (5.0 vs 4.0); Azure App Service / Container Apps is stronger on low ops burden (4.0 vs 3.0).
+- Why not Azure App Service? (runner-up) Swapping it in lowers the stack score by 3.0 points. AWS ECS on Fargate is stronger on team skill match (5.0 vs 2.5), learning curve (5.0 vs 4.0); Azure App Service is stronger on low ops burden (4.0 vs 3.0).
 - Why not Vercel? (popular choice) Ruled out for your answers: No published SLA, so nothing backs your 99.95% availability target.
 - Why not Render? (popular choice) Ruled out for your answers: No published SLA, so nothing backs your 99.95% availability target.
 
@@ -291,9 +291,9 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 - Render: No published SLA, so nothing backs your 99.95% availability target
 - Railway: No HIPAA Business Associate Agreement available; No published SLA, so nothing backs your 99.95% availability target
 - Fly.io: No published SLA, so nothing backs your 99.95% availability target
-- AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (CloudFront distribution), below your 99.95% availability target
+- AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
 - Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay; No HIPAA Business Associate Agreement available
-- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (Cloud Storage Standard class in one region (Cloud CDN: 99.95%)), below your 99.95% availability target
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay
 - Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay; No HIPAA Business Associate Agreement available; No SOC 2 report available
 - Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay; No HIPAA Business Associate Agreement available; No SOC 2 report available
 - Google Kubernetes Engine (Autopilot): The provider's SLA is 99.9% (Autopilot Pods in multiple zones (the control plane is 99.95%)), below your 99.95% availability target
@@ -308,11 +308,11 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 ## Supporting services
 
 - **Realtime**: WebSockets in the Python + Django app (Django Channels): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
-- **Background jobs**: Celery / RQ / Dramatiq (Redis/Valkey broker): Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (ElastiCache (Valkey)).
+- **Background jobs**: Celery (Redis/Valkey broker): Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (ElastiCache (Valkey)).
 - **Static frontend**: Amazon S3 + CloudFront: React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Python + Django instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.
 - **Object storage**: Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only): Media and documents belong in object storage, not the database.
 - **Authentication**: Amazon Cognito (HIPAA-eligible): Do not hand-roll password storage, MFA or SSO.
-- **Push notifications**: Firebase Cloud Messaging (+ APNs) or Expo Notifications: Standard channel for mobile engagement on Android and iOS. Push services are not covered by a BAA: put no health information in the notification text (e.g. 'You have a new message') and show the content only after the user signs in.
+- **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS. Push services are not covered by a BAA: put no health information in the notification text (e.g. 'You have a new message') and show the content only after the user signs in.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 - **Audit & security**: Encrypted storage (KMS), audit logging, least-privilege IAM, WAF: The HIPAA Security Rule requires access controls, audit trails and encryption.
 
@@ -338,9 +338,9 @@ About ₹35,520-₹174,240 per month. Budget status: **within**. Planning estima
   - Why frontend changes: React SPA (Vite) now takes a penalty (Client-side rendering is a liability when organic search is the business), moving the gap 18.0 points toward Next.js (React); SEO moved the gap 17.7 points toward Next.js (React) (Next.js (React) 5.0/5 vs React SPA (Vite) 2.0/5, weight 0.2 -> 4.2).
 - **Must run on-premises**: hosting: AWS ECS on Fargate -> On-prem Kubernetes (k3s / RKE2 / OpenShift)
   - Why hosting changes: AWS ECS on Fargate is now ruled out: Public-cloud service; deployment must be on-premises.
-- **Team has no relevant prior skills**: backend: Python + Django -> Node.js + Express; hosting: AWS ECS on Fargate -> Azure App Service / Container Apps
+- **Team has no relevant prior skills**: backend: Python + Django -> Node.js + Express; hosting: AWS ECS on Fargate -> Azure App Service
   - Why backend changes: Python + Django lost a bonus (Your team already ships Python + Django (python listed in team skills)), moving the gap 6.0 points toward Node.js + Express; hiring pool moved the gap 3.9 points toward Node.js + Express (Node.js + Express 5.0/5 vs Python + Django 4.0/5, weight 0.5 -> 3.0).
-  - Why hosting changes: Team skill match moved the gap 10.3 points toward Azure App Service / Container Apps (Azure App Service / Container Apps 3.0/5 vs AWS ECS on Fargate 3.0/5, weight 2.5 -> 0.0, was 2.5 vs 5.0).
+  - Why hosting changes: Team skill match moved the gap 10.3 points toward Azure App Service (Azure App Service 3.0/5 vs AWS ECS on Fargate 3.0/5, weight 2.5 -> 0.0, was 2.5 vs 5.0).
 
 ## Next-best complete stacks
 

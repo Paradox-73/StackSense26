@@ -306,7 +306,7 @@ Runs here: Server-rendered HTML + HTMX (server rendering + static files), the Py
 - Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay; Public-cloud service; deployment must be on-premises
 - Google Cloud Run: Public-cloud service; deployment must be on-premises
 - Google Kubernetes Engine (Autopilot): Public-cloud service; deployment must be on-premises
-- Azure App Service / Container Apps: Public-cloud service; deployment must be on-premises
+- Azure App Service: Public-cloud service; deployment must be on-premises
 - DigitalOcean (App Platform + Managed DBs): Public-cloud service; deployment must be on-premises
 - Hetzner Cloud / VPS (Docker, Coolify): Public-cloud service; deployment must be on-premises
 - AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs; Public-cloud service; deployment must be on-premises

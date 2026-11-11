@@ -27,8 +27,8 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 ### How the parts fit
 
 1. **Request path**: The browser loads Next.js (React) from AWS EKS (Kubernetes); it sends API calls to the Java/Kotlin + Spring Boot service on AWS EKS (Kubernetes) (~25,000 requests/s at peak), which queries MySQL.
-2. **Sign-in**: Sign-in uses Amazon Cognito in the Mumbai region; the Java/Kotlin + Spring Boot API checks the session or token on every request.
-3. **Data**: MySQL is the system of record (about 1,520 GB within 12 months); uploaded files go to Amazon S3 + CloudFront. Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens. Every store above is placed in the region your residency rule requires.
+2. **Sign-in**: Sign-in uses Amazon Cognito in the Mumbai region (ap-south-1); the Java/Kotlin + Spring Boot API checks the session or token on every request.
+3. **Data**: MySQL is the system of record (about 1,520 GB within 12 months); uploaded files go to Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN). Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens. Every store above is placed in the region your residency rule requires.
 4. **Deploy**: CI builds container images and rolls them out on AWS EKS (Kubernetes) (manifests or Helm), one service at a time. Database schema changes run as versioned migrations before the new code serves traffic.
 
 ## Inputs used
@@ -282,7 +282,7 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 
 **Alternatives**
 - AWS ECS on Fargate (stack 92.2, -1.5): Loses: Kubernetes earns its complexity when running many independently deployed services.
-- Azure App Service / Container Apps (stack 88.8, -4.9): Loses: Kubernetes earns its complexity when running many independently deployed services.
+- Azure App Service (stack 88.8, -4.9): Loses: Kubernetes earns its complexity when running many independently deployed services.
 
 **Why not the others?**
 - Why not AWS ECS on Fargate? (runner-up) Swapping it in lowers the stack score by 1.5 points. AWS EKS (Kubernetes) is stronger on portability (low lock-in) (4.0 vs 3.0); AWS ECS on Fargate is stronger on low ops burden (3.0 vs 1.0). 1.5 of the 1.5 points come from a stack compatibility rule: Kubernetes earns its complexity when running many independently deployed services.
@@ -296,9 +296,9 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 - Render: No PCI-DSS attestation published; No India region; data must stay in India; No published SLA, so nothing backs your 99.95% availability target
 - Railway: No PCI-DSS attestation published; No India region; data must stay in India; No published SLA, so nothing backs your 99.95% availability target
 - Fly.io: No PCI-DSS attestation published; No India region; data must stay in India; No published SLA, so nothing backs your 99.95% availability target
-- AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (CloudFront distribution), below your 99.95% availability target
+- AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
 - Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
-- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (Cloud Storage Standard class in one region (Cloud CDN: 99.95%)), below your 99.95% availability target
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay
 - Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay; No PCI-DSS attestation published
 - Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay; No PCI-DSS attestation published
 - Google Kubernetes Engine (Autopilot): The provider's SLA is 99.9% (Autopilot Pods in multiple zones (the control plane is 99.95%)), below your 99.95% availability target
@@ -320,12 +320,12 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 - **Realtime**: WebSockets in the Java/Kotlin + Spring Boot app (Spring WebSocket with STOMP): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
 - **Secondary store (document)**: MongoDB (MongoDB Atlas (runs on AWS, GCP or Azure in the same region as your compute)): Your primary database fits your data less well than MongoDB: 'document' 3/5 against 5/5.
 - **Analytics**: ClickHouse Cloud (AWS/GCP/Azure) fed by a continuous copy of database changes: Run heavy aggregations on a columnar store instead of the transactional database.
-- **Background jobs**: Spring Batch / SQS listeners: Send emails, process uploads and call slow APIs outside the request path.
+- **Background jobs**: Amazon SQS with Spring Cloud AWS listeners: Send emails, process uploads and call slow APIs outside the request path.
 - **Search**: Amazon OpenSearch Service: Search across ~507 GB of documents (an estimate: the document share of your ~1,520 GB total, from your 2 data shapes) needs an inverted index with relevance ranking, highlighting and filters; database text indexes slow down and rank poorly at this size.
-- **Payments**: Razorpay / Cashfree (India) or Stripe with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).
-- **Object storage**: Amazon S3 + CloudFront: Media and documents belong in object storage, not the database.
-- **Authentication**: Amazon Cognito in the Mumbai region: Do not hand-roll password storage, MFA or SSO.
-- **Push notifications**: Firebase Cloud Messaging (+ APNs) or Expo Notifications: Standard channel for mobile engagement on Android and iOS.
+- **Payments**: Razorpay with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.
+- **Object storage**: Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN): Media and documents belong in object storage, not the database.
+- **Authentication**: Amazon Cognito in the Mumbai region (ap-south-1): Do not hand-roll password storage, MFA or SSO.
+- **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 - **Audit & security**: Encrypted storage (KMS), audit logging, least-privilege IAM, WAF: PCI-DSS requires access controls, audit trails and encryption.
 

@@ -26,7 +26,7 @@ Availability approach: The platform runs the functions across zones, with no ins
 ### How the parts fit
 
 1. **Request path**: The browser loads Next.js (React) from Cloudflare Pages + Workers; it sends API calls to functions on Cloudflare Pages + Workers, one invocation per request (~2.2 requests/s at peak).
-2. **Sign-in**: Sign-in uses Clerk / Auth0 / framework built-in auth; each function checks the token on every request.
+2. **Sign-in**: Sign-in uses Auth0; each function checks the token on every request.
 3. **Data**: PostgreSQL is the system of record (about 14 GB within 12 months); uploaded files go to Cloudflare R2 (+ Cloudflare CDN). Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens.
 4. **Deploy**: A git push builds the app; Cloudflare Pages + Workers deploys it with a preview URL per pull request. Database schema changes run as versioned migrations before the new code serves traffic.
 
@@ -35,6 +35,10 @@ Availability approach: The platform runs the functions across zones, with no ins
 - Scale tier: Small (1k-10k daily users) (peak ~2.2 req/s, derived); database tier: Small (10-100 GB of data) (~14 GB in 12 months)
 - Budget: ~$21/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Assumption: compliance = dpdp: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies.
+
+## Warnings and how they were resolved
+
+- **[INFO] Cloudflare Pages + Workers publishes no uptime SLA**: Your 99% target rests on the app alone: Cloudflare Pages + Workers commits to no uptime figure and owes no credit when it is down. *Resolution:* Run two or more instances in separate regions or zones and alert on an external uptime check; pick a host with a published SLA if the target is contractual.
 
 ## Per-layer reasoning
 
@@ -317,11 +321,11 @@ Runs here: Next.js (server rendering + static files), the serverless functions. 
 
 ## Supporting services
 
-- **Search**: Postgres full-text search to start; Meilisearch/Typesense/OpenSearch when facets & typo-tolerance matter: Catalogue/content search with relevance tuning outgrows LIKE queries quickly.
-- **Payments**: Razorpay / Cashfree (India) or Stripe with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).
+- **Search**: Postgres full-text search: Catalogue/content search with relevance tuning outgrows LIKE queries quickly; the database's own text index starts it, and Meilisearch takes over when facets and typo tolerance matter.
+- **Payments**: Razorpay with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.
 - **Object storage**: Cloudflare R2 (+ Cloudflare CDN): Media and documents belong in object storage, not the database.
-- **Authentication**: Clerk / Auth0 / framework built-in auth: Do not hand-roll password storage, MFA or SSO.
-- **Observability**: OpenTelemetry instrumentation -> Grafana Cloud / Sentry: Traces, metrics and error tracking from day one; required to defend an availability target.
+- **Authentication**: Auth0: Do not hand-roll password storage, MFA or SSO.
+- **Observability**: OpenTelemetry instrumentation -> Grafana Cloud: Traces, metrics and error tracking from day one; required to defend an availability target.
 
 ## Estimated monthly cost
 

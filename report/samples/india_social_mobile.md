@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Social network / UGC feed' project at Large (100k-1M daily users) scale (~1,389 peak req/s) built by 3 engineer(s) in 10 weeks, StackSense recommends React Native (Expo) + Firebase (BaaS on Google Cloud) + Cloud Firestore + Provided by Firebase (architecture: BaaS-first (managed backend + thin server-side functions)). Estimated infrastructure cost: ₹65,568-₹436,992/month (stretch budget).
+For a 'Social network / UGC feed' project at Large (100k-1M daily users) scale (~1,389 peak req/s) built by 3 engineer(s) in 10 weeks, StackSense recommends React Native (Expo) + Firebase (BaaS on Google Cloud) + Cloud Firestore + Provided by Firebase (architecture: BaaS-first (managed backend + thin server-side functions)). Estimated infrastructure cost: ₹58,848-₹360,192/month (stretch budget).
 
 ## Recommended stack
 
@@ -36,6 +36,10 @@ Availability approach: Firebase runs the backend on a paid plan; turn on point-i
 - Budget: ~$833/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Assumption: compliance = dpdp: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies.
 - Defaults used (1): Special workloads = none
+
+## Warnings and how they were resolved
+
+- **[INFO] Cloudflare Pages + Workers publishes no uptime SLA**: Your 99.9% target rests on the app alone: Cloudflare Pages + Workers commits to no uptime figure and owes no credit when it is down. *Resolution:* Run two or more instances in separate regions or zones and alert on an external uptime check; pick a host with a published SLA if the target is contractual.
 
 ## Per-layer reasoning
 
@@ -289,19 +293,18 @@ With about 100,000 daily users on iOS and Android, nothing of yours needs separa
 
 ## Supporting services
 
-- **Cache**: Redis/Valkey (Workers KV for simple caching, or Upstash Redis): Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database.
 - **Realtime**: Built-in realtime of Firebase (BaaS on Google Cloud): Subscriptions/listeners are provided by the BaaS; no socket server needed.
-- **Search**: Meilisearch or Typesense (cloud or self-hosted); OpenSearch past ~10M documents: Search across ~193 GB of documents (an estimate: the document share of your ~290 GB total, from your 2 data shapes) needs an inverted index with relevance ranking, highlighting and filters; database text indexes slow down and rank poorly at this size.
-- **Object storage**: Cloud Storage for Firebase (included in the Firebase project): Media and documents belong in object storage, not the database; Firebase security rules cover both.
+- **Secondary store (graph)**: Neo4j (Neo4j AuraDB): Your primary database fits your data less well than Neo4j: 'graph' 1/5 against 5/5.
+- **Search**: Meilisearch Cloud: Search across ~193 GB of documents (an estimate: the document share of your ~290 GB total, from your 2 data shapes) needs an inverted index with relevance ranking, highlighting and filters; database text indexes slow down and rank poorly at this size.
+- **Object storage**: Cloud Storage for Firebase (included in the Firebase project): Media and documents belong in object storage, not the database. Firebase security rules cover both.
 - **Offline sync**: Firestore offline persistence (built into the client SDKs): Offline use needs a local copy of the data and conflict handling when the device reconnects; the primary database does not provide that by itself.
-- **Push notifications**: Firebase Cloud Messaging (+ APNs) or Expo Notifications: Standard channel for mobile engagement on Android and iOS.
-- **Observability**: OpenTelemetry instrumentation -> Grafana Cloud / Sentry: Traces, metrics and error tracking from day one; required to defend an availability target.
+- **Push notifications**: Expo push notifications (FCM and APNs underneath): Standard channel for mobile engagement on Android and iOS.
+- **Observability**: OpenTelemetry instrumentation -> Grafana Cloud: Traces, metrics and error tracking from day one; required to defend an availability target.
 
 ### Add later (ops budget)
 
 A team of 3 is kept to 2 extra system(s) to operate. Our estimate: a team of 1-2 people runs at most 1 extra system next to its app and database, 3-5 people 2, 6-12 people 4, 13 or more no cap. Compliance and security services are never deferred.
 
-- **Secondary store (graph)**: Neo4j (Neo4j AuraDB): add when graph queries on Cloud Firestore get slow or awkward (more than ~2 s, or several lookups per request). Your primary database fits your data less well than Neo4j: 'graph' 1/5 against 5/5.
 - **Analytics**: ClickHouse Cloud (AWS/GCP/Azure) fed by a continuous copy of database changes: add when dashboard or reporting queries on the primary database take more than ~2 s. Run heavy aggregations on a columnar store instead of the transactional database.
 
 ## Estimated monthly cost
@@ -309,10 +312,10 @@ A team of 3 is kept to 2 extra system(s) to operate. Our estimate: a team of 1-2
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
 | Backend: Firebase (BaaS on Google Cloud) (includes its database) | 483 | 3,052 | plan sized for the larger of traffic (Large (100k-1M daily users)) and ~290 GB of data in 12 months; per-read/write pricing at your request volume; disk beyond the plan's allowance billed per GB |
-| Cache: Redis / Valkey | 200 | 1,500 | Large (100k-1M daily users) price band (the app's scale) |
-| **Total** | **683** | **4,552** | |
+| Secondary store (graph): Neo4j | 130 | 700 | Medium (100 GB-1 TB of data) price band (the app's scale) |
+| **Total** | **613** | **3,752** | |
 
-About ₹65,568-₹436,992 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹58,848-₹360,192 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

@@ -36,6 +36,10 @@ Availability approach: Supabase runs the backend on a paid plan; turn on point-i
 - Budget: ~$50/month
 - Defaults used (2): What do users do? = read, sign_in, post; Special workloads = none
 
+## Warnings and how they were resolved
+
+- **[INFO] Cloudflare Pages + Workers publishes no uptime SLA**: Your 99.9% target rests on the app alone: Cloudflare Pages + Workers commits to no uptime figure and owes no credit when it is down. *Resolution:* Run two or more instances in separate regions or zones and alert on an external uptime check; pick a host with a published SLA if the target is contractual.
+
 ## Per-layer reasoning
 
 ### Frontend: Next.js (React) (88.0)
@@ -305,7 +309,7 @@ Runs here: Next.js (server rendering + static files). Supabase runs the API, aut
 ## Supporting services
 
 - **Realtime**: Built-in realtime of Supabase (BaaS on Postgres): Subscriptions/listeners are provided by the BaaS; no socket server needed.
-- **Observability**: OpenTelemetry instrumentation -> Grafana Cloud / Sentry: Traces, metrics and error tracking from day one; required to defend an availability target.
+- **Observability**: OpenTelemetry instrumentation -> Grafana Cloud: Traces, metrics and error tracking from day one; required to defend an availability target.
 
 ## Estimated monthly cost
 

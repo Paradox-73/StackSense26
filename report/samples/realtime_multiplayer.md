@@ -26,7 +26,7 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 ### How the parts fit
 
 1. **Request path**: The browser loads React SPA (Vite) from Fly.io; it sends API calls to the Go service on Fly.io (~3,472 requests/s at peak), which queries MongoDB.
-2. **Sign-in**: Sign-in uses Clerk / Auth0 / framework built-in auth; the Go API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses Auth0; the Go API checks the session or token on every request.
 3. **Data**: MongoDB is the system of record (about 170 GB within 12 months).
 4. **Deploy**: CI builds a container image and rolls it out on Fly.io with health checks and zero-downtime restarts. MongoDB keeps no fixed schema: new code reads both the old and the new document shape during a rollout, and backfills that rewrite old documents run as versioned scripts (indexes and validation rules ship the same way).
 
@@ -39,6 +39,7 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 ## Warnings and how they were resolved
 
 - **[WARNING] 50 ms target for users worldwide**: The stack as shown runs its API and MongoDB in one region. A round trip between continents alone takes ~85 ms (US East - West Europe) to ~170-225 ms (Southeast Asia - Europe or US East), measured between cloud regions (https://learn.microsoft.com/en-us/azure/networking/azure-network-latency), so users far from that region miss a 50 ms target before any work is done. *Resolution:* Deploy the API in a region per continent with read replicas (or a multi-region database for writes), cache reads at the edge (CDN or edge functions), or treat the target as per-region.
+- **[INFO] Fly.io publishes no uptime SLA**: Your 99.9% target rests on the app alone: Fly.io commits to no uptime figure and owes no credit when it is down. *Resolution:* Run two or more instances in separate regions or zones and alert on an external uptime check; pick a host with a published SLA if the target is contractual.
 
 ## Per-layer reasoning
 
@@ -271,7 +272,7 @@ Runs here: React SPA (static files), the Go API as long-running processes. The d
 
 **Alternatives**
 - AWS ECS on Fargate (stack 82.0, -4.2): Loses: Anycast + multi-region VMs keep websocket round-trips short for global users.
-- Azure App Service / Container Apps (stack 81.5, -4.7): Loses: Anycast + multi-region VMs keep websocket round-trips short for global users.
+- Azure App Service (stack 81.5, -4.7): Loses: Anycast + multi-region VMs keep websocket round-trips short for global users.
 
 **Why not the others?**
 - Why not AWS ECS on Fargate? (runner-up) Swapping it in lowers the stack score by 4.2 points. Fly.io is stronger on realtime fit (5.0 vs 4.0), performance / latency (5.0 vs 4.0); AWS ECS on Fargate is stronger on scalability (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0). 2.0 of the 4.2 points come from a stack compatibility rule: Anycast + multi-region VMs keep websocket round-trips short for global users.
@@ -301,8 +302,8 @@ Runs here: React SPA (static files), the Go API as long-running processes. The d
 - **Realtime**: Redis pub/sub for cross-instance fan-out (Upstash Redis on Fly): With several app instances, a message published on one must reach sockets on all others.
 - **Collaboration sync**: Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus or y-websocket as the sync server: Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke.
 - **Ingestion buffer**: Redpanda/Kafka or NATS JetStream: A durable log absorbs write bursts and keeps device ingestion separate from database writes, and lets you replay messages.
-- **Authentication**: Clerk / Auth0 / framework built-in auth: Do not hand-roll password storage, MFA or SSO.
-- **Observability**: OpenTelemetry instrumentation -> Grafana Cloud / Sentry: Traces, metrics and error tracking from day one; required to defend an availability target.
+- **Authentication**: Auth0: Do not hand-roll password storage, MFA or SSO.
+- **Observability**: OpenTelemetry instrumentation -> Grafana Cloud: Traces, metrics and error tracking from day one; required to defend an availability target.
 
 ## Estimated monthly cost
 

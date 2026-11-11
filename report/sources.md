@@ -111,6 +111,7 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - database: Redis / Valkey: https://redis.io/docs/latest/
 - database: Redis / Valkey: https://valkey.io/docs/
 - database: Redis / Valkey: https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/
+- database: Redis / Valkey: https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/retirement-faq
 - database: Apache Cassandra / ScyllaDB: https://cassandra.apache.org/doc/latest/
 - database: Apache Cassandra / ScyllaDB: https://docs.scylladb.com/
 - database: Apache Cassandra / ScyllaDB: https://discord.com/blog/how-discord-stores-trillions-of-messages
@@ -227,10 +228,10 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - hosting: Google Kubernetes Engine (Autopilot): https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview
 - hosting: Google Kubernetes Engine (Autopilot): https://cloud.google.com/kubernetes-engine/pricing
 - hosting: Google Kubernetes Engine (Autopilot): https://cloud.google.com/kubernetes-engine/sla
-- hosting: Azure App Service / Container Apps: https://learn.microsoft.com/azure/app-service/overview
-- hosting: Azure App Service / Container Apps: https://learn.microsoft.com/azure/container-apps/overview
-- hosting: Azure App Service / Container Apps: https://learn.microsoft.com/azure/compliance/offerings/offering-hipaa-us
-- hosting: Azure App Service / Container Apps: https://learn.microsoft.com/en-us/azure/app-service/quickstart-php
+- hosting: Azure App Service: https://learn.microsoft.com/azure/app-service/overview
+- hosting: Azure App Service: https://learn.microsoft.com/azure/container-apps/overview
+- hosting: Azure App Service: https://learn.microsoft.com/azure/compliance/offerings/offering-hipaa-us
+- hosting: Azure App Service: https://learn.microsoft.com/en-us/azure/app-service/quickstart-php
 - hosting: DigitalOcean (App Platform + Managed DBs): https://docs.digitalocean.com/products/app-platform/
 - hosting: DigitalOcean (App Platform + Managed DBs): https://docs.digitalocean.com/products/app-platform/details/availability/
 - hosting: DigitalOcean (App Platform + Managed DBs): https://www.digitalocean.com/pricing
@@ -298,9 +299,9 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - hosting: Google Cloud Run (compliance maturity): https://cloud.google.com/security/compliance/offerings
 - hosting: Google Cloud Run (compliance maturity): https://cloud.google.com/logging/docs/audit
 - hosting: Google Cloud Run (compliance maturity): https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes
-- hosting: Azure App Service / Container Apps (compliance maturity): https://learn.microsoft.com/azure/compliance/
-- hosting: Azure App Service / Container Apps (compliance maturity): https://learn.microsoft.com/azure/azure-monitor/essentials/activity-log
-- hosting: Azure App Service / Container Apps (compliance maturity): https://learn.microsoft.com/azure/virtual-machines/dedicated-hosts
+- hosting: Azure App Service (compliance maturity): https://learn.microsoft.com/azure/compliance/
+- hosting: Azure App Service (compliance maturity): https://learn.microsoft.com/azure/azure-monitor/essentials/activity-log
+- hosting: Azure App Service (compliance maturity): https://learn.microsoft.com/azure/virtual-machines/dedicated-hosts
 - hosting: DigitalOcean (App Platform + Managed DBs) (compliance maturity): https://www.digitalocean.com/trust
 - hosting: DigitalOcean (App Platform + Managed DBs) (compliance maturity): https://www.digitalocean.com/trust/hipaa-at-do
 - hosting: Hetzner Cloud / VPS (Docker, Coolify) (compliance maturity): https://www.hetzner.com/unternehmen/zertifizierung/

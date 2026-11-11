@@ -26,8 +26,8 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 ### How the parts fit
 
 1. **Request path**: The iOS/Android app, installed from the app stores, sends API calls to the Java/Kotlin + Spring Boot service on AWS EKS (Kubernetes) (~2,315 requests/s at peak), which queries PostgreSQL.
-2. **Sign-in**: Sign-in uses Amazon Cognito in the Mumbai region; the Java/Kotlin + Spring Boot API checks the session or token on every request.
-3. **Data**: PostgreSQL is the system of record (about 1,460 GB within 12 months); uploaded files go to Amazon S3 + CloudFront. Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens. Every store above is placed in the region your residency rule requires.
+2. **Sign-in**: Sign-in uses Amazon Cognito in the Mumbai region (ap-south-1); the Java/Kotlin + Spring Boot API checks the session or token on every request.
+3. **Data**: PostgreSQL is the system of record (about 1,460 GB within 12 months); uploaded files go to Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN). Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens. Every store above is placed in the region your residency rule requires.
 4. **Deploy**: CI builds container images and rolls them out on AWS EKS (Kubernetes) (manifests or Helm), one service at a time. App releases go through App Store and Google Play review. Database schema changes run as versioned migrations before the new code serves traffic.
 
 ## Inputs used
@@ -292,9 +292,9 @@ Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The data
 - Render: No India region; data must stay in India; No published SLA, so nothing backs your 99.95% availability target
 - Railway: No India region; data must stay in India; No published SLA, so nothing backs your 99.95% availability target
 - Fly.io: No India region; data must stay in India; No published SLA, so nothing backs your 99.95% availability target
-- AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (CloudFront distribution), below your 99.95% availability target
+- AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
 - Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
-- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (Cloud Storage Standard class in one region (Cloud CDN: 99.95%)), below your 99.95% availability target
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay
 - Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay
 - Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay
 - Google Kubernetes Engine (Autopilot): The provider's SLA is 99.9% (Autopilot Pods in multiple zones (the control plane is 99.95%)), below your 99.95% availability target
@@ -308,12 +308,12 @@ Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The data
 ## Supporting services
 
 - **Realtime**: WebSockets in the Java/Kotlin + Spring Boot app (Spring WebSocket with STOMP): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
-- **Background jobs**: Spring Batch / SQS listeners: Send emails, process uploads and call slow APIs outside the request path.
-- **Phone login (SMS OTP)**: MSG91 or Twilio Verify, with DLT-registered SMS templates: One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates.
-- **Payments**: Razorpay / Cashfree (India) or Stripe with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).
-- **Object storage**: Amazon S3 + CloudFront: Media and documents belong in object storage, not the database.
-- **Authentication**: Amazon Cognito in the Mumbai region: Do not hand-roll password storage, MFA or SSO.
-- **Push notifications**: Firebase Cloud Messaging (+ APNs) or Expo Notifications: Standard channel for mobile engagement on Android and iOS.
+- **Background jobs**: Amazon SQS with Spring Cloud AWS listeners: Send emails, process uploads and call slow APIs outside the request path.
+- **Phone login (SMS OTP)**: MSG91, with DLT-registered SMS templates: One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India.
+- **Payments**: Razorpay with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.
+- **Object storage**: Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN): Media and documents belong in object storage, not the database.
+- **Authentication**: Amazon Cognito in the Mumbai region (ap-south-1): Do not hand-roll password storage, MFA or SSO.
+- **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 
 ## Estimated monthly cost

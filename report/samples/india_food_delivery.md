@@ -27,7 +27,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 ### How the parts fit
 
 1. **Request path**: The browser loads Next.js (React) from AWS EKS (Kubernetes); it sends API calls to the Node.js + NestJS service on AWS EKS (Kubernetes) (~6,944 requests/s at peak), which queries PostgreSQL.
-2. **Sign-in**: Sign-in uses Clerk / Auth0 / framework built-in auth; the Node.js + NestJS API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses Amazon Cognito; the Node.js + NestJS API checks the session or token on every request.
 3. **Data**: PostgreSQL is the system of record (about 2,800 GB within 12 months); uploaded files go to Amazon S3 + CloudFront. Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens.
 4. **Deploy**: CI builds container images and rolls them out on AWS EKS (Kubernetes) (manifests or Helm), one service at a time. Database schema changes run as versioned migrations before the new code serves traffic.
 
@@ -278,7 +278,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + NestJS API a
 
 **Alternatives**
 - AWS ECS on Fargate (stack 88.6, +0.0): Scores 100.0 on its own; its stack is less than 0.05 stack points behind the pick.
-- Azure App Service / Container Apps (stack 84.2, -4.4): Scores 82.5 on its own; its stack is 4.4 stack points behind the pick.
+- Azure App Service (stack 84.2, -4.4): Scores 82.5 on its own; its stack is 4.4 stack points behind the pick.
 
 **Why not the others?**
 - Why not AWS ECS on Fargate? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores the same (less than 0.05 points apart); either is defensible. AWS EKS (Kubernetes) is stronger on portability (low lock-in) (4.0 vs 3.0); AWS ECS on Fargate is stronger on low ops burden (3.0 vs 1.0).
@@ -292,9 +292,9 @@ Runs here: Next.js (server rendering + static files), the Node.js + NestJS API a
 - Render: No PCI-DSS attestation published; No published SLA, so nothing backs your 99.95% availability target
 - Railway: No PCI-DSS attestation published; No published SLA, so nothing backs your 99.95% availability target
 - Fly.io: No PCI-DSS attestation published; No published SLA, so nothing backs your 99.95% availability target
-- AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (CloudFront distribution), below your 99.95% availability target
+- AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
 - Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
-- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (Cloud Storage Standard class in one region (Cloud CDN: 99.95%)), below your 99.95% availability target
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay
 - Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay; No PCI-DSS attestation published
 - Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay; No PCI-DSS attestation published
 - Google Kubernetes Engine (Autopilot): The provider's SLA is 99.9% (Autopilot Pods in multiple zones (the control plane is 99.95%)), below your 99.95% availability target
@@ -313,12 +313,12 @@ Runs here: Next.js (server rendering + static files), the Node.js + NestJS API a
 - **Background jobs**: BullMQ (Redis): Send emails, process uploads and call slow APIs outside the request path. BullMQ keeps its jobs in Redis, so the app needs a Redis/Valkey instance (the one already listed above).
 - **Search**: Amazon OpenSearch Service: Search across ~933 GB of documents (an estimate: the document share of your ~2,800 GB total, from your 2 data shapes) needs an inverted index with relevance ranking, highlighting and filters; database text indexes slow down and rank poorly at this size.
 - **Object storage**: Amazon S3 + CloudFront: Uploaded files and video belong in object storage, not the database.
-- **Media delivery**: CDN in front of the object storage, with image resizing at the edge: Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.
-- **Maps & live location**: Google Maps Platform, Mapbox or Ola Maps + location updates over the realtime channel: Send position updates every few seconds over WebSockets (not polling) and keep only the latest point per device in a fast store; map tiles and routing come from a maps provider.
-- **Phone login (SMS OTP)**: MSG91 or Twilio Verify, with DLT-registered SMS templates: One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates.
-- **Payments**: Razorpay / Cashfree (India) or Stripe with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).
-- **Authentication**: Clerk / Auth0 / framework built-in auth: Do not hand-roll password storage, MFA or SSO.
-- **Push notifications**: Firebase Cloud Messaging (+ APNs) or Expo Notifications: Standard channel for mobile engagement on Android and iOS.
+- **Media delivery**: Amazon CloudFront in front of the uploads bucket: Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.
+- **Maps & live location**: Google Maps Platform + location updates over the realtime channel: Send position updates every few seconds over WebSockets (not polling) and keep only the latest point per device in a fast store; map tiles and routing come from a maps provider.
+- **Phone login (SMS OTP)**: MSG91, with DLT-registered SMS templates: One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates.
+- **Payments**: Razorpay with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.
+- **Authentication**: Amazon Cognito: Do not hand-roll password storage, MFA or SSO.
+- **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 - **Audit & security**: Encrypted storage (KMS), audit logging, least-privilege IAM, WAF: PCI-DSS requires access controls, audit trails and encryption.
 
