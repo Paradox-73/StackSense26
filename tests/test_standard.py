@@ -578,6 +578,9 @@ def test_an_on_premises_sharepoint_server_is_reachable_from_an_air_gapped_site()
 
 @pytest.mark.parametrize("text,how", [
     ("NSE stock exchange feed", "its API"), ("Currency exchange rates API", "its API"), ("Exchange rate feed", "its API"),
+    ("Exchange market data feed", "its API"), ("Exchange FIX gateway", "its API"), ("Stock exchange server", "its API"),
+    ("On-premises Exchange", "the SharePoint or Exchange server's REST API"),
+    ("Hybrid Exchange", "the SharePoint or Exchange server's REST API"),
     ("Microsoft Exchange Server 2019", "the SharePoint or Exchange server's REST API"),
     ("MS Exchange", "the SharePoint or Exchange server's REST API"),
     ("Exchange 2016 mail server", "the SharePoint or Exchange server's REST API"),
