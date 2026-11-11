@@ -39,6 +39,23 @@
       },
       {
         "open": true,
+        "when": {
+          "kind": [
+            "desktop"
+          ]
+        },
+        "text": "{name} is the desktop app for {app_phrase} with about {users} {user_noun} (~{peak} requests/s at peak), built by {team_phrase} in {weeks} weeks."
+      },
+      {
+        "when": {
+          "kind": [
+            "desktop"
+          ]
+        },
+        "text": "Desktop is the only client, so the app ships as an installer and there are no web pages to build or host; the server side is only the API it calls."
+      },
+      {
+        "open": true,
         "text": "{name} is the frontend for {app_phrase} with about {users} {user_noun} (~{peak} requests/s at peak), built by {team_phrase} in {weeks} weeks."
       },
       {

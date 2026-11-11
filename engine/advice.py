@@ -97,6 +97,24 @@ def _env(p: dict, host: dict) -> dict:
             "no_hyperscaler": p.get("cloud_preference") == "no_hyperscaler"}
 
 
+# The desktop app beside a web or phone frontend, in the first language the team lists that a toolkit is written in;
+# Electron, which packages the web frontend, for JavaScript teams and when no listed language has one.
+DESKTOP_TOOLKITS = [
+    ({"cpp", "c"}, "Qt (C++), a native Windows, macOS and Linux app beside the web frontend",
+     "The team writes C++, and Qt builds native desktop apps for Windows, macOS and Linux from one codebase.",
+     "https://doc.qt.io/qt-6/supported-platforms.html"),
+    ({"rust"}, "Tauri (Rust), the web frontend in a small desktop app",
+     "The team writes Rust, and Tauri draws the web frontend in the system's own web view, so a minimal installer "
+     "stays under 600 KB.", "https://v2.tauri.app/start/"),
+    ({"csharp"}, ".NET MAUI (C#), a Windows and macOS app",
+     "The team writes C#, and .NET MAUI builds Windows and macOS apps from one C# codebase; it has no Linux target.",
+     "https://learn.microsoft.com/dotnet/maui/what-is-maui"),
+    (set(), "Electron, packaging the web frontend as a Windows, macOS and Linux app",
+     "One JavaScript codebase for web and desktop; Electron embeds Chromium and Node.js in each app, so installers "
+     "are large.", "https://www.electronjs.org/docs/latest/"),
+]
+
+
 def _app_host_kind(stack: dict) -> str:
     """How the server code is hosted, for the availability text: serverless (the platform spreads functions
     across zones), static (files from a CDN edge, no app server) or instances (you run 2+ behind a load balancer)."""
@@ -568,10 +586,8 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         add("Offline sync", sync[0], "Offline use needs a local copy of the data and conflict handling when the device "
             "reconnects; the primary database does not provide that by itself.", sync[1])
 
-    if "desktop" in p["platforms"]:
-        add("Desktop app", "Electron, packaging the web frontend as a Windows, macOS and Linux app",
-            "One codebase for web and desktop; Tauri gives smaller installers but needs some Rust for native features.",
-            "https://www.electronjs.org/docs/latest/")
+    if "desktop" in p["platforms"] and not d.get("desktop_only"):  # desktop only: the frontend is the toolkit itself
+        add("Desktop app", *next((t[1:] for t in DESKTOP_TOOLKITS if t[0] & d["skills"]), DESKTOP_TOOLKITS[-1][1:]))
     if d["mobile"] and env["air_gapped"]:
         add("Notifications", "In-app and on-device notifications only",
             "Firebase Cloud Messaging and Apple Push Notification service need the internet, which an air-gapped "

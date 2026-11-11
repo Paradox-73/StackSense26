@@ -504,8 +504,10 @@ def derive(profile: dict, assumptions: list[dict], warnings: list[dict]) -> dict
     availability = float(p["availability"])
     skills = set(p["team_skills"])
     mobile = any(x in p["platforms"] for x in ("ios", "android"))
-    # A desktop app is the web frontend in a desktop shell (engine/advice.py adds the shell); API only has no frontend.
-    web = bool({"web", "desktop"} & set(p["platforms"]))
+    # Beside a web or phone app, a desktop app shares that frontend's code (engine/advice.py adds the desktop toolkit);
+    # a desktop-only project's frontend is the desktop toolkit itself, with no web pages. API only has no frontend.
+    desktop_only = "desktop" in p["platforms"] and not mobile and "web" not in p["platforms"]
+    web = "web" in p["platforms"] or ("desktop" in p["platforms"] and mobile)
     api_only = p["platforms"] == ["api_only"]
 
     arch = p["architecture"]
@@ -560,6 +562,7 @@ def derive(profile: dict, assumptions: list[dict], warnings: list[dict]) -> dict
         "skills": skills,
         "mobile": mobile,
         "web": web,
+        "desktop_only": desktop_only,
         "api_only": api_only,
         "primary_shape": p["data_shapes"][0],
         "secondary_shapes": p["data_shapes"][1:],

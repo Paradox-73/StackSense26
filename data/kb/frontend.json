@@ -550,6 +550,182 @@
         "https://spec.openapis.org/oas/latest.html",
         "https://swagger.io/docs/specification/v3_0/about/"
       ]
+    },
+    {
+      "id": "qt",
+      "name": "Qt (C++)",
+      "kind": "desktop",
+      "platforms": [
+        "desktop"
+      ],
+      "summary": "Cross-platform application framework in C++, with Widgets or QML for the interface; native desktop apps for Windows, macOS and Linux.",
+      "scores": {
+        "ease": 2,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 3,
+        "performance": 5,
+        "seo": 1,
+        "velocity": 3,
+        "hiring": 3,
+        "offline": 5,
+        "structure": 4,
+        "interactivity": 5
+      },
+      "skills": [
+        "cpp"
+      ],
+      "related_skills": [
+        "c",
+        "python"
+      ],
+      "team_min": 1,
+      "lock_in": 2,
+      "strengths": [
+        "One C++ codebase builds native apps for Windows, macOS and Linux",
+        "Native speed for heavy work such as video, CAD or large files"
+      ],
+      "weaknesses": [
+        "C++ interfaces take longer to build than web ones",
+        "A smaller hiring pool than web frameworks"
+      ],
+      "sources": [
+        "https://doc.qt.io/qt-6/",
+        "https://doc.qt.io/qt-6/supported-platforms.html"
+      ]
+    },
+    {
+      "id": "tauri",
+      "name": "Tauri (Rust)",
+      "kind": "desktop",
+      "platforms": [
+        "desktop"
+      ],
+      "summary": "Desktop apps with a Rust core and a web interface rendered by the operating system's own web view.",
+      "scores": {
+        "ease": 3,
+        "ops": 4,
+        "maturity": 3,
+        "realtime": 3,
+        "performance": 4,
+        "seo": 1,
+        "velocity": 4,
+        "hiring": 2,
+        "offline": 5,
+        "structure": 3,
+        "interactivity": 5
+      },
+      "skills": [
+        "rust"
+      ],
+      "related_skills": [
+        "javascript",
+        "typescript",
+        "react",
+        "vue",
+        "svelte"
+      ],
+      "team_min": 1,
+      "lock_in": 2,
+      "strengths": [
+        "Uses the web view already on the user's system, so a minimal app stays under 600 KB",
+        "Any frontend that compiles to HTML, JavaScript and CSS draws the interface"
+      ],
+      "weaknesses": [
+        "Native features are written in Rust",
+        "A younger ecosystem than Electron's"
+      ],
+      "sources": [
+        "https://v2.tauri.app/start/"
+      ]
+    },
+    {
+      "id": "dotnet_maui",
+      "name": ".NET MAUI (C#)",
+      "kind": "desktop",
+      "platforms": [
+        "desktop"
+      ],
+      "summary": "Microsoft's cross-platform UI framework in C# and XAML; one codebase for Windows and macOS desktop apps (and Android and iOS).",
+      "scores": {
+        "ease": 3,
+        "ops": 4,
+        "maturity": 3,
+        "realtime": 3,
+        "performance": 4,
+        "seo": 1,
+        "velocity": 4,
+        "hiring": 3,
+        "offline": 5,
+        "structure": 4,
+        "interactivity": 4
+      },
+      "skills": [
+        "csharp"
+      ],
+      "related_skills": [
+        "java",
+        "kotlin"
+      ],
+      "team_min": 1,
+      "lock_in": 2,
+      "strengths": [
+        "One C# codebase for Windows and macOS desktop apps",
+        "The same code can later target Android and iOS"
+      ],
+      "weaknesses": [
+        "Targets Windows and macOS, not Linux",
+        "Building the macOS app needs a Mac"
+      ],
+      "sources": [
+        "https://learn.microsoft.com/dotnet/maui/what-is-maui"
+      ]
+    },
+    {
+      "id": "electron",
+      "name": "Electron (JavaScript)",
+      "kind": "desktop",
+      "platforms": [
+        "desktop"
+      ],
+      "summary": "Desktop apps for Windows, macOS and Linux in JavaScript or TypeScript, with Chromium and Node.js embedded in the app.",
+      "scores": {
+        "ease": 4,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 4,
+        "performance": 3,
+        "seo": 1,
+        "velocity": 5,
+        "hiring": 5,
+        "offline": 4,
+        "structure": 3,
+        "interactivity": 5
+      },
+      "skills": [
+        "javascript",
+        "typescript",
+        "node"
+      ],
+      "related_skills": [
+        "react",
+        "vue",
+        "angular",
+        "svelte",
+        "nextjs"
+      ],
+      "team_min": 1,
+      "lock_in": 1,
+      "strengths": [
+        "One JavaScript codebase for Windows, macOS and Linux apps",
+        "Web skills and libraries carry over"
+      ],
+      "weaknesses": [
+        "Every app embeds Chromium and Node.js, so installers are large"
+      ],
+      "sources": [
+        "https://www.electronjs.org/docs/latest/"
+      ]
     }
   ]
 }

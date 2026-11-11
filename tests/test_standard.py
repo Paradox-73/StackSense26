@@ -879,3 +879,22 @@ def test_hosting_provided_by_a_backend_service_has_no_borrowed_region():
     doc["budget"]["monthly_infra_usd"] = 50
     hosting = run(doc)["stack"]["hosting"]["choice"]
     assert hosting.startswith("Provided by") and "region" not in hosting, hosting
+
+
+@pytest.mark.parametrize("languages,toolkit", [(["C++"], "Qt (C++)"), (["Rust"], "Tauri (Rust)"),
+                                               (["csharp"], ".NET MAUI (C#)"), (["typescript"], "Electron (JavaScript)")])
+def test_a_desktop_only_project_gets_a_desktop_toolkit_in_the_team_language(languages, toolkit):
+    out = edited("P3", project={"platforms": ["desktop"]}, team={"languages": languages})
+    front = out["stack"]["frontend"]
+    assert front["choice"] == toolkit, front["choice"]
+    assert "no web pages to build or host" in front["justification"], front["justification"]
+    assert not [s for s in out["stack"]["supporting"] if "Desktop" in s["choice"] or "web frontend" in s["choice"]]
+
+
+@pytest.mark.parametrize("languages,toolkit", [(["C++"], "Qt"), (["Rust"], "Tauri"), (["csharp"], ".NET MAUI"),
+                                               (["typescript"], "Electron")])
+def test_a_desktop_app_beside_the_web_frontend_uses_the_team_language(languages, toolkit):
+    out = edited("P3", project={"platforms": ["web", "desktop"]}, team={"languages": languages})
+    desktop = [s["choice"] for s in out["stack"]["supporting"] if s["layer"] == "other" and "desktop" in s["choice"].lower()
+               or s["choice"].startswith(("Qt", "Tauri", ".NET MAUI", "Electron"))]
+    assert len(desktop) == 1 and desktop[0].startswith(toolkit), desktop
