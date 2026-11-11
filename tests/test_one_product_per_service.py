@@ -126,3 +126,11 @@ def test_uploads_on_azure_under_audits_and_india_residency_stay_private():
     out = run(_doc("P5"))  # Azure, data_residency india, ISO 27001, uploads
     store = [s["choice"] for s in _sup(out, "storage")]
     assert store and "private container" in store[0] and "SAS" in store[0] and "Front Door" in store[0], store
+
+
+def test_azure_uploads_under_hipaa_and_residency_read_cleanly():
+    from engine.advice import _object_storage
+    env = {"onprem": False, "hybrid": False, "cloud": "azure", "audit_rules": ["iso27001"], "hipaa": True,
+           "india": True, "eu": False, "us": False, "self_managed": False, "no_hyperscaler": False}
+    name = _object_storage(env, "azure")[0]
+    assert ",," not in name and "HIPAA BAA" in name and "SAS URLs" in name, name

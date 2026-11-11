@@ -964,10 +964,12 @@ def _object_storage(env: dict, prov: str, private: bool = True) -> tuple[str, st
     if env["cloud"] == "azure" and env["audit_rules"]:
         # Front Door holds none of these audits in data/kb/hosting.json (no public Microsoft page lists its scope);
         # Microsoft's Azure Storage page puts Blobs in Azure's ISO, SOC and PCI DSS audits.
-        baa = ", after you confirm it is in scope for Microsoft's HIPAA BAA," if env["hipaa"] else ""
         # Under a residency rule the uploads also stay private: short-lived SAS URLs, as on the other clouds.
-        lock = ", a private container in your required region with short-lived SAS URLs," if residency(env) else ""
-        return (f"Blob Storage{baa}{lock} without Front Door (no public Microsoft page lists Front Door's audit scope)",
+        notes = [x for x, on in (("after you confirm it is in scope for Microsoft's HIPAA BAA", env["hipaa"]),
+                                 ("a private container in your required region with short-lived SAS URLs",
+                                  residency(env))) if on]
+        said = "".join(f", {x}" for x in notes) + ("," if notes else "")
+        return (f"Blob Storage{said} without Front Door (no public Microsoft page lists Front Door's audit scope)",
                 AZURE_HIPAA_DOCS if env["hipaa"] else
                 "https://learn.microsoft.com/en-us/azure/storage/common/storage-compliance-offerings")
     if env["cloud"] and env["hipaa"]:  # uploads hold health information: a CDN may carry only public files
