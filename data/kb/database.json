@@ -1020,6 +1020,9 @@
         "gcp": "Self-managed Postgres + TimescaleDB extension on Compute Engine or GKE in the same region (Cloud SQL does not offer the extension)",
         "onprem": "Self-managed Postgres + TimescaleDB extension"
       },
+      "offering_compliance": {"any": {"name": "Timescale Cloud", "soc2": true, "hipaa": true, "pci": false, "iso27001": false,
+                                      "note": "SOC 2 Type 2 report on the Scale and Enterprise plans, HIPAA on the Enterprise plan, GDPR; no ISO/IEC 27001 or PCI DSS listed",
+                                      "source": "https://www.tigerdata.com/security"}},
       "self_managed_on": {"gcp": "https://cloud.google.com/sql/docs/postgres/extensions"},
       "strengths": [
         "Full SQL + joins with relational data on the same database",

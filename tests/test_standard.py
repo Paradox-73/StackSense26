@@ -710,8 +710,9 @@ def test_self_run_object_storage_is_ceph_not_the_archived_minio():
            "india": False, "eu": False, "us": False}
     named["self-managed HIPAA line"] = _object_storage(env, "hetzner")[0]
     assert [k for k, text in named.items() if "minio" in text.lower()] == []
-    assert {"E7_air_gapped", "P2 no hyperscaler", "hybrid", "on_prem", "self-managed HIPAA line"} <= \
+    assert {"E7_air_gapped", "hybrid", "on_prem", "self-managed HIPAA line"} <= \
         {k for k, text in named.items() if "Ceph Object Gateway" in text}
+    assert "DigitalOcean Spaces in BLR1" in named["P2 no hyperscaler"]  # one product per pick, in India
 
 
 def test_hipaa_files_with_no_hyperscaler_stay_where_the_hosts_baa_reaches():

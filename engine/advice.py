@@ -41,12 +41,33 @@ def ops_budget(team: int) -> int | None:
     return None
 
 
-def portable_offering(item: dict, host: dict, onprem: bool, hybrid: bool, no_hyperscaler: bool = False) -> str | None:
+# Compliance rules a third-party managed offering must hold (database.json offering_compliance), and its flag.
+OFFERING_RULES = {"hipaa": "hipaa", "pci_dss": "pci", "soc2": "soc2", "iso27001": "iso27001"}
+RULE_NAMES = {"hipaa": "HIPAA BAA", "pci_dss": "PCI DSS attestation", "soc2": "SOC 2 report",
+              "iso27001": "ISO/IEC 27001 certificate"}
+
+
+def offering_gaps(item: dict, host: dict, compliance=()) -> list[str]:
+    """The project's compliance rules that the store's third-party managed offering on this host lacks."""
+    offers = item.get("managed_offerings", {})
+    comp = (item.get("offering_compliance") or {}).get("any") if host.get("provider") not in offers else None
+    return [rule for rule, flag in OFFERING_RULES.items() if comp and rule in compliance and not comp.get(flag)]
+
+
+def portable_offering(item: dict, host: dict, onprem: bool, hybrid: bool, no_hyperscaler: bool = False,
+                      compliance=()) -> str | None:
     """Managed offering for a datastore. Under hybrid deployment, name the cloud service and its
     on-premises twin (same engine and version), so the same code runs in both places. With AWS, Google Cloud and
-    Azure ruled out, an offering that names one of them gives way to the self-managed setup."""
+    Azure ruled out, an offering that names one of them gives way to the self-managed setup, and so does a
+    third-party offering that lacks an attestation the project needs."""
     offers = item.get("managed_offerings", {})
     cloud = offers.get("onprem" if onprem else host.get("provider")) or offers.get("any")
+    gaps = [] if onprem else offering_gaps(item, host, compliance)
+    if gaps and offers.get("onprem"):
+        where = CLOUD_NAMES.get(host.get("provider"), host.get("name", "your host"))
+        comp = item["offering_compliance"]["any"]
+        cloud = (f"{offers['onprem']} on {where} VMs or Kubernetes in the same region ({comp['name']} publishes no "
+                 f"{' or '.join(RULE_NAMES[g] for g in gaps)}: {comp['source']})")
     if no_hyperscaler and cloud and any(n in cloud for n in ("Amazon", "AWS", "Azure", "Google", "Cloud SQL", "Atlas")):
         cloud = offers.get("onprem") or cloud
     if hybrid and not onprem and offers.get("onprem"):
@@ -60,7 +81,8 @@ def database_offering(db: dict, host: dict, p: dict) -> str:
     """The managed offering the stack's database runs as on this host (the API's host under split hosting)."""
     # 3. Self-managed cloud VMs (EC2-style or a VPS such as Hetzner) run the database themselves, as on-premises.
     onprem = host.get("kind") == "onprem" or (bool(p.get("self_managed")) and (host.get("vm", False) or host.get("kind") == "vps"))
-    return portable_offering(db, host, onprem, p["deployment"] == "hybrid", p.get("cloud_preference") == "no_hyperscaler") or \
+    return portable_offering(db, host, onprem, p["deployment"] == "hybrid", p.get("cloud_preference") == "no_hyperscaler",
+                             p["compliance"]) or \
         f"a managed {db['name']} service in the same region as your compute"
 
 
@@ -292,7 +314,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
 
     def offering(dbid: str) -> str:
         text = portable_offering(kb["index"][dbid], host, env["onprem"] or env["self_managed"], env["hybrid"],
-                                 env["no_hyperscaler"]) or \
+                                 env["no_hyperscaler"], p["compliance"]) or \
             f"a managed {kb['index'][dbid]['name']} service in the same region as your compute"
         return _redis_offering(text, env) if dbid == "redis" else text
 
@@ -605,8 +627,13 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             sync = ("Firestore offline persistence (built into the client SDKs)",
                     "https://firebase.google.com/docs/firestore/manage-data/enable-offline")
         elif db["id"] in ("postgres", "timescaledb") or be["id"] == "supabase":
-            sync = ("PowerSync or ElectricSQL: a local SQLite copy on the device kept in sync with Postgres",
-                    "https://docs.powersync.com/")
+            # ElectricSQL's 2024 rewrite syncs Postgres "shapes" over HTTP into the app's own store, with no local SQLite
+            # copy (electric.ax/docs/intro), so PowerSync is the one named.
+            sync = (("PowerSync on its Team or Enterprise plan (the plans its pricing page lists with HIPAA compliance), "
+                     "with a signed BAA before any PHI syncs: a local SQLite copy on the device kept in sync with Postgres",
+                     "https://www.powersync.com/pricing") if env["hipaa"] else
+                    ("PowerSync: a local SQLite copy on the device kept in sync with Postgres",
+                     "https://docs.powersync.com/"))
         else:
             sync = ("Local SQLite on the device plus a sync API with per-record version numbers",
                     "https://www.sqlite.org/whentouse.html")
@@ -755,6 +782,14 @@ OTP_USD = {"india": (0.002, 0.005), "other": (0.01, 0.05)}
 SSO_DAU_PER_MAU = 0.2  # daily to monthly users, the same planning heuristic the brief reader uses
 
 
+# MSG91's data-localisation system audit (Allied Boston Consultants, March 2024): data stored only in India, in Google
+# Cloud Mumbai, with some processing in AWS Singapore. Twilio runs Verify in its US1 region only (Twilio's regional
+# product availability lists no Verify in IE1 or AU1, and Twilio has no India region).
+MSG91_AUDIT = "https://msg91.com/pdf/sar.pdf"
+MSG91_RESIDENCY = (" MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation "
+                   "audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify "
+                   "runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would "
+                   "be processed and stored outside India.")
 SMS_BY_CLOUD = {"aws": "Twilio Verify or Amazon SNS / Cognito SMS",
                 "gcp": "Twilio Verify or Identity Platform phone sign-in (SMS)",
                 "azure": "Twilio Verify or Azure Communication Services SMS"}
@@ -781,9 +816,15 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
             # Uploads under HIPAA hold health information: no public CDN caches them (the storage line says so too).
             "Short-lived signed URLs from the object storage, issued by the API after an access check (no public CDN "
             "for PHI)" if env["hipaa"] else
+            # Under a residency rule (RBI's included) a CDN's edge caches would copy the files out of the country.
+            "Short-lived signed URLs from the private bucket in your region, issued by the API after an access check "
+            "(no public CDN)" if residency(env) else
             "CDN in front of the object storage, with image resizing at the edge",
             "Hand uploads out from the object storage, not the app server; each signed URL expires within minutes and "
             "every download is logged for the HIPAA audit trail." if env["hipaa"] and not env["onprem"] else
+            "Hand uploads out from the bucket, not the app server; a public CDN would cache copies at edge sites outside "
+            "the country your data must stay in, and each signed URL expires within minutes." if residency(env)
+            and not env["onprem"] else
             "Serve uploads from the object store through the reverse proxy, not the app server; resize images on the fly "
             "instead of storing every size." if env["onprem"] else
             "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.",
@@ -849,12 +890,13 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
         sms = dau30 * OTP_PER_USER_DAY
         add("Phone login (SMS OTP)", "An SMS gateway inside your network (a GSM modem driven by Kannel or Gammu), or "
             "authenticator-app codes (TOTP) instead of SMS" if env["air_gapped"] else
-            "MSG91 or Twilio Verify, with DLT-registered SMS templates" if india else
+            "MSG91, with DLT-registered SMS templates" if india or env["india"] else
             # The cloud's own SMS service only on that cloud and when the team may use managed services there.
             SMS_BY_CLOUD.get("" if env["self_managed"] or env["hybrid"] else env["cloud"] or "", "Twilio Verify or Vonage Verify"),
             "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud"
-            + ("; Indian operators deliver only DLT-registered templates." if india else "."),
-            "https://www.twilio.com/en-us/verify/pricing",
+            + ("; Indian operators deliver only DLT-registered templates." if india else ".")
+            + (MSG91_RESIDENCY if env["india"] and not env["air_gapped"] else ""),
+            MSG91_AUDIT if (india or env["india"]) and not env["air_gapped"] else "https://www.twilio.com/en-us/verify/pricing",
             usage=(sms * price[0], sms * price[1],
                    f"~{sms:,.0f} SMS a month (one login every ~20 days per active user) at ${price[0]}-{price[1]} each"))
     if "user_code" in work:
@@ -888,6 +930,11 @@ HIPAA_HOST_DOCS = {"render": "https://render.com/docs/hipaa-compliance", "flyio"
                    "vercel": "https://vercel.com/kb/guide/hipaa-compliance-guide-vercel"}
 
 
+def residency(env: dict) -> bool:
+    """A rule keeps the data in one country or region: uploads stay out of a public CDN's worldwide edge caches."""
+    return env["india"] or env["eu"] or env["us"]
+
+
 def _object_storage(env: dict, prov: str) -> tuple[str, str]:
     """The object store for uploaded files, and its source."""
     if env["onprem"]:
@@ -909,6 +956,13 @@ def _object_storage(env: dict, prov: str) -> tuple[str, str]:
                 # Microsoft lists the services its BAA covers only in a Service Trust Portal document.
                 "azure": ("Blob Storage, after you confirm it is in scope for Microsoft's HIPAA BAA (Front Door for "
                           "public, non-PHI files only)", AZURE_HIPAA_DOCS)}[env["cloud"]]
+    if env["cloud"] and residency(env):  # CDN edge caches keep copies outside the country, so uploads skip the CDN
+        return {"aws": ("Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN)",
+                        "https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html"),
+                "gcp": ("Cloud Storage, a private bucket in your required region (short-lived signed URLs, no public CDN)",
+                        "https://cloud.google.com/storage/docs/access-control/signed-urls"),
+                "azure": ("Blob Storage, a private container in your required region (short-lived SAS URLs, no public "
+                          "CDN)", "https://learn.microsoft.com/azure/storage/common/storage-sas-overview")}[env["cloud"]]
     if env["cloud"]:
         return {"aws": ("Amazon S3 + CloudFront", S3_DOCS),
                 "gcp": ("Cloud Storage + Cloud CDN", "https://cloud.google.com/cdn/docs/setting-up-cdn-with-bucket"),
@@ -930,14 +984,14 @@ def _object_storage(env: dict, prov: str) -> tuple[str, str]:
         lists = {"render": "; Render's HIPAA page lists no object store",
                  "vercel": "; Vercel's BAA lists its CDN and functions, not a file store"}.get(prov, "")
         return f"Object storage{where} from a vendor that signs a BAA covering it{lists} (no public CDN for PHI)", src
-    if env["india"] and env["no_hyperscaler"]:
-        return ("S3-compatible storage in an Indian region (DigitalOcean Spaces BLR1 or Ceph Object Gateway on your "
-                "servers) + CDN", "https://docs.digitalocean.com/products/spaces/details/availability/")
+    if env["india"] and (env["no_hyperscaler"] or prov == "digitalocean"):
+        return ("DigitalOcean Spaces in BLR1 (Bangalore), a private bucket with short-lived signed URLs (no public CDN)",
+                "https://docs.digitalocean.com/products/spaces/details/availability/")
     if env["india"]:
-        return ("S3-compatible storage in an Indian region (Amazon S3 Mumbai or Google Cloud Storage asia-south1) + CDN",
+        return ("Amazon S3 in Mumbai (ap-south-1), a private bucket with short-lived signed URLs (no public CDN)",
                 "https://docs.aws.amazon.com/general/latest/gr/s3.html")
     if env["eu"]:
-        return ("S3-compatible storage in an EU jurisdiction (Cloudflare R2 EU or Backblaze B2 EU Central) + CDN",
+        return ("Cloudflare R2 in its EU jurisdiction, a private bucket with short-lived signed URLs (no public CDN)",
                 "https://developers.cloudflare.com/r2/reference/data-location/")
     if prov == "cloudflare":
         return "Cloudflare R2 (+ Cloudflare CDN)", "https://developers.cloudflare.com/r2/buckets/public-buckets/"
@@ -1393,9 +1447,11 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
                 lo, hi = max(lo, slo), max(hi, shi)
                 basis.append(f"at least the storage: ~{d['data_12mo_gb']:,.0f} GB at ${per_gb:g}/GB-month, one copy to "
                              f"{STORAGE_COPIES_HIGH} copies ({STORAGE_PRICE_SOURCE.get(db['id'], STORAGE_PRICE_SOURCE['default'])})")
-        if dbhost.get("provider") in (db.get("self_managed_on") or {}):
+        gaps = offering_gaps(db, dbhost, p["compliance"]) and not _env(p, dbhost)["onprem"]
+        if dbhost.get("provider") in (db.get("self_managed_on") or {}) or gaps:
             lo, hi = lo * SELF_MANAGED_COST_FACTOR, hi * SELF_MANAGED_COST_FACTOR
-            basis.append(f"x{SELF_MANAGED_COST_FACTOR:g} planning allowance: no managed {db['name']} on {CLOUD_NAMES.get(dbhost['provider'], dbhost['provider'])}, "
+            basis.append(f"x{SELF_MANAGED_COST_FACTOR:g} planning allowance: no {'compliant ' if gaps else ''}managed "
+                         f"{db['name']} on {CLOUD_NAMES.get(dbhost['provider'], dbhost['provider'])}, "
                          "so backup storage, monitoring and a tested failover are yours to build")
         lic = db.get("self_managed_licence") if _env(p, host)["onprem"] else None
         # Run on your own servers, a commercial database needs a licence the managed services include in their

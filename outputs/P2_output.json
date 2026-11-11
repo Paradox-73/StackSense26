@@ -182,7 +182,7 @@
       },
       {
         "layer": "storage",
-        "choice": "S3-compatible storage in an Indian region (Amazon S3 Mumbai or Google Cloud Storage asia-south1) + CDN",
+        "choice": "DigitalOcean Spaces in BLR1 (Bangalore), a private bucket with short-lived signed URLs (no public CDN)",
         "justification": "Uploaded files and video belong in object storage, not the database.",
         "driven_by": [
           "requirements.file_media_storage",
@@ -190,12 +190,12 @@
         ],
         "alternatives": [],
         "tradeoffs": [],
-        "source": "https://docs.aws.amazon.com/general/latest/gr/s3.html"
+        "source": "https://docs.digitalocean.com/products/spaces/details/availability/"
       },
       {
         "layer": "cdn",
-        "choice": "CDN in front of the object storage, with image resizing at the edge",
-        "justification": "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.",
+        "choice": "Short-lived signed URLs from the private bucket in your region, issued by the API after an access check (no public CDN)",
+        "justification": "Hand uploads out from the bucket, not the app server; a public CDN would cache copies at edge sites outside the country your data must stay in, and each signed URL expires within minutes.",
         "driven_by": [
           "project.platforms",
           "scale.users_12_months"
@@ -206,15 +206,15 @@
       },
       {
         "layer": "auth",
-        "choice": "MSG91 or Twilio Verify, with DLT-registered SMS templates",
-        "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates.",
+        "choice": "MSG91, with DLT-registered SMS templates",
+        "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India.",
         "driven_by": [
           "requirements.auth",
           "infrastructure.data_residency"
         ],
         "alternatives": [],
         "tradeoffs": [],
-        "source": "https://www.twilio.com/en-us/verify/pricing"
+        "source": "https://msg91.com/pdf/sar.pdf"
       },
       {
         "layer": "payments",
