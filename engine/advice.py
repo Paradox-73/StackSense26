@@ -837,12 +837,11 @@ def _object_storage(env: dict, prov: str) -> tuple[str, str]:
         if not env["no_hyperscaler"]:
             return f"Amazon S3 or Google Cloud Storage{where} under a signed BAA (+ CDN for public, non-PHI files only)", S3_DOCS
         src = HIPAA_HOST_DOCS.get(prov, S3_DOCS)
-        if prov == "render":  # the disk sits in the service's region
-            return ("Files on a persistent disk of the HIPAA-enabled Render service (a disk keeps that service to one "
-                    "instance; no public CDN for PHI)", src)
         if prov == "flyio" and not where:  # where Tigris keeps data is not checked here, so not under a residency rule
             return "Tigris object storage under the BAA for Tigris that Fly.io offers (no public CDN for PHI)", src
-        lists = "; Vercel's BAA lists its CDN and functions, not a file store" if prov == "vercel" else ""
+        # A Render disk holds PHI but keeps its service to one instance and serves no signed URLs, so it is not offered.
+        lists = {"render": "; Render's HIPAA page lists no object store",
+                 "vercel": "; Vercel's BAA lists its CDN and functions, not a file store"}.get(prov, "")
         return f"Object storage{where} from a vendor that signs a BAA covering it{lists} (no public CDN for PHI)", src
     if env["india"]:
         return ("S3-compatible storage in an Indian region (DigitalOcean Spaces BLR1 or MinIO on your servers) + CDN"
