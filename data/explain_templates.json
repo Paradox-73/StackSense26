@@ -87,17 +87,38 @@
           "stack_any": [
             "react_native",
             "flutter"
-          ]
+          ],
+          "both_phones": 1
         },
         "text": "One codebase builds both the iOS and the Android app, which halves the work for {team_phrase}."
       },
       {
         "when": {
           "stack_any": [
+            "react_native",
+            "flutter"
+          ],
+          "both_phones": 0
+        },
+        "text": "It builds the {phones} app now, and the same code can ship an {other_phone} app later without a rewrite."
+      },
+      {
+        "when": {
+          "stack_any": [
             "native_mobile"
-          ]
+          ],
+          "both_phones": 1
         },
         "text": "Native Swift and Kotlin apps give full platform APIs and the best performance, at the cost of two codebases."
+      },
+      {
+        "when": {
+          "stack_any": [
+            "native_mobile"
+          ],
+          "both_phones": 0
+        },
+        "text": "A native {native_lang} app gives full {phones} platform APIs and the best performance, in one codebase."
       },
       {
         "filler": true,
@@ -208,12 +229,27 @@
         "when": {
           "consistency": [
             "strong"
-          ]
+          ],
+          "assumed": 0,
+          "static": 0
         },
         "min": {
           "strong": 1
         },
         "text": "You need strong consistency, and {name} gives it: a read after a write always sees that write."
+      },
+      {
+        "when": {
+          "consistency": [
+            "strong"
+          ],
+          "assumed": 1,
+          "static": 0
+        },
+        "min": {
+          "strong": 1
+        },
+        "text": "Strong consistency is assumed, since no input says stale reads are acceptable, and {name} gives it: a read after a write always sees that write."
       },
       {
         "when": {
@@ -245,7 +281,7 @@
         "when": {
           "provided": true
         },
-        "text": "With about {users} daily users on iOS and Android, nothing of yours needs separate hosting: {baas} runs the backend and the app stores ship the app."
+        "text": "With about {users} daily users on {phones}, nothing of yours needs separate hosting: {baas} runs the backend and the app stores ship the app."
       },
       {
         "when": {
@@ -372,7 +408,7 @@
         "when": {
           "tie": true
         },
-        "text": "{runner} is within {margin}, inside the tie margin (stacks this close count as tied), so either is defensible (see the runner-up note)."
+        "text": "{runner} is within {margin}, inside the tie margin (stacks this close count as tied); {kept}."
       }
     ]
   }

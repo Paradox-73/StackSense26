@@ -15,6 +15,7 @@ import re
 
 from . import __version__
 from .advice import SSO_DAU_PER_MAU
+from .explain import mobile_name
 from .kb import LAYERS, field_specs, load_kb
 from .recommender import recommend
 
@@ -633,13 +634,21 @@ def _component(layer: str, sl: dict, origin: dict, f: dict, result: dict) -> dic
     if item.get("kind") == "none" or (layer == "database" and item.get("static_only")):
         choice, extra = "None", ""  # the section 4 spelling for a layer that is not needed; the name says why
         ex = dict(ex, paragraph=f"{pick['name']}. {ex.get('paragraph') or ''}".strip())
+    if layer == "frontend":
+        choice = mobile_name(pick["id"], choice, f["project.platforms"])
     if layer == "frontend" and result.get("companion"):
         comp = result["companion"]
         apps = "/".join(x for x in ("Android", "iOS") if x.lower() in f["project.platforms"])
-        choice += f" + {comp['name']} for the {apps} app"
-        extra = f" {comp['why']}"
+        name = mobile_name(comp["id"], comp["name"], f["project.platforms"])
+        choice += f" + {name} for the {apps} app"
+        extra = f" {comp['why'].replace(comp['name'], name)}"
     if layer == "database" and sl.get("managed_offering") and choice != "None":
-        choice += f": {sl['managed_offering']}"
+        index = load_kb()["index"]
+        host = index.get(((result["stack"]["hosting"].get("api_host") or {}).get("id")
+                          or result["stack"]["hosting"]["pick"]["id"]), {})
+        functions = "faas" in (host.get("kind"), index.get(result["stack"]["backend"]["pick"]["id"], {}).get("kind"))
+        offering = sl["managed_offering"] if functions else re.sub(r" \(\+ [^)]*for serverless\)", "", sl["managed_offering"])
+        choice += f": {offering}"
     if layer == "hosting":
         api = sl.get("api_host")
         if api:
@@ -755,6 +764,8 @@ def _warnings(result: dict, origin: dict) -> list[dict]:
 def _assumptions(result: dict) -> list[str]:
     out = []
     for a in result.get("assumptions", []):
+        if a.get("field") == "latency_target_ms":
+            continue  # to_answers already states the latency default in the standard field's words
         label = a.get("label") or a.get("field", "")
         reason = a.get("reason", "")
         for app_words, file_words in FORM_WORDS:

@@ -77,7 +77,7 @@ def explain_pick(layer: str, pick: dict, layer_scored: list[dict], w: Weights, r
             tradeoffs.append(f"{b['label']} is only {b['score']:.1f}/5 (weight {b['weight']:.1f}).")
     tradeoffs += relevant_lines(pick["item"].get("weaknesses", []), stack_ids, p)[:2]
 
-    risks = [f"{x['reason']} ({x['delta']:+})." for x in pick["adjustments"] if x["delta"] < 0]
+    risks = [f"{x['reason'].rstrip('.')}." for x in pick["adjustments"] if x["delta"] < 0]
     risks += [f"{r['note']}" for r in mine if r["kind"] in ("caveat", "conflict")]
     if skills_given and pick["raw"].get("skill_fit", 3) <= 1.5:
         risks.append(f"Nobody on the team listed {pick['name']} or a closely related skill; plan 2-4 weeks to learn it.")
@@ -122,7 +122,8 @@ def explain_pick(layer: str, pick: dict, layer_scored: list[dict], w: Weights, r
         if tie:
             text = _tie_text(layer, pick["name"], ac, favour_pick, favour_alt, margin, best, pick)
         vs = {"runner_up": ac["name"], "runner_up_id": ac["id"], "margin": margin, "tie": tie,
-              "favour_pick": favour_pick, "favour_runner_up": favour_alt, "text": text}
+              "favour_pick": favour_pick, "favour_runner_up": favour_alt, "text": text,
+              "kept": kept_text(layer, pick["name"], ac, margin, best)}
     return {"why": why, "strengths": relevant_lines(pick["item"].get("strengths", []), stack_ids, p)[:3], "tradeoffs": tradeoffs,
             "risks": risks, "input_contributions": contribs, "vs_runner_up": vs, "confidence": confidence}
 
@@ -197,11 +198,30 @@ CHOOSE_IF = {"cost": "a lower bill", "scalability": "headroom to scale", "ease":
 
 
 def _crit_diffs(pick: dict, other: dict) -> list[tuple[float, str, float, float]]:
-    """(weighted difference, criterion, pick score, other score) for weighted criteria, largest first."""
+    """(weighted difference, criterion, pick score, other score) for weighted criteria, largest first. A criterion
+    whose scores print the same at one decimal is left out: "stronger on cost (4.2 vs 4.2)" says nothing."""
     ob = {b["criterion"]: b["score"] for b in other["breakdown"]}
     out = [(b["weight"] * (b["score"] - ob.get(b["criterion"], b["score"])), b["criterion"], b["score"],
             ob.get(b["criterion"], b["score"])) for b in pick["breakdown"] if b["weight"] > 0]
-    return sorted(out, reverse=True)
+    return sorted((x for x in out if f"{x[2]:.1f}" != f"{x[3]:.1f}"), reverse=True)
+
+
+def kept_text(layer: str, a: str, alt_cand: dict, margin: float, best: dict | None) -> str:
+    """Why the pick stays over a runner-up within the tie margin, as a sentence."""
+    if best and best.get("tie_break", {}).get("kept_on_growth_path"):
+        return (f"{a}'s stack is kept because it is also the pick at larger scale: otherwise a growing team "
+                "would have to migrate away and back")
+    reason = None
+    if best is not None:
+        other = {"picks": dict(best["picks"], **{layer: alt_cand}), "no_skills": best.get("no_skills"),
+                 "no_fe_skills": best.get("no_fe_skills"), "lock_in_ok": best.get("lock_in_ok"),
+                 "cloud_skills": best.get("cloud_skills", ())}
+        reason = tie_reason(best, other)
+    if reason:
+        return f"The tie went to {a} on {reason}"
+    if margin >= 0:
+        return f"{a} has the higher stack score"
+    return f"{a} stays as part of the stack chosen by {stack_rule(best)}"
 
 
 def _tie_text(layer, a, alt_cand, fa, fb, margin, best, pick=None):
@@ -227,23 +247,7 @@ def _tie_text(layer, a, alt_cand, fa, fb, margin, best, pick=None):
             s += ". It is stronger on " + ", ".join(f"{x['label'].lower()} (+{x['points']:.1f})" for x in fa[:2])
         if fb:
             s += f"; {b} is stronger on " + ", ".join(f"{x['label'].lower()} (+{x['points']:.1f})" for x in fb[:2])
-    reason = None
-    kept = bool(best and best.get("tie_break", {}).get("kept_on_growth_path"))
-    if best is not None and not kept:
-        other = {"picks": dict(best["picks"], **{layer: alt_cand}), "no_skills": best.get("no_skills"),
-                 "no_fe_skills": best.get("no_fe_skills"), "lock_in_ok": best.get("lock_in_ok"),
-                 "cloud_skills": best.get("cloud_skills", ())}
-        reason = tie_reason(best, other)
-    if kept:
-        s += (f". {a}'s stack is kept because it is also the pick at larger scale: otherwise a growing team "
-              "would have to migrate away and back")
-    elif reason:
-        s += f". The tie went to {a} on {reason}"
-    elif margin >= 0:
-        s += f". {a} has the higher stack score"
-    else:
-        s += f". {a} stays as part of the stack chosen by {stack_rule(best)}"
-    return s + ". Either is defensible."
+    return s + f". {kept_text(layer, a, alt_cand, margin, best)}. Either is defensible."
 
 
 # ---------------------------------------------------------------- why a pick switched
@@ -338,6 +342,17 @@ LANG_LABELS = {"node": "Node.js", "python": "Python", "go": "Go", "jvm": "Java/K
                "ruby": "Ruby", "php": "PHP", "elixir": "Elixir"}
 
 
+NATIVE_NAMES = {("ios",): "Native iOS (Swift)", ("android",): "Native Android (Kotlin)"}
+PHONE_NAMES = {"ios": "iOS", "android": "Android"}
+
+
+def mobile_name(item_id: str, name: str, platforms) -> str:
+    """The native toolkit named for the phone platforms the project targets: one platform is one app, not two."""
+    if item_id != "native_mobile":
+        return name
+    return NATIVE_NAMES.get(tuple(x for x in ("ios", "android") if x in platforms), name)
+
+
 def _templates() -> dict:
     from .kb import _read
     return _read("explain_templates.json")
@@ -374,13 +389,15 @@ def _ctx(layer: str, s: dict, items: dict, p: dict, d: dict, cost: dict, provide
     lead = max((b for b in pick["breakdown"] if b["criterion"] != "skill_fit" and b["weight"] > 0),
                key=lambda b: b["points"], default=None)
     be_line = next((x for x in cost["lines"] if x["component"].startswith("Backend:")), None)
+    phones = [x for x in ("ios", "android") if x in p.get("platforms", [])]
     from .advice import architecture
     c = {
         "lead_crit": lead["label"].lower() if lead and not lead["label"][:3].isupper() else lead and lead["label"],
         "lead_s": f"{lead['score']:.1f}" if lead else None, "lead_w": f"{lead['weight']:.1f}" if lead else None,
         "optional_host": s.get("optional_host"),
         "backend_cost": _money_txt(be_line["low"], be_line["high"], p) if be_line else None,
-        "name": pick["name"], "app_phrase": f"{_article(app)} {app} project", "users": _fmt_int(p["dau"]),
+        "name": mobile_name(pick["id"], pick["name"], p.get("platforms", [])),
+        "app_phrase": f"{_article(app)} {app} project", "users": _fmt_int(p["dau"]),
         "peak": _num(d["peak_rps"]) if d["peak_rps"] else "<0.1",
         "team_phrase": "a solo developer" if p["team_size"] == 1 else f"a team of {p['team_size']}",
         "weeks": p["timeline_weeks"],
@@ -405,6 +422,11 @@ def _ctx(layer: str, s: dict, items: dict, p: dict, d: dict, cost: dict, provide
         "budget": _money_txt(d["budget_usd"], d["budget_usd"], p),
         "runner": vs["runner_up"] if vs else None, "margin": points(vs["margin"]) if vs else None,
         "tie": bool(vs and vs["tie"]), "kind": kind, "provided": provided,
+        "kept": _lower_first(vs["kept"]) if vs and vs.get("kept") else None,
+        "assumed": 1 if "consistency" in d.get("defaulted", ()) else 0, "static": 1 if kind == "static" else 0,
+        "phones": " and ".join(PHONE_NAMES[x] for x in phones) or None, "both_phones": 1 if len(phones) == 2 else 0,
+        "other_phone": PHONE_NAMES[({"ios", "android"} - set(phones)).pop()] if len(phones) == 1 else None,
+        "native_lang": {"ios": "Swift", "android": "Kotlin"}[phones[0]] if len(phones) == 1 else None,
         "seo": p["seo"], "consistency": p["consistency"], "read_write": p["read_write"],
         # The server code runs as request-scoped functions: a functions backend, or a server framework on a
         # frontend or functions platform with no API host of its own.
@@ -426,7 +448,7 @@ def _applies(t: dict, c: dict, stack: set, p: dict) -> bool:
         if k in ("kind", "seo", "consistency", "read_write"):
             if c[k] not in v:
                 return False
-        elif k in ("provided", "tie", "functions", "services"):
+        elif k in ("provided", "tie", "functions", "services", "assumed", "static", "both_phones"):
             if c[k] != v:
                 return False
         elif k in LINE_CONDITIONS:
@@ -496,6 +518,28 @@ def compare_text(pick: dict, other: dict) -> str:
     return "; ".join(parts)
 
 
+def _lower_first(s: str) -> str:
+    return "the" + s[3:] if s.startswith("The ") else s
+
+
+def _rule_gap_text(best: dict, hits: list[dict], gap: float, rule_gap: float) -> str | None:
+    """The stack rules behind a swap's gap, when they move it by a point or more: without this a 12-point gap is
+    explained by 1-point criterion differences only."""
+    if rule_gap < 1:
+        return None
+    mine = {r["id"]: r for r in best.get("rules", [])}
+    theirs = {r["id"]: r for r in hits}
+    pool = sorted((r for i, r in theirs.items() if i not in mine and r["delta"] < 0), key=lambda r: r["delta"])
+    pool += sorted((r for i, r in mine.items() if i not in theirs and r["delta"] > 0), key=lambda r: -r["delta"])
+    if not pool:
+        return None
+    note = pool[0]["note"].rstrip(".")
+    if rule_gap >= gap + 0.05:
+        return (f"A stack compatibility rule costs it {rule_gap:.1f} points, more than the whole gap, while on this "
+                f"layer's own criteria it is {rule_gap - gap:.1f} points ahead: {note}")
+    return f"{min(rule_gap, gap):.1f} of the {gap:.1f} points come from a stack compatibility rule: {note}"
+
+
 def why_not_list(layer: str, best: dict, scored: list[dict], excluded: list[dict], rules: list[dict],
                  p: dict, d: dict, kb_items: list[dict], runner_id: str | None = None) -> list[dict]:
     """'Why not X' for the runner-up, the layer's top scorer and the popular options of this layer:
@@ -529,14 +573,17 @@ def why_not_list(layer: str, best: dict, scored: list[dict], excluded: list[dict
             if abs(gap) < TIE_MARGIN:
                 head = (f"Within the {TIE_MARGIN:g}-point tie margin (counted as tied): swapped in, its stack scores "
                         + (f"{abs(gap):.1f} points {'lower' if gap >= 0 else 'higher'}" if round(abs(gap), 1) > 0 else
-                           "the same (less than 0.05 points apart)") + "; either is defensible")
+                           "the same (less than 0.05 points apart)")
+                        + (f"; {_lower_first(kept_text(layer, pick['name'], cand, gap, best))}" if gap < 0 else "")
+                        + "; either is defensible")
             elif gap > 0:
                 head = f"Swapping it in lowers the stack score by {gap:.1f} points"
             else:
-                head = (f"Swapped into this stack it scores {-gap:.1f} points higher, but the pick was kept by the "
-                        "whole-stack choice (see the tie-break note)")
+                head = (f"Swapped into this stack it scores {-gap:.1f} points higher, but "
+                        f"{_lower_first(kept_text(layer, pick['name'], cand, gap, best))}")
+            rule = _rule_gap_text(best, hits, gap, gap - (pick["score"] - cand["score"]) / 4)
             out.append({"id": iid, "name": cand["name"], "role": role, "excluded": False, "gap": gap,
-                        "text": head + (f". {why}." if why else ".")})
+                        "text": head + (f". {why}." if why else ".") + (f" {rule}." if rule else "")})
         if len(out) >= 4:
             break
     return out
