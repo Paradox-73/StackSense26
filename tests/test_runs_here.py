@@ -1,4 +1,6 @@
 """Each host says what runs on it; a mobile-only app on a BaaS has no host of its own to pay for."""
+import pytest
+
 from engine import recommend
 from engine.export import to_markdown
 
@@ -45,12 +47,12 @@ def test_embedded_database_is_not_called_a_managed_service():
     from engine.kb import load_kb
     kb = load_kb()["index"]
     stack = {"frontend": kb["htmx"], "backend": kb["django"], "database": kb["sqlite"], "hosting": kb["flyio"]}
-    d = {"web": True, "mobile": False}
-    text = runs_here(d, stack)
+    p, d = {"compliance": []}, {"web": True, "mobile": False}
+    text = runs_here(p, d, stack)
     assert "managed service" not in text
     assert "embedded single-file database" in text and "no separate database server" in text
     stack["database"] = kb["postgres"]
-    assert "separate managed service" in runs_here(d, stack)
+    assert "separate managed service" in runs_here(p, d, stack)
 
 
 def test_spa_on_container_host_is_served_from_the_clouds_object_storage_and_cdn(presets):
@@ -72,3 +74,32 @@ def test_spa_on_container_host_is_served_from_the_clouds_object_storage_and_cdn(
                      "data_growth_gb_month": 20, "dau": 20000, "budget_monthly": 3000}, with_counterfactuals=False)
     search = [s for s in big["supporting_services"] if s["role"] == "Search"]
     assert search and "estimate" in search[0]["why"] and "~213 GB of documents" in search[0]["why"]
+
+
+CLOUD_SPA = {"aws": (["python", "react", "aws"], "aws_ecs", "Amazon S3 + CloudFront"),
+             "gcp": (["python", "react", "gcp"], "gcp_cloud_run", "Cloud Storage bucket + Cloud CDN"),
+             "azure": (["csharp", "react", "azure"], "azure_apps", None)}
+ATTESTATION_GAP = {"pci_dss": "No PCI-DSS attestation published", "iso27001": "No ISO/IEC 27001 certification published",
+                   "soc2": "No SOC 2 report available", "hipaa": "No HIPAA Business Associate Agreement available"}
+
+
+@pytest.mark.parametrize("rule", sorted(ATTESTATION_GAP))
+@pytest.mark.parametrize("cloud", sorted(CLOUD_SPA))
+def test_spa_files_go_to_the_clouds_cdn_only_if_it_holds_the_attestation(cloud, rule):
+    """The knowledge base records S3 + CloudFront and Cloud Storage + Cloud CDN as holding HIPAA, PCI DSS, SOC 2 and
+    ISO 27001, and Blob Storage + Front Door as holding none (no public Microsoft page lists Front Door's audit scope).
+    The hosting layer rules a host out for a missing one, so the built files may not go there either: on Azure they
+    stay on the app's own instances, and the hosting text says why."""
+    skills, host, pairing = CLOUD_SPA[cloud]
+    r = recommend({"app_type": "saas", "team_skills": skills, "cloud_preference": cloud, "cloud_required": True,
+                   "dau": 20000, "budget_monthly": 2000, "seo": "none", "compliance": [rule]}, with_counterfactuals=False)
+    assert (r["stack"]["frontend"]["pick"]["id"], r["stack"]["hosting"]["pick"]["id"]) == ("react_spa", host)
+    static = [s["name"] for s in r["supporting_services"] if s["role"] == "Static frontend"]
+    text, request = r["stack"]["hosting"]["runs_here"], r["architecture"]["how_parts_fit"][0]["text"]
+    if pairing:
+        assert static == [pairing] and pairing in text and pairing in request, (static, text, request)
+        return
+    assert static == [] and not [x for x in r["cost"]["lines"] if x["component"].startswith("Static frontend")], static
+    assert text.startswith("Runs here: React SPA (static files), ") and "Front Door" not in request, (text, request)
+    assert ("Azure Blob Storage + Front Door would serve the static files from the edge, but it fails your compliance "
+            f"rules ({ATTESTATION_GAP[rule]}).") in text, text

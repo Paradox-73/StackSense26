@@ -482,7 +482,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).",
             "https://www.pcisecuritystandards.org/document_library/")
 
-    home = spa_static_home(stack) if d["web"] and not env["onprem"] else None
+    home = spa_static_home(p, d, stack) if d["web"] and not env["onprem"] else None
     if home:
         name, src, per_gb, fee = home
         why = (f"{short_name(stack['frontend'])} is built to static files (HTML, JavaScript, CSS): a bucket behind the "
@@ -944,21 +944,36 @@ SPA_STATIC_HOME = {
 }
 SPA_STATIC_PRICE_SOURCES = {"gcp": "https://cloud.google.com/cdn/pricing and https://cloud.google.com/vpc/network-pricing",
                             "azure": "https://azure.microsoft.com/en-us/pricing/details/frontdoor/"}
+# Each pairing's static-host entry in the knowledge base, whose compliance record the built files' home must pass.
+SPA_STATIC_KB = {"aws": "aws_s3_cloudfront", "gcp": "gcp_storage_cdn", "azure": "azure_blob_frontdoor"}
 # Planning figure: the SPA's JavaScript, CSS and images delivered per active user a day (bundles of 0.5-2 MB,
 # mostly cached by the browser between visits).
 SPA_MB_PER_USER_DAY = 1.0
 SPA_INSTANCE_HOSTS = ("containers", "kubernetes", "paas", "vps")
 
 
-def spa_static_home(stack: dict) -> tuple | None:
-    """(name, source, price per GB, monthly fee) of the object storage + CDN that serves a static browser app's
-    built files, when the frontend is built to static files and the host runs instances on a hyperscaler."""
+def spa_static_pairing(stack: dict) -> dict | None:
+    """The knowledge-base entry of the cloud's object storage + CDN that would serve a static browser app's built
+    files: the frontend is built to static files and the host runs instances on a hyperscaler."""
     fe, host = stack["frontend"], stack.get("api_host") or stack["hosting"]
     if fe.get("kind") != "web" or fe["id"] in SERVER_RENDERED or stack["backend"].get("kind") not in ("server", "faas"):
         return None
-    if stack["hosting"].get("kind") not in SPA_INSTANCE_HOSTS:
+    if stack["hosting"].get("kind") not in SPA_INSTANCE_HOSTS or host.get("provider") not in SPA_STATIC_KB:
         return None
-    return SPA_STATIC_HOME.get(host.get("provider"))
+    return load_kb()["index"][SPA_STATIC_KB[host["provider"]]]
+
+
+def spa_static_gaps(p: dict, d: dict, pairing: dict) -> list[str]:
+    """The compliance rules the pairing fails as a host (attestations, residency); with any, the app's own instances
+    serve the built files."""
+    return [r[0] for r in hard_constraints("hosting", pairing, p, d) if r[1] == "compliance"]
+
+
+def spa_static_home(p: dict, d: dict, stack: dict) -> tuple | None:
+    """(name, source, price per GB, monthly fee) of the object storage + CDN that serves a static browser app's
+    built files: a pairing applies (spa_static_pairing) and passes the project's compliance rules."""
+    pairing = spa_static_pairing(stack)
+    return SPA_STATIC_HOME[pairing["provider"]] if pairing and not spa_static_gaps(p, d, pairing) else None
 
 
 def short_name(item: dict) -> str:
@@ -1026,7 +1041,7 @@ def split_note(stack: dict, api: dict, rule_id: str) -> str:
             "or a rewrite on the frontend platform).")
 
 
-def runs_here(d: dict, stack: dict, api_host: dict | None = None) -> str:
+def runs_here(p: dict, d: dict, stack: dict, api_host: dict | None = None) -> str:
     """What actually runs on the hosting pick, and what runs elsewhere."""
     fe, be, host = stack["frontend"], stack["backend"], stack["hosting"]
     if api_host:
@@ -1042,9 +1057,10 @@ def runs_here(d: dict, stack: dict, api_host: dict | None = None) -> str:
         return (f"Runs here: {short_name(fe)} as pre-built static pages. No server code and no database: "
                 "content files are built into pages at deploy time, and the free static plan covers the traffic.")
     parts = []
+    home = spa_static_home(p, d, stack) if d["web"] else None
     if d["web"] and fe.get("kind") == "mobile":
         parts.append("the web app's pages (the mobile app ships through the app stores)")
-    elif d["web"] and spa_static_home(stack):
+    elif home:
         pass  # the built files are served from the cloud's object storage + CDN, said below
     elif d["web"]:
         parts.append(f"{short_name(fe)} ({'server rendering + static files' if fe['id'] in SERVER_RENDERED else 'static files'})")
@@ -1054,10 +1070,13 @@ def runs_here(d: dict, stack: dict, api_host: dict | None = None) -> str:
     elif be.get("kind") == "faas":
         parts.append("the serverless functions")
     text = "Runs here: " + (", ".join(parts) if parts else "nothing but optional static pages") + "."
-    home = spa_static_home(stack) if d["web"] else None
+    pairing = spa_static_pairing(stack) if d["web"] else None
     if home:
         text += (f" {short_name(fe)} is built to static files that are served from {home[0]}, not from these "
                  "instances (see Supporting services).")
+    elif pairing:
+        text += (f" {short_name(pairing)} would serve the static files from the edge, but it fails your compliance "
+                 f"rules ({'; '.join(spa_static_gaps(p, d, pairing))}).")
     if be.get("kind") == "baas":
         text += f" {short_name(be)} runs the API, auth and database as its own managed service."
     else:
@@ -1394,6 +1413,7 @@ def how_parts_fit(p: dict, d: dict, stack: dict, services: list[dict], api_host:
     peak = _num(d["peak_rps"]) if d["peak_rps"] else "<0.1"
     mobile_only = d["mobile"] and not d["web"]
     api_on = api_host["name"] if api_host else hname
+    home = spa_static_home(p, d, stack)
     if mobile_only:
         lead, then = "The iOS/Android app, installed from the app stores,", " "
     elif fe.get("kind") == "mobile":
@@ -1402,8 +1422,8 @@ def how_parts_fit(p: dict, d: dict, stack: dict, services: list[dict], api_host:
         views = f" with {be['view_layer']['name']}" if be.get("view_layer") else ""
         lead, then = (f"The browser requests pages that the {bname} service renders{views} on {api_on} "
                       "(HTMX swaps in HTML fragments)"), "; "
-    elif spa_static_home(stack) and not mobile_only:
-        lead, then = f"The browser loads {fe['name']}'s built files from {spa_static_home(stack)[0]}", "; it "
+    elif home and not mobile_only:
+        lead, then = f"The browser loads {fe['name']}'s built files from {home[0]}", "; it "
     else:
         lead, then = f"The browser loads {fe['name']} from {hname}", "; it "
     if kind == "none":
@@ -1458,8 +1478,8 @@ def how_parts_fit(p: dict, d: dict, stack: dict, services: list[dict], api_host:
         deploy = f"CI packages the functions and deploys them with infrastructure as code to {hname}."
     else:
         deploy = f"CI builds a container image and rolls it out on {api_on} with health checks and zero-downtime restarts."
-    if spa_static_home(stack) and not mobile_only and fe.get("kind") == "web":
-        deploy += f" The frontend's built files are uploaded to {spa_static_home(stack)[0].split(' + ')[0]} and the CDN cache is invalidated."
+    if home and not mobile_only and fe.get("kind") == "web":
+        deploy += f" The frontend's built files are uploaded to {home[0].split(' + ')[0]} and the CDN cache is invalidated."
     if mobile_only and not deploy.startswith("App releases"):
         deploy += " App releases go through App Store and Google Play review."
     if fe["id"] == "react_native":

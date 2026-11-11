@@ -732,7 +732,7 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
     region_note = _db_region_note(p, stack_items, api_host)
     if region_note:
         layers_out["database"]["explanation"]["risks"].append(region_note)
-    layers_out["hosting"]["runs_here"] = runs_here(d, stack_items, api_host)
+    layers_out["hosting"]["runs_here"] = runs_here(p, d, stack_items, api_host)
     if api_host:
         layers_out["hosting"]["api_host"] = {k: v for k, v in api_host.items() if k != "item"}
         layers_out["hosting"]["api_host"]["why"] = (f"The {short_name(stack_items['backend'])} API gets its own long-running host: "
