@@ -157,7 +157,7 @@
       },
       {
         "layer": "storage",
-        "choice": "Blob Storage + Front Door",
+        "choice": "Blob Storage without Front Door (no public Microsoft page lists Front Door's audit scope)",
         "justification": "Uploaded files and video belong in object storage, not the database.",
         "driven_by": [
           "requirements.file_media_storage",
@@ -165,7 +165,7 @@
         ],
         "alternatives": [],
         "tradeoffs": [],
-        "source": "https://learn.microsoft.com/en-us/azure/frontdoor/integrate-storage-account"
+        "source": "https://learn.microsoft.com/en-us/azure/storage/common/storage-compliance-offerings"
       },
       {
         "layer": "auth",
