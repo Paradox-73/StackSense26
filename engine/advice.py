@@ -1614,6 +1614,9 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
             basis.append(f"x{SELF_MANAGED_COST_FACTOR:g} planning allowance: no {'compliant ' if gaps else ''}managed "
                          f"{db['name']} on {CLOUD_NAMES.get(dbhost['provider'], dbhost['provider'])}, "
                          "so backup storage, monitoring and a tested failover are yours to build")
+        if self_run_db(db, dbhost, offer) and not db.get("single_node"):
+            # On the team's own servers the managed band, its storage floor and allowance do not apply.
+            lo, hi, basis = self_run_db_cost(p, d, db, dbhost)
         lic = db.get("self_managed_licence") if _env(p, host)["onprem"] else None
         # Run on your own servers, a commercial database needs a licence the managed services include in their
         # price. The free edition fits only a small database with no failover (a 99.9%+ target, the default
@@ -1679,12 +1682,43 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
     }
 
 
+def self_run_db(db: dict, host: dict, offer: str) -> bool:
+    """The database runs on the team's own servers (on-premises, or a VPS host with no managed service for it), so it
+    costs one more server of that host, not a managed service's price."""
+    return host.get("kind") == "onprem" or (host.get("kind") == "vps" and offer.lower().startswith("self-managed"))
+
+
+def self_run_db_cost(p: dict, d: dict, db: dict, host: dict) -> tuple[float, float, list[str]]:
+    """(low, high, basis) of a self-run database: a server of the host sized for the database tier at the host's own
+    band, a standby for a stated availability target, and the host's backups where it prices them. On-premises the
+    database takes servers of its own, priced at the on-premises server band (a Kubernetes host's band also carries
+    the cluster, which the database shares)."""
+    server = load_kb()["index"]["onprem_docker"] if host.get("kind") == "onprem" else host
+    lo, hi = tier_cost(server, d["db_tier"], p)
+    basis = [f"{d['db_tier_label']} database tier (~{d['data_12mo_gb']:,.0f} GB in 12 months) on "
+             + ("servers of its own on your premises" if server is not host else f"a {host['name']} server of its own")
+             + ", at the host's rates rather than a managed service's"]
+    mult = _avail(d)
+    if mult > 1 and not db.get("single_node"):
+        lo, hi = lo * mult, hi * mult
+        basis.append(f"x{mult:g} for {d['availability']:g}% availability (a standby server)")
+    share = host.get("backup_share")
+    if share:
+        lo, hi = lo * (1 + share), hi * (1 + share)
+        basis.append(f"+{share:.0%} for the host's daily server backups ({host['backup_source']})")
+    return lo, hi, basis
+
+
 def min_feasible_cost(p: dict, d: dict, hosting_feasible: list[dict], db_feasible: list[dict]) -> float:
-    """Cheapest monthly hosting plus database cost among the technologies that pass the hard constraints."""
+    """Cheapest monthly hosting plus database cost among the technologies that pass the hard constraints. On the
+    cheapest host, a database that host runs on its own servers costs that host's server price."""
     if not hosting_feasible or not db_feasible:
         return 0.0
-    h = min(tier_cost(x["item"], d["compute_tier"], p)[0] for x in hosting_feasible)
-    dbc = min(tier_cost(x["item"], d["db_tier"], p, d)[0] for x in db_feasible)
+    cheapest = min(hosting_feasible, key=lambda x: tier_cost(x["item"], d["compute_tier"], p)[0])["item"]
+    h = tier_cost(cheapest, d["compute_tier"], p)[0]
+    dbc = min(self_run_db_cost(p, d, x["item"], cheapest)[0]
+              if self_run_db(x["item"], cheapest, database_offering(x["item"], cheapest, p))
+              else tier_cost(x["item"], d["db_tier"], p, d)[0] for x in db_feasible)
     return h + dbc
 
 

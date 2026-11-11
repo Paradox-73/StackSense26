@@ -54,7 +54,9 @@ ONPREM = {"app_type": "analytics_dashboard", "platforms": ["ios"], "user_actions
 
 
 def test_budget_guard_never_gives_up_a_technology_the_growth_path_holds():
-    p, a, w = normalize(deepcopy(ONPREM))
+    # A budget at which the guard would trade the host away at some tier (since an on-premises database is priced as
+    # servers of its own), so the hold is exercised.
+    p, a, w = normalize(dict(deepcopy(ONPREM), budget_monthly=100000))
     d = derive(p, a, w)
     picks, _, holds, _, _ = _growth_path(load_kb(), p, d)
     assert _first_flip_back(picks) is None
