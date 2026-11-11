@@ -495,6 +495,11 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             basis = (f"~{SPA_MB_PER_USER_DAY:g} MB of files per active user a day (~{gb:,.0f} GB a month) at ${per_gb:g}/GB"
                      + (f" plus the ${fee:g} monthly base fee" if fee else "") + f" ({SPA_STATIC_PRICE_SOURCES[prov]})")
             add("Static frontend", name, why, src, usage=(usd, usd, basis))
+            # The budget check prices bills without usage terms; this line carries a fixed fee, so it counts the line at
+            # the tier's typical users (as Enterprise SSO does) to compare stacks with and without it fairly.
+            typical = fee + typical_users(p, tier) * 30 * SPA_MB_PER_USER_DAY / 1024 * per_gb
+            out[-1]["tier_usage"] = (typical, typical, f"the ${fee:g} monthly base fee plus the transfer of a typical "
+                                     f"{TIER_NAMES[tier]} tier ({SPA_STATIC_PRICE_SOURCES[prov]})")
     if p.get("cacheable_share") == "most" and not static and be.get("kind") != "baas":
         add("CDN", "Cloudflare or CloudFront in front of the app",
             "You said most requests return the same content to everyone; a CDN answers them without touching the servers, "
@@ -805,15 +810,20 @@ def _object_storage(env: dict, prov: str) -> str:
         return "MinIO or Ceph (S3-compatible, self-hosted)"
     if env["hybrid"]:
         return "S3 API everywhere: the cloud's object storage in the cloud, MinIO on-premises (same client code)"
+    if env["cloud"] and env["hipaa"]:  # uploads hold health information: a CDN may carry only public files
+        return {"aws": "Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only)",
+                "gcp": "Cloud Storage under the Google Cloud BAA (Cloud CDN for public, non-PHI files only)",
+                "azure": "Blob Storage under Microsoft's BAA (Front Door for public, non-PHI files only)"}[env["cloud"]]
     if env["cloud"]:
         return {"aws": "Amazon S3 + CloudFront", "gcp": "Cloud Storage + Cloud CDN", "azure": "Blob Storage + Front Door"}[env["cloud"]]
+    if env["hipaa"]:
+        where = " in an Indian region" if env["india"] else ""
+        return (f"MinIO on your BAA-covered servers{where} (no public CDN for PHI)" if env["no_hyperscaler"] else
+                f"Amazon S3 or Google Cloud Storage{where} under a signed BAA (+ CDN for public, non-PHI files only)")
     if env["india"]:
         return ("S3-compatible storage in an Indian region (DigitalOcean Spaces BLR1 or MinIO on your servers) + CDN"
                 if env["no_hyperscaler"] else
                 "S3-compatible storage in an Indian region (Amazon S3 Mumbai or Google Cloud Storage asia-south1) + CDN")
-    if env["hipaa"]:
-        return ("MinIO on your BAA-covered servers (no public CDN for PHI)" if env["no_hyperscaler"] else
-                "Amazon S3 or Google Cloud Storage under a signed BAA (+ CDN for public, non-PHI files only)")
     if env["eu"]:
         return "S3-compatible storage in an EU jurisdiction (Cloudflare R2 EU or Backblaze B2 EU Central) + CDN"
     if prov == "cloudflare":
@@ -901,13 +911,15 @@ WEBSOCKET_LIBS = {
 SPA_STATIC_HOME = {
     "aws": ("Amazon S3 + CloudFront", "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html",
             None, None),
+    # Cache egress to North America/Europe for the first 10 TiB, plus the external Application Load Balancer the bucket
+    # needs for HTTPS on a custom domain: one forwarding rule at $0.025 an hour (https://cloud.google.com/vpc/network-pricing).
     "gcp": ("Cloud Storage bucket + Cloud CDN", "https://cloud.google.com/cdn/docs/setting-up-cdn-with-bucket",
-            0.08, 0.0),   # cache egress to North America/Europe, first 10 TiB (https://cloud.google.com/cdn/pricing)
+            0.08, 18.25),
     "azure": ("Azure Blob Storage static website + Azure Front Door Standard",
               "https://learn.microsoft.com/azure/storage/blobs/storage-blob-static-website",
               0.083, 35.0),  # Standard base fee + first 10 TB out (https://azure.microsoft.com/pricing/details/frontdoor/)
 }
-SPA_STATIC_PRICE_SOURCES = {"gcp": "https://cloud.google.com/cdn/pricing",
+SPA_STATIC_PRICE_SOURCES = {"gcp": "https://cloud.google.com/cdn/pricing and https://cloud.google.com/vpc/network-pricing",
                             "azure": "https://azure.microsoft.com/en-us/pricing/details/frontdoor/"}
 # Planning figure: the SPA's JavaScript, CSS and images delivered per active user a day (bundles of 0.5-2 MB,
 # mostly cached by the browser between visits).

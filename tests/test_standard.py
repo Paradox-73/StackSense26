@@ -502,3 +502,22 @@ def test_each_service_stays_on_the_named_cloud_and_the_deployment_model():
     queue = [s["choice"] for s in edited("P4", infrastructure={"deployment_model": "self_hosted_cloud_vm"})["stack"][
         "supporting"] if s["layer"] == "queue"]
     assert queue and not [q for q in queue if "SQS" in q], queue
+
+
+def test_a_spa_served_from_a_cloud_storage_bucket_pays_for_its_load_balancer():
+    """Cloud Storage serves no HTTPS on a custom domain by itself: the bucket sits behind an external Application Load
+    Balancer whose forwarding rule costs $0.025 an hour, about $18 a month, before any traffic."""
+    out = edited("P3", infrastructure={"cloud_preference": "gcp"})
+    line = [a for a in out["estimated_monthly_cost_usd"]["assumptions"] if a.startswith("Static frontend")]
+    assert out["stack"]["frontend"]["choice"].startswith("React SPA") and line, out["stack"]["frontend"]
+    assert "plus the $18.25 monthly base fee" in line[0], line
+
+
+@pytest.mark.parametrize("cloud,residency", [("any", "none"), ("aws", "none"), ("gcp", "eu"), ("none", "india")])
+def test_hipaa_uploads_are_never_put_behind_a_public_cdn(cloud, residency):
+    doc = edit("P2", infrastructure={"cloud_preference": cloud, "data_residency": residency})
+    doc["compliance"].append("hipaa")
+    out = run(doc)
+    storage = [s["choice"] for s in out["stack"]["supporting"] if s["layer"] in ("storage", "cdn")
+               and "is built to static files" not in s["justification"]]  # the app's own bundle may use a CDN
+    assert storage and not [s for s in storage if CDN.search(s) and not re.search(r"non-PHI|no public CDN", s)], storage
