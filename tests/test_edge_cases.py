@@ -138,3 +138,47 @@ def test_every_warning_code_in_the_engine_is_tested():
     tested = "".join(f.read_text(encoding="utf-8") for f in (root / "tests").glob("test_*.py"))
     untested = sorted(c for c in emitted if c not in tested)
     assert not untested, untested
+
+
+def scenario(**sections) -> dict:
+    """Public scenario P3 run through the standard adapter, with some sections edited."""
+    import json
+    from pathlib import Path
+
+    from engine.standard import run
+    doc = json.loads((Path(__file__).resolve().parent.parent / "scenarios" / "public" / "P3.json").read_text(encoding="utf-8"))
+    for sec, values in sections.items():
+        doc[sec].update(values)
+    return run(doc)
+
+
+def severities(out: dict) -> dict:
+    return {w["code"]: w["severity"] for w in out["warnings"]}
+
+
+def test_concurrency_above_the_user_count_is_a_critical_contradiction():
+    out = scenario(scale={"users_at_launch": 1000, "users_12_months": 10000, "peak_concurrent_users": 50000})
+    assert severities(out).get("CONCURRENT_ABOVE_USERS") == "critical" and out["status"] == "ok_with_warnings"
+    assert any(a.startswith("Relaxed: scale.peak_concurrent_users 50,000 capped at the user count, 10,000")
+               for a in out["assumptions"]), out["assumptions"]
+    assert "CONCURRENT_ABOVE_USERS" not in severities(scenario())
+
+
+def test_api_only_with_offline_and_seo_is_relaxed_and_gets_no_client_parts():
+    out = scenario(project={"type": "api_platform", "platforms": ["api_only"]},
+                   requirements={"offline_support": True, "seo_critical": True})
+    found = severities(out)
+    assert found.get("API_ONLY_CLIENT_REQUIREMENT") == "critical", found
+    assert "OFFLINE_WEB" not in found and "SEO_NO_WEB" not in found, found
+    parts = [s["choice"] for s in out["stack"]["supporting"]]
+    assert not [c for c in parts if "SQLite" in c or "sync" in c.lower()], parts
+
+
+def test_seo_on_a_network_without_the_internet_is_a_contradiction():
+    gapped = scenario(infrastructure={"deployment_model": "air_gapped", "cloud_preference": "none"},
+                      requirements={"seo_critical": True})
+    assert severities(gapped).get("SEO_RESTRICTED_DEPLOYMENT") == "critical"
+    assert any("requirements.seo_critical true treated as false" in a for a in gapped["assumptions"])
+    on_prem = scenario(infrastructure={"deployment_model": "on_premise", "cloud_preference": "none"},
+                       requirements={"seo_critical": True})
+    assert severities(on_prem).get("SEO_RESTRICTED_DEPLOYMENT") == "warning"

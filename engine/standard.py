@@ -387,6 +387,7 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
         origin[key] = list(dict.fromkeys(origin.get(key, []) + list(paths)))
 
     ptype, platforms = f["project.type"], f["project.platforms"]
+    _relax_contradictions(f, notes, warns)
     app = APP_TYPE[ptype]
     if ptype == "other" and "web" not in platforms and {"android", "ios"} & set(platforms):
         app = "mobile_first"
@@ -608,6 +609,50 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
             continue
         notes.append(f"Existing system '{text}': integrated through {how}; it stays the system of record for its own data")
     return a, origin, notes, warns
+
+
+def _relax_contradictions(f: dict, notes: list[str], warns: list[dict]) -> None:
+    """Fields that cannot all hold (section 6): a critical warning, and the weaker field relaxed in place, so every
+    later step (stack, services, summary) sees the relaxed value; assumptions say exactly what was relaxed."""
+    users = max(f["scale.users_at_launch"], f["scale.users_12_months"])
+    peak = f["scale.peak_concurrent_users"]
+    if peak is not None and peak > users:
+        warns.append(_std_warn("CONCURRENT_ABOVE_USERS", "critical",
+                               f"scale.peak_concurrent_users ({peak:,}) is more than the {users:,} users the project will "
+                               "ever have: more people cannot be online at once than exist. Relaxed: concurrency is capped "
+                               f"at {users:,}, every user online at once; correct the figure if it counts connections or "
+                               "devices rather than people.", ["scale.peak_concurrent_users", "scale.users_12_months"]))
+        notes.append(f"Relaxed: scale.peak_concurrent_users {peak:,} capped at the user count, {users:,}")
+        f["scale.peak_concurrent_users"] = users
+    if not set(f["project.platforms"]) - {"api_only"}:
+        client = [(path, what) for path, what in (("requirements.offline_support", "working offline needs an app on the "
+                                                   "user's device"), ("requirements.seo_critical", "search ranking needs "
+                                                   "web pages for crawlers")) if f[path]]
+        if client:
+            warns.append(_std_warn("API_ONLY_CLIENT_REQUIREMENT", "critical",
+                                   f"project.platforms is api_only, so there is no client, but {' and '.join(w for _, w in client)}. "
+                                   f"Relaxed: {' and '.join(p for p, _ in client)} treated as false, so no offline sync or "
+                                   "pre-rendered pages are added; add web, android or ios to project.platforms if a client "
+                                   "is planned.", ["project.platforms"] + [p for p, _ in client]))
+            for path, _ in client:
+                notes.append(f"Relaxed: {path} true treated as false (project.platforms is api_only)")
+                f[path] = False
+    deploy = f["infrastructure.deployment_model"]
+    if f["requirements.seo_critical"] and deploy == "air_gapped":
+        warns.append(_std_warn("SEO_RESTRICTED_DEPLOYMENT", "critical",
+                               "requirements.seo_critical needs public pages that search engines crawl, but an air-gapped "
+                               "network has no internet connection, so no crawler can reach them. Relaxed: "
+                               "requirements.seo_critical treated as false; publish public pages from a separate site "
+                               "outside the network.", ["requirements.seo_critical", "infrastructure.deployment_model"]))
+        notes.append("Relaxed: requirements.seo_critical true treated as false (infrastructure.deployment_model is air_gapped)")
+        f["requirements.seo_critical"] = False
+    elif f["requirements.seo_critical"] and deploy == "on_premise":
+        warns.append(_std_warn("SEO_RESTRICTED_DEPLOYMENT", "warning",
+                               "requirements.seo_critical needs public pages that search engines crawl, and on-premises "
+                               "servers sit behind your firewall with no CDN in the stack. Kept: the pages are rendered on "
+                               "your servers, so open them to the internet through the firewall or a reverse proxy, or "
+                               "publish them from a separate public site.",
+                               ["requirements.seo_critical", "infrastructure.deployment_model"]))
 
 
 def _language_warning(result: dict, f: dict, a: dict) -> list[dict]:
