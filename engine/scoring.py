@@ -771,7 +771,7 @@ def hard_constraints(layer: str, item: dict, p: dict, d: dict) -> list[tuple[str
             out.append(("No ISO/IEC 27001 certification published", "compliance", 0))
         regions = item.get("residency_regions", item.get("regions"))
         note = item.get("residency_note")
-        if layer == "hosting" and "static_regions" in item and static_site(p):
+        if layer == "hosting" and "static_regions" in item and static_site(p) and d["data_12mo_gb"] <= STATIC_CONTENT_MAX_GB:
             # A static site's data is its files and their logs: where the host stores those, not where functions run.
             regions, note = item["static_regions"], item.get("static_residency_note")
         if regions is not None:

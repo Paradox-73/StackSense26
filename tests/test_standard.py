@@ -537,3 +537,25 @@ def test_a_function_platform_never_hosts_a_framework_it_runs_only_in_beta(base, 
     host, backend = out["stack"]["hosting"]["choice"], out["stack"]["backend"]["choice"]
     if host.startswith(("Vercel", "Netlify", "Cloudflare")) and "for the API" not in host:
         assert not re.search(r"Phoenix|Rails|ASP\.NET|Spring|Laravel", backend), (backend, host)
+
+
+def test_a_read_only_site_gets_no_database_without_a_backend():
+    doc = edit("P5", project={"type": "content_site"}, infrastructure={"cloud_preference": "aws"},
+               requirements={"auth": "none", "payments": False, "realtime": False, "file_media_storage": False})
+    stack = run(doc)["stack"]
+    assert not (stack["backend"]["choice"] == "None" and stack["database"]["choice"] != "None"), core({"stack": stack})
+
+
+def test_render_static_sites_do_not_claim_a_region():
+    """Render serves static sites from a global CDN and offers no region for them (render.com/docs/regions)."""
+    doc = edit("P1", compliance=["hipaa"], infrastructure={"cloud_preference": "none", "data_residency": "eu"})
+    out = run(doc)
+    assert not out["stack"] or not out["stack"]["hosting"]["choice"].startswith("Render"), out["stack"]["hosting"]
+
+
+def test_a_read_only_project_with_a_real_database_is_not_held_to_the_static_rule():
+    """Over ~5 GB of content needs a database and code that reads it, so the host runs functions, not a static site."""
+    doc = edit("P5", project={"type": "content_site"}, compliance=["iso27001"],
+               infrastructure={"cloud_preference": "none", "data_residency": "india", "existing_systems": []},
+               requirements={"auth": "none", "payments": False, "realtime": False, "file_media_storage": False})
+    assert run(doc)["status"] != "infeasible"

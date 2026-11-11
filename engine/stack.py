@@ -123,7 +123,9 @@ def _tb_value(combo: dict, attr: str) -> float:
         elif attr == "cloud_pref":
             # A layer the stack does without (no server code, no database) puts nothing off the preferred cloud,
             # so a static site is not out-voted by a stack that adds a database on that cloud.
-            absent = c["item"].get("kind") == "none" or (c["item"].get("static_only") and not c["item"].get("provider"))
+            picks = combo["picks"]
+            static = picks["backend"]["item"].get("kind") == "none" and picks["database"]["item"].get("static_only")
+            absent = static and (c["item"].get("kind") == "none" or (c["item"].get("static_only") and not c["item"].get("provider")))
             tot += absent or any(a["input"] == "cloud_preference" and a["delta"] > 0 for a in c.get("adjustments", []))
         elif attr == "arch_pref":
             tot += any(a["input"] == "architecture" and a["delta"] > 0 for a in c.get("adjustments", []))

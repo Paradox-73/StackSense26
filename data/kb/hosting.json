@@ -154,7 +154,7 @@
         "global"
       ],
       "static_regions": ["north_america"],
-      "static_residency_note": "Netlify serves a static site's files from its global edge and keeps hosting, storage and logs with US providers; a function region moves only where functions run, so only a US residency rule is met for a static site",
+      "static_residency_note": "Netlify serves a static site's files from its global edge and keeps hosting, storage and logs with US providers; a function region moves only where functions run (and their durable cache), so only a US residency rule is met for a static site",
       "compliance": {
         "hipaa": false,
         "pci": true,
@@ -411,6 +411,8 @@
         "europe",
         "southeast_asia"
       ],
+      "static_regions": [],
+      "static_residency_note": "Render serves static sites from a global CDN and offers no region for them, so a data-residency rule is treated as not met for a static site",
       "compliance": {
         "hipaa": true,
         "hipaa_min_usd": 499,
@@ -460,6 +462,7 @@
         "Fewer knobs than AWS/GCP at very large scale"
       ],
       "sources": [
+        "https://render.com/docs/regions",
         "https://render.com/docs",
         "https://render.com/pricing",
         "https://render.com/docs/regions",
@@ -1172,7 +1175,7 @@
         "maturity_sources": ["https://cloud.google.com/security/compliance/hipaa", "https://cloud.google.com/security/compliance/pci-dss"]
       },
       "cost_usd": [[18, 21], [21, 45], [45, 290], [290, 2700], [2700, 25000], [25000, 100000]],
-      "static_cost_note": "The load balancer that gives the bucket HTTPS on your domain costs $0.025 an hour (about $18 a month) with no traffic; Cloud CDN cache egress is $0.08 per GB to North America and Europe ($0.09 in Asia Pacific) for the first 10 TiB.",
+      "static_cost_note": "The load balancer that gives the bucket HTTPS on your domain costs $0.025 an hour (about $18 a month) with no traffic; Cloud CDN cache egress is $0.08 per GiB to North America and Europe ($0.09 in Asia Pacific) for the first 10 TiB.",
       "strengths": [
         "The bucket sits in the region you choose (asia-south1 Mumbai, europe-west3 Frankfurt, us-central1 Iowa), so the files stay there",
         "Covered by Google Cloud's HIPAA BAA, with a 99.95% Cloud CDN SLA"
@@ -1217,7 +1220,7 @@
         "iso27001": false,
         "gdpr_dpa": true,
         "maturity": 2,
-        "maturity_note": "Its audit scope is published only in a Service Trust Portal document that needs a sign-in, so it is treated as holding no HIPAA, PCI DSS, SOC 2 or ISO 27001 attestation until checked.",
+        "maturity_note": "No public page checked here states its HIPAA, PCI DSS, SOC 2 or ISO 27001 scope (Azure's audit-scope appendix is a Service Trust Portal document), so it is treated as holding none of them until checked.",
         "maturity_sources": ["https://learn.microsoft.com/en-us/azure/compliance/offerings/cloud-services-in-audit-scope"]
       },
       "cost_usd": [[0, 0], [0, 50], [50, 600], [600, 6000], [6000, 60000], [60000, 200000]],
@@ -1697,7 +1700,7 @@
       "weaknesses": [
         "Fewer managed services than hyperscalers",
         {"text": "Its HIPAA BAA does not cover App Platform or Managed Databases (only Droplets, Kubernetes and other listed products)", "when": {"compliance_any": ["hipaa"]}},
-        {"text": "Static sites in BLR1 (Bangalore) have limited availability: they are served through the Cloudflare CDN only", "when": {"india": true, "stack_any": ["no_custom_backend"]}}
+        {"text": "DigitalOcean lists static sites in BLR (Bangalore) as having limited availability, through the Cloudflare CDN only", "when": {"india": true, "stack_any": ["no_custom_backend"]}}
       ],
       "static_cost_usd": [[0, 0], [1, 6], [6, 60], [60, 600], [600, 6000], [6000, 30000]],
       "static_cost_note": "Three static-site apps are free with 1 GiB of transfer each a month; more transfer is $0.02 per GiB, and static-only apps past three are $3 a month each.",
