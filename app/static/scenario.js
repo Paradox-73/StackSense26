@@ -169,6 +169,7 @@ function loadText(text, fileName) {
 
 /* An array file (such as the organisers' file of all public scenarios): the user picks the element to load. */
 function offerChoice(list, name) {
+  S.run++; S.out = S.outFor = null; syncOut();  /* a run still in flight must not replace the choice, nor its output stay downloadable */
   const label = (x, i) => {
     const o = x && typeof x === "object" && !Array.isArray(x) ? x : {};
     return `${show(o.scenario_id) || `#${i + 1}`}${o.project && o.project.name ? `: ${show(o.project.name)}` : ""}`;
