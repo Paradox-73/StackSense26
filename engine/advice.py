@@ -97,6 +97,18 @@ def _env(p: dict, host: dict) -> dict:
             "no_hyperscaler": p.get("cloud_preference") == "no_hyperscaler"}
 
 
+# Dedicated servers that run each live match and hold its authoritative state; the fleet's hours are not in the estimate.
+GAME_SERVERS = {
+    "aws": ("Amazon GameLift Servers (managed dedicated game servers, with FlexMatch matchmaking)",
+            "Live matches run on dedicated game servers that hold each match's state; GameLift deploys, scales and "
+            "places them by player latency, so the API only handles accounts, progress and leaderboards. The fleet's "
+            "server hours are billed on top of this estimate.",
+            "https://docs.aws.amazon.com/gameliftservers/latest/developerguide/gamelift-intro.html"),
+    "any": ("Agones (dedicated game servers on Kubernetes)",
+            "Live matches run on dedicated game servers that hold each match's state; Agones hosts, runs and scales them "
+            "on a Kubernetes cluster, so the API only handles accounts, progress and leaderboards. The cluster's server "
+            "hours are billed on top of this estimate.", "https://agones.dev/site/docs/"),
+}
 # The desktop app beside a web or phone frontend, in the first language the team lists that a toolkit is written in;
 # Electron, which packages the web frontend, for JavaScript teams and when no listed language has one.
 DESKTOP_TOOLKITS = [
@@ -586,7 +598,9 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         add("Offline sync", sync[0], "Offline use needs a local copy of the data and conflict handling when the device "
             "reconnects; the primary database does not provide that by itself.", sync[1])
 
-    if "desktop" in p["platforms"] and not d.get("desktop_only"):  # desktop only: the frontend is the toolkit itself
+    if stack["frontend"].get("kind") == "game" and p["realtime"] != "none":  # a live game built in an engine
+        add("Game servers", *(GAME_SERVERS["aws"] if "aws" in (prov, p.get("cloud_preference")) else GAME_SERVERS["any"]))
+    if "desktop" in p["platforms"] and not d.get("desktop_only") and stack["frontend"].get("kind") != "game":
         add("Desktop app", *next((t[1:] for t in DESKTOP_TOOLKITS if t[0] & d["skills"]), DESKTOP_TOOLKITS[-1][1:]))
     if d["mobile"] and env["air_gapped"]:
         add("Notifications", "In-app and on-device notifications only",

@@ -106,7 +106,8 @@ APP_TYPE_NOTES = {
     "marketplace": "a two-sided marketplace (listings, bookings, payouts) is scored like e-commerce",
     "web_app": "a general web application is scored like a SaaS product",
     "api_platform": "an API platform is scored like a SaaS product whose clients call the API",
-    "gaming": "a game backend is scored like a realtime collaboration product: shared state over live connections",
+    "gaming": "a live game backend is scored like a realtime collaboration product: shared state over live "
+              "connections, with dedicated game servers for the matches",
     "other": "a project of type 'other' is scored like a SaaS product",
 }
 # The engine's priorities are a ranked list of at most three; the standard's 1-5 levels are read in this order.
@@ -163,6 +164,16 @@ PLATFORM_API = {"WordPress": "the WordPress REST API", "Drupal": "Drupal's core 
 # The engine services an existing platform replaces, by the platform's kind.
 PLATFORM_ROLES = {"queue": ("Background jobs", "Ingestion buffer"), "warehouse": ("Analytics",)}
 BEING_REPLACED = re.compile(r"being replaced|to be replaced|replacing|migrat|retir|sunset|decommission")
+# Project types whose in-app sales are digital goods, and each store's billing rule: (name, rule, source).
+DIGITAL_GOODS = ("gaming", "social", "content_site", "web_app", "ai_ml_product", "realtime_collab", "other")
+STORE_RULES = {
+    "ios": ("App Store In-App Purchase", "Apple's App Review Guideline 3.1.1 requires in-app purchase to unlock "
+            "features, subscriptions, in-game currencies and premium content",
+            "https://developer.apple.com/app-store/review/guidelines/#in-app-purchase"),
+    "android": ("Google Play Billing", "Google Play's payments policy requires its billing system for digital items "
+                "such as virtual currencies, extra lives and add-on items",
+                "https://support.google.com/googleplay/android-developer/answer/9858738"),
+}
 IDENTITY = [(r"\bentra\b|\bazure ad\b|azure active directory", "Microsoft Entra ID"), (r"\bokta\b", "Okta"),
             (r"google workspace|\bg ?suite\b", "Google Workspace"), (r"\bkeycloak\b", "Keycloak"), (r"\bauth0\b", "Auth0"),
             (r"\bcognito\b", "Amazon Cognito"), (r"active directory|\badfs\b", "Active Directory"),
@@ -250,7 +261,7 @@ SERVICE_LAYER = {"Cache": "cache", "Realtime": "realtime", "Background jobs": "q
                  "Search": "search", "Payments": "payments", "Static frontend": "cdn", "CDN": "cdn",
                  "Media delivery": "cdn", "Object storage": "storage", "Authentication": "auth",
                  "Enterprise SSO": "auth", "Phone login (SMS OTP)": "auth", "Model serving": "ml",
-                 "Vector search": "ml", "Observability": "observability"}
+                 "Vector search": "ml", "Observability": "observability", "Game servers": "realtime"}
 SERVICE_FIELDS = {
     "cache": ["scale.workload", "requirements.p95_latency_ms", "scale.users_12_months"],
     "realtime": ["requirements.realtime", "scale.peak_concurrent_users"],
@@ -419,9 +430,15 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
     ptype, platforms = f["project.type"], f["project.platforms"]
     _relax_contradictions(f, notes, warns)
     app = APP_TYPE[ptype]
-    if ptype == "other" and "web" not in platforms and {"android", "ios"} & set(platforms):
+    phones_only = "web" not in platforms and bool({"android", "ios"} & set(platforms))
+    if ptype == "other" and phones_only:
         app = "mobile_first"
         notes.append("project.type 'other' with only phone platforms is scored as a mobile-first app")
+    elif ptype == "gaming" and not f["requirements.realtime"]:
+        # A turn-based or asynchronous game keeps realtime off as given; a live game is scored as realtime below.
+        app = "mobile_first" if phones_only else "saas"
+        notes.append("project.type 'gaming' with requirements.realtime false: a turn-based or asynchronous game is "
+                     f"scored like {'a mobile-first app' if phones_only else 'a SaaS product'}, and realtime stays off")
     elif ptype in APP_TYPE_NOTES:
         notes.append(f"project.type '{ptype}': {APP_TYPE_NOTES[ptype]}")
     put("app_type", app, "project.type")
@@ -451,7 +468,8 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
     workloads = [(w, path) for w, path, on in (
         ("text_search", "requirements.full_text_search", f["requirements.full_text_search"]),
         ("media_uploads", "requirements.file_media_storage", f["requirements.file_media_storage"]),
-        ("phone_otp", "requirements.auth", auth == "phone_otp")) if on]
+        ("phone_otp", "requirements.auth", auth == "phone_otp"),
+        ("game_client", "project.type", ptype == "gaming")) if on]
     put("special_workloads", [w for w, _ in workloads],
         *([p for _, p in workloads] or ["requirements.full_text_search", "requirements.file_media_storage"]))
     ml = f["requirements.ml_features"]
@@ -698,6 +716,25 @@ def _reuse_services(result: dict, f: dict) -> dict:
     cost["total_low"] = cost["total_low"] - sum(x["low"] for x in dropped)
     cost["total_high"] = cost["total_high"] - sum(x["high"] for x in dropped)
     return dict(result, supporting_services=services, deferred_services=deferred, cost=cost)
+
+
+def _store_billing(result: dict, f: dict) -> dict:
+    """A phone app that sells digital goods (levels, in-game currency, subscriptions, premium content) must sell them
+    through the store's own billing; a card processor stays only for the web. Shops, marketplaces, fintech and
+    healthtech sell physical goods or real-world services, which the stores' rules send to a card processor instead."""
+    phones = [x for x in ("ios", "android") if x in f["project.platforms"]]
+    pay = next((s for s in result.get("supporting_services", []) if s["role"] == "Payments"), None)
+    if not (phones and pay and f["requirements.payments"] and f["project.type"] in DIGITAL_GOODS):
+        return result
+    web = "web" in f["project.platforms"]
+    rules = [STORE_RULES[x] for x in phones]
+    name = (" and ".join(r[0] for r in rules) + " for digital goods and subscriptions sold in the app"
+            + (f"; {pay['name']} for purchases on the website" if web else ""))
+    why = ("Digital goods bought inside a phone app go through the store's own billing: " + "; ".join(r[1] for r in rules)
+           + "." + (f" Purchases on the website can still use {pay['name']}." if web else "")
+           + " Physical goods and services used outside the app are the exception, paid through a card processor.")
+    new = {"role": "Payments", "name": name, "why": why, "source": rules[0][2]}
+    return dict(result, supporting_services=[new if s is pay else s for s in result["supporting_services"]])
 
 
 def _platform_notes(f: dict, notes: list[str], warns: list[dict]) -> None:
@@ -1106,7 +1143,7 @@ def run(doc) -> dict:
             s["role"] == "Search" for s in result.get("supporting_services", []) + result.get("deferred_services", [])):
         assumptions.append("requirements.full_text_search is false, so no search service is recommended, although "
                            "projects of this type usually add one")
-    result = _reuse_services(result, fields)
+    result = _store_billing(_reuse_services(result, fields), fields)
     stack = {l: _component(l, result["stack"][l], origin, fields, result) for l in LAYERS}
     stack["supporting"] = _supporting(result, fields)
     style = _style(result)

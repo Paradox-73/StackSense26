@@ -41,6 +41,23 @@
         "open": true,
         "when": {
           "kind": [
+            "game"
+          ]
+        },
+        "text": "{name} is the game client for {app_phrase} with about {users} {user_noun} (~{peak} requests/s at peak), built by {team_phrase} in {weeks} weeks."
+      },
+      {
+        "when": {
+          "kind": [
+            "game"
+          ]
+        },
+        "text": "One engine project builds the game for every platform you target, and the server side is only the API and services it calls."
+      },
+      {
+        "open": true,
+        "when": {
+          "kind": [
             "desktop"
           ]
         },

@@ -744,7 +744,7 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
         _provided_by_baas(layers_out["hosting"], stack_items)
 
     companion = None
-    if d["mobile"] and d["web"] and not d.get("one_codebase"):
+    if d["mobile"] and d["web"] and not d.get("one_codebase") and stack_items["frontend"].get("kind") != "game":
         # The other half of a web + mobile project: a mobile app beside a web frontend, or (for a
         # mobile-first app whose primary frontend is a mobile toolkit) a web app beside the mobile app.
         mobile_primary = stack_items["frontend"].get("kind") == "mobile"
@@ -794,12 +794,20 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
             detail += (f" The database is sized for ~{d['data_12mo_gb']:,.0f} GB of data in 12 months, an estimated size "
                        "(you gave no data volume); state your data volume for a firmer figure.")
         if min_cost > d["budget_usd"]:
-            # Said from the stack shown: its own bill, and why it is above the cheapest compliant hosting + database.
-            pair = sum(x["low"] for x in cost["lines"] if x["component"].split(":")[0] in ("Hosting", "Database"))
-            res = (f"No feasible combination fits: the cheapest compliant hosting + database alone costs about {_money(min_cost, p)}. "
-                   f"The stack shown starts at {_money(cost['total_low'], p)}, {_money(pair, p)} of it for its hosting and database"
-                   + (", which scored higher on your other priorities than the cheapest pair" if pair > min_cost + 0.5 else "")
-                   + ". Cost was weighted up. Raise the budget or reduce scale/compliance scope.")
+            # Said from the stack shown: its own bill, and why it is above the cheapest compliant hosting + database. A
+            # backend service's line covers its hosting and database too.
+            parts = ("Hosting", "Database") + (("Backend",) if stack_items["backend"].get("kind") == "baas" else ())
+            pair = sum(x["low"] for x in cost["lines"] if x["component"].split(":")[0] in parts)
+            if cost["total_low"] < min_cost:
+                res = (f"No feasible combination fits: the stack shown starts at {_money(cost['total_low'], p)}, below the "
+                       f"cheapest compliant separate hosting + database ({_money(min_cost, p)}), and is still above the budget. ")
+            else:
+                res = (f"No feasible combination fits: the cheapest compliant hosting + database alone costs about "
+                       f"{_money(min_cost, p)}. The stack shown starts at {_money(cost['total_low'], p)}, "
+                       f"{_money(pair, p)} of it for its hosting and database"
+                       + (", which scored higher on your other priorities than the cheapest pair" if pair > min_cost + 0.5
+                          else "") + ". ")
+            res += "Cost was weighted up. Raise the budget or reduce scale/compliance scope."
         else:
             res = "A cheaper stack exists but scored lower on your other priorities; see the 'Budget cut' scenario under 'What would change'."
         core["warnings"].append(_warn("BUDGET_INFEASIBLE" if min_cost > d["budget_usd"] else "BUDGET_STRETCH",

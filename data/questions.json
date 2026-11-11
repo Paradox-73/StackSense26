@@ -187,6 +187,10 @@
             {
               "value": "user_code",
               "label": "Run code that users submit"
+            },
+            {
+              "value": "game_client",
+              "label": "A game client built in a game engine (Unity, Unreal Engine)"
             }
           ],
           "help": "Each one adds a specialised service the four main picks do not cover, usually billed by use: video minutes, map loads, SMS messages or data served (egress). Two also change the picks: running users' code needs a host with long-running workers (functions-only hosts such as Vercel, Netlify, Cloudflare Workers and Lambda are excluded), and live location raises realtime to at least 'some'.",

@@ -898,3 +898,68 @@ def test_a_desktop_app_beside_the_web_frontend_uses_the_team_language(languages,
     desktop = [s["choice"] for s in out["stack"]["supporting"] if s["layer"] == "other" and "desktop" in s["choice"].lower()
                or s["choice"].startswith(("Qt", "Tauri", ".NET MAUI", "Electron"))]
     assert len(desktop) == 1 and desktop[0].startswith(toolkit), desktop
+
+
+def game(languages: list[str], realtime: bool, platforms=("android", "ios"), **extra) -> dict:
+    doc = load("P6")
+    doc["project"].update(type="gaming", platforms=list(platforms))
+    doc["team"].update(languages=languages, size=extra.get("size", 6), experience="intermediate")
+    doc["requirements"].update(realtime=realtime, payments=True, offline_support=False)
+    doc["scale"].update(users_12_months=extra.get("users", 200000), peak_concurrent_users=extra.get("peak", 20000))
+    doc["budget"]["monthly_infra_usd"] = extra.get("budget", 20000)
+    doc["infrastructure"].update(cloud_preference=extra.get("cloud", "any"))
+    return run(doc)
+
+
+@pytest.mark.parametrize("languages,engine", [(["C++"], "Unreal Engine (C++)"), (["csharp"], "Unity (C#)")])
+def test_a_game_client_is_built_in_the_engine_of_the_team_language(languages, engine):
+    out = game(languages, realtime=True)
+    assert out["stack"]["frontend"]["choice"] == engine, out["stack"]["frontend"]["choice"]
+
+
+@pytest.mark.parametrize("cloud,servers", [("aws", "Amazon GameLift Servers"), ("any", "Agones")])
+def test_a_live_game_gets_dedicated_game_servers(cloud, servers):
+    out = game(["C++"], realtime=True, cloud=cloud)
+    live = [s["choice"] for s in out["stack"]["supporting"] if s["layer"] == "realtime"]
+    assert any(c.startswith(servers) for c in live), live
+
+
+def test_a_turn_based_game_keeps_realtime_off():
+    out = game(["csharp"], realtime=False, size=1, users=5000, peak=300, budget=50)
+    codes_seen = {w["code"] for w in out["warnings"]}
+    assert "IMPLIED_REALTIME" not in codes_seen, codes_seen
+    parts = [s["layer"] + ": " + s["choice"] for s in out["stack"]["supporting"]]
+    assert not [p for p in parts if p.startswith("realtime")], parts
+    assert any("realtime stays off" in a for a in out["assumptions"])
+
+
+@pytest.mark.parametrize("platforms,stores", [(["android", "ios"], ["Google Play Billing", "App Store In-App Purchase"]),
+                                              (["ios"], ["App Store In-App Purchase"])])
+def test_a_phone_app_sells_digital_goods_through_the_store(platforms, stores):
+    out = game(["csharp"], realtime=False, platforms=platforms)
+    pay = [s for s in out["stack"]["supporting"] if s["layer"] == "payments"]
+    assert len(pay) == 1 and all(x in pay[0]["choice"] for x in stores) and "Stripe" not in pay[0]["choice"], pay
+    assert "3.1.1" in pay[0]["justification"] if "ios" in platforms else True
+    shop = edited("P2", project={"platforms": ["android", "ios"]})
+    assert not [s for s in shop["stack"]["supporting"] if s["layer"] == "payments" and "In-App" in s["choice"]]
+
+
+def test_budget_lines_agree_for_a_stack_on_a_backend_service():
+    doc = load("P6")
+    doc["project"]["platforms"], doc["team"]["languages"] = ["ios"], ["swift"]
+    doc["scale"].update(users_12_months=400000, peak_concurrent_users=6000)
+    doc["budget"]["monthly_infra_usd"] = 50
+    out = run(doc)
+    assert "BUDGET_INFEASIBLE" in codes(out) and "BaaS" in out["stack"]["backend"]["choice"], out["stack"]["backend"]
+    for w in out["warnings"]:
+        if w["code"] == "BUDGET_INFEASIBLE":
+            floor = re.search(r"hosting \+ database alone costs about \$([\d,]+)", w["message"])
+            shown = int(re.search(r"[Tt]he stack shown starts at \$([\d,]+)", w["message"]).group(1).replace(",", ""))
+            assert not floor or shown >= int(floor.group(1).replace(",", "")), w["message"]
+            assert "$0/month of it" not in w["message"], w["message"]
+
+
+def test_a_web_game_without_an_engine_client_gets_no_game_servers():
+    out = game(["typescript"], realtime=True, platforms=["web"])
+    assert out["stack"]["frontend"]["choice"] not in ("Unity (C#)", "Unreal Engine (C++)")
+    assert not [s for s in out["stack"]["supporting"] if s["choice"].startswith(("Agones", "Amazon GameLift"))]

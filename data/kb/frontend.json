@@ -726,6 +726,97 @@
       "sources": [
         "https://www.electronjs.org/docs/latest/"
       ]
+    },
+    {
+      "id": "unity",
+      "name": "Unity (C#)",
+      "kind": "game",
+      "platforms": [
+        "ios",
+        "android",
+        "web",
+        "desktop"
+      ],
+      "summary": "Game engine scripted in C#; one project builds the game for Android, iOS, the web, Windows, macOS and Linux.",
+      "scores": {
+        "ease": 3,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 4,
+        "performance": 4,
+        "seo": 1,
+        "velocity": 4,
+        "hiring": 4,
+        "offline": 4,
+        "structure": 4,
+        "interactivity": 5
+      },
+      "skills": [
+        "csharp"
+      ],
+      "related_skills": [
+        "java",
+        "cpp"
+      ],
+      "team_min": 1,
+      "lock_in": 3,
+      "strengths": [
+        "One project builds the game for Android, iOS, the web and desktop",
+        "Scripts in C#, which the team may already write"
+      ],
+      "weaknesses": [
+        "The engine's own editor, build pipeline and asset workflow to learn",
+        "Engine licence terms set by Unity"
+      ],
+      "sources": [
+        "https://docs.unity.com/en-us/engine/current/manual/platform-specific",
+        "https://docs.unity.com/en-us/engine/current/manual/scripting"
+      ]
+    },
+    {
+      "id": "unreal",
+      "name": "Unreal Engine (C++)",
+      "kind": "game",
+      "platforms": [
+        "ios",
+        "android",
+        "desktop"
+      ],
+      "summary": "Epic Games' engine with gameplay classes in C++; releases games for Windows, iOS, Android and consoles.",
+      "scores": {
+        "ease": 2,
+        "ops": 4,
+        "maturity": 5,
+        "realtime": 5,
+        "performance": 5,
+        "seo": 1,
+        "velocity": 3,
+        "hiring": 3,
+        "offline": 4,
+        "structure": 4,
+        "interactivity": 5
+      },
+      "skills": [
+        "cpp"
+      ],
+      "related_skills": [
+        "c",
+        "csharp"
+      ],
+      "team_min": 2,
+      "lock_in": 3,
+      "strengths": [
+        "High-end rendering and performance for action games",
+        "Gameplay classes in C++"
+      ],
+      "weaknesses": [
+        "No web build target",
+        "A steep learning curve and large builds"
+      ],
+      "sources": [
+        "https://dev.epicgames.com/documentation/en-us/unreal-engine/sharing-and-releasing-projects-for-unreal-engine",
+        "https://dev.epicgames.com/documentation/en-us/unreal-engine/programming-with-cplusplus-in-unreal-engine"
+      ]
     }
   ]
 }

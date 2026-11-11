@@ -74,7 +74,7 @@ def test_api_host_passes_the_hard_constraints():
     seen = 0
     # Split hosting needs a frontend platform and a server backend; most random projects now state long-running or
     # GPU work or many open connections, which rule the platform out, so two seeds that hold such projects are used.
-    for inp in profiles(9, 60) + profiles(11, 60):
+    for inp in profiles(3, 60) + profiles(10, 60):
         r = recommend(inp, with_counterfactuals=False)
         if not r.get("feasible"):
             continue

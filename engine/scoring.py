@@ -691,6 +691,13 @@ def hard_constraints(layer: str, item: dict, p: dict, d: dict) -> list[tuple[str
                 out.append(("API only: there is no user interface to build" if d.get("api_only") else
                             "You target a user interface, so a frontend is needed", "platforms", 0))
             return out
+        if kind == "game":  # a game engine builds the whole client, for games only, on every platform it covers
+            game = "game_client" in (p.get("special_workloads") or [])
+            missing = [x for x in p["platforms"] if x != "api_only" and x not in item.get("platforms", [])]
+            if not game or missing:
+                out.append(("Game engine; the project is not a game" if not game else
+                            f"Game engine without a {', '.join(missing)} build", "platforms", 0))
+            return out
         if bool(d.get("desktop_only")) != (kind == "desktop"):
             out.append(("Not a desktop toolkit; you target desktop only" if d.get("desktop_only") else
                         "Desktop toolkit; desktop is not your only client, so one is suggested beside the main frontend"
@@ -1148,11 +1155,12 @@ def adjustments(layer: str, item: dict, p: dict, d: dict, best_fit: tuple | None
         # list: every engineer learns a new server language (and its libraries) while building the product.
         a(-UNFAMILIAR_BACKEND_PENALTY, "team_skills",
           f"Nobody on the team listed {item['name'].split(' + ')[0]} or a closely related skill: a new server language to learn")
-    if layer == "frontend" and kind == "desktop" and d["skills"] and skill_fit(item, d["skills"]) <= UNFAMILIAR_SKILL_FIT:
-        # A desktop app is the whole client in the toolkit's language, so an unknown one costs like a backend's.
+    if layer == "frontend" and kind in ("desktop", "game") and d["skills"] and \
+            skill_fit(item, d["skills"]) <= UNFAMILIAR_SKILL_FIT:
+        # A desktop app or a game is the whole client in the toolkit's language, so an unknown one costs like a backend's.
         a(-UNFAMILIAR_BACKEND_PENALTY, "team_skills",
           f"Nobody on the team listed {item['name'].split(' (')[-1].rstrip(')')} or a closely related skill: the "
-          "whole desktop app is in a new language")
+          f"whole {'game' if kind == 'game' else 'desktop app'} is in a new language")
 
     if (
         layer == "backend"
