@@ -487,8 +487,9 @@ def test_an_inference_api_is_a_cpu_scoring_endpoint_only_where_a_scoring_model_f
     assert sage[0].startswith("Amazon SageMaker real-time endpoint") and cost[0].startswith("Model serving: CPU endpoint: $75-180")
     hosted, cost = ml(edited("P3", requirements={"ml_features": "inference_api"}))  # a whiteboard calls a hosted model
     assert "endpoint for your own model" not in hosted[0] and cost[0].startswith("Model serving: inference")
-    inline, cost = ml(edited("P4", infrastructure={"cloud_preference": "none"}))  # functions only: no container
-    assert "inside the API's functions" in inline[0] and not cost, (inline, cost)
+    apart, cost = ml(edited("P4", infrastructure={"cloud_preference": "none"}))  # functions only: a service apart
+    assert "service of its own that the API's functions call" in apart[0] and cost[0].startswith(
+        "Model serving: CPU endpoint: $75-180"), (apart, cost)
 
 
 def test_each_service_stays_on_the_named_cloud_and_the_deployment_model():
@@ -610,3 +611,16 @@ def test_the_scoring_endpoint_band_names_sagemaker_as_the_service_only_on_aws(in
     assert ml and service in ml[0] and line, (ml, line)
     assert ("SageMaker's list prices, used as a reference" in line[0]) == reference, line
     assert reference == ("SageMaker" not in ml[0]), ml
+
+
+@pytest.mark.parametrize("base,sections,style", [
+    ("P4", {"infrastructure": {"cloud_preference": "none"}}, "modular_monolith"),  # the API runs as Vercel functions
+    ("P1", {"project": {"type": "fintech"}, "requirements": {"ml_features": "inference_api"}}, "static")])  # Netlify static
+def test_a_scoring_model_beside_functions_or_a_static_site_gets_a_service_of_its_own(base, sections, style):
+    """ONNX Runtime's Node.js package unpacks to 308 MB, over the 250 MB Vercel allows a function, and a static site
+    runs no server code: either way the model runs as a small CPU service of its own, priced like the endpoint."""
+    out = edited(base, **sections)
+    ml = [s["choice"] for s in out["stack"]["supporting"] if s["layer"] == "ml"]
+    cost = [a for a in out["estimated_monthly_cost_usd"]["assumptions"] if a.startswith("Model serving: CPU endpoint")]
+    assert out["architecture_style"] == style and ml and "service of its own" in ml[0], ml
+    assert "inside" not in ml[0] and cost and "used as a reference" in cost[0], (ml, cost)

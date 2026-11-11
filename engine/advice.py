@@ -584,11 +584,12 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     if scoring_model(p):
         # A trained scoring or classification model (credit score, fraud score): a CPU endpoint, not an LLM service.
         where = "" if env["hybrid"] or env["self_managed"] else env["cloud"] or ""
-        if not where and host.get("kind") in ("frontend_paas", "faas"):
+        if not where and static:
+            where = "static"  # no server code to run the model beside
+        elif not where and host.get("kind") in ("frontend_paas", "faas"):
             where = "functions"  # a function platform runs no container beside the API
         ml, src = SCORING_SERVING.get(where, SCORING_SERVING["self"])
-        add("Model serving", ml, "Serve the model from its own endpoint, versioned and monitored apart from the web "
-            "tier; a small scoring model runs on CPU.", src)
+        add("Model serving", ml, SCORING_WHY.get(where, SCORING_WHY_DEFAULT), src)
     elif p["app_type"] == "ml_product" or p.get("ml_features", "none") != "none":
         ml = {"gcp": "Vertex AI endpoints", "aws": "Amazon Bedrock / SageMaker", "azure": "Azure AI Foundry"}.get(
             "" if env["hybrid"] or env["self_managed"] else env["cloud"] or "")
@@ -1087,9 +1088,23 @@ SCORING_SERVING = {
               "https://learn.microsoft.com/azure/machine-learning/concept-endpoints-online"),
     "self": ("Your own model in a CPU container beside the API (BentoML, or ONNX Runtime behind a small HTTP service)",
              "https://docs.bentoml.com/"),
-    "functions": ("Your model exported to ONNX and run inside the API's functions (ONNX Runtime), with no server of its own",
-                  "https://onnxruntime.ai/docs/get-started/with-javascript/node.html"),
+    "functions": ("Your own model as a small CPU container service of its own that the API's functions call (BentoML, or "
+                  "ONNX Runtime behind a small HTTP service), in the stack's region",
+                  "https://vercel.com/docs/functions/limitations"),
+    "static": ("Your own model as a small CPU container service of its own (BentoML, or ONNX Runtime behind a small HTTP "
+               "service), in the stack's region: the site runs no server code", "https://docs.bentoml.com/"),
 }
+SCORING_WHY = {
+    # onnxruntime-node 1.31.1: unpackedSize 307,626,018 bytes (registry.npmjs.org/onnxruntime-node/1.31.1); function
+    # limits: vercel.com/docs/functions/limitations, developers.cloudflare.com/workers/platform/limits/.
+    "functions": "A function's size is capped (250 MB for a Node.js function on Vercel, 64 MiB for a Cloudflare Worker) "
+                 "and ONNX Runtime's Node.js package alone unpacks to 308 MB, so the model runs apart from the functions, "
+                 "versioned and monitored on its own; a small scoring model runs on CPU.",
+    "static": "With no server code in the stack, the model needs an endpoint of its own, versioned and monitored apart "
+              "from the pages; a small scoring model runs on CPU.",
+}
+SCORING_WHY_DEFAULT = ("Serve the model from its own endpoint, versioned and monitored apart from the web tier; a small "
+                       "scoring model runs on CPU.")
 
 
 def scoring_model(p: dict) -> bool:
@@ -1281,7 +1296,7 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
             line(s["role"], *s["usage"])
         elif s.get("tier_usage") and not usage:
             line(s["role"], *s["tier_usage"])
-        if s["role"] == "Model serving" and scoring_model(p) and s["name"] != SCORING_SERVING["functions"][0]:
+        if s["role"] == "Model serving" and scoring_model(p):
             sagemaker = ("one ml.c5.large at $0.102 an hour to two ml.m5.large at $0.115-0.121 (US East, Mumbai), "
                          "https://aws.amazon.com/sagemaker/pricing/")
             line("Model serving: CPU endpoint", *SCORING_ENDPOINT_USD,
@@ -1289,8 +1304,6 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
                  if s["name"] == SCORING_SERVING["aws"][0] else
                  "one or two always-on CPU instances serving the model, priced at Amazon SageMaker's list prices, used "
                  "as a reference for that capacity (SageMaker is not the service here): " + sagemaker)
-        elif s["role"] == "Model serving" and scoring_model(p):
-            pass  # the model runs inside the API's functions, already priced with them
         elif s["role"] == "Model serving" and usage and not _env(p, host)["onprem"]:
             tokens = p["dau"] * 30 * MODEL_CALLS_PER_USER_DAY * MODEL_TOKENS_PER_CALL
             line("Model serving: inference", tokens / 1e6 * MODEL_USD_PER_M_TOKENS[0], tokens / 1e6 * MODEL_USD_PER_M_TOKENS[1],
