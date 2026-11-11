@@ -1282,9 +1282,13 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
         elif s.get("tier_usage") and not usage:
             line(s["role"], *s["tier_usage"])
         if s["role"] == "Model serving" and scoring_model(p) and s["name"] != SCORING_SERVING["functions"][0]:
+            sagemaker = ("one ml.c5.large at $0.102 an hour to two ml.m5.large at $0.115-0.121 (US East, Mumbai), "
+                         "https://aws.amazon.com/sagemaker/pricing/")
             line("Model serving: CPU endpoint", *SCORING_ENDPOINT_USD,
-                 "one or two always-on CPU instances behind a real-time endpoint: one ml.c5.large at $0.102 an hour to "
-                 "two ml.m5.large at $0.115-0.121 (US East, Mumbai), https://aws.amazon.com/sagemaker/pricing/")
+                 "one or two always-on CPU instances behind a real-time endpoint: " + sagemaker
+                 if s["name"] == SCORING_SERVING["aws"][0] else
+                 "one or two always-on CPU instances serving the model, priced at Amazon SageMaker's list prices, used "
+                 "as a reference for that capacity (SageMaker is not the service here): " + sagemaker)
         elif s["role"] == "Model serving" and scoring_model(p):
             pass  # the model runs inside the API's functions, already priced with them
         elif s["role"] == "Model serving" and usage and not _env(p, host)["onprem"]:

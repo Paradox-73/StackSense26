@@ -596,3 +596,17 @@ def test_a_go_server_never_runs_on_cloudflare_workers(langs):
     out = run(edit("P3", team={"languages": langs}, compliance=["gdpr", "pci_dss"], infrastructure={"cloud_preference": "none"}))
     host, backend = out["stack"]["hosting"]["choice"], out["stack"]["backend"]["choice"]
     assert not (host.startswith("Cloudflare") and "for the API" not in host and backend.startswith("Go")), (backend, host)
+
+
+@pytest.mark.parametrize("infra,service,reference", [
+    ({}, "Amazon SageMaker", False), ({"cloud_preference": "gcp"}, "Vertex AI", True),
+    ({"cloud_preference": "azure"}, "Azure Machine Learning", True), ({"deployment_model": "self_hosted_cloud_vm"}, "CPU container", True)])
+def test_the_scoring_endpoint_band_names_sagemaker_as_the_service_only_on_aws(infra, service, reference):
+    """The $75-180 band is SageMaker's list price. Off AWS it is a reference price, and the endpoint in use is the
+    cloud's own or the team's container."""
+    out = edited("P4", infrastructure=infra)
+    ml = [s["choice"] for s in out["stack"]["supporting"] if s["layer"] == "ml"]
+    line = [a for a in out["estimated_monthly_cost_usd"]["assumptions"] if a.startswith("Model serving: CPU endpoint")]
+    assert ml and service in ml[0] and line, (ml, line)
+    assert ("SageMaker's list prices, used as a reference" in line[0]) == reference, line
+    assert reference == ("SageMaker" not in ml[0]), ml
