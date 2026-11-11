@@ -211,7 +211,7 @@ Suggested offering: Timescale Cloud (Tiger Data) on AWS
 
 **Alternatives**
 - PostgreSQL (stack 81.8, -4.2): Scores 62.5 on its own; its stack is 4.2 stack points behind the pick.
-- Microsoft SQL Server / Azure SQL Database (stack 80.5, -5.5): Scores 57.3 on its own; its stack is 5.5 stack points behind the pick.
+- Microsoft SQL Server (stack 80.5, -5.5): Scores 57.3 on its own; its stack is 5.5 stack points behind the pick.
 
 **Why not the others?**
 - Why not PostgreSQL? (runner-up) Swapping it in lowers the stack score by 4.2 points. TimescaleDB (Postgres) is stronger on data-model fit (4.5 vs 3.5); PostgreSQL is stronger on ecosystem maturity (5.0 vs 4.0), realtime fit (3.0 vs 2.0); PostgreSQL takes a penalty: Only 3/5 fit for your primary 'time series' data.
@@ -283,6 +283,10 @@ Runs here: the Go API as long-running processes. React SPA is built to static fi
 **Excluded by hard constraints**
 - Cloudflare Pages + Workers: Keeping data and TLS termination inside India or the EU needs the Data Localization Suite, an Enterprise add-on; treated as not meeting a residency rule.
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
 - AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs

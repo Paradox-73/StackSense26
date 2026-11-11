@@ -152,7 +152,7 @@ Firebase (BaaS on Google Cloud) serves the API at about 0.1 requests/s at peak (
 - Why not Serverless functions (Node/Python FaaS)? (runner-up) Swapping it in lowers the stack score by 4.5 points. Firebase (BaaS on Google Cloud) is stronger on realtime fit (5.0 vs 1.0), learning curve (5.0 vs 4.0); Serverless functions (Node/Python FaaS) is stronger on team skill match (3.5 vs 3.0), portability (low lock-in) (3.0 vs 1.0).
 - Why not Node.js + Express? (popular choice) Swapping it in lowers the stack score by 5.8 points. Firebase (BaaS on Google Cloud) is stronger on development speed (5.0 vs 4.0), low ops burden (5.0 vs 4.0); Node.js + Express is stronger on team skill match (4.5 vs 3.0), portability (low lock-in) (5.0 vs 1.0).
 - Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 17.4 points. Firebase (BaaS on Google Cloud) is stronger on team skill match (3.0 vs 1.5), learning curve (5.0 vs 4.0); Python + Django is stronger on structure for large teams (4.0 vs 1.0), portability (low lock-in) (5.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn.
-- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 20.2 points. Firebase (BaaS on Google Cloud) is stronger on learning curve (5.0 vs 2.0), development speed (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on structure for large teams (5.0 vs 1.0), portability (low lock-in) (5.0 vs 1.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
+- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 39.2 points. Firebase (BaaS on Google Cloud) is stronger on learning curve (5.0 vs 2.0), development speed (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on structure for large teams (5.0 vs 1.0), portability (low lock-in) (5.0 vs 1.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
 
 **Excluded by hard constraints**
 - No server code (static site): Only for read-only sites; your users sign in, post or pay
@@ -277,6 +277,10 @@ Runs here: React SPA (static files). Firebase runs the API, auth and database as
 
 **Excluded by hard constraints**
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
 - AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs
@@ -316,7 +320,8 @@ About ₹0-₹0 per month. Budget status: **within**. Planning estimate from pub
 - **Low tolerance for vendor lock-in**: backend: Firebase (BaaS on Google Cloud) -> Supabase (BaaS on Postgres); database: Cloud Firestore -> PostgreSQL
   - Why backend changes: Firebase (BaaS on Google Cloud) is now ruled out: Proprietary API with the highest lock-in; you asked for low lock-in.
   - Why database changes: Cloud Firestore is now ruled out: Proprietary API with the highest lock-in; you asked for low lock-in.
-- **HIPAA compliance required**: backend: Firebase (BaaS on Google Cloud) -> Node.js + Express; hosting: Vercel -> Google Cloud Run
+- **HIPAA compliance required**: frontend: React SPA (Vite) -> Next.js (React); backend: Firebase (BaaS on Google Cloud) -> Node.js + Express; hosting: Vercel -> Google Cloud Run
+  - Why frontend changes: Low ops burden, where React SPA (Vite) leads (5.0/5 vs 4.0/5), counts for less now (share of the total weight fell; gap 0.1 points toward Next.js (React)); on its own React SPA (Vite) still scores 5.9 higher, so Next.js (React) wins as part of the whole stack (a stack rule now applies: One language across the stack: shared types, shared validation, any developer can work on any layer).
   - Why backend changes: Firebase (BaaS on Google Cloud) is now ruled out: No HIPAA Business Associate Agreement available.
   - Why hosting changes: Vercel now takes a penalty (No free option at your scale (from ~$350/month)), moving the gap 37.3 points toward Google Cloud Run; cost at your scale moved the gap 28.1 points toward Google Cloud Run (Google Cloud Run 4.3/5 vs Vercel 1.0/5, was 4.3 vs 5.0).
 
@@ -347,4 +352,6 @@ About ₹0-₹0 per month. Budget status: **within**. Planning estimate from pub
 - https://vercel.com/docs/limits/fair-use-guidelines
 - https://vercel.com/security
 - https://vercel.com/kb/guide/do-vercel-serverless-functions-support-websocket-connections
+- https://vercel.com/docs/functions/configuring-functions/region
+- https://vercel.com/docs/security/compliance
 - https://vite.dev/guide/static-deploy

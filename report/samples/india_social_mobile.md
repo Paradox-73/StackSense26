@@ -160,7 +160,7 @@ Firebase (BaaS on Google Cloud) serves the API at about 1,389 requests/s at peak
 **Why not the others?**
 - Why not Node.js + Express? (runner-up) Swapping it in lowers the stack score by 11.5 points. Firebase (BaaS on Google Cloud) is stronger on realtime fit (5.0 vs 4.0), scalability (5.0 vs 4.0); Node.js + Express is stronger on cost at your scale (5.0 vs 3.4), team skill match (5.0 vs 4.5).
 - Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 25.4 points. Firebase (BaaS on Google Cloud) is stronger on realtime fit (5.0 vs 2.0), team skill match (4.5 vs 1.5); Python + Django is stronger on cost at your scale (5.0 vs 3.4), structure for large teams (4.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn.
-- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 22.8 points. Firebase (BaaS on Google Cloud) is stronger on team skill match (4.5 vs 1.5), realtime fit (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on cost at your scale (5.0 vs 3.4), structure for large teams (5.0 vs 1.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
+- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 41.8 points. Firebase (BaaS on Google Cloud) is stronger on team skill match (4.5 vs 1.5), realtime fit (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on cost at your scale (5.0 vs 3.4), structure for large teams (5.0 vs 1.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
 
 **Excluded by hard constraints**
 - No server code (static site): Only for read-only sites; your users sign in, post or pay
@@ -266,6 +266,10 @@ With about 100,000 daily users on iOS and Android, nothing of yours needs separa
 
 **Excluded by hard constraints**
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
 - AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs

@@ -131,13 +131,13 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - database: Cloud Firestore: https://firebase.google.com/docs/firestore/manage-data/enable-offline
 - database: No database (content files in git): https://docs.astro.build/en/guides/content-collections/
 - database: No database (content files in git): https://developers.cloudflare.com/pages/framework-guides/
-- database: Microsoft SQL Server / Azure SQL Database: https://learn.microsoft.com/en-us/sql/sql-server/
-- database: Microsoft SQL Server / Azure SQL Database: https://learn.microsoft.com/en-us/azure/azure-sql/database/sql-database-paas-overview
-- database: Microsoft SQL Server / Azure SQL Database: https://learn.microsoft.com/en-us/azure/azure-sql/database/free-offer
-- database: Microsoft SQL Server / Azure SQL Database: https://azure.microsoft.com/en-us/pricing/details/azure-sql-database/single/
-- database: Microsoft SQL Server / Azure SQL Database: https://aws.amazon.com/rds/sqlserver/pricing/
-- database: Microsoft SQL Server / Azure SQL Database: https://cloud.google.com/sql/docs/sqlserver
-- database: Microsoft SQL Server / Azure SQL Database: https://learn.microsoft.com/en-us/ef/core/providers/sql-server/
+- database: Microsoft SQL Server: https://learn.microsoft.com/en-us/sql/sql-server/
+- database: Microsoft SQL Server: https://learn.microsoft.com/en-us/azure/azure-sql/database/sql-database-paas-overview
+- database: Microsoft SQL Server: https://learn.microsoft.com/en-us/azure/azure-sql/database/free-offer
+- database: Microsoft SQL Server: https://azure.microsoft.com/en-us/pricing/details/azure-sql-database/single/
+- database: Microsoft SQL Server: https://aws.amazon.com/rds/sqlserver/pricing/
+- database: Microsoft SQL Server: https://cloud.google.com/sql/docs/sqlserver
+- database: Microsoft SQL Server: https://learn.microsoft.com/en-us/ef/core/providers/sql-server/
 - database: Google BigQuery: https://cloud.google.com/bigquery/docs/introduction
 - database: Google BigQuery: https://cloud.google.com/bigquery/pricing
 - database: Google BigQuery: https://cloud.google.com/bigquery/quotas
@@ -147,16 +147,20 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - hosting: Vercel: https://vercel.com/docs/limits/fair-use-guidelines
 - hosting: Vercel: https://vercel.com/security
 - hosting: Vercel: https://vercel.com/kb/guide/do-vercel-serverless-functions-support-websocket-connections
+- hosting: Vercel: https://vercel.com/docs/functions/configuring-functions/region
+- hosting: Vercel: https://vercel.com/docs/security/compliance
 - hosting: Netlify: https://docs.netlify.com/
 - hosting: Netlify: https://www.netlify.com/pricing/
 - hosting: Netlify: https://docs.netlify.com/functions/optional-configuration/
+- hosting: Netlify: https://docs.netlify.com/build/caching/caching-overview/
+- hosting: Netlify: https://www.netlify.com/legal/subprocessors/
 - hosting: Cloudflare Pages + Workers: https://developers.cloudflare.com/workers/platform/pricing/
 - hosting: Cloudflare Pages + Workers: https://developers.cloudflare.com/durable-objects/
 - hosting: Cloudflare Pages + Workers: https://www.cloudflare.com/trust-hub/compliance-resources/
 - hosting: Cloudflare Pages + Workers: https://developers.cloudflare.com/data-localization/region-support/
+- hosting: Render: https://render.com/docs/regions
 - hosting: Render: https://render.com/docs
 - hosting: Render: https://render.com/pricing
-- hosting: Render: https://render.com/docs/regions
 - hosting: Render: https://render.com/docs/hipaa-compliance
 - hosting: Render: https://render.com/docs/disks
 - hosting: Render: https://render.com/docs/free
@@ -188,6 +192,22 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - hosting: AWS S3 + CloudFront (static): https://aws.amazon.com/s3/pricing/
 - hosting: AWS S3 + CloudFront (static): https://nextjs.org/docs/app/guides/static-exports
 - hosting: AWS S3 + CloudFront (static): https://aws.amazon.com/cloudfront/sla/
+- hosting: Firebase Hosting (static): https://firebase.google.com/docs/hosting
+- hosting: Firebase Hosting (static): https://firebase.google.com/terms/service-level-agreement
+- hosting: Google Cloud Storage + Cloud CDN (static): https://cloud.google.com/storage/docs/hosting-static-website
+- hosting: Google Cloud Storage + Cloud CDN (static): https://cloud.google.com/vpc/network-pricing
+- hosting: Google Cloud Storage + Cloud CDN (static): https://cloud.google.com/cdn/pricing
+- hosting: Google Cloud Storage + Cloud CDN (static): https://cloud.google.com/storage/docs/locations
+- hosting: Google Cloud Storage + Cloud CDN (static): https://cloud.google.com/storage/sla
+- hosting: Google Cloud Storage + Cloud CDN (static): https://cloud.google.com/cdn/sla
+- hosting: Azure Static Web Apps: https://learn.microsoft.com/en-us/azure/static-web-apps/overview
+- hosting: Azure Static Web Apps: https://learn.microsoft.com/en-us/azure/static-web-apps/plans
+- hosting: Azure Static Web Apps: https://azure.microsoft.com/en-us/pricing/details/app-service/static/
+- hosting: Azure Static Web Apps: https://learn.microsoft.com/en-us/azure/static-web-apps/faq
+- hosting: Azure Blob Storage + Front Door (static): https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-static-website
+- hosting: Azure Blob Storage + Front Door (static): https://azure.microsoft.com/en-us/pricing/details/frontdoor/
+- hosting: Azure Blob Storage + Front Door (static): https://learn.microsoft.com/en-us/azure/cdn/classic-cdn-retirement-faq
+- hosting: Azure Blob Storage + Front Door (static): https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services
 - hosting: Google Cloud Run: https://cloud.google.com/run/docs
 - hosting: Google Cloud Run: https://cloud.google.com/run/pricing
 - hosting: Google Cloud Run: https://cloud.google.com/run/docs/triggering/websockets
@@ -202,8 +222,8 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - hosting: Azure App Service / Container Apps: https://learn.microsoft.com/azure/container-apps/overview
 - hosting: Azure App Service / Container Apps: https://learn.microsoft.com/azure/compliance/offerings/offering-hipaa-us
 - hosting: Azure App Service / Container Apps: https://learn.microsoft.com/en-us/azure/app-service/quickstart-php
-- hosting: Azure App Service / Container Apps: https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services
 - hosting: DigitalOcean (App Platform + Managed DBs): https://docs.digitalocean.com/products/app-platform/
+- hosting: DigitalOcean (App Platform + Managed DBs): https://docs.digitalocean.com/products/app-platform/details/availability/
 - hosting: DigitalOcean (App Platform + Managed DBs): https://www.digitalocean.com/pricing
 - hosting: DigitalOcean (App Platform + Managed DBs): https://www.digitalocean.com/pricing/app-platform
 - hosting: DigitalOcean (App Platform + Managed DBs): https://docs.digitalocean.com/platform/regional-availability/
@@ -232,6 +252,9 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - rule frontend_paas_rdbms_pooling: https://neon.tech/docs/serverless/serverless-driver
 - rule faas_backend_no_faas_host: https://knative.dev/docs/
 - rule heavy_server_on_frontend_paas: https://vercel.com/docs/functions/runtimes
+- rule container_only_language_on_vercel: https://vercel.com/docs/functions/runtimes/container
+- rule container_only_language_on_workers: https://developers.cloudflare.com/workers/languages/
+- rule no_runtime_on_netlify: https://docs.netlify.com/build/functions/get-started/
 - rule light_server_on_lambda: https://github.com/awslabs/aws-lambda-web-adapter
 - rule realtime_flyio: https://fly.io/docs/networking/
 - rule fullstack_typescript: https://www.typescriptlang.org/docs/
@@ -252,7 +275,6 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - rule laravel_orm_nosql_store: https://laravel.com/docs/12.x/database
 - rule phoenix_ecto_nosql_store: https://hexdocs.pm/phoenix/ecto.html
 - rule dotnet_ef_nosql_store: https://learn.microsoft.com/en-us/ef/core/providers/
-- rule static_site_on_server_host: https://cloud.google.com/storage/docs/hosting-static-website
 - rule bigquery_off_gcp: https://cloud.google.com/bigquery/docs/locations
 - hosting: Netlify (compliance maturity): https://www.netlify.com/security/
 - hosting: Render (compliance maturity): https://render.com/security
@@ -261,6 +283,9 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - hosting: AWS ECS on Fargate (compliance maturity): https://aws.amazon.com/compliance/programs/
 - hosting: AWS ECS on Fargate (compliance maturity): https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html
 - hosting: AWS ECS on Fargate (compliance maturity): https://aws.amazon.com/ec2/dedicated-hosts/
+- hosting: Firebase Hosting (static) (compliance maturity): https://cloud.google.com/security/compliance/services-in-scope
+- hosting: Azure Static Web Apps (compliance maturity): https://learn.microsoft.com/en-us/azure/compliance/offerings/cloud-services-in-audit-scope
+- hosting: Azure Blob Storage + Front Door (static) (compliance maturity): https://learn.microsoft.com/en-us/azure/storage/common/storage-compliance-offerings
 - hosting: Google Cloud Run (compliance maturity): https://cloud.google.com/security/compliance/offerings
 - hosting: Google Cloud Run (compliance maturity): https://cloud.google.com/logging/docs/audit
 - hosting: Google Cloud Run (compliance maturity): https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes

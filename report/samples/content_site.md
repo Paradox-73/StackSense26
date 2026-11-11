@@ -148,8 +148,8 @@ The site serves about 20,000 daily users read-only, so the pages are built once 
 **Why not the others?**
 - Why not Serverless functions (Node/Python FaaS)? (runner-up) Swapping it in lowers the stack score by 3.0 points. No server code (static site) is stronger on performance / latency (5.0 vs 3.0), team skill match (4.5 vs 3.5).
 - Why not Node.js + Express? (popular choice) Swapping it in lowers the stack score by 7.6 points. No server code (static site) is stronger on performance / latency (5.0 vs 3.0), low ops burden (5.0 vs 4.0); Node.js + Express is stronger on realtime fit (4.0 vs 1.0).
-- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 17.4 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), performance / latency (5.0 vs 3.0); Python + Django is stronger on structure for large teams (4.0 vs 3.0), realtime fit (2.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn.
-- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 20.2 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 2.0); Java/Kotlin + Spring Boot is stronger on structure for large teams (5.0 vs 3.0), realtime fit (3.0 vs 1.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
+- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 42.4 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), performance / latency (5.0 vs 3.0); Python + Django is stronger on structure for large teams (4.0 vs 3.0), realtime fit (2.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn.
+- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 39.2 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 2.0); Java/Kotlin + Spring Boot is stronger on structure for large teams (5.0 vs 3.0), realtime fit (3.0 vs 1.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
 
 ### Database: No database (content files in git) (91.9)
 
@@ -221,9 +221,9 @@ Netlify hosts the stack for users worldwide at a 99.9% availability target. It s
 Runs here: Next.js as pre-built static pages. No server code and no database: content files are built into pages at deploy time, and the free static plan covers the traffic.
 
 **Why**
-- Cost at your scale: 5.0/5 vs 2.3 average for this layer - weighted up because: Tight budget (~$20/month).
+- Cost at your scale: 5.0/5 vs 2.2 average for this layer - weighted up because: Tight budget (~$20/month).
 - Learning curve: 5.0/5 vs 3.5 average for this layer - weighted up because: 4-week MVP: no time to learn new tools; Solo developer.
-- Low ops burden: 5.0/5 vs 4.1 average for this layer - weighted up because: Solo developer: every hour on ops is lost on product.
+- Low ops burden: 5.0/5 vs 4.3 average for this layer - weighted up because: Solo developer: every hour on ops is lost on product.
 - Team skill match (3.5/5, related): nobody listed Netlify, but JavaScript carries over.
 - Excellent for static/content sites (Astro, Nuxt, SvelteKit)
 - Built-in forms, redirects, split testing
@@ -292,8 +292,8 @@ About ₹0-₹0 per month. Budget status: **within**. Planning estimate from pub
   - Why hosting changes: Vercel no longer takes a penalty (Minimum ~$40/month is 2.0x the whole budget), moving the gap 7.2 points toward Vercel; team skill match moved the gap 0.2 points toward Vercel (Vercel 4.0/5 vs Netlify 3.5/5); on its own Netlify still scores 2.5 higher, so Vercel wins as part of the whole stack (a stack rule now applies: Vercel builds Next.js: ISR, image optimisation, middleware and preview deploys work with zero configuration).
 - **10x more users (200,000 DAU)**: hosting: Netlify -> Cloudflare Pages + Workers
   - Why hosting changes: Cost at your scale moved the gap 3.1 points toward Cloudflare Pages + Workers (Cloudflare Pages + Workers 5.0/5 vs Netlify 4.3/5, was 5.0 vs 5.0).
-- **10x fewer users (2,000 DAU)**: hosting: Netlify -> Vercel
-  - Why hosting changes: Cost at your scale, where Netlify leads (5.0/5 vs 3.5/5), counts for less now (share of the total weight fell; gap 7.9 points toward Vercel); on its own Netlify still scores 7.9 higher, so Vercel wins as part of the whole stack (a stack rule now applies: Vercel builds Next.js: ISR, image optimisation, middleware and preview deploys work with zero configuration).
+- **10x fewer users (2,000 DAU)**: hosting: Netlify -> Firebase Hosting (static)
+  - Why hosting changes: Cost at your scale, where Netlify leads (5.0/5 vs 3.7/5), counts for less now (share of the total weight fell; gap 10.7 points toward Firebase Hosting (static)); on its own Netlify still scores 3.9 higher, so Firebase Hosting (static) wins as part of the whole stack (the other layers changed, and the stack-level compatibility rules or tie-break favour it).
 - **A team of 15 engineers**: hosting: Netlify -> Cloudflare Pages + Workers
   - Why hosting changes: Team skill match moved the gap 1.0 points toward Cloudflare Pages + Workers (Cloudflare Pages + Workers 4.0/5 vs Netlify 3.5/5, weight 3.5 -> 4.5).
 - **Realtime becomes core**: backend: No server code (static site) -> Firebase (BaaS on Google Cloud); database: No database (content files in git) -> Cloud Firestore; hosting: Netlify -> Cloudflare Pages + Workers
@@ -305,7 +305,7 @@ About ₹0-₹0 per month. Budget status: **within**. Planning estimate from pub
 - **HIPAA compliance required**: hosting: Netlify -> AWS S3 + CloudFront (static)
   - Why hosting changes: Netlify is now ruled out: No HIPAA Business Associate Agreement available.
 - **Data must stay in India**: hosting: Netlify -> AWS S3 + CloudFront (static)
-  - Why hosting changes: Netlify is now ruled out: No India region; data must stay in India.
+  - Why hosting changes: Netlify is now ruled out: Netlify serves a static site's files from its global edge and keeps hosting, storage and logs with US providers; a function region moves only where functions run (and their durable cache), so only a US residency rule is met for a static site.
 
 ## Next-best complete stacks
 
@@ -327,3 +327,5 @@ About ₹0-₹0 per month. Budget status: **within**. Planning estimate from pub
 - https://docs.netlify.com/
 - https://www.netlify.com/pricing/
 - https://docs.netlify.com/functions/optional-configuration/
+- https://docs.netlify.com/build/caching/caching-overview/
+- https://www.netlify.com/legal/subprocessors/

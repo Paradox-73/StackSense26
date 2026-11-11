@@ -21,7 +21,7 @@
  "fuzz_rules": 15,
  "fuzz_seed": 2026,
  "glossary_terms": 43,
- "hosting_platforms": 20,
+ "hosting_platforms": 24,
  "llm_acceptable_pct": 94,
  "llm_acceptable_picks": 160,
  "llm_break_briefs": 7,
@@ -31,10 +31,10 @@
  "question_groups": 5,
  "questions": 42,
  "quick_questions": 7,
- "rules": 62,
+ "rules": 65,
  "scenario_fixtures": 8,
- "source_urls": 344,
- "technologies": 60,
- "tests": 947,
- "warning_codes": 51
+ "source_urls": 369,
+ "technologies": 64,
+ "tests": 1005,
+ "warning_codes": 53
 }

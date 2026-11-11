@@ -151,7 +151,7 @@ Supabase (BaaS on Postgres) serves the API at about 4.3 requests/s at peak (Hobb
 - Why not Serverless functions (Node/Python FaaS)? (runner-up) Swapping it in lowers the stack score by 1.0 points. Supabase (BaaS on Postgres) is stronger on realtime fit (4.0 vs 1.0), development speed (5.0 vs 4.0); Serverless functions (Node/Python FaaS) is stronger on team skill match (3.5 vs 3.0), hiring pool (4.0 vs 3.0).
 - Why not Node.js + Express? (highest score in this layer) Swapping it in lowers the stack score by 1.5 points. Supabase (BaaS on Postgres) is stronger on low ops burden (5.0 vs 4.0), development speed (5.0 vs 4.0); Node.js + Express is stronger on team skill match (4.5 vs 3.0), ecosystem maturity (5.0 vs 4.0).
 - Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 12.8 points. Supabase (BaaS on Postgres) is stronger on team skill match (3.0 vs 1.5), low ops burden (5.0 vs 4.0); Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn.
-- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 14.9 points. Supabase (BaaS on Postgres) is stronger on team skill match (3.0 vs 1.5), low ops burden (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on ecosystem maturity (5.0 vs 4.0), hiring pool (5.0 vs 3.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
+- Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 33.9 points. Supabase (BaaS on Postgres) is stronger on team skill match (3.0 vs 1.5), low ops burden (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on ecosystem maturity (5.0 vs 4.0), hiring pool (5.0 vs 3.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
 
 **Excluded by hard constraints**
 - No server code (static site): Only for read-only sites; your users sign in, post or pay
@@ -205,7 +205,7 @@ Suggested offering: Included with Supabase (BaaS on Postgres)
 
 **Alternatives**
 - MySQL (stack 71.2, -13.8): Loses: Supabase is a managed Postgres: auth, row-level security, storage and realtime come with the database. Note: Supabase's value comes from its bundled Postgres; a different primary database removes most of its benefits.
-- Microsoft SQL Server / Azure SQL Database (stack 70.2, -14.8): Loses: Supabase is a managed Postgres: auth, row-level security, storage and realtime come with the database. Note: Supabase's value comes from its bundled Postgres; a different primary database removes most of its benefits.
+- Microsoft SQL Server (stack 70.2, -14.8): Loses: Supabase is a managed Postgres: auth, row-level security, storage and realtime come with the database. Note: Supabase's value comes from its bundled Postgres; a different primary database removes most of its benefits.
 
 **Why not the others?**
 - Why not MySQL? (runner-up) Swapping it in lowers the stack score by 13.8 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0).
@@ -281,6 +281,10 @@ Runs here: Next.js (server rendering + static files). Supabase runs the API, aut
 
 **Excluded by hard constraints**
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
 - AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs

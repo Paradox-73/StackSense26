@@ -12,7 +12,7 @@ For an 'ML / AI product' project at Medium (10k-100k daily users) scale (~69 pea
 |---|---|---|---|---|
 | Frontend | **Next.js (React)** | 87.8 | 3.0, solid (1.5-4 points) | Nuxt (Vue) (-3.0) |
 | Backend | **Python + FastAPI** | 90.0 | 0.7, close call (under 1.5) | Python + Django (-0.7, tie) |
-| Database | **PostgreSQL** | 87.0 | 1.6, solid (1.5-4 points) | Microsoft SQL Server / Azure SQL Database (-1.6) |
+| Database | **PostgreSQL** | 87.0 | 1.6, solid (1.5-4 points) | Microsoft SQL Server (-1.6) |
 | Hosting | **Google Cloud Run** | 99.8 | 2.8, solid (1.5-4 points) | DigitalOcean (App Platform + Managed DBs) (-2.8) |
 
 Stack score: **94.1** / 100 (average of layer scores plus compatibility adjustments).
@@ -159,7 +159,7 @@ Python + FastAPI serves the API at about 69 requests/s at peak (Medium (10k-100k
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 560 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $75-$600 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server / Azure SQL Database, by 1.6 stack points.
+Your data is mainly relational and reaches about 560 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $75-$600 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server, by 1.6 stack points.
 
 Suggested offering: Cloud SQL / AlloyDB for PostgreSQL
 
@@ -176,7 +176,7 @@ Suggested offering: Cloud SQL / AlloyDB for PostgreSQL
 - Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless
 - Connection-per-process model needs PgBouncer/RDS Proxy under serverless
 
-**Versus runner-up:** PostgreSQL beats Microsoft SQL Server / Azure SQL Database by 1.6 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on general quality (baseline weights) (+1.1), realtime needs (+0.3), application type (+0.1).
+**Versus runner-up:** PostgreSQL beats Microsoft SQL Server by 1.6 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on general quality (baseline weights) (+1.1), realtime needs (+0.3), application type (+0.1).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +53.5
@@ -202,11 +202,11 @@ Suggested offering: Cloud SQL / AlloyDB for PostgreSQL
 | Portability (low lock-in) | 5.0 | 0.5 | 2.4 |
 
 **Alternatives**
-- Microsoft SQL Server / Azure SQL Database (stack 92.5, -1.6): Scores 80.5 on its own; its stack is 1.6 stack points behind the pick.
+- Microsoft SQL Server (stack 92.5, -1.6): Scores 80.5 on its own; its stack is 1.6 stack points behind the pick.
 - MySQL (stack 90.1, -4.0): Scores 70.8 on its own; its stack is 4.0 stack points behind the pick.
 
 **Why not the others?**
-- Why not Microsoft SQL Server / Azure SQL Database? (runner-up) Swapping it in lowers the stack score by 1.6 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0), data-model fit (4.7 vs 4.3).
+- Why not Microsoft SQL Server? (runner-up) Swapping it in lowers the stack score by 1.6 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0), data-model fit (4.7 vs 4.3).
 - Why not MySQL? (popular choice) Swapping it in lowers the stack score by 4.0 points. PostgreSQL is stronger on data-model fit (4.7 vs 4.0), realtime fit (3.0 vs 2.0); MySQL takes a penalty: Fits your vector records 2/5, so they would need a second database; PostgreSQL holds all your record shapes.
 - Why not MongoDB? (popular choice) Swapping it in lowers the stack score by 8.1 points. PostgreSQL is stronger on data-model fit (4.7 vs 2.7), consistency fit (5.0 vs 3.5); MongoDB is stronger on realtime fit (4.0 vs 3.0), scalability (5.0 vs 4.0); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data.
 
@@ -279,6 +279,10 @@ Runs here: Next.js (server rendering + static files), the Python + FastAPI API a
 
 **Excluded by hard constraints**
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay; No SOC 2 report available
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay; No SOC 2 report available
 - Hetzner Cloud / VPS (Docker, Coolify): No SOC 2 report available
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
@@ -323,8 +327,8 @@ About ₹35,232-₹439,200 per month. Budget status: **stretch**. Planning estim
 ## Next-best complete stacks
 
 - Next.js (React) + Python + Django + PostgreSQL + Google Cloud Run (93.5, -0.7)
-- Next.js (React) + Python + FastAPI + Microsoft SQL Server / Azure SQL Database + Google Cloud Run (92.5, -1.6)
-- Next.js (React) + Python + Django + Microsoft SQL Server / Azure SQL Database + Google Cloud Run (91.9, -2.3)
+- Next.js (React) + Python + FastAPI + Microsoft SQL Server + Google Cloud Run (92.5, -1.6)
+- Next.js (React) + Python + Django + Microsoft SQL Server + Google Cloud Run (91.9, -2.3)
 
 ## Sources
 

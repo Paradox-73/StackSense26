@@ -206,7 +206,7 @@ Suggested offering: Amazon RDS / Aurora MySQL
 
 **Alternatives**
 - PostgreSQL (stack 93.9, +0.3): Scores 86.3 on its own; its stack is 0.3 stack points ahead of the pick.
-- Microsoft SQL Server / Azure SQL Database (stack 92.6, -1.0): Scores 81.1 on its own; its stack is 1.0 stack points behind the pick.
+- Microsoft SQL Server (stack 92.6, -1.0): Scores 81.1 on its own; its stack is 1.0 stack points behind the pick.
 
 **Why not the others?**
 - Why not PostgreSQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.3 points higher; either is defensible. MySQL is stronger on team skill match (5.0 vs 4.5); PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0).
@@ -291,6 +291,10 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 - Railway: No PCI-DSS attestation published; No India region; data must stay in India; No published SLA, so nothing backs your 99.95% availability target
 - Fly.io: No PCI-DSS attestation published; No India region; data must stay in India; No published SLA, so nothing backs your 99.95% availability target
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (CloudFront distribution), below your 99.95% availability target
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (Cloud Storage Standard class in one region (Cloud CDN: 99.95%)), below your 99.95% availability target
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay; No PCI-DSS attestation published
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay; No PCI-DSS attestation published
 - Google Kubernetes Engine (Autopilot): The provider's SLA is 99.9% (Autopilot Pods in multiple zones (the control plane is 99.95%)), below your 99.95% availability target
 - DigitalOcean (App Platform + Managed DBs): No PCI-DSS attestation published
 - Hetzner Cloud / VPS (Docker, Coolify): The provider's SLA is 99.9% (each Cloud Server), below your 99.95% availability target; No PCI-DSS attestation published; No India region; data must stay in India
@@ -344,7 +348,7 @@ About ₹1,036,800-₹5,472,000 per month. Budget status: **stretch**. Planning 
 ## Next-best complete stacks
 
 - Next.js (React) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes) (93.9, +0.3)
-- Next.js (React) + Java/Kotlin + Spring Boot + Microsoft SQL Server / Azure SQL Database + AWS EKS (Kubernetes) (92.6, -1.0)
+- Next.js (React) + Java/Kotlin + Spring Boot + Microsoft SQL Server + AWS EKS (Kubernetes) (92.6, -1.0)
 - Next.js (React) + Java/Kotlin + Spring Boot + PostgreSQL + AWS ECS on Fargate (92.4, -1.2)
 
 ## Sources

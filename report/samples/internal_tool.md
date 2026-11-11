@@ -294,6 +294,10 @@ Runs here: Server-rendered HTML + HTMX (server rendering + static files), the Py
 - AWS EKS (Kubernetes): Public-cloud service; deployment must be on-premises
 - AWS Lambda + API Gateway: Public-cloud service; deployment must be on-premises
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay; Public-cloud service; deployment must be on-premises
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay; Public-cloud service; deployment must be on-premises
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay; Public-cloud service; deployment must be on-premises
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay; Public-cloud service; deployment must be on-premises
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay; Public-cloud service; deployment must be on-premises
 - Google Cloud Run: Public-cloud service; deployment must be on-premises
 - Google Kubernetes Engine (Autopilot): Public-cloud service; deployment must be on-premises
 - Azure App Service / Container Apps: Public-cloud service; deployment must be on-premises

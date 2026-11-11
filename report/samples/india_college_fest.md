@@ -215,7 +215,7 @@ Suggested offering: Neon / Supabase Postgres connected through Hyperdrive
 
 **Alternatives**
 - MySQL (stack 84.4, -0.5): Scores 78.3 on its own; its stack is 0.5 stack points behind the pick.
-- Microsoft SQL Server / Azure SQL Database (stack 83.3, -1.6): Scores 73.7 on its own; its stack is 1.6 stack points behind the pick.
+- Microsoft SQL Server (stack 83.3, -1.6): Scores 73.7 on its own; its stack is 1.6 stack points behind the pick.
 
 **Why not the others?**
 - Why not MySQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.5 points lower; either is defensible. PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0); MySQL takes a penalty: Minimum ~$15/month uses most of the budget.
@@ -292,6 +292,10 @@ Runs here: Next.js (server rendering + static files), the serverless functions. 
 
 **Excluded by hard constraints**
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud
 - On-prem Kubernetes (k3s / RKE2 / OpenShift): On-premises option; you chose public cloud
 - AWS EC2 VMs (Docker Compose): Plain VMs your team patches and operates; offered when you choose self-managed VMs

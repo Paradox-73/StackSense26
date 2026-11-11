@@ -9,7 +9,7 @@ subtitle: "Synergy '26 · StackSense Challenge · Project report"
 
 ## 1. Abstract
 
-StackSense recommends a frontend, backend, database and hosting platform for a software project, plus supporting services such as a job queue, search, SMS sign-in or payments where needed. It reads a scenario file in the standard schema, validates every field and writes the section 4 output: a status, an architecture style, each component with its justification, driving input fields, alternatives and trade-offs, a monthly cost band, warnings with a severity and every assumption. Rules and weighted scoring over a cited knowledge base of 60 technologies make every choice, so the same file always gives the same stack. Data residency, compliance, deployment model and an explicit cloud remove options before any scoring. A language model is optional, never picks a component, and switching it off leaves every stack unchanged. A property test over 1,000 random projects found no violation of the eight hard constraints it checks.
+StackSense recommends a frontend, backend, database and hosting platform for a software project, plus supporting services such as a job queue, search, SMS sign-in or payments where needed. It reads a scenario file in the standard schema, validates every field and writes the section 4 output: a status, an architecture style, each component with its justification, driving input fields, alternatives and trade-offs, a monthly cost band, warnings with a severity and every assumption. Rules and weighted scoring over a cited knowledge base of 64 technologies make every choice, so the same file always gives the same stack. Data residency, compliance, deployment model and an explicit cloud remove options before any scoring. A language model is optional, never picks a component, and switching it off leaves every stack unchanged. A property test over 1,000 random projects found no violation of the eight hard constraints it checks.
 
 ## 2. Problem understanding
 
@@ -39,7 +39,7 @@ The engine (`engine/`) is pure Python. A FastAPI app (`app/main.py`) serves a JS
 4. `engine/profile.py` derives daily users, peak requests per second, the data size and the scale tier.
 5. `engine/conflicts.py` runs 22 contradiction checks, each with its resolution.
 6. `engine/scoring.py` weights 19 criteria and removes every option that breaks a hard constraint.
-7. `engine/recommender.py` and `engine/stack.py` score the rest and search 625 stacks under 62 compatibility rules.
+7. `engine/recommender.py` and `engine/stack.py` score the rest and search 625 stacks under 65 compatibility rules.
 8. `engine/advice.py` adds the style, supporting services and cost band; `engine/explain.py` writes justifications, alternatives and trade-offs.
 9. `engine/standard.py` assembles the section 4 output, and `cli.py` writes `outputs/<scenario_id>_output.json`.
 
@@ -99,7 +99,7 @@ Architecture preference (7%, [MonolithFirst](https://martinfowler.com/bliki/Mono
 
 ### 4.4 Validation rules
 
-- **Types, values and ranges.** Every field has its table 3.1 type, and enum values are lower-case strings exactly as written, so `availability: 99.9` as a number is an error that names the allowed strings. Counts are 0 or more, team size and weeks 1 or more, latency above 0 or null, priorities 1 to 5, numbers finite, the description at most 5,000 characters and the platform list non-empty.
+- **Types, values and ranges.** Every field has its table 3.1 type, and enum values are lower-case strings exactly as written, so `availability: 99.9` as a number is an error that names the allowed strings. Counts are 0 or more, team size and weeks 1 or more, latency above 0 or null, priorities 1 to 5, numbers finite and the platform list non-empty; the description may be any length, since it is not parsed.
 - **Required fields.** `project.type`, `project.platforms`, `scale.users_at_launch`, `scale.users_12_months`, `team.size`, `team.experience`, `team.languages` (may be empty), `budget.monthly_infra_usd` and `timeline.mvp_weeks`. In an otherwise valid file a missing one takes its documented default with a `MISSING_REQUIRED_FIELD` warning; a missing optional field takes its default, noted in `assumptions`.
 - **Unknown keys.** An unknown enum value or priority key is an error; any other unknown key raises an `UNKNOWN_FIELD` info warning and is ignored.
 - **Result.** Any error gives `invalid_input`, `stack` null and every problem in `validation_errors`; nothing raises. The questionnaire clamps a bad value with a warning instead (`VALUE_CLAMPED`).
@@ -116,7 +116,7 @@ Quick mode asks seven questions; Refine opens all 42. "Describe your project" fi
 
 ### 5.1 How technologies are represented
 
-`data/kb/*.json` holds 60 technologies: 11 frontends, 14 backends, 15 databases and 20 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region. 62 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 344 URLs, and no end-of-life product is in the knowledge base.
+`data/kb/*.json` holds 64 technologies: 11 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region. 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 369 URLs, and no end-of-life product is in the knowledge base.
 
 ### 5.2 Scoring and filtering
 
@@ -179,11 +179,11 @@ Three intermediate engineers (JavaScript, TypeScript, Python) with nobody on ope
 
 ![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io, $1,190 to $4,635 a month](screenshots/s-P3.png)
 
-Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1. PostgreSQL leads; MySQL takes a penalty because tenants share one database and its privileges stop at table and column level. Supporting services add Yjs shared documents (CRDTs), Redis pub/sub across instances, a cache, hosted checkout and social sign-in.
+Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1. PostgreSQL leads Microsoft SQL Server by 2.1 on realtime fit and portability; MySQL takes a penalty because tenants share one database and its privileges stop at table and column level. Supporting services add Yjs shared documents (CRDTs), Redis pub/sub across instances, a cache, hosted checkout and social sign-in.
 
 ### 6.4 P4 QuickCredit: digital lending in India (in depth)
 
-![P4 QuickCredit: React SPA, Spring Boot, PostgreSQL and AWS ECS on Fargate, $1,945 to $7,310 a month](screenshots/s-P4.png)
+![P4 QuickCredit: React SPA, Spring Boot, PostgreSQL and AWS ECS on Fargate, $1,960 to $7,240 a month](screenshots/s-P4.png)
 
 P4 is the most constrained scenario: AWS required, RBI localisation, PCI DSS, ISO 27001 and 99.95%, for eight seniors (Java, Kotlin, TypeScript) who can run infrastructure, sized at about 60,000 daily users and 833 requests per second at peak.
 
@@ -191,12 +191,12 @@ P4 is the most constrained scenario: AWS required, RBI localisation, PCI DSS, IS
 - **Backend.** Spring Boot matches the team and scores 5/5 on scalability, maturity and structure, which the load, the 99.95% target and the scalability and maintainability priorities weight up; Go is 3.0 behind on skill match. Supabase (not on AWS, no ISO 27001) and Firebase (not on AWS) are ruled out.
 - **Database.** A double-entry ledger needs ACID, so eventually consistent stores are out; Firestore is off AWS and SQLite has no failover. PostgreSQL on Amazon RDS or Aurora in Mumbai costs $800 to $1,600 for about 500 GB with a standby; MySQL ties (0.1).
 - **Frontend.** Behind a login SEO does not matter, so a React SPA ships as static files on S3 and CloudFront; Angular ties (0.8) and Next.js loses 1.2 for adding a Node.js server. Native iOS and Android apps (Swift, Kotlin) score best among mobile toolkits.
-- **Supporting services.** The credit-scoring model on an Amazon SageMaker endpoint in Mumbai ($60 to $250, CPU); Cognito in Mumbai with an SMS gateway; hosted checkout; KYC files in a separate S3 bucket; KMS, audit logging, least-privilege IAM and a WAF for PCI DSS.
-- **Cost.** $1,945 to $7,310 against $6,000, with hosting and the database doubled for 99.95%; the floor fits the budget, so the status is `ok` and the budget check reads "stretch".
+- **Supporting services.** The credit-scoring model on an Amazon SageMaker endpoint in Mumbai ($75 to $180, one or two CPU instances); Cognito in Mumbai with an SMS gateway; hosted checkout; KYC files in a separate S3 bucket; KMS, audit logging, least-privilege IAM and a WAF for PCI DSS.
+- **Cost.** $1,960 to $7,240 against $6,000, with hosting and the database doubled for 99.95%; the floor fits the budget, so the status is `ok` and the budget check reads "stretch".
 
 ### 6.5 P5 PeopleDesk: internal HR tool
 
-![P5 PeopleDesk: HTMX, ASP.NET Core, Azure SQL Database and Azure App Service, $44 to $375 a month](screenshots/s-P5.png)
+![P5 PeopleDesk: HTMX, ASP.NET Core, Microsoft SQL Server on Azure SQL Database and Azure App Service, $44 to $375 a month](screenshots/s-P5.png)
 
 Two C# developers build a tool for 1,200 employees on Azure in India under ISO 27001, for $300 a month. Azure rules out every other host, and Supabase also lacks ISO 27001. ASP.NET Core leads Laravel by 3.7 points (Laravel and Express would need an identity broker for company sign-in), and HTMX leads a React SPA by 1.4. Existing systems are reused: sign-in through Microsoft Entra ID over OpenID Connect, SQL Server kept as Azure SQL Database, Microsoft 365 through the Graph API; an info warning notes that SQL Server 2019 security updates end on 8 January 2030.
 
@@ -248,7 +248,7 @@ I checked the recommendations with a test suite, an answer key, an LLM-only base
 
 ### 8.1 Tests
 
-The 947 tests cover scoring, constraints and cost; explanations against the engine's numbers; inputs, edge cases and warnings; stability properties; the language-model checks and fallbacks; accuracy against the answer key; and the app, packaging and documents. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1005 tests cover scoring, constraints and cost; explanations against the engine's numbers; inputs, edge cases and warnings; stability properties; the language-model checks and fallbacks; accuracy against the answer key; and the app, packaging and documents. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -287,7 +287,7 @@ Next: an architect review of the answer key and the public outputs, scheduled re
 
 **Datasets.** None shipped. The [Stack Overflow Developer Survey 2025](https://survey.stackoverflow.co/2025/technology) is the hiring-pool proxy; INR budgets use a fixed planning rate of 96 INR to 1 USD from the FBIL reference rate.
 
-**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 344 URLs is in `report/sources.md`. Main references: [expert systems](https://en.wikipedia.org/wiki/Expert_system), the [weighted sum model](https://en.wikipedia.org/wiki/Weighted_sum_model), counterfactual explanations ([Wachter, Mittelstadt and Russell, 2017](https://arxiv.org/abs/1711.00399)), [ISO/IEC 25010](https://www.iso.org/standard/78176.html), [AWS Well-Architected](https://aws.amazon.com/architecture/well-architected/), [ATAM](https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/), the Google SRE book ([availability table](https://sre.google/sre-book/availability-table/)), Fowler's [MonolithFirst](https://martinfowler.com/bliki/MonolithFirst.html), [Team Topologies](https://teamtopologies.com/key-concepts), [DORA research](https://dora.dev/research/), [HHS on HIPAA and cloud computing](https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html), the [PCI SSC library](https://www.pcisecuritystandards.org/document_library/), the [MeitY data protection framework](https://www.meity.gov.in/data-protection-framework), the [RBI directive on payment data storage (2018)](https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244), [endoflife.date](https://endoflife.date/) and the [Microsoft lifecycle pages](https://learn.microsoft.com/lifecycle/).
+**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 369 URLs is in `report/sources.md`. Main references: [expert systems](https://en.wikipedia.org/wiki/Expert_system), the [weighted sum model](https://en.wikipedia.org/wiki/Weighted_sum_model), counterfactual explanations ([Wachter, Mittelstadt and Russell, 2017](https://arxiv.org/abs/1711.00399)), [ISO/IEC 25010](https://www.iso.org/standard/78176.html), [AWS Well-Architected](https://aws.amazon.com/architecture/well-architected/), [ATAM](https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/), the Google SRE book ([availability table](https://sre.google/sre-book/availability-table/)), Fowler's [MonolithFirst](https://martinfowler.com/bliki/MonolithFirst.html), [Team Topologies](https://teamtopologies.com/key-concepts), [DORA research](https://dora.dev/research/), [HHS on HIPAA and cloud computing](https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html), the [PCI SSC library](https://www.pcisecuritystandards.org/document_library/), the [MeitY data protection framework](https://www.meity.gov.in/data-protection-framework), the [RBI directive on payment data storage (2018)](https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244), [endoflife.date](https://endoflife.date/) and the [Microsoft lifecycle pages](https://learn.microsoft.com/lifecycle/).
 
 **Repository.** <https://github.com/Paradox-73/StackSense26>. `python run.py` starts the app, `python -m pytest` runs the tests, `python tools/bench.py`, `tools/fuzz.py` and `tools/question_influence.py` rerun the studies, and `python tools/build_assets.py` then `tools/build_report.py` rebuild the tables and this PDF.
 
@@ -313,7 +313,7 @@ After the weighted average come adjustments with a stated reason: a minimum pric
 
 ### A.4 Stack search, ties and growth
 
-The top five options per layer give 625 stacks. The 62 compatibility rules add synergies (Next.js with Vercel, Supabase with Postgres, DynamoDB with Lambda), caveats (Lambda with Postgres needs RDS Proxy) and conflicts (WebSockets on Netlify or Lambda, DynamoDB off AWS, SQLite on hosts that run several instances). Ties within 1 stack point go to the fewest misses, then the preferred cloud, team skill match, the hiring pool when no skills are listed, the frontend's points from the most important answers and lower lock-in, then the higher score. Every run also works out the answer at all six scale tiers, smallest first, and passes over a stack that returns to a technology a smaller tier already left when one that does not is within 4 points of the top. If the chosen stack's minimum bill is over the budget, the best stack that keeps the same backend and database, fits the budget and scores at most 5 points lower replaces it. When the frontend platform runs server code only as short functions and the load or realtime needs a long-running API, the API gets its own host.
+The top five options per layer give 625 stacks. The 65 compatibility rules add synergies (Next.js with Vercel, Supabase with Postgres, DynamoDB with Lambda), caveats (Lambda with Postgres needs RDS Proxy) and conflicts (WebSockets on Netlify or Lambda, DynamoDB off AWS, SQLite on hosts that run several instances). Ties within 1 stack point go to the fewest misses, then the preferred cloud, team skill match, the hiring pool when no skills are listed, the frontend's points from the most important answers and lower lock-in, then the higher score. Every run also works out the answer at all six scale tiers, smallest first, and passes over a stack that returns to a technology a smaller tier already left when one that does not is within 4 points of the top. If the chosen stack's minimum bill is over the budget, the best stack that keeps the same backend and database, fits the budget and scores at most 5 points lower replaces it. When the frontend platform runs server code only as short functions and the load or realtime needs a long-running API, the API gets its own host.
 
 ### A.5 Supporting services and cost lines
 
@@ -463,14 +463,14 @@ Safety (new in 2023) is not scored: the four layers are infrastructure, and no o
 <!-- BEGIN validation -->
 | What is checked | Tests |
 |---|---|
-| Scoring, constraints and cost | 320 |
+| Scoring, constraints and cost | 321 |
 | Explanations match the engine | 116 |
-| Inputs, edge cases and warnings | 156 |
+| Inputs, edge cases and warnings | 203 |
 | Stability and properties | 76 |
-| Language-model layer (checks and fallbacks) | 185 |
+| Language-model layer (checks and fallbacks) | 189 |
 | Accuracy against the answer key | 9 |
-| App, packaging and documents | 85 |
-| **All** | **947** |
+| App, packaging and documents | 91 |
+| **All** | **1005** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.

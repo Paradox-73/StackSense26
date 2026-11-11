@@ -185,7 +185,8 @@ CLAIMS = [
     ("fuzz_clean_rules", [r"violations of (?:the )?(\d+) (?:hard-constraint|properties)"]),
     ("fuzz_rules", [r"checks (\d+) properties", r"(\d+) must-hold rules"]),
 ]
-DOCS = [d for d in (ROOT / "README.md", REPORT / "report.md", REPORT / "demo_script.md") if d.exists()]  # the demo script is not in the zip
+DOCS = [d for d in (ROOT / "README.md", REPORT / "report.md", REPORT / "demo_script.md", ROOT / "docs" / "REFERENCE.md")
+        if d.exists()]  # the demo script is not in the zip
 
 
 def doc_problems(facts: dict) -> list[str]:

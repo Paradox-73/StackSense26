@@ -205,7 +205,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 **Alternatives**
 - MySQL (stack 86.6, -2.0): Scores 75.7 on its own; its stack is 2.0 stack points behind the pick.
-- Microsoft SQL Server / Azure SQL Database (stack 86.0, -2.7): Scores 72.9 on its own; its stack is 2.7 stack points behind the pick.
+- Microsoft SQL Server (stack 86.0, -2.7): Scores 72.9 on its own; its stack is 2.7 stack points behind the pick.
 
 **Why not the others?**
 - Why not MySQL? (runner-up) Swapping it in lowers the stack score by 2.0 points. PostgreSQL is stronger on team skill match (4.5 vs 3.5), realtime fit (3.0 vs 2.0).
@@ -287,6 +287,10 @@ Runs here: Next.js (server rendering + static files), the Node.js + NestJS API a
 - Railway: No PCI-DSS attestation published; No published SLA, so nothing backs your 99.95% availability target
 - Fly.io: No PCI-DSS attestation published; No published SLA, so nothing backs your 99.95% availability target
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (CloudFront distribution), below your 99.95% availability target
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (Cloud Storage Standard class in one region (Cloud CDN: 99.95%)), below your 99.95% availability target
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay; No PCI-DSS attestation published
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay; No PCI-DSS attestation published
 - Google Kubernetes Engine (Autopilot): The provider's SLA is 99.9% (Autopilot Pods in multiple zones (the control plane is 99.95%)), below your 99.95% availability target
 - DigitalOcean (App Platform + Managed DBs): No PCI-DSS attestation published
 - Hetzner Cloud / VPS (Docker, Coolify): The provider's SLA is 99.9% (each Cloud Server), below your 99.95% availability target; No PCI-DSS attestation published

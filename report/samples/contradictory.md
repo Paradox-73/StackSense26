@@ -27,7 +27,7 @@ Availability approach: Multi-AZ everywhere + multi-region failover drills, 24x7 
 
 1. **Request path**: The browser loads Next.js (React) from Azure App Service / Container Apps; it sends API calls to the Node.js + Express service on Azure App Service / Container Apps (~34,722 requests/s at peak), which queries PostgreSQL.
 2. **Sign-in**: Sign-in uses Microsoft Entra External ID; the Node.js + Express API checks the session or token on every request.
-3. **Data**: PostgreSQL is the system of record (about 11,000 GB within 12 months); uploaded files go to Blob Storage + Front Door. PHI (protected health information) stays in the database and object storage, encrypted at rest, on services covered by a signed BAA; keep it out of logs, analytics and push notification text. Every store above is placed in the region your residency rule requires.
+3. **Data**: PostgreSQL is the system of record (about 11,000 GB within 12 months); uploaded files go to Blob Storage under Microsoft's BAA (Front Door for public, non-PHI files only). PHI (protected health information) stays in the database and object storage, encrypted at rest, on services covered by a signed BAA; keep it out of logs, analytics and push notification text. Every store above is placed in the region your residency rule requires.
 4. **Deploy**: CI builds a container image and rolls it out on Azure App Service / Container Apps with health checks and zero-downtime restarts. Database schema changes run as versioned migrations before the new code serves traffic.
 
 ## Inputs used
@@ -219,7 +219,7 @@ Suggested offering: Azure Database for PostgreSQL Flexible Server
 
 **Alternatives**
 - MySQL (stack 50.8, -0.5): Scores 6.8 on its own; its stack is 0.5 stack points behind the pick.
-- Microsoft SQL Server / Azure SQL Database (stack 49.0, -2.2): Scores 0.0 on its own; its stack is 2.2 stack points behind the pick.
+- Microsoft SQL Server (stack 49.0, -2.2): Scores 0.0 on its own; its stack is 2.2 stack points behind the pick.
 
 **Why not the others?**
 - Why not MySQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.5 points lower; either is defensible. PostgreSQL is stronger on realtime fit (3.0 vs 2.0); MySQL takes a penalty: Near its practical scale ceiling at your traffic/data size (needs sharding or re-architecture).
@@ -303,6 +303,10 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 - Fly.io: No India region; data must stay in India
 - AWS Lambda + API Gateway: The provider's SLA is 99.95% (per region), below your 99.99% availability target
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (CloudFront distribution), below your 99.99% availability target
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.95% (Firebase Hosting (service credits are a share of fees paid)), below your 99.99% availability target; No HIPAA Business Associate Agreement available
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (Cloud Storage Standard class in one region (Cloud CDN: 99.95%)), below your 99.99% availability target
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.95% (Standard plan (the Free plan has none)), below your 99.99% availability target; No HIPAA Business Associate Agreement available
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay; No HIPAA Business Associate Agreement available
 - Google Cloud Run: The provider's SLA is 99.95% (Cloud Run services in most regions), below your 99.99% availability target
 - Google Kubernetes Engine (Autopilot): The provider's SLA is 99.9% (Autopilot Pods in multiple zones (the control plane is 99.95%)), below your 99.99% availability target
 - DigitalOcean (App Platform + Managed DBs): The provider's SLA is 99.95% (each App Platform component), below your 99.99% availability target; No HIPAA Business Associate Agreement available
@@ -322,7 +326,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 - **Cache**: Redis/Valkey (Azure Cache for Redis): Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database.
 - **Realtime**: Redis pub/sub for cross-instance fan-out (Azure Cache for Redis): With several app instances, a message published on one must reach sockets on all others.
 - **Background jobs**: BullMQ (Redis): Send emails, process uploads and call slow APIs outside the request path. BullMQ keeps its jobs in Redis, so the app needs a Redis/Valkey instance (the one already listed above).
-- **Object storage**: Blob Storage + Front Door: Media and documents belong in object storage, not the database.
+- **Object storage**: Blob Storage under Microsoft's BAA (Front Door for public, non-PHI files only): Media and documents belong in object storage, not the database.
 - **Authentication**: Microsoft Entra External ID: Do not hand-roll password storage, MFA or SSO.
 - **Observability**: OpenTelemetry instrumentation -> Azure Monitor / App Insights: Traces, metrics and error tracking from day one; required to defend an availability target.
 - **Audit & security**: Encrypted storage (KMS), audit logging, least-privilege IAM, WAF: The HIPAA Security Rule requires access controls, audit trails and encryption.

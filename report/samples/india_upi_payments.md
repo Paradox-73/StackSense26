@@ -206,7 +206,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 **Alternatives**
 - MySQL (stack 91.7, -0.7): Scores 89.4 on its own; its stack is 0.7 stack points behind the pick.
-- Microsoft SQL Server / Azure SQL Database (stack 91.0, -1.3): Scores 86.8 on its own; its stack is 1.3 stack points behind the pick.
+- Microsoft SQL Server (stack 91.0, -1.3): Scores 86.8 on its own; its stack is 1.3 stack points behind the pick.
 
 **Why not the others?**
 - Why not MySQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.7 points lower; either is defensible. PostgreSQL is stronger on team skill match (5.0 vs 4.5), realtime fit (3.0 vs 2.0).
@@ -287,6 +287,10 @@ Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The data
 - Railway: No India region; data must stay in India; No published SLA, so nothing backs your 99.95% availability target
 - Fly.io: No India region; data must stay in India; No published SLA, so nothing backs your 99.95% availability target
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (CloudFront distribution), below your 99.95% availability target
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (Cloud Storage Standard class in one region (Cloud CDN: 99.95%)), below your 99.95% availability target
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay
 - Google Kubernetes Engine (Autopilot): The provider's SLA is 99.9% (Autopilot Pods in multiple zones (the control plane is 99.95%)), below your 99.95% availability target
 - Hetzner Cloud / VPS (Docker, Coolify): The provider's SLA is 99.9% (each Cloud Server), below your 99.95% availability target; No India region; data must stay in India
 - On-prem VMs + Docker Compose: On-premises option; you chose public cloud; Docker Compose runs an app's containers on one Docker host and restarts them only on that host; placing and moving containers across several hosts is what Swarm or Kubernetes add: no automatic failover to a second host, so it cannot meet 99.95% availability

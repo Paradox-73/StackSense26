@@ -28,7 +28,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 
 1. **Request path**: The browser loads React SPA (Vite)'s built files from Amazon S3 + CloudFront; it sends API calls to the Python + Django service on AWS ECS on Fargate (~69 requests/s at peak), which queries PostgreSQL.
 2. **Sign-in**: Sign-in uses Amazon Cognito (HIPAA-eligible); the Python + Django API checks the session or token on every request.
-3. **Data**: PostgreSQL is the system of record (about 280 GB within 12 months); uploaded files go to Amazon S3 (a separate bucket for uploaded files, served through the same CloudFront as the static frontend). PHI (protected health information) stays in the database and object storage, encrypted at rest, on services covered by a signed BAA; keep it out of logs, analytics and push notification text.
+3. **Data**: PostgreSQL is the system of record (about 280 GB within 12 months); uploaded files go to Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only). PHI (protected health information) stays in the database and object storage, encrypted at rest, on services covered by a signed BAA; keep it out of logs, analytics and push notification text.
 4. **Deploy**: CI builds a container image and rolls it out on AWS ECS on Fargate with health checks and zero-downtime restarts. The frontend's built files are uploaded to Amazon S3 and the CDN cache is invalidated. Database schema changes run as versioned migrations before the new code serves traffic.
 
 ## Inputs used
@@ -205,7 +205,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 **Alternatives**
 - MySQL (stack 87.8, -0.8): Scores 85.5 on its own; its stack is 0.8 stack points behind the pick.
-- Microsoft SQL Server / Azure SQL Database (stack 87.3, -1.3): Scores 83.6 on its own; its stack is 1.3 stack points behind the pick.
+- Microsoft SQL Server (stack 87.3, -1.3): Scores 83.6 on its own; its stack is 1.3 stack points behind the pick.
 
 **Why not the others?**
 - Why not MySQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.8 points lower; either is defensible. PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0).
@@ -286,6 +286,10 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 - Railway: No HIPAA Business Associate Agreement available; No published SLA, so nothing backs your 99.95% availability target
 - Fly.io: No published SLA, so nothing backs your 99.95% availability target
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (CloudFront distribution), below your 99.95% availability target
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay; No HIPAA Business Associate Agreement available
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (Cloud Storage Standard class in one region (Cloud CDN: 99.95%)), below your 99.95% availability target
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay; No HIPAA Business Associate Agreement available; No SOC 2 report available
+- Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay; No HIPAA Business Associate Agreement available; No SOC 2 report available
 - Google Kubernetes Engine (Autopilot): The provider's SLA is 99.9% (Autopilot Pods in multiple zones (the control plane is 99.95%)), below your 99.95% availability target
 - DigitalOcean (App Platform + Managed DBs): No HIPAA Business Associate Agreement available
 - Hetzner Cloud / VPS (Docker, Coolify): The provider's SLA is 99.9% (each Cloud Server), below your 99.95% availability target; No HIPAA Business Associate Agreement available; No SOC 2 report available
@@ -300,7 +304,7 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 - **Realtime**: WebSockets in the Python + Django app (Django Channels): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
 - **Background jobs**: Celery / RQ / Dramatiq (Redis/Valkey broker): Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (ElastiCache (Valkey)).
 - **Static frontend**: Amazon S3 + CloudFront: React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Python + Django instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.
-- **Object storage**: Amazon S3 (a separate bucket for uploaded files, served through the same CloudFront as the static frontend): Media and documents belong in object storage, not the database.
+- **Object storage**: Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only): Media and documents belong in object storage, not the database.
 - **Authentication**: Amazon Cognito (HIPAA-eligible): Do not hand-roll password storage, MFA or SSO.
 - **Push notifications**: Firebase Cloud Messaging (+ APNs) or Expo Notifications: Standard channel for mobile engagement on Android and iOS. Push services are not covered by a BAA: put no health information in the notification text (e.g. 'You have a new message') and show the content only after the user signs in.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
