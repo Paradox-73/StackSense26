@@ -1011,7 +1011,8 @@ def short_name(item: dict) -> str:
 def baas_hosts_everything(d: dict, stack: dict) -> bool:
     """Mobile-only app on a BaaS: the app ships through the stores and the BaaS runs the backend,
     so no host of your own is needed (a landing page is optional)."""
-    return d["mobile"] and not d["web"] and stack["backend"].get("kind") == "baas" and not d.get("workers")
+    return (d["mobile"] or d.get("api_only")) and not d["web"] and stack["backend"].get("kind") == "baas" \
+        and not d.get("workers")
 
 
 # Split hosting. A frontend platform runs a server framework only as short-lived functions. From
@@ -1075,6 +1076,9 @@ def runs_here(p: dict, d: dict, stack: dict, api_host: dict | None = None) -> st
         text = (f"Runs here: {short_name(fe)} ({'server rendering + static files' if fe['id'] in SERVER_RENDERED else 'static files'}). "
                 f"The {short_name(be)} API runs on {api_host['name']} as long-running processes (split hosting).")
         return text + _database_where(stack, f"{api_host['name']}'s")
+    if baas_hosts_everything(d, stack) and d.get("api_only"):
+        return (f"Nothing of yours needs hosting: {short_name(be)} runs the API, auth, database and file storage, "
+                "and the customers' own code calls the API.")
     if baas_hosts_everything(d, stack):
         optional = "Firebase Hosting (free tier)" if be["id"] == "firebase" else host["name"]
         return (f"Nothing of yours needs hosting: the app ships through the App Store and Google Play, and "

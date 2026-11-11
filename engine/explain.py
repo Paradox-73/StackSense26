@@ -447,7 +447,7 @@ def _ctx(layer: str, s: dict, items: dict, p: dict, d: dict, cost: dict, provide
         "kept": _lower_first(vs["kept"]) if vs and vs.get("kept") else None,
         "assumed": 1 if "consistency" in d.get("defaulted", ()) else 0, "static": 1 if kind == "static" else 0,
         "phones": " and ".join(PHONE_NAMES[x] for x in phones) or None, "both_phones": 1 if len(phones) == 2 else 0,
-        "one": 1 if d.get("one_codebase") else 0,
+        "one": 1 if d.get("one_codebase") else 0, "api": 1 if d.get("api_only") else 0,
         "targets": _and([PHONE_NAMES.get(x, x) for x in d.get("one_codebase") or []]) or None,
         "other_phone": PHONE_NAMES[({"ios", "android"} - set(phones)).pop()] if len(phones) == 1 else None,
         "native_lang": {"ios": "Swift", "android": "Kotlin"}[phones[0]] if len(phones) == 1 else None,
@@ -475,7 +475,7 @@ def _applies(t: dict, c: dict, stack: set, p: dict) -> bool:
         if k in ("kind", "seo", "consistency", "read_write"):
             if c[k] not in v:
                 return False
-        elif k in ("provided", "tie", "functions", "services", "assumed", "static", "both_phones", "one"):
+        elif k in ("provided", "tie", "functions", "services", "assumed", "static", "both_phones", "one", "api"):
             if c[k] != v:
                 return False
         elif k in LINE_CONDITIONS:

@@ -857,3 +857,25 @@ def test_systems_with_no_known_interface_say_so():
     for name in ("WhatsApp groups", "Windows 7 office PCs"):
         assert any(a.startswith(f"Existing system '{name}': no known integration path") for a in out["assumptions"])
     assert not [a for a in out["assumptions"] if "integrated through its API" in a]
+
+
+def test_an_api_only_project_on_a_backend_service_has_no_host_of_its_own():
+    out = run({"scenario_id": "bare", "project": {"type": "api_platform", "platforms": ["api_only"]},
+               "scale": {"users_at_launch": 0, "users_12_months": 0}, "team": {"size": 1, "experience": "mixed", "languages": []},
+               "budget": {"monthly_infra_usd": 0}, "timeline": {"mvp_weeks": 1}})
+    stack = out["stack"]
+    assert stack["frontend"]["choice"] == "None" and "BaaS" in stack["backend"]["choice"], stack["backend"]["choice"]
+    hosting = stack["hosting"]
+    assert hosting["choice"].startswith("Provided by"), hosting["choice"]
+    assert "app stores" not in hosting["justification"] and "customers' own code" in hosting["justification"], hosting
+
+
+def test_hosting_provided_by_a_backend_service_has_no_borrowed_region():
+    """A Flutter app on a BaaS for an Indian ledger: hosting is the BaaS's, so the scored web host's region is not shown."""
+    doc = load("P6")
+    doc["project"]["type"], doc["team"]["languages"], doc["compliance"] = "fintech", ["dart"], ["dpdp", "rbi_localisation"]
+    doc["requirements"].update(payments=True, availability="99.9")
+    doc["scale"].update(users_12_months=100000, peak_concurrent_users=2000, data_volume_gb_12_months=50)
+    doc["budget"]["monthly_infra_usd"] = 50
+    hosting = run(doc)["stack"]["hosting"]["choice"]
+    assert hosting.startswith("Provided by") and "region" not in hosting, hosting

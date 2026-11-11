@@ -299,6 +299,14 @@
         "text": "With about {users} daily users on {phones}, nothing of yours needs separate hosting: {baas} runs the backend and the app stores ship the app."
       },
       {
+        "open": true,
+        "when": {
+          "provided": true,
+          "api": 1
+        },
+        "text": "There is no client to host: {baas} runs the API that the customers' own code calls, about {peak} requests/s at peak, with its sign-in, database and file storage."
+      },
+      {
         "when": {
           "provided": true
         },

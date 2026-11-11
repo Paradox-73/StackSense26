@@ -849,7 +849,7 @@ def _component(layer: str, sl: dict, origin: dict, f: dict, result: dict) -> dic
             choice += f" for the frontend + {api['name']} for the API"
         provider = load_kb()["index"].get((api or {}).get("id") or pick["id"], {}).get("provider", "")
         region = _region(provider, f)
-        if region:
+        if region and not choice.startswith("Provided by"):  # the scored host's region; the BaaS card has its own
             choice += f", region {region}"
     # The answers that added the most points to this pick, then the hard constraints that ruled rivals out.
     scored = sorted((c for c in ex.get("input_contributions", []) if c["points"] >= DRIVER_MIN_POINTS
