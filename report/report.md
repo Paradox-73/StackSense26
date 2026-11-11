@@ -281,7 +281,7 @@ Next: an architect review of the answer key and the public outputs, scheduled re
 
 **Libraries.** [FastAPI](https://fastapi.tiangolo.com/) 0.142.2 (MIT), [Starlette](https://starlette.dev/) 1.7.0 (BSD-3), [Pydantic](https://docs.pydantic.dev/) 2.13.5 (MIT), [Uvicorn](https://uvicorn.dev/) 0.54.0 (BSD-3); tests: [pytest](https://docs.pytest.org/) 9.1.1 (MIT), [HTTPX](https://www.python-httpx.org/) 0.28.1 (BSD-3); report and screenshots only: [markdown-it-py](https://github.com/executablebooks/markdown-it-py) (MIT), [pypdf](https://github.com/py-pdf/pypdf) (BSD-3), [Playwright for Python](https://playwright.dev/python/) (Apache-2.0) and Google Chrome. The browser code uses no third-party JavaScript.
 
-**Fonts.** In `app/static/fonts/` under the SIL Open Font License 1.1: [Fraunces](https://github.com/undercasetype/Fraunces), [Geist and Geist Mono](https://github.com/vercel/geist-font).
+**Fonts.** In `app/static/fonts/` under the SIL Open Font License 1.1: [Atkinson Hyperlegible Next and Mono](https://github.com/googlefonts/atkinson-hyperlegible-next).
 
 **APIs.** The optional [Google Gemini API](https://ai.google.dev/gemini-api/docs/openai) through its OpenAI-compatible endpoint (free tier); [OpenRouter](https://openrouter.ai/) can be configured instead. The client uses only the Python standard library.
 

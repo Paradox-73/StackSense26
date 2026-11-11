@@ -184,7 +184,7 @@ def test_readme_starts_with_the_architecture_figure():
 def test_fonts_are_cited_in_report_and_readme():
     for f in (ROOT / "README.md", ROOT / "report" / "report.md"):
         text = f.read_text(encoding="utf-8")
-        for need in ("Fraunces", "Geist", "SIL Open Font License"):
+        for need in ("Atkinson Hyperlegible", "SIL Open Font License"):
             assert need in text, (f.name, need)
 
 

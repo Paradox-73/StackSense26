@@ -46,8 +46,6 @@ def test_every_local_resource_is_served():
 def test_font_licence_shipped():
     text = (STATIC / "fonts" / "OFL.txt").read_text(encoding="utf-8")
     assert "SIL Open Font License" in text and "Atkinson Hyperlegible Next" in text and "Atkinson Hyperlegible Mono" in text
-    report = (STATIC.parent.parent / "report" / "fonts" / "OFL.txt").read_text(encoding="utf-8")
-    assert "SIL Open Font License" in report and "Fraunces" in report and "Geist" in report
 
 
 @pytest.fixture

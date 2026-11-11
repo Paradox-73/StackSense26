@@ -395,10 +395,10 @@ def assemble(pages: dict[str, int], toc_pages: dict[str, int]) -> tuple[str, lis
     toc = f'<nav class="toc"><h2 class="toc-h">Contents</h2><ol>{toc_items}</ol></nav>'
     body = body.replace("<!-- TOC -->", toc)
     css = (ROOT / "tools" / "report_print.css").read_text(encoding="utf-8")
-    fonts = ROOT / "report" / "fonts"
+    fonts = ROOT / "app" / "static" / "fonts"
     ff = "".join(
         f"@font-face{{font-family:'{fam}';font-weight:{w};src:url('{(fonts / f).as_uri()}') format('woff2');}}"
-        for fam, f, w in (("Fraunces", "fraunces-latin.woff2", "500 600"), ("Geist", "geist-latin.woff2", "400 700"), ("Geist Mono", "geist-mono-latin.woff2", "400 600")))
+        for fam, f, w in (("Atkinson Hyperlegible Next", "atkinson-next-latin.woff2", "200 800"), ("Atkinson Hyperlegible Mono", "atkinson-mono-latin.woff2", "200 800")))
     doc = (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><title>StackSense report</title>'
            f'<base href="{REPORT.as_uri()}/"><style>{ff}{css}</style></head><body>{cover_html(cover)}{body}</body></html>')
     return doc, heads, missing, src

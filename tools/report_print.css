@@ -1,17 +1,17 @@
 /* Print styles for report/StackSense_Report.pdf (A4). Used by tools/build_report.py. */
-@page { size: A4; margin: 15mm 14mm 17mm 14mm; @bottom-center { content: "Page " counter(page) " of " counter(pages); font: 9pt "Geist", sans-serif; color: #5b5266; } }
+@page { size: A4; margin: 15mm 14mm 17mm 14mm; @bottom-center { content: "Page " counter(page) " of " counter(pages); font: 9pt "Atkinson Hyperlegible Next", sans-serif; color: #566070; } }
 @page :first { margin: 0; @bottom-center { content: none; } }
-:root { --ink: #241c2e; --muted: #5b5266; --accent: #4b2a63; --gold: #b8872b; --line: #d9d0e0; --paper: #f6f1ea; }
-html { font: 10.5pt/1.45 "Geist", "Segoe UI", Arial, sans-serif; color: var(--ink); }
+:root { --ink: #2a313d; --muted: #566070; --accent: #00726d; --gold: #3eede7; --line: #d3e3e8; --paper: #f0fcff; }
+html { font: 10.5pt/1.45 "Atkinson Hyperlegible Next", "Segoe UI", Arial, sans-serif; color: var(--ink); }
 body { margin: 0; }
-h1, h2, h3, h4 { font-family: "Fraunces", Georgia, serif; font-weight: 600; color: var(--ink); line-height: 1.2; break-after: avoid; }
+h1, h2, h3, h4 { font-family: "Atkinson Hyperlegible Next", Georgia, serif; font-weight: 600; color: var(--ink); line-height: 1.2; break-after: avoid; }
 h2 { font-size: 17pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1.2pt solid var(--accent); }
 h3 { font-size: 12.5pt; margin: 14pt 0 5pt; color: var(--accent); }
 h4, h5 { font-size: 11pt; margin: 10pt 0 4pt; }
 p { margin: 0 0 7pt; orphans: 3; widows: 3; }
 a { color: var(--accent); text-decoration: none; }
-code { font: 9pt "Geist Mono", Consolas, monospace; background: #f1ecf5; padding: 0 2pt; border-radius: 2pt; overflow-wrap: normal; word-break: normal; }
-pre { font: 8.5pt/1.35 "Geist Mono", Consolas, monospace; background: #f4f0f7; padding: 6pt 8pt; border-radius: 4pt; white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid; }
+code { font: 9pt "Atkinson Hyperlegible Mono", Consolas, monospace; background: #e2f2f6; padding: 0 2pt; border-radius: 2pt; overflow-wrap: normal; word-break: normal; }
+pre { font: 8.5pt/1.35 "Atkinson Hyperlegible Mono", Consolas, monospace; background: #eaf6f9; padding: 6pt 8pt; border-radius: 4pt; white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid; }
 pre code { background: none; padding: 0; }
 ul, ol { margin: 0 0 7pt; padding-left: 16pt; }
 li { margin: 0 0 2.5pt; }
@@ -31,9 +31,9 @@ em { color: var(--ink); }
 
 /* cover */
 .cover { height: 297mm; box-sizing: border-box; padding: 38mm 24mm 24mm; background: var(--paper); break-after: page; page-break-after: always; }
-.cover .kicker { font: 600 10.5pt "Geist", sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
-.cover-title { font: 600 54pt/1.05 "Fraunces", Georgia, serif; margin: 10mm 0 6mm; border: 0; padding: 0; }
-.cover-pitch { font: 500 17pt/1.35 "Fraunces", Georgia, serif; max-width: 150mm; color: var(--ink); margin-bottom: 22mm; }
+.cover .kicker { font: 600 10.5pt "Atkinson Hyperlegible Next", sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.cover-title { font: 600 54pt/1.05 "Atkinson Hyperlegible Next", Georgia, serif; margin: 10mm 0 6mm; border: 0; padding: 0; }
+.cover-pitch { font: 500 17pt/1.35 "Atkinson Hyperlegible Next", Georgia, serif; max-width: 150mm; color: var(--ink); margin-bottom: 22mm; }
 .cover-meta { font-size: 11pt; width: 150mm; margin: 0; }
 .cover-meta td { border: 0; border-top: 0.6pt solid var(--line); padding: 5pt 4pt; }
 .cover-meta td:first-child { width: 38mm; color: var(--muted); font-weight: 600; }
