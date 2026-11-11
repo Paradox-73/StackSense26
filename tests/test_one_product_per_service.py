@@ -23,6 +23,10 @@ def outs() -> dict:
     return {p.stem: run(json.loads(p.read_text(encoding="utf-8"))) for p in PUBLIC}
 
 
+def _choices(out: dict) -> list[str]:
+    return [s["choice"] for s in out["stack"]["supporting"]]
+
+
 def _sup(out: dict, layer: str) -> list[dict]:
     return [s for s in out["stack"]["supporting"] if s["layer"] == layer]
 
@@ -33,7 +37,7 @@ def test_sign_in_cdn_and_file_storage_appear_once(outs):
     for name, out in dict(outs, P4_sso=run(sso)).items():
         for layer in ("auth", "cdn", "storage"):
             assert len(_sup(out, layer)) <= 1, (name, layer, [s["choice"] for s in _sup(out, layer)])
-    assert "Keycloak" not in json.dumps(run(sso)["stack"]["supporting"])  # one tenant: a federation, not a broker
+    assert "Keycloak" not in json.dumps(_choices(run(sso)))  # one tenant: a federation, not a broker
 
 
 def test_no_generic_cdn_and_no_product_lists(outs):
@@ -46,7 +50,7 @@ def test_no_generic_cdn_and_no_product_lists(outs):
 
 def test_no_self_hosted_keycloak_without_devops(outs):
     for name in ("P2", "P6"):  # has_devops false, India residency
-        assert "Keycloak" not in json.dumps(outs[name]["stack"]["supporting"]), name
+        assert "Keycloak" not in json.dumps(_choices(outs[name])), name
 
 
 def test_push_service_follows_the_mobile_framework(outs):

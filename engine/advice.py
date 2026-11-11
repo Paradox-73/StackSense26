@@ -1074,6 +1074,125 @@ def _observability(env: dict) -> str:
     return "Grafana Cloud"
 
 
+# Per role: the alternatives a supporting service was weighed against (choice, why not) and its known downsides.
+# Planning judgements, each stated as a reason; vendor facts behind them are cited where the services are chosen.
+SERVICE_NOTES = {
+    "Cache": ([("The database's own buffer cache only", "It holds hot rows only until the working set outgrows the "
+                "database's memory, and every read still costs a database round trip")],
+              ["Cached data can be stale: each write must expire or update the keys it changes"]),
+    "Realtime": ([("Polling the API every few seconds", "Every client asks again and again, which multiplies requests and "
+                   "still shows changes late")],
+                 ["Open connections hold memory per user and need pub/sub to reach users on other instances"]),
+    "Collaboration sync": ([("Operational transformation (ShareDB)", "A central server must order every edit, and offline "
+                             "edits merge less cleanly than with CRDTs")],
+                           ["Document snapshots grow with edit history and need compaction"]),
+    "Background jobs": ([("Doing the work inside the web request", "Slow emails, uploads and API calls would hold the request "
+                          "open and fail with it")],
+                        ["A job can run twice after a retry, so handlers must be idempotent"]),
+    "Ingestion buffer": ([("Writing each event straight to the database", "A burst reaches the database all at once, with no "
+                           "replay if it falls behind")],
+                         ["Consumers must keep up, or the backlog and its storage grow"]),
+    "Search": ([("SQL LIKE queries", "They scan every row, rank nothing and miss misspellings")],
+               ["The index is a second copy of the data and lags the database by the sync delay"]),
+    "Vector search": ([("A dedicated vector database (Qdrant, Pinecone)", "A second store to keep in sync and pay for before "
+                        "the embeddings reach millions of vectors")],
+                      ["Large vector indexes compete with the relational workload for the same memory"]),
+    "Analytics": ([("Running reports on the primary database", "Long scans compete with the app's own queries")],
+                  ["Copied data arrives with a delay, so dashboards trail the live system"]),
+    "Payments": ([("Taking card details on your own pages", "Card data on your servers moves the PCI-DSS audit from the "
+                   "shortest self-assessment (SAQ A) to a full one")],
+                 ["Every transaction pays the gateway's fee, and refunds and disputes follow its process"]),
+    "Static frontend": ([("Serving the built files from the app's instances", "Every page load reaches the app servers, which "
+                          "then need sizing for static traffic as well")],
+                        ["Each release must invalidate the cached files"]),
+    "CDN": ([("No CDN: the app answers every request", "The servers must be sized for all requests, including those that "
+              "return the same content to everyone")],
+            ["Cached responses can be stale until they expire or are purged"]),
+    "Media delivery": ([("Serving files through the app server", "Each download holds an app connection and pays the app "
+                         "host's egress price")],
+                       ["Links that leak can be shared until they expire, so keep their lifetime short"]),
+    "Object storage": ([("Files in database columns", "They bloat backups and the database disk, which costs several times "
+                         "more per GB than object storage")],
+                       ["Files and their database rows can drift apart: delete or replace both together"]),
+    "Authentication": ([("Hand-written login with password hashing", "Password storage, MFA, resets and lockouts are easy to "
+                         "get wrong and are the first things attackers test")],
+                       ["Sign-in depends on the identity provider staying up; moving users off it later is a migration"]),
+    "Enterprise SSO": ([("Keycloak identity brokering (self-hosted)", "A server to run, patch and back up beside the "
+                         "backend-as-a-service, which already brokers SAML and OIDC")],
+                       ["Each customer's identity provider must be configured and its certificates renewed"]),
+    "Phone login (SMS OTP)": ([("Authenticator-app codes (TOTP)", "Every user must install an app first, which loses "
+                                "sign-ups on a consumer product")],
+                              ["Each SMS is paid, and open sign-up forms invite SMS-pumping fraud: rate-limit by number "
+                               "and IP"]),
+    "Offline sync": ([("A sync API you write yourself", "Conflict detection, retries and partial sync are a project of their "
+                       "own")],
+                     ["Offline edits that conflict need a merge rule the users understand"]),
+    "Push notifications": ([("Polling for new messages", "It drains batteries and still misses users who are not in the "
+                             "app")],
+                           ["Delivery is best-effort, and users can switch notifications off"]),
+    "Notifications": ([("Push through a relay outside the network", "It breaks the air gap")],
+                      ["Users see news only while they use a device inside the network"]),
+    "Model serving": ([("Running the model inside the web servers", "Model memory and CPU spikes slow every request, and the "
+                        "two cannot scale apart")],
+                      ["An always-on endpoint bills while idle unless it scales to zero"]),
+    "Video on demand": ([("Serving MP4 files from the app server", "No adaptive bitrate, so slow connections stall, and app "
+                          "egress costs far more than a CDN's")],
+                        ["Transcoding and delivery are billed per minute, so costs follow watch time"]),
+    "Live video": ([("Peer-to-peer WebRTC without a server", "Each participant uploads a stream to every other, which fails "
+                     "past a handful of people")],
+                   ["Media servers and TURN relays need capacity near the users"]),
+    "Maps & live location": ([("Polling positions from the database", "Every map view queries again, and positions lag by "
+                               "the poll interval")],
+                             ["Map loads are billed per view past the free quota"]),
+    "Code sandbox": ([("Running submissions in the web server's process", "One submission could read secrets or take the "
+                       "server down")],
+                     ["Sandboxed workers start slower and need their own capacity"]),
+    "Desktop app": ([("Tauri", "Smaller installers, but native features need some Rust")],
+                    ["Electron bundles Chromium, so installers are large"]),
+    "Hybrid split": ([("Everything in one place", "Your rules keep the system of record on-premises, so the cloud cannot "
+                       "hold all of it")],
+                     ["Two environments to deploy, monitor and keep on the same versions"]),
+    "Observability": ([("Logs only", "Without traces and metrics there is no way to see which call is slow or failing")],
+                      ["Telemetry volume is billed: sample traces and set log retention"]),
+    "Audit & security": ([("The cloud's default settings", "Auditors ask for evidence of access control, audit logging and "
+                           "encryption that defaults do not record")],
+                         ["Audit logs and key management add a running cost and need regular review"]),
+}
+SECONDARY_NOTES = ([("Querying that shape on the primary database", "It models this data less well, so those queries get "
+                     "slow or awkward as the data grows")],
+                   ["A second store to keep in sync with the system of record"])
+
+
+def service_notes(s: dict, compliance=()) -> tuple[list[tuple[str, str]], list[str]]:
+    """(alternatives, trade-offs) of one supporting service, with the product alternatives its choice implies."""
+    alts, trade = SECONDARY_NOTES if s["role"].startswith("Secondary store") else SERVICE_NOTES.get(s["role"], ([], []))
+    name, extra = s["name"], []
+    if name.startswith("MSG91"):
+        extra.append(("Twilio Verify", "Twilio runs Verify in its US region, so codes and numbers would be processed and "
+                      "stored outside India" if "data_residency_india" in compliance else
+                      "Equivalent, but MSG91 already registers the DLT templates Indian operators require"))
+    elif name.startswith("Twilio Verify"):
+        extra.append(("Vonage Verify", "Equivalent; one SMS vendor is enough"))
+    elif name.startswith("Razorpay"):
+        extra += [("Cashfree", "Equivalent hosted checkout; one gateway is enough to start"),
+                  ("Stripe", "Stripe takes new Indian businesses by invitation only")]
+    elif name.startswith("Stripe"):
+        extra.append(("Adyen", "Suits large merchants with negotiated contracts; more setup than a first release needs"))
+    elif name.startswith("PowerSync"):
+        extra.append(("ElectricSQL", "Since its 2024 rewrite it syncs Postgres data over HTTP into the app's own store, "
+                      "with no local SQLite copy on the device"))
+    elif "Keycloak" in name:
+        extra.append(("Auth0", "A hosted identity service outside your servers, which your deployment rules or budget "
+                      "keep out"))
+    elif s["role"] == "Authentication":
+        extra.append(("Keycloak (self-hosted)", "A server to run, patch and back up, for no feature this project needs"))
+    elif name.startswith("DigitalOcean Spaces in BLR1"):
+        extra.append(("Ceph Object Gateway on your own servers", "A storage cluster to run yourself"))
+    elif s["role"] == "Search" and "Meilisearch" not in name:
+        extra.append(("Meilisearch", "A second system to run before the data needs it"))
+    return extra + alts, trade
+
+
 def apply_ops_budget(p: dict, services: list[dict]) -> tuple[list[dict], list[dict], dict]:
     """Split services into kept and deferred. Must-haves (no trigger: auth, observability, payments,
     audit, realtime, compliance controls, and systems the scale already needs) are always kept.

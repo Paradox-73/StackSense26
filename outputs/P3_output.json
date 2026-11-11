@@ -148,113 +148,184 @@
       {
         "layer": "cache",
         "choice": "Redis/Valkey (Upstash Redis on Fly)",
-        "justification": "Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database.",
+        "justification": "Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database. The 100 ms p95 target (requirements.p95_latency_ms) leaves little time for repeated database reads.",
         "driven_by": [
           "scale.workload",
           "requirements.p95_latency_ms",
           "scale.users_12_months"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "The database's own buffer cache only",
+            "why_not": "It holds hot rows only until the working set outgrows the database's memory, and every read still costs a database round trip"
+          }
+        ],
+        "tradeoffs": [
+          "Cached data can be stale: each write must expire or update the keys it changes"
+        ],
         "source": "https://redis.io/docs/latest/develop/use/client-side-caching/"
       },
       {
         "layer": "realtime",
         "choice": "Redis pub/sub for cross-instance fan-out (Upstash Redis on Fly)",
-        "justification": "With several app instances, a message published on one must reach sockets on all others.",
+        "justification": "With several app instances, a message published on one must reach sockets on all others. Up to 5,000 users online at once (scale.peak_concurrent_users) hold open connections.",
         "driven_by": [
           "requirements.realtime",
           "scale.peak_concurrent_users"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Polling the API every few seconds",
+            "why_not": "Every client asks again and again, which multiplies requests and still shows changes late"
+          }
+        ],
+        "tradeoffs": [
+          "Open connections hold memory per user and need pub/sub to reach users on other instances"
+        ],
         "source": "https://redis.io/docs/latest/develop/interact/pubsub/"
       },
       {
         "layer": "other",
         "choice": "Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus or y-websocket as the sync server",
-        "justification": "Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke.",
+        "justification": "Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "project.type",
           "requirements.realtime"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Operational transformation (ShareDB)",
+            "why_not": "A central server must order every edit, and offline edits merge less cleanly than with CRDTs"
+          }
+        ],
+        "tradeoffs": [
+          "Document snapshots grow with edit history and need compaction"
+        ],
         "source": "https://docs.yjs.dev/"
       },
       {
         "layer": "queue",
         "choice": "River (jobs in PostgreSQL)",
-        "justification": "Send emails, process uploads and call slow APIs outside the request path.",
+        "justification": "Send emails, process uploads and call slow APIs outside the request path. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.file_media_storage",
           "scale.workload"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Doing the work inside the web request",
+            "why_not": "Slow emails, uploads and API calls would hold the request open and fail with it"
+          }
+        ],
+        "tradeoffs": [
+          "A job can run twice after a retry, so handlers must be idempotent"
+        ],
         "source": "https://riverqueue.com/docs"
       },
       {
         "layer": "storage",
         "choice": "Cloudflare R2 (S3-compatible, no egress fees)",
-        "justification": "Uploaded files and video belong in object storage, not the database.",
+        "justification": "Uploaded files and video belong in object storage, not the database. The scenario stores 200 GB within 12 months (scale.data_volume_gb_12_months).",
         "driven_by": [
           "requirements.file_media_storage"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Files in database columns",
+            "why_not": "They bloat backups and the database disk, which costs several times more per GB than object storage"
+          }
+        ],
+        "tradeoffs": [
+          "Files and their database rows can drift apart: delete or replace both together"
+        ],
         "source": "https://developers.cloudflare.com/r2/pricing/"
       },
       {
         "layer": "cdn",
         "choice": "Cloudflare CDN in front of the uploads bucket",
-        "justification": "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.",
+        "justification": "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "project.platforms",
           "scale.users_12_months"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Serving files through the app server",
+            "why_not": "Each download holds an app connection and pays the app host's egress price"
+          }
+        ],
+        "tradeoffs": [
+          "Links that leak can be shared until they expire, so keep their lifetime short"
+        ],
         "source": "https://developers.cloudflare.com/r2/pricing/"
       },
       {
         "layer": "payments",
         "choice": "Stripe with hosted checkout (card tokens)",
-        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).",
+        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.payments",
           "compliance"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Adyen",
+            "why_not": "Suits large merchants with negotiated contracts; more setup than a first release needs"
+          },
+          {
+            "choice": "Taking card details on your own pages",
+            "why_not": "Card data on your servers moves the PCI-DSS audit from the shortest self-assessment (SAQ A) to a full one"
+          }
+        ],
+        "tradeoffs": [
+          "Every transaction pays the gateway's fee, and refunds and disputes follow its process"
+        ],
         "source": "https://docs.stripe.com/payments/checkout"
       },
       {
         "layer": "auth",
         "choice": "Auth0",
-        "justification": "Do not hand-roll password storage, MFA or SSO.",
+        "justification": "Do not hand-roll password storage, MFA or SSO. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.auth"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Keycloak (self-hosted)",
+            "why_not": "A server to run, patch and back up, for no feature this project needs"
+          },
+          {
+            "choice": "Hand-written login with password hashing",
+            "why_not": "Password storage, MFA, resets and lockouts are easy to get wrong and are the first things attackers test"
+          }
+        ],
+        "tradeoffs": [
+          "Sign-in depends on the identity provider staying up; moving users off it later is a migration"
+        ],
         "source": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
       },
       {
         "layer": "observability",
         "choice": "OpenTelemetry instrumentation -> Grafana Cloud",
-        "justification": "Traces, metrics and error tracking from day one; required to defend an availability target.",
+        "justification": "Traces, metrics and error tracking from day one; required to defend an availability target. A 99.9% availability target (requirements.availability) allows about 43 minutes of downtime a month, so failures must show within minutes.",
         "driven_by": [
           "requirements.availability"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Logs only",
+            "why_not": "Without traces and metrics there is no way to see which call is slow or failing"
+          }
+        ],
+        "tradeoffs": [
+          "Telemetry volume is billed: sample traces and set log retention"
+        ],
         "source": "https://opentelemetry.io/docs/"
       },
       {
         "layer": "ci_cd",
         "choice": "GitHub Actions",
-        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate.",
+        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate. All 5 engineers (team.size) release through the same pipeline.",
         "driven_by": [
           "infrastructure.deployment_model",
           "team.size"

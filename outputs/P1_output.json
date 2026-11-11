@@ -136,18 +136,25 @@
       {
         "layer": "observability",
         "choice": "An uptime check plus the host's web analytics",
-        "justification": "With no server code there is nothing to trace; watch that the pages are up and how fast they load.",
+        "justification": "With no server code there is nothing to trace; watch that the pages are up and how fast they load. A 99% availability target (requirements.availability) allows about 432 minutes of downtime a month, so failures must show within minutes.",
         "driven_by": [
           "requirements.availability"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Logs only",
+            "why_not": "Without traces and metrics there is no way to see which call is slow or failing"
+          }
+        ],
+        "tradeoffs": [
+          "Telemetry volume is billed: sample traces and set log retention"
+        ],
         "source": "https://web.dev/articles/vitals"
       },
       {
         "layer": "ci_cd",
         "choice": "GitHub Actions",
-        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate.",
+        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate. All 1 engineers (team.size) release through the same pipeline.",
         "driven_by": [
           "infrastructure.deployment_model",
           "team.size"

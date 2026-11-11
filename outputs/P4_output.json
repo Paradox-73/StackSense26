@@ -150,127 +150,218 @@
       {
         "layer": "queue",
         "choice": "Amazon SQS with Spring Cloud AWS listeners",
-        "justification": "Send emails, process uploads and call slow APIs outside the request path.",
+        "justification": "Send emails, process uploads and call slow APIs outside the request path. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.file_media_storage",
           "scale.workload"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Doing the work inside the web request",
+            "why_not": "Slow emails, uploads and API calls would hold the request open and fail with it"
+          }
+        ],
+        "tradeoffs": [
+          "A job can run twice after a retry, so handlers must be idempotent"
+        ],
         "source": "https://docs.awspring.io/spring-cloud-aws/docs/3.3.0/reference/html/index.html#sqs-integration"
       },
       {
         "layer": "storage",
         "choice": "Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN)",
-        "justification": "Uploaded files and video belong in object storage, not the database. Hand uploads out from the bucket, not the app server; a public CDN would cache copies at edge sites outside the country your data must stay in, and each signed URL expires within minutes.",
+        "justification": "Uploaded files and video belong in object storage, not the database. Hand uploads out from the bucket, not the app server; a public CDN would cache copies at edge sites outside the country your data must stay in, and each signed URL expires within minutes. The scenario stores 500 GB within 12 months (scale.data_volume_gb_12_months).",
         "driven_by": [
           "requirements.file_media_storage",
           "infrastructure.data_residency",
           "project.platforms",
           "scale.users_12_months"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Files in database columns",
+            "why_not": "They bloat backups and the database disk, which costs several times more per GB than object storage"
+          },
+          {
+            "choice": "Serving files through the app server",
+            "why_not": "Each download holds an app connection and pays the app host's egress price"
+          }
+        ],
+        "tradeoffs": [
+          "Files and their database rows can drift apart: delete or replace both together",
+          "Links that leak can be shared until they expire, so keep their lifetime short"
+        ],
         "source": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html"
       },
       {
         "layer": "other",
         "choice": "MSG91, with DLT-registered SMS templates",
-        "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India.",
+        "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.auth",
           "infrastructure.data_residency"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Twilio Verify",
+            "why_not": "Twilio runs Verify in its US region, so codes and numbers would be processed and stored outside India"
+          },
+          {
+            "choice": "Authenticator-app codes (TOTP)",
+            "why_not": "Every user must install an app first, which loses sign-ups on a consumer product"
+          }
+        ],
+        "tradeoffs": [
+          "Each SMS is paid, and open sign-up forms invite SMS-pumping fraud: rate-limit by number and IP"
+        ],
         "source": "https://msg91.com/pdf/sar.pdf"
       },
       {
         "layer": "payments",
         "choice": "Razorpay with hosted checkout (card tokens)",
-        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.",
+        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.payments",
           "compliance"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Cashfree",
+            "why_not": "Equivalent hosted checkout; one gateway is enough to start"
+          },
+          {
+            "choice": "Stripe",
+            "why_not": "Stripe takes new Indian businesses by invitation only"
+          },
+          {
+            "choice": "Taking card details on your own pages",
+            "why_not": "Card data on your servers moves the PCI-DSS audit from the shortest self-assessment (SAQ A) to a full one"
+          }
+        ],
+        "tradeoffs": [
+          "Every transaction pays the gateway's fee, and refunds and disputes follow its process"
+        ],
         "source": "https://razorpay.com/docs/payments/payment-gateway/web-integration/hosted/"
       },
       {
         "layer": "cdn",
         "choice": "Amazon S3 + CloudFront",
-        "justification": "React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Java/Kotlin + Spring Boot instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.",
+        "justification": "React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Java/Kotlin + Spring Boot instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "project.platforms",
           "scale.users_12_months"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Serving the built files from the app's instances",
+            "why_not": "Every page load reaches the app servers, which then need sizing for static traffic as well"
+          }
+        ],
+        "tradeoffs": [
+          "Each release must invalidate the cached files"
+        ],
         "source": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html"
       },
       {
         "layer": "auth",
         "choice": "Amazon Cognito in the Mumbai region (ap-south-1)",
-        "justification": "Do not hand-roll password storage, MFA or SSO.",
+        "justification": "Do not hand-roll password storage, MFA or SSO. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.auth",
           "infrastructure.data_residency"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Keycloak (self-hosted)",
+            "why_not": "A server to run, patch and back up, for no feature this project needs"
+          },
+          {
+            "choice": "Hand-written login with password hashing",
+            "why_not": "Password storage, MFA, resets and lockouts are easy to get wrong and are the first things attackers test"
+          }
+        ],
+        "tradeoffs": [
+          "Sign-in depends on the identity provider staying up; moving users off it later is a migration"
+        ],
         "source": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-identity-federation.html"
       },
       {
         "layer": "other",
         "choice": "Firebase Cloud Messaging (+ APNs)",
-        "justification": "Standard channel for mobile engagement on Android and iOS.",
+        "justification": "Standard channel for mobile engagement on Android and iOS. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "project.platforms"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Polling for new messages",
+            "why_not": "It drains batteries and still misses users who are not in the app"
+          }
+        ],
+        "tradeoffs": [
+          "Delivery is best-effort, and users can switch notifications off"
+        ],
         "source": "https://firebase.google.com/docs/cloud-messaging"
       },
       {
         "layer": "ml",
         "choice": "Amazon SageMaker real-time endpoint for your own model (Amazon Bedrock for a hosted one)",
-        "justification": "Serve the model from its own endpoint, versioned and monitored apart from the web tier; a small scoring model runs on CPU.",
+        "justification": "Serve the model from its own endpoint, versioned and monitored apart from the web tier; a small scoring model runs on CPU. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.ml_features",
           "infrastructure.data_residency"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Running the model inside the web servers",
+            "why_not": "Model memory and CPU spikes slow every request, and the two cannot scale apart"
+          }
+        ],
+        "tradeoffs": [
+          "An always-on endpoint bills while idle unless it scales to zero"
+        ],
         "source": "https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html"
       },
       {
         "layer": "observability",
         "choice": "OpenTelemetry instrumentation -> CloudWatch + X-Ray",
-        "justification": "Traces, metrics and error tracking from day one; required to defend an availability target.",
+        "justification": "Traces, metrics and error tracking from day one; required to defend an availability target. A 99.95% availability target (requirements.availability) allows about 22 minutes of downtime a month, so failures must show within minutes.",
         "driven_by": [
           "requirements.availability",
           "infrastructure.data_residency"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Logs only",
+            "why_not": "Without traces and metrics there is no way to see which call is slow or failing"
+          }
+        ],
+        "tradeoffs": [
+          "Telemetry volume is billed: sample traces and set log retention"
+        ],
         "source": "https://opentelemetry.io/docs/"
       },
       {
         "layer": "other",
         "choice": "Encrypted storage (KMS), audit logging, least-privilege IAM, WAF",
-        "justification": "PCI-DSS requires access controls, audit trails and encryption.",
+        "justification": "PCI-DSS requires access controls, audit trails and encryption. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "compliance"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "The cloud's default settings",
+            "why_not": "Auditors ask for evidence of access control, audit logging and encryption that defaults do not record"
+          }
+        ],
+        "tradeoffs": [
+          "Audit logs and key management add a running cost and need regular review"
+        ],
         "source": "https://www.pcisecuritystandards.org/document_library/"
       },
       {
         "layer": "ci_cd",
         "choice": "GitHub Actions",
-        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate.",
+        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate. All 8 engineers (team.size) release through the same pipeline.",
         "driven_by": [
           "infrastructure.deployment_model",
           "team.size"

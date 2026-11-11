@@ -14,7 +14,7 @@ import json
 import re
 
 from . import __version__
-from .advice import SSO_DAU_PER_MAU
+from .advice import SSO_DAU_PER_MAU, service_notes
 from .explain import LANG_LABELS, mobile_name
 from .kb import LAYERS, field_specs, load_kb
 from .recommender import recommend
@@ -924,6 +924,26 @@ def _component(layer: str, sl: dict, origin: dict, f: dict, result: dict) -> dic
 ONE_PER_LAYER = ("auth", "cdn", "storage")
 
 
+def _quote(layer: str, f: dict) -> str:
+    """One number from the scenario that a supporting service is chosen or sized for."""
+    if layer == "observability":
+        a = float(f["requirements.availability"])
+        return (f" A {a:g}% availability target (requirements.availability) allows about "
+                f"{(100 - a) / 100 * 30 * 24 * 60:,.0f} minutes of downtime a month, so failures must show within minutes.")
+    if layer == "cache" and f["requirements.p95_latency_ms"]:
+        return (f" The {f['requirements.p95_latency_ms']:g} ms p95 target (requirements.p95_latency_ms) leaves little "
+                "time for repeated database reads.")
+    if layer == "realtime" and f["scale.peak_concurrent_users"]:
+        return (f" Up to {f['scale.peak_concurrent_users']:,.0f} users online at once (scale.peak_concurrent_users) "
+                "hold open connections.")
+    if layer == "ci_cd":
+        return f" All {f['team.size']:,.0f} engineers (team.size) release through the same pipeline."
+    if layer in ("storage", "search") and f["scale.data_volume_gb_12_months"] is not None:
+        return (f" The scenario stores {f['scale.data_volume_gb_12_months']:,g} GB within 12 months "
+                "(scale.data_volume_gb_12_months).")
+    return f" Sized for the {f['scale.users_12_months']:,.0f} users expected at 12 months (scale.users_12_months)."
+
+
 def _supporting(result: dict, f: dict) -> list[dict]:
     out = []
     services = [(s, False) for s in result.get("supporting_services", [])] + \
@@ -937,15 +957,17 @@ def _supporting(result: dict, f: dict) -> list[dict]:
         fields = OTHER_FIELDS.get(s["role"]) or SERVICE_FIELDS[layer]
         if f["infrastructure.data_residency"] != "none" and layer in ("storage", "auth", "cache", "observability", "ml"):
             fields = fields + ["infrastructure.data_residency"]
-        tradeoffs = []
+        alts, tradeoffs = service_notes(s, result.get("profile", {}).get("compliance", []))
+        tradeoffs = list(tradeoffs)
         if s.get("system"):
             tradeoffs.append(f"One more system to run: {s['system']}")
         if s.get("trigger"):
             tradeoffs.append(f"Add it {s['trigger']}" if deferred else f"Can wait until {s['trigger']}")
         why = s["why"] + (" Deferred: the team's operations budget keeps it out of the first release." if deferred else "")
         layer = s.get("layer") or layer
+        alts = [{"choice": c, "why_not": w} for c, w in alts if c.split(" (")[0] not in s["name"]]
         entry = {"layer": layer, "choice": s["name"], "justification": why, "driven_by": fields,
-                 "alternatives": [], "tradeoffs": tradeoffs, "source": s.get("source"), "role": s["role"]}
+                 "alternatives": alts, "tradeoffs": tradeoffs, "source": s.get("source"), "role": s["role"]}
         first = next((x for x in out if x["layer"] == layer), None) if layer in ONE_PER_LAYER else None
         if first:  # one sign-in product, one CDN, one file store: a second line of the layer adds to the first
             if s["role"] == "Static frontend":  # it names the bucket and the CDN, so it leads
@@ -953,6 +975,7 @@ def _supporting(result: dict, f: dict) -> list[dict]:
             first["justification"] += " " + why
             first["driven_by"] = list(dict.fromkeys(first["driven_by"] + fields))
             first["tradeoffs"] = list(dict.fromkeys(first["tradeoffs"] + tradeoffs))
+            first["alternatives"] += [a for a in alts if a not in first["alternatives"]]
             continue
         out.append(entry)
     idps = _systems(f["infrastructure.existing_systems"])[1]
@@ -962,9 +985,11 @@ def _supporting(result: dict, f: dict) -> list[dict]:
         first = out.index(replaced[0]) if replaced else len(out)
         out = [x for x in out if x not in replaced]
         out.insert(first, _reuse_identity(idps[0], replaced))
-    for x in out:
+    for x in out:  # each justification quotes the scenario number the service answers to
+        x["justification"] += _quote(x["layer"], f)
         x.pop("role", None)
     out.append(_ci_cd(f))
+    out[-1]["justification"] += _quote("ci_cd", f)
     return out
 
 

@@ -147,91 +147,161 @@
       {
         "layer": "queue",
         "choice": "Celery (Redis/Valkey broker)",
-        "justification": "Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (DigitalOcean Managed Caching (Valkey)).",
+        "justification": "Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (DigitalOcean Managed Caching (Valkey)). Sized for the 2,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.file_media_storage",
           "scale.workload"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Doing the work inside the web request",
+            "why_not": "Slow emails, uploads and API calls would hold the request open and fail with it"
+          }
+        ],
+        "tradeoffs": [
+          "A job can run twice after a retry, so handlers must be idempotent"
+        ],
         "source": "https://docs.celeryq.dev/en/stable/getting-started/backends-and-brokers/index.html"
       },
       {
         "layer": "storage",
         "choice": "DigitalOcean Spaces in BLR1 (Bangalore), a private bucket with short-lived signed URLs (no public CDN)",
-        "justification": "Uploaded files and video belong in object storage, not the database. Hand uploads out from the bucket, not the app server; a public CDN would cache copies at edge sites outside the country your data must stay in, and each signed URL expires within minutes.",
+        "justification": "Uploaded files and video belong in object storage, not the database. Hand uploads out from the bucket, not the app server; a public CDN would cache copies at edge sites outside the country your data must stay in, and each signed URL expires within minutes. The scenario stores 100 GB within 12 months (scale.data_volume_gb_12_months).",
         "driven_by": [
           "requirements.file_media_storage",
           "infrastructure.data_residency",
           "project.platforms",
           "scale.users_12_months"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Ceph Object Gateway on your own servers",
+            "why_not": "A storage cluster to run yourself"
+          },
+          {
+            "choice": "Files in database columns",
+            "why_not": "They bloat backups and the database disk, which costs several times more per GB than object storage"
+          },
+          {
+            "choice": "Serving files through the app server",
+            "why_not": "Each download holds an app connection and pays the app host's egress price"
+          }
+        ],
+        "tradeoffs": [
+          "Files and their database rows can drift apart: delete or replace both together",
+          "Links that leak can be shared until they expire, so keep their lifetime short"
+        ],
         "source": "https://docs.digitalocean.com/products/spaces/details/availability/"
       },
       {
         "layer": "other",
         "choice": "MSG91, with DLT-registered SMS templates",
-        "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India.",
+        "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India. Sized for the 2,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.auth",
           "infrastructure.data_residency"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Twilio Verify",
+            "why_not": "Twilio runs Verify in its US region, so codes and numbers would be processed and stored outside India"
+          },
+          {
+            "choice": "Authenticator-app codes (TOTP)",
+            "why_not": "Every user must install an app first, which loses sign-ups on a consumer product"
+          }
+        ],
+        "tradeoffs": [
+          "Each SMS is paid, and open sign-up forms invite SMS-pumping fraud: rate-limit by number and IP"
+        ],
         "source": "https://msg91.com/pdf/sar.pdf"
       },
       {
         "layer": "auth",
         "choice": "Django's built-in authentication (django.contrib.auth), with the users in your database in India",
-        "justification": "Do not hand-roll password storage, MFA or SSO.",
+        "justification": "Do not hand-roll password storage, MFA or SSO. Sized for the 2,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.auth",
           "infrastructure.data_residency"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Keycloak (self-hosted)",
+            "why_not": "A server to run, patch and back up, for no feature this project needs"
+          },
+          {
+            "choice": "Hand-written login with password hashing",
+            "why_not": "Password storage, MFA, resets and lockouts are easy to get wrong and are the first things attackers test"
+          }
+        ],
+        "tradeoffs": [
+          "Sign-in depends on the identity provider staying up; moving users off it later is a migration"
+        ],
         "source": "https://docs.djangoproject.com/en/stable/topics/auth/"
       },
       {
         "layer": "other",
         "choice": "PowerSync: a local SQLite copy on the device kept in sync with Postgres",
-        "justification": "Offline use needs a local copy of the data and conflict handling when the device reconnects; the primary database does not provide that by itself.",
+        "justification": "Offline use needs a local copy of the data and conflict handling when the device reconnects; the primary database does not provide that by itself. Sized for the 2,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.offline_support"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "ElectricSQL",
+            "why_not": "Since its 2024 rewrite it syncs Postgres data over HTTP into the app's own store, with no local SQLite copy on the device"
+          },
+          {
+            "choice": "A sync API you write yourself",
+            "why_not": "Conflict detection, retries and partial sync are a project of their own"
+          }
+        ],
+        "tradeoffs": [
+          "Offline edits that conflict need a merge rule the users understand"
+        ],
         "source": "https://docs.powersync.com/"
       },
       {
         "layer": "other",
         "choice": "Expo push notifications (FCM and APNs underneath)",
-        "justification": "Standard channel for mobile engagement on Android and iOS.",
+        "justification": "Standard channel for mobile engagement on Android and iOS. Sized for the 2,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "project.platforms"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Polling for new messages",
+            "why_not": "It drains batteries and still misses users who are not in the app"
+          }
+        ],
+        "tradeoffs": [
+          "Delivery is best-effort, and users can switch notifications off"
+        ],
         "source": "https://docs.expo.dev/push-notifications/overview/"
       },
       {
         "layer": "observability",
         "choice": "OpenTelemetry instrumentation -> the host's built-in metrics and logs, kept in your Indian region; self-hosted Grafana + Prometheus + Loki there once you outgrow them",
-        "justification": "Traces, metrics and error tracking from day one; required to defend an availability target.",
+        "justification": "Traces, metrics and error tracking from day one; required to defend an availability target. A 99% availability target (requirements.availability) allows about 432 minutes of downtime a month, so failures must show within minutes.",
         "driven_by": [
           "requirements.availability",
           "infrastructure.data_residency"
         ],
-        "alternatives": [],
-        "tradeoffs": [],
+        "alternatives": [
+          {
+            "choice": "Logs only",
+            "why_not": "Without traces and metrics there is no way to see which call is slow or failing"
+          }
+        ],
+        "tradeoffs": [
+          "Telemetry volume is billed: sample traces and set log retention"
+        ],
         "source": "https://opentelemetry.io/docs/"
       },
       {
         "layer": "ci_cd",
         "choice": "GitHub Actions",
-        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate.",
+        "justification": "Every push runs the tests and deploys the same way; hosted runners mean no build server to operate. All 2 engineers (team.size) release through the same pipeline.",
         "driven_by": [
           "infrastructure.deployment_model",
           "team.size"
