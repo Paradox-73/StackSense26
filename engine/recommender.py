@@ -281,6 +281,34 @@ def _growth_path(kb: dict, p: dict, d: dict, own: dict | None = None) -> tuple[l
     return picks, lefts, holds, forbids, nowide
 
 
+def _pair_with_mobile(best: dict, combos: list[dict], kb: dict, p: dict, d: dict, w) -> dict:
+    """Web + mobile: of the web frameworks tied with the pick (same other layers, within the tie margin), prefer one
+    that shares code with the mobile toolkit the app will most likely use (React with React Native), so both apps
+    are written in one ecosystem."""
+    fe, tb = best["picks"]["frontend"]["item"], best.get("tie_break") or {}
+    if not (d["mobile"] and d["web"]) or d.get("one_codebase") or fe.get("kind") != "web" or \
+            tb.get("kept_on_growth_path") or tb.get("avoided_return") or tb.get("budget_guard"):
+        return best  # a stack held for the growth path or the budget keeps its frontend
+    tied = [c for c in combos if c is not best and c["score"] >= best["score"] - TIE_MARGIN
+            and all(c["picks"][l]["id"] == best["picks"][l]["id"] for l in LAYERS if l != "frontend")]
+    if not tied:  # checked first: scoring the mobile toolkits is the costly part
+        return best
+    ranked, _ = score_layer("frontend", [it for it in kb["frontend"] if it.get("kind") == "mobile"], p, dict(d, web=False), w)
+    mobile = set(ranked[0]["item"].get("skills", [])) - {"javascript", "typescript"} if ranked else set()
+    tied = [c for c in tied if mobile & set(c["picks"]["frontend"]["item"].get("skills", []))]
+    if not mobile or mobile & set(fe.get("skills", [])) or not tied:
+        return best
+    pick, top = max(tied, key=lambda c: c["score"]), max(combos, key=lambda c: c["score"])
+    shared = ", ".join(sorted(mobile & set(pick["picks"]["frontend"]["item"].get("skills", []))))
+    pick.pop("tie_break", None)
+    if top is not pick and top["score"] > pick["score"]:
+        pick["tie_break"] = {"top_scorer": {l: c["name"] for l, c in top["picks"].items()}, "top_score": top["score"],
+                             "margin": round(top["score"] - pick["score"], 2), "kept_on_growth_path": False,
+                             "decided_by": f"sharing code with the mobile app ({ranked[0]['item']['name']} and "
+                                           f"{pick['picks']['frontend']['item']['name']} both use {shared})"}
+    return pick
+
+
 def _core(raw: dict, kb: dict | None = None, light: bool = False) -> dict:
     """Run the pipeline without counterfactuals. Returns an internal result dict. `kb` replaces the
     knowledge base (used only by the score-noise study, which passes a perturbed copy). `light` is for
@@ -310,6 +338,7 @@ def _core(raw: dict, kb: dict | None = None, light: bool = False) -> dict:
     best = _budget_guard(p, d, combos, choose(combos, lefts[k], holds[k], _fits(p, d, layer_scored["database"]),
                                               forbids[k]), layer_scored["database"], lefts[k],
                          wide=None if k in nowide else _wider(kb, p, d, layer_scored), hold=holds[k])
+    best = _pair_with_mobile(best, combos, kb, p, d, w)
     combos[:] = [c for c in combos if c is not best]
     combos.insert(0, best)
     for layer in relaxed:  # the statement asks for exactly which constraints were relaxed: the pick's own waived limits

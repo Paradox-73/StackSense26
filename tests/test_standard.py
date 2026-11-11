@@ -963,3 +963,20 @@ def test_a_web_game_without_an_engine_client_gets_no_game_servers():
     out = game(["typescript"], realtime=True, platforms=["web"])
     assert out["stack"]["frontend"]["choice"] not in ("Unity (C#)", "Unreal Engine (C++)")
     assert not [s for s in out["stack"]["supporting"] if s["choice"].startswith(("Agones", "Amazon GameLift"))]
+
+
+def test_the_web_frontend_shares_code_with_the_mobile_app_when_they_tie():
+    """A beginner JavaScript team's web + Android marketplace: Nuxt (Vue) and Next.js (React) tie on the web, and the
+    Android app is React Native, so the tie goes to the framework that shares React with it."""
+    out = run({"project": {"type": "marketplace", "platforms": ["web", "android"]},
+               "scale": {"traffic_pattern": "seasonal", "workload": "balanced", "users_at_launch": 500,
+                         "users_12_months": 20000, "peak_concurrent_users": 400, "data_volume_gb_12_months": 30},
+               "team": {"has_devops": False, "size": 4, "experience": "beginner", "languages": ["javascript", "html", "css"]},
+               "budget": {"monthly_infra_usd": 0}, "timeline": {"mvp_weeks": 8},
+               "infrastructure": {"cloud_preference": "any", "deployment_model": "managed_cloud", "data_residency": "india"},
+               "requirements": {"realtime": True, "full_text_search": True, "file_media_storage": True, "payments": True,
+                                "auth": "social", "seo_critical": True, "availability": "99"},
+               "compliance": ["dpdp"], "priorities": {"cost": 5, "time_to_market": 4, "scalability": 2, "performance": 2}})
+    choice = out["stack"]["frontend"]["choice"]
+    assert choice == "Next.js (React) + React Native (Expo) for the Android app", choice
+    assert "sharing code with the mobile app" in out["stack"]["frontend"]["justification"] or "higher stack score" in         out["stack"]["frontend"]["justification"], out["stack"]["frontend"]["justification"]
