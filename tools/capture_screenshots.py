@@ -40,6 +40,7 @@ COLUMN_PT = 514.9  # tools/report_print.css prints every screenshot across the 1
 MIN_PT = 7  # the smallest text in a printed screenshot
 PAGE_PT = 720  # the tallest picture that fits a page with its caption: tools/report_print.css leaves 265 mm (751 pt)
 GALLERY_W = 1180  # window width for the gallery: the result card is then about 710 px wide, so its 10.5 px labels print at 7 pt
+NO_SKELETON = "() => !document.querySelector('.sk, #out.busy')"  # no loading placeholder (class sk) and no engine run in flight
 
 
 def _result(preset: str, **override) -> dict:
@@ -202,6 +203,7 @@ def capture_scenarios(browser, port: int, only: str | None, check_only: bool) ->
         page.goto(f"http://127.0.0.1:{port}/scenario?theme=light&example={stem}")
         page.wait_for_selector("#sc-out .sc-status", timeout=30000)
         page.wait_for_timeout(500)
+        page.wait_for_function(NO_SKELETON, timeout=30000)
         text = page.evaluate("document.querySelector('#sc-out').innerText")
         missing = [f"page lacks {t!r}" for t in scenario_expect(stem) if t.lower() not in text.lower()]
         clip = scenario_clip(page, first, last)
@@ -295,6 +297,7 @@ def main() -> int:
                 if name in ACTS:
                     ACTS[name](page)
                     page.wait_for_timeout(800)
+                page.wait_for_function(NO_SKELETON, timeout=30000)
                 for hidden in HIDE.get(name, []):
                     page.evaluate("(s) => { const e = document.querySelector(s); if (e) e.style.display = 'none'; }", hidden)
                 if name.startswith("e"):  # edge cases: open the warnings list so the resolutions are on the picture

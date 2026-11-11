@@ -84,6 +84,14 @@ async function api(path, body, signal) {
   return (r.headers.get("content-type") || "").includes("json") ? r.json() : r.text();
 }
 
+/* ================================================================== skeletons
+   Flat bars in the shape of what is loading. They never carry .pick-b, .kb-sec or .sc-status: the screenshot tool
+   waits for those, and then for every .sk to be gone. */
+const SK_W = [92, 74, 86, 63, 80];
+const skLines = (n, label) => `<div class="sk-lines" role="status" aria-label="${esc(label)}">${
+  Array.from({ length: n }, (_, i) => `<i class="sk" style="--w:${SK_W[i % SK_W.length]}%"></i>`).join("")}</div>`;
+const skTable = (rows, label) => `<div class="sk-table" role="status" aria-label="${esc(label)}">${"<i class=\"sk\"></i>".repeat(rows)}</div>`;
+
 /* ================================================================== questions model */
 const allFields = () => S.questions.steps.flatMap((s) => s.fields);
 const fieldByKey = (k) => allFields().find((f) => f.key === k);
@@ -266,7 +274,7 @@ function syncQuick() {
 const LAYER_NAME = { frontend: "Frontend", backend: "Backend", database: "Database", hosting: "Hosting" };
 async function askNext() {
   const box = $("#asknext-out"), btn = $("#asknext-btn");
-  box.hidden = false; box.innerHTML = `<p class="muted small">Testing the unanswered questions against your answers...</p>`;
+  box.hidden = false; box.innerHTML = skLines(4, "Testing the unanswered questions against your answers");
   btn.disabled = true;
   try {
     const r = await api("/api/next", { answers: sent() });
@@ -692,9 +700,12 @@ async function run({ change = null, compare = true } = {}) {
   }
 }
 
+/** The first result's placeholder: the header (score, title, cost), four stations and the what-if block. */
 function skeleton() {
-  return `<div class="skel" aria-busy="true" aria-label="Scoring every technology and stack combination">
-    <div class="sk sk-head"></div><div class="sk-grid">${LAYERS.map(() => '<div class="sk sk-card"></div>').join("")}</div><div class="sk sk-bar"></div></div>`;
+  return `<div class="skel" role="status" aria-busy="true" aria-label="Scoring every technology and stack combination">
+    <div class="sk-head"><i class="sk sk-dial"></i><div class="sk-lines"><i class="sk" style="--w:72%"></i><i class="sk" style="--w:44%"></i></div><div class="sk-lines"><i class="sk"></i><i class="sk" style="--w:64%"></i></div></div>
+    <ul class="sk-stns">${LAYERS.map(() => '<li><i class="sk"></i><i class="sk"></i><i class="sk"></i></li>').join("")}</ul>
+    <i class="sk sk-block"></i></div>`;
 }
 
 /* ================================================================== result: small parts */
@@ -943,7 +954,7 @@ function renderDepends() {
   }
   const names = unknown.map(noun);
   if (!S.sens) {
-    box.innerHTML = `<div class="dep loading" aria-busy="true"><p class="dep-h"><b>Checking what depends on your ${unknown.length === 1 ? "unknown answer" : `${unknown.length} unknown answers`}</b> <span class="muted">(${esc(names.join(", "))})…</span></p></div>`;
+    box.innerHTML = `<div class="dep" aria-busy="true"><p class="dep-h"><b>Testing ${unknown.length === 1 ? "your unknown answer" : `${unknown.length} unknown answers`}</b> <span class="muted">(${esc(names.join(", "))})</span></p>${skLines(3, "Testing which picks depend on your unknown answers")}</div>`;
     return;
   }
   const s = S.sens;
@@ -1093,7 +1104,7 @@ async function fillFromBrief() {
   out.hidden = false;
   if (!text) { out.innerHTML = `<p class="muted small">Write a sentence or two about your project first.</p>`; return; }
   btn.disabled = true;
-  out.innerHTML = `<p class="muted small">Reading your description...</p>`;
+  out.innerHTML = skLines(4, "Reading your description");
   try {
     applyBrief(await api("/api/brief", { text }));
   } catch (e) {
@@ -1151,7 +1162,7 @@ function renderSummary() {
   if (!s) {
     box.innerHTML = `<div class="sum"><div class="sum-h"><h3>Plain-English summary</h3>
       <button type="button" class="link-btn" id="sum-go">Write summary</button></div>
-      <p class="muted small">A language model re-words the engine's own facts. Its text is shown only if every technology and number in it appears in those facts; otherwise you get the engine's template text.</p></div>`;
+      <p class="muted small" id="sum-note">A language model re-words the engine's own facts. Its text is shown only if every technology and number in it appears in those facts; otherwise you get the engine's template text.</p></div>`;
     return;
   }
   const ok = s.source === "llm" && s.checked;
@@ -1166,14 +1177,15 @@ function renderSummary() {
 }
 
 async function loadSummary() {
-  const key = summaryKey(), btn = $("#sum-go");
+  const key = summaryKey(), btn = $("#sum-go"), note = $("#sum-note");
   if (btn) { btn.disabled = true; btn.textContent = "Writing..."; }
+  if (note) note.outerHTML = skLines(4, "Writing the summary");
   try {
     S.summary = { key, data: await api("/api/summary", sent()) };
   } catch (e) {
     S.summary = null;
-    const box = $("#summary"); if (box) box.insertAdjacentHTML("beforeend", `<p class="muted small" role="alert">Could not write the summary. ${esc(e.message)}</p>`);
-    if (btn) { btn.disabled = false; btn.textContent = "Write summary"; }
+    renderSummary();
+    $("#summary .sum")?.insertAdjacentHTML("beforeend", `<p class="muted small" role="alert">Could not write the summary. ${esc(e.message)}</p>`);
     return;
   }
   renderSummary();
@@ -1194,7 +1206,7 @@ function renderWhatIfText() {
 async function askWhatIf() {
   const q = $("#wq-in").value.trim(), out = $("#wq-out"), btn = $("#wq-go");
   if (!q) return;
-  btn.disabled = true; out.textContent = "Reading the question...";
+  btn.disabled = true; out.innerHTML = skLines(1, "Reading the question");
   try {
     const r = await api("/api/whatif", { answers: sent(), question: q });
     const keys = Object.keys(r.changes).filter(fieldByKey), before = {};
@@ -1338,7 +1350,7 @@ function whyNotSection(l, s) {
 async function runRobustness() {
   const box = $("#rob-out");
   if (!box) return;
-  box.innerHTML = `<p class="muted small">Running 60 engine runs…</p>`;
+  box.innerHTML = skTable(5, "Running 60 engine runs");
   try {
     const x = await api("/api/robustness", sent());
     if (!x.feasible) { box.innerHTML = `<p class="muted small">No feasible stack to test.</p>`; return; }
@@ -1355,7 +1367,7 @@ async function runWhyNot(layer) {
   else pins[layer] = $(`[data-wn-sel="${layer}"]`).value;
   const at = layer === "all" ? S.whyLayer || "frontend" : layer, box = $(`#wn-out-${at}`);
   if (!box) return;
-  box.innerHTML = `<p class="muted small">Re-running the search with that choice fixed and trying single answer changes…</p>`;
+  box.innerHTML = skLines(4, "Re-running the search with that choice fixed and trying single answer changes");
   try {
     const x = await api("/api/whynot", { answers: sent(), pins });
     if (!x.ok) { box.innerHTML = `<p class="muted small">${esc(x.error)}</p>`; return; }
@@ -1458,7 +1470,7 @@ async function loadGrowth() {
 async function showGrowth() {
   const el = $("#panel-growth");
   if (!S.result || !S.result.feasible) return;
-  if (!(S.growth && S.growthKey === JSON.stringify(S.answers))) el.innerHTML = `<p class="muted g-wait">Running the engine at 1×, 3×, 10×, 30× and 100× your users…</p>`;
+  if (!(S.growth && S.growthKey === JSON.stringify(S.answers))) el.innerHTML = `<p class="muted g-wait">Running the engine at 1×, 3×, 10×, 30× and 100× your users.</p>${skTable(7, "Running the growth path")}`;
   try {
     const g = await loadGrowth();
     if (g) el.innerHTML = growthHtml(g);
@@ -1597,7 +1609,7 @@ function deferredPanel(r) {
 /* ================================================================== knowledge base */
 async function renderKb() {
   const el = $("#view-kb");
-  el.innerHTML = skeleton();
+  el.innerHTML = `<div class="kb-head">${skLines(2, "Loading the knowledge base")}</div>${LAYERS.map(() => `<div class="sk-kb">${skTable(6, "")}</div>`).join("")}`;
   let kb;
   try { kb = await api("/api/kb"); } catch (e) {
     el.innerHTML = `<div class="empty" role="alert"><h2>Could not load the knowledge base</h2><p>${esc(e.message)}</p></div>`; return;

@@ -103,7 +103,8 @@ function syncOut() {
 function renderOut() {
   const o = S.out, box = $("#sc-out");
   syncOut();
-  if (!o) { box.innerHTML = `<p class="muted">Load a scenario file, or pick a public example, then run it.</p>`; return; }
+  box.removeAttribute("aria-busy");
+  if (!o) { box.innerHTML = `<p class="sc-empty">Load a scenario file or pick an example; the result shows here.</p>`; return; }
   const list = (items, fn) => `<ul class="sc-list">${items.map(fn).join("")}</ul>`;
   let h = `<div class="sc-head"><span class="sc-status ${esc(o.status)}">${esc(o.status)}</span>${
     o.architecture_style ? `<span class="sc-style">${esc(o.architecture_style)}</span>` : ""}${
@@ -135,9 +136,16 @@ function download(name, data) {
 
 const say = (t) => { $("#sc-msg").textContent = t; };
 
+/* While a run is in flight: a skeleton in the shape of the result when there is none yet, else the old result dimmed.
+   The skeleton never carries .sc-status or .sc-c, which the tests and the screenshot tool wait for. */
+const SKELETON = `<div role="status" aria-label="Running the scenario"><div class="sk-lines"><i class="sk" style="--w:38%;height:24px"></i>
+  <i class="sk"></i><i class="sk" style="--w:88%"></i><i class="sk" style="--w:62%"></i></div><ul class="sk-stns">${
+  "<li><i class=\"sk\"></i><i class=\"sk\"></i><i class=\"sk\"></i></li>".repeat(4)}</ul></div>`;
+
 async function runScenario() {
-  const sent = JSON.stringify(S.doc), run = ++S.run;
+  const sent = JSON.stringify(S.doc), run = ++S.run, box = $("#sc-out");
   say("Running...");
+  if (S.out) box.setAttribute("aria-busy", "true"); else box.innerHTML = SKELETON;
   let out = null, err = null;
   try { out = await api("/api/scenario", S.doc); } catch (e) { err = e; }
   if (run !== S.run) return;  /* a later run or load replaced this one */
@@ -175,6 +183,7 @@ function offerChoice(list, name) {
     return `${show(o.scenario_id) || `#${i + 1}`}${o.project && o.project.name ? `: ${show(o.project.name)}` : ""}`;
   };
   say(`${name}.json holds ${list.length} scenarios; pick one.`);
+  $("#sc-out").removeAttribute("aria-busy");
   $("#sc-out").innerHTML = `<p class="muted">Which of the ${list.length} scenarios in the file?</p><div class="sc-bar">${
     list.map((x, i) => `<button type="button" class="sc-btn" data-i="${i}">${esc(label(x, i))}</button>`).join("")}</div>`;
   $("#sc-out").onclick = (e) => {
