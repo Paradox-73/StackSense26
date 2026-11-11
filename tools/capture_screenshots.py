@@ -72,7 +72,8 @@ SHOTS = [
      lambda: ["Depends on"]),
     ("f06-glossary", "#preset=hipaa_telehealth&term=hipaa", None,
      "A glossary popover: plain-English definition, who it applies to, official source.",
-     lambda: ["HIPAA"]),
+     lambda: ["HIPAA", "Answer {quick_questions} questions".format(  # the heading counts the quick form's questions
+         **json.loads((ROOT / "report" / "facts.json").read_text(encoding="utf-8")))]),
     ("f07-refine-form", "#refine=1&open=1", "#form",
      "Refine: all 32 questions in five groups, with help text and Not sure on each.",
      lambda: ["Daily active users"]),

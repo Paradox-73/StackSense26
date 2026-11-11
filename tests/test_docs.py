@@ -167,6 +167,15 @@ def test_architecture_figures_quote_the_right_counts(facts):
         assert "<title" in svg and "<desc" in svg
 
 
+def test_the_page_writes_the_quick_question_count_from_the_quick_form():
+    """The page said 'Answer 5 questions' while quick mode asks 7. Its own text now names no count: app.js writes the
+    length of QUICK, the list the quick form is drawn from, into the heading."""
+    html = (ROOT / "app" / "static" / "index.html").read_text(encoding="utf-8")
+    js = (ROOT / "app" / "static" / "app.js").read_text(encoding="utf-8")
+    assert re.findall(r"\d+ (?:quick )?questions", html) == []
+    assert '<h1>Answer <span id="n-quick">' in html and '$("#n-quick").textContent = QUICK.length;' in js
+
+
 def test_readme_starts_with_the_architecture_figure():
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     assert readme.index("docs/architecture.svg") < readme.index("## Quick start")

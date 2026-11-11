@@ -1,5 +1,5 @@
 /* StackSense single-page UI. Vanilla JS, no build step.
-   Layout: quick questions (left) -> live result (right, sticky on desktop). Refine = full 32-question form, collapsed.
+   Layout: quick questions (left) -> live result (right, sticky on desktop). Refine = the full form, collapsed.
    Every answer change re-runs the engine (debounced, stale requests aborted). One answer model (S.answers)
    drives the quick chips, the refine form and the what-if sliders, so they always agree.
    "Not sure" marks an answer unknown: the default is used and /api/sensitivity reports which picks depend on it.
@@ -117,7 +117,7 @@ function sent() {
   return a;
 }
 
-/* ================================================================== quick mode: the 5 questions that matter most */
+/* ================================================================== quick mode: the questions that matter most */
 const APP_SHORT = {
   saas: "SaaS", ecommerce: "E-commerce", realtime_collab: "Realtime / chat", content_site: "Content / SEO site",
   analytics_dashboard: "Dashboards", ml_product: "AI / ML product", iot_telemetry: "IoT", fintech: "Fintech",
@@ -1724,6 +1724,7 @@ async function settled() { /* deep links: wait for the debounce, the live run an
   try { S.glossary = await api("/api/glossary"); } catch (e) { S.glossary = null; /* (i) buttons are simply omitted */ }
   S.answers = defaults();
   $("#n-q").textContent = allFields().length;
+  $("#n-quick").textContent = QUICK.length;
   api("/api/health").then((h) => {
     S.health = h;
     $("#n-tech").textContent = Object.values(h.technologies).reduce((a, b) => a + b, 0);
