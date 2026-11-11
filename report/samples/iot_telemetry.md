@@ -302,7 +302,7 @@ Runs here: the Go API as long-running processes. React SPA is built to static fi
 ## Supporting services
 
 - **Realtime**: WebSockets in the Go app (coder/websocket or gorilla/websocket): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
-- **Ingestion buffer**: Amazon Kinesis / MSK (MQTT via AWS IoT Core): A durable log absorbs write bursts and keeps device ingestion separate from database writes, and lets you replay messages.
+- **Ingestion buffer**: Amazon Kinesis Data Streams (MQTT via AWS IoT Core): A durable log absorbs write bursts and keeps device ingestion separate from database writes, and lets you replay messages.
 - **Static frontend**: Amazon S3 + CloudFront: React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Go instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.
 - **Authentication**: Amazon Cognito: Do not hand-roll password storage, MFA or SSO.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.

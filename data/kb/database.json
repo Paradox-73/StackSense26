@@ -556,7 +556,7 @@
         "flyio": "Upstash Redis on Fly",
         "digitalocean": "DigitalOcean Managed Caching (Valkey)",
         "hetzner": "Self-managed Valkey",
-        "onprem": "Self-managed Valkey / Redis Sentinel",
+        "onprem": "Self-managed Valkey with Sentinel failover",
         "cloudflare": "Upstash Redis"
       },
       "strengths": [

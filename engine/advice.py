@@ -430,7 +430,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     # Write volume follows the users and the request rate; open connections alone (users online at once) do not
     # need a log in front of the database.
     if p["app_type"] == "iot_telemetry" or (p["read_write"] == "write_heavy" and d["dau_tier"] >= 3):
-        managed = {"aws": "Amazon Kinesis / MSK", "gcp": "Google Pub/Sub", "azure": "Azure Event Hubs"}.get(
+        managed = {"aws": "Amazon Kinesis Data Streams", "gcp": "Google Pub/Sub", "azure": "Azure Event Hubs"}.get(
             "" if env["hybrid"] else env["cloud"] or "", "Redpanda/Kafka or NATS JetStream")
         add("Ingestion buffer", managed + (" (MQTT via AWS IoT Core)" if prov == "aws" and p["app_type"] == "iot_telemetry" else ""),
             "A durable log absorbs write bursts and keeps device ingestion separate from database writes, and lets you replay messages.",
@@ -685,8 +685,8 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         if not ml:
             ml = ("a self-hosted inference server (vLLM or Hugging Face TGI) on your own GPUs" if env["onprem"] else
                   "a model API under a signed BAA, or self-hosted vLLM on HIPAA-eligible GPUs" if env["hipaa"] else
-                  "self-hosted vLLM on GPUs in your Indian region, or a model API that processes data in India" if env["india"] else
-                  "self-hosted vLLM on GPUs in your EU region, or a model API that processes data in the EU" if env["eu"] else
+                  "self-hosted vLLM on GPUs in your Indian region" if env["india"] else
+                  "self-hosted vLLM on GPUs in your EU region" if env["eu"] else
                   "a hosted model API or GPU inference provider")
         add("Model serving", ml, "Keep GPU inference separate from the web tier so each scales on its own metric.",
             "https://cloud.google.com/vertex-ai/docs")
@@ -1086,7 +1086,7 @@ def _observability(env: dict) -> str:
     if env["self_managed"]:
         return "self-hosted Grafana + Prometheus + Loki + Tempo on your own VMs"
     if env["cloud"]:
-        return {"aws": "CloudWatch + X-Ray", "gcp": "Cloud Monitoring/Trace", "azure": "Azure Monitor / App Insights"}[env["cloud"]]
+        return {"aws": "CloudWatch + X-Ray", "gcp": "Cloud Monitoring/Trace", "azure": "Azure Monitor Application Insights"}[env["cloud"]]
     if env["hipaa"]:
         return "Datadog or New Relic under a signed BAA, or self-hosted Grafana + Prometheus + Loki"
     if env["india"]:

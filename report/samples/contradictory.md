@@ -334,7 +334,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 - **Background jobs**: BullMQ (Redis): Send emails, process uploads and call slow APIs outside the request path. BullMQ keeps its jobs in Redis, so the app needs a Redis/Valkey instance (the one already listed above).
 - **Object storage**: Blob Storage, after you confirm it is in scope for Microsoft's HIPAA BAA (Front Door for public, non-PHI files only): Media and documents belong in object storage, not the database.
 - **Authentication**: Microsoft Entra External ID: Do not hand-roll password storage, MFA or SSO.
-- **Observability**: OpenTelemetry instrumentation -> Azure Monitor / App Insights: Traces, metrics and error tracking from day one; required to defend an availability target.
+- **Observability**: OpenTelemetry instrumentation -> Azure Monitor Application Insights: Traces, metrics and error tracking from day one; required to defend an availability target.
 - **Audit & security**: Encrypted storage (KMS), audit logging, least-privilege IAM, WAF: The HIPAA Security Rule requires access controls, audit trails and encryption.
 
 ## Estimated monthly cost
