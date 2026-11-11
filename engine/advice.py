@@ -591,7 +591,9 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             "tier; a small scoring model runs on CPU.", src)
     elif p["app_type"] == "ml_product" or p.get("ml_features", "none") != "none":
         ml = {"gcp": "Vertex AI endpoints", "aws": "Amazon Bedrock / SageMaker", "azure": "Azure AI Foundry"}.get(
-            "" if env["hybrid"] else env["cloud"] or "")
+            "" if env["hybrid"] or env["self_managed"] else env["cloud"] or "")
+        if not ml and env["self_managed"]:  # VMs you run: no managed model service
+            ml = "a self-hosted inference server (vLLM or Hugging Face TGI) on GPU VMs you run"
         if not ml and env["hybrid"]:
             ml = "a self-hosted inference server (vLLM) packaged as a container, so it runs in both places"
         if not ml:

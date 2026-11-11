@@ -553,6 +553,14 @@ def test_render_static_sites_do_not_claim_a_region():
     assert not out["stack"] or not out["stack"]["hosting"]["choice"].startswith("Render"), out["stack"]["hosting"]
 
 
+@pytest.mark.parametrize("ptype", ["content_site", "internal_tool"])
+def test_self_run_vms_never_get_a_managed_model_service(ptype):
+    doc = edit("P2", project={"type": ptype}, requirements={"ml_features": "inference_api"},
+               infrastructure={"deployment_model": "self_hosted_cloud_vm", "cloud_preference": "aws"})
+    ml = [s["choice"] for s in run(doc)["stack"]["supporting"] if s["layer"] == "ml"]
+    assert ml and not [m for m in ml if re.search(r"Bedrock|SageMaker|Vertex|Azure AI", m)], ml
+
+
 def test_a_read_only_project_with_a_real_database_is_not_held_to_the_static_rule():
     """Over ~5 GB of content needs a database and code that reads it, so the host runs functions, not a static site."""
     doc = edit("P5", project={"type": "content_site"}, compliance=["iso27001"],
