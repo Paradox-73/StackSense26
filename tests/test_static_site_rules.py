@@ -46,3 +46,12 @@ def test_a_compliant_read_only_site_is_served_by_a_compliant_host_on_its_cloud()
     assert picks["backend"] == "None" and picks["database"] == "None", picks
     assert "App Service" in picks["hosting"], picks
     assert not [w for w in out["warnings"] if w["severity"] == "critical"], out["warnings"]
+
+
+def test_a_host_with_no_published_sla_gets_an_info_warning_for_a_stated_target():
+    out = run(json.loads((ROOT / "scenarios" / "public" / "P3.json").read_text(encoding="utf-8")))  # Fly.io at 99.9%
+    assert out["stack"]["hosting"]["choice"].startswith("Fly.io"), out["stack"]["hosting"]["choice"]
+    sla = [w for w in out["warnings"] if w["code"] == "NO_PUBLISHED_SLA"]
+    assert sla and sla[0]["severity"] == "info" and "requirements.availability" in sla[0]["fields"], out["warnings"]
+    free = _site(budget=0)  # a $0 budget is on free plans, which FREE_TIER_NO_SLA already covers
+    assert not [w for w in free["warnings"] if w["code"] == "NO_PUBLISHED_SLA"], free["warnings"]

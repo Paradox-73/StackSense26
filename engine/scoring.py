@@ -299,7 +299,16 @@ def sla_warnings(p: dict, d: dict, host: dict) -> list[dict]:
     """A stated availability target the chosen host's SLA does not back. A static host below the target is kept
     (hard_constraints lets it through): moving pre-built pages to app servers adds code to run, not uptime."""
     sla = host.get("sla")
-    if "availability" in d["defaulted"] or not sla or sla["percent"] >= d["availability"] or not host.get("static_only"):
+    if "availability" in d["defaulted"]:
+        return []
+    if not sla and host.get("kind") != "onprem" and d["budget_usd"] > 0 and d["availability"] <= 99.9:
+        # Above 99.9% such a host is ruled out (hard_constraints); a zero budget has FREE_TIER_NO_SLA instead.
+        return [_warn("NO_PUBLISHED_SLA", "info", f"{host['name']} publishes no uptime SLA",
+                      f"Your {d['availability']:g}% target rests on the app alone: {host['name']} commits to no uptime "
+                      "figure and owes no credit when it is down.",
+                      "Run two or more instances in separate regions or zones and alert on an external uptime check; "
+                      "pick a host with a published SLA if the target is contractual.", ["availability"])]
+    if not sla or sla["percent"] >= d["availability"] or not host.get("static_only"):
         return []
     return [_warn("STATIC_HOST_SLA_GAP", "warning", f"{host['name']} commits to {sla['percent']:g}%, below your "
                   f"{d['availability']:g}% target",
