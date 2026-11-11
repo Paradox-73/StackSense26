@@ -44,6 +44,7 @@ from .scoring import (
     net_cost,
     score_layer,
     skill_fit,
+    sla_warnings,
     tier_cost,
 )
 from .stack import (
@@ -843,6 +844,7 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
                                       sev, "Budget below estimated cost", detail, res, ["budget_monthly", "dau"]))
 
     core["warnings"] += _scale_warnings(p, d, stack_items, core["warnings"])
+    core["warnings"] += sla_warnings(p, d, api_host["item"] if api_host else stack_items["hosting"])
 
     best_picks = {l: best["picks"][l]["id"] for l in LAYERS}
     cfs = _counterfactuals(_raw_from_profile(p, d["defaulted"]), best_picks, p, d, layer_views(core)) if with_counterfactuals else []

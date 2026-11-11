@@ -5,6 +5,7 @@ from .kb import CLOUD_NAMES, load_kb
 from .profile import TIER_LABELS, TIER_NAMES, USD_PER_INR, typical_users
 from .scoring import (
     DERIVED_SHAPES,
+    STATIC_CONTENT_MAX_GB,
     STEADY_TRAFFIC_TIER,
     entry_plan,
     hard_constraints,
@@ -541,7 +542,19 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             "so the servers are sized for the remaining share.",
             "https://developers.cloudflare.com/cache/concepts/default-cache-behavior/")
 
-    if static:
+    if static and d["data_12mo_gb"] > STATIC_CONTENT_MAX_GB:
+        # Pages stay in git; media past the size git handles well go to object storage and are linked from the pages.
+        store, src = SITE_MEDIA_STORE[env["cloud"]] if env["cloud"] else _object_storage(env, prov)
+        lo, hi, price_src = FILE_STORE_USD_PER_GB.get(env["cloud"] or "", FILE_STORE_USD_PER_GB[""])
+        gb = d["data_12mo_gb"]
+        usage = ((0.0, 0.0, f"~{gb:,.0f} GB of site media on your own disks: the hardware is outside this estimate")
+                 if env["onprem"] else (gb * lo, gb * hi, f"~{gb:,.0f} GB of site media at ${lo:g}-{hi:g}/GB-month "
+                                                          f"({price_src})"))
+        add("Object storage", f"{store} for the site's media (images, video, downloads)",
+            f"About {gb:,.0f} GB is too much to keep in git (clones and builds slow down past ~{STATIC_CONTENT_MAX_GB} GB), "
+            "so the pages stay in the repository and the media sit in object storage, linked from the pages.", src,
+            usage=usage, tier_usage=usage)
+    elif static:
         pass  # images live in the repository and are served by the host's CDN
     elif p["app_type"] in ("social_network", "content_site", "ecommerce", "healthcare", "ml_product") or d["mobile"]:
         if be["id"] == "firebase":
@@ -860,6 +873,10 @@ FILE_STORE_USD_PER_GB = {"aws": (0.023, 0.025, "https://aws.amazon.com/s3/pricin
                          "": (0.015, 0.025, "https://developers.cloudflare.com/r2/pricing/ and "
                                             "https://aws.amazon.com/s3/pricing/")}
 S3_DOCS = "https://aws.amazon.com/s3/"
+# The bucket of each cloud that holds a static site's media beside its pages.
+SITE_MEDIA_STORE = {"aws": ("Amazon S3", S3_DOCS),
+                    "gcp": ("Cloud Storage", "https://cloud.google.com/storage/docs/hosting-static-website"),
+                    "azure": ("Azure Blob Storage", "https://learn.microsoft.com/azure/storage/blobs/storage-blobs-introduction")}
 AWS_HIPAA_DOCS = "https://aws.amazon.com/compliance/hipaa-eligible-services-reference/"  # lists Amazon S3
 AZURE_HIPAA_DOCS = "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-hipaa-us"
 # Object storage a team runs itself; MinIO's repository is archived and no longer maintained (github.com/minio/minio).
@@ -1525,7 +1542,10 @@ def how_parts_fit(p: dict, d: dict, stack: dict, services: list[dict], api_host:
         auth = svc.get("Authentication") or svc.get("Phone login (SMS OTP)") or "the framework's built-in auth"
         checker = "each function checks the token" if kind == "faas" else f"the {bname} API checks the session or token"
         login = f"Sign-in uses {auth}; {checker} on every request."
-    data = (f"Content lives as files in the git repository (about {_num(d['data_12mo_gb'])} GB); there is no database"
+    data = (f"Pages live as files in the git repository and the ~{_num(d['data_12mo_gb'])} GB of media in object "
+            "storage, linked from the pages; there is no database"
+            if db.get("static_only") and d["data_12mo_gb"] > STATIC_CONTENT_MAX_GB else
+            f"Content lives as files in the git repository (about {_num(d['data_12mo_gb'])} GB); there is no database"
             if db.get("static_only") else f"{dname} is the system of record (about {_num(d['data_12mo_gb'])} GB within 12 months)")
     if kind == "baas" and be.get("bundled_database") == db["id"]:
         data += f", run by {bname}"

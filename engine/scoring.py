@@ -13,7 +13,7 @@ from collections import defaultdict
 from functools import lru_cache
 
 from .kb import CRITERION_LABELS, LAYER_CRITERIA, load_kb
-from .profile import DAU_THRESHOLDS, TIER_LABELS, tier_label
+from .profile import DAU_THRESHOLDS, TIER_LABELS, _warn, tier_label
 
 BASELINE = {
     "maturity": 1.0, "velocity": 1.0, "ops": 1.0, "cost": 1.0, "scalability": 1.0,
@@ -293,6 +293,21 @@ def static_site(p: dict) -> bool:
     """Users only read published content, so the site can be pre-built static files."""
     actions = set(p.get("user_actions") or [])
     return bool(actions) and actions <= {"read"}
+
+
+def sla_warnings(p: dict, d: dict, host: dict) -> list[dict]:
+    """A stated availability target the chosen host's SLA does not back. A static host below the target is kept
+    (hard_constraints lets it through): moving pre-built pages to app servers adds code to run, not uptime."""
+    sla = host.get("sla")
+    if "availability" in d["defaulted"] or not sla or sla["percent"] >= d["availability"] or not host.get("static_only"):
+        return []
+    return [_warn("STATIC_HOST_SLA_GAP", "warning", f"{host['name']} commits to {sla['percent']:g}%, below your "
+                  f"{d['availability']:g}% target",
+                  f"The provider's SLA is {sla['percent']:g}% ({sla['scope']}); a read-only site keeps its static host, "
+                  "since serving the same files from app servers adds code to run and patch without raising the CDN's "
+                  f"commitment ({sla.get('source', 'see the provider SLA')}).",
+                  "Accept the SLA as the target, or put a second CDN in front with health-checked DNS failover between "
+                  "the two for the extra nines.", ["availability"])]
 
 
 def self_hosted_baas(item: dict, p: dict) -> bool:
@@ -625,7 +640,7 @@ def daily_hits_at_tier_floor(d: dict) -> float:
     users = DAU_THRESHOLDS[d["compute_tier"] - 1] if d["compute_tier"] > 0 else 0
     return users * d["req_per_user_day"] * d["origin_share"]
 # Content kept as files in a git repository (pages, posts, small images): above this, clones and
-# builds get slow and media belongs in object storage with a real content store.
+# builds get slow, so a static site's media go to object storage (engine/advice.py) and the pages stay in git.
 STATIC_CONTENT_MAX_GB = 5
 
 
@@ -724,9 +739,6 @@ def hard_constraints(layer: str, item: dict, p: dict, d: dict) -> list[tuple[str
             out.append(("Only for read-only sites; your users sign in, post or pay", "user_actions", 0))
         elif p["realtime"] == "core":
             out.append(("Static files cannot hold live connections; realtime is core", "realtime", 0))
-        elif layer == "database" and d["data_12mo_gb"] > STATIC_CONTENT_MAX_GB:
-            out.append((f"~{d['data_12mo_gb']:,.0f} GB within 12 months is too much to keep as files in git "
-                        f"(over ~{STATIC_CONTENT_MAX_GB} GB)", "data_volume_gb", 0))
     required = p.get("cloud_required") or p["cloud_preference"] == "no_hyperscaler"  # ruling clouds out is always a rule
     if required and p["cloud_preference"] != "none" and p["deployment"] != "on_prem":
         pref = p["cloud_preference"]
@@ -772,7 +784,9 @@ def hard_constraints(layer: str, item: dict, p: dict, d: dict) -> list[tuple[str
         out.append(("No GPU machines on this host; GPU work needs one", "background_work", 0))
     sla = item.get("sla") if layer == "hosting" else None
     stated_avail = "availability" not in d["defaulted"]
-    if stated_avail and sla and sla["percent"] < d["availability"]:
+    if stated_avail and sla and sla["percent"] < d["availability"] and not item.get("static_only"):
+        # A static host is kept for a read-only site below its SLA: the gap is a warning (sla_warnings), since
+        # moving pre-built pages to app servers adds code to run without raising the CDN's commitment.
         # The provider's own service-level agreement is the uptime it commits to: a target above it rests on the
         # app alone (the same reason the single-host rule above excludes hosts without failover).
         out.append((f"The provider's SLA is {sla['percent']:g}% ({sla['scope']}), below your {d['availability']:g}% "
@@ -791,8 +805,9 @@ def hard_constraints(layer: str, item: dict, p: dict, d: dict) -> list[tuple[str
             out.append(("No ISO/IEC 27001 certification published", "compliance", 0))
         regions = item.get("residency_regions", item.get("regions"))
         note = item.get("residency_note")
-        if layer == "hosting" and "static_regions" in item and static_site(p) and d["data_12mo_gb"] <= STATIC_CONTENT_MAX_GB:
-            # A static site's data is its files and their logs: where the host stores those, not where functions run.
+        if layer == "hosting" and "static_regions" in item and static_site(p):
+            # A static site's data is its files and their logs: where the host stores those, not where functions run
+            # (media past STATIC_CONTENT_MAX_GB sit in object storage, which follows the residency rule on its own).
             regions, note = item["static_regions"], item.get("static_residency_note")
         if regions is not None:
             for rule, region in RESIDENCY_RULES.items():
