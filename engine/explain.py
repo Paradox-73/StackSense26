@@ -353,6 +353,24 @@ def mobile_name(item_id: str, name: str, platforms) -> str:
     return NATIVE_NAMES.get(tuple(x for x in ("ios", "android") if x in platforms), name)
 
 
+def _skill_sentence(item: dict, fit: float | None, skills: set) -> str | None:
+    """A server backend's deciding human reason: which listed language it uses, with its team skill match score."""
+    from .kb import field_specs
+    if item.get("kind") not in ("server", "faas") or fit is None or not skills:
+        return None
+    labels = {o["value"]: o["label"] for o in field_specs()["team_skills"].get("options", [])}
+    names = lambda xs: " and ".join(labels.get(x, x) for x in sorted(xs))  # noqa: E731
+    lang = LANG_LABELS.get(item.get("language", ""), item["name"])
+    direct = skills & set(item.get("skills", []))
+    related = skills & set(item.get("related_skills", []))
+    if direct:
+        return f"The team lists {names(direct)}, so it needs no new server language (team skill match {fit:.1f}/5)."
+    if related:
+        return (f"Nobody listed {lang}, but {names(related)} {'carry' if len(related) > 1 else 'carries'} over "
+                f"(team skill match {fit:.1f}/5).")
+    return f"Nobody on the team lists {lang} or a related skill (team skill match {fit:.1f}/5), so plan time to learn it."
+
+
 def _templates() -> dict:
     from .kb import _read
     return _read("explain_templates.json")
@@ -427,6 +445,9 @@ def _ctx(layer: str, s: dict, items: dict, p: dict, d: dict, cost: dict, provide
         "phones": " and ".join(PHONE_NAMES[x] for x in phones) or None, "both_phones": 1 if len(phones) == 2 else 0,
         "other_phone": PHONE_NAMES[({"ios", "android"} - set(phones)).pop()] if len(phones) == 1 else None,
         "native_lang": {"ios": "Swift", "android": "Kotlin"}[phones[0]] if len(phones) == 1 else None,
+        "skill_sentence": _skill_sentence(it, raw.get("skill_fit"), set(p.get("team_skills", []))) if layer == "backend" else None,
+        "ws_list": "background jobs, WebSockets and database connection pools" if p["realtime"] != "none"
+                   else "background jobs and database connection pools",
         "seo": p["seo"], "consistency": p["consistency"], "read_write": p["read_write"],
         # The server code runs as request-scoped functions: a functions backend, or a server framework on a
         # frontend or functions platform with no API host of its own.

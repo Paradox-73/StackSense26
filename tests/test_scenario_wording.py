@@ -96,3 +96,13 @@ def test_one_phone_platform_is_one_app(platforms, languages, native):
     assert "on iOS and Android" not in words and "two codebases" not in words, words
     if native:
         assert front["choice"] == native, front["choice"]
+
+
+def test_backend_states_the_team_language_and_its_skill_score(outs):
+    for name in ("P2", "P3", "P4", "P5", "P6"):
+        text = outs[name]["stack"]["backend"]["justification"]
+        assert re.search(r"The team lists .+ \(team skill match \d\.\d/5\)", text), (name, text)
+    p5 = outs["P5"]["stack"]["backend"]["justification"]
+    assert "C#" in p5 and "Entra ID" in p5 and "SQL Server" in p5, p5
+    for name in ("P4", "P5", "P6"):  # realtime is false in all three
+        assert "WebSockets" not in outs[name]["stack"]["backend"]["justification"], name

@@ -140,6 +140,9 @@
         "text": "{name} serves the API at about {peak} requests/s at peak ({tier}) for {team_phrase}."
       },
       {
+        "text": "{skill_sentence}"
+      },
+      {
         "when": {
           "kind": [
             "baas"
@@ -155,7 +158,7 @@
           "functions": 0,
           "services": 0
         },
-        "text": "It runs as a long-running {lang} service, so background jobs, WebSockets and database connection pools live in one deployable process."
+        "text": "It runs as a long-running {lang} service, so {ws_list} live in one deployable process."
       },
       {
         "when": {
@@ -165,7 +168,7 @@
           "functions": 0,
           "services": 1
         },
-        "text": "It runs as a few long-running {lang} services, one per team, each deployed on its own with its own background jobs, WebSockets and database connection pool."
+        "text": "It runs as a few long-running {lang} services, one per team, each deployed on its own with its own {ws_list}."
       },
       {
         "when": {

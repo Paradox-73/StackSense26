@@ -604,6 +604,14 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
     return a, origin, notes, warns
 
 
+def _reused(result: dict, f: dict) -> tuple[str | None, str | None]:
+    """The existing database the stack keeps and the existing identity provider sign-in goes through, if any."""
+    db = load_kb()["index"].get(result["stack"]["database"]["pick"]["id"], {})
+    dbs, idps = _systems(f["infrastructure.existing_systems"])[:2]
+    idps = [i for i in idps if i not in _cloud_only_identity(idps, f)] if f["requirements.auth"] != "none" else []
+    return (db["name"] if db.get("id") in dbs else None), (idps[0] if idps else None)
+
+
 def _cloud_only_identity(idps: list[str], f: dict) -> list[str]:
     """The existing identity providers the network cannot reach: the cloud ones, when the site is air-gapped."""
     return [i for i in idps if i in CLOUD_IDENTITY] if f["infrastructure.deployment_model"] == "air_gapped" else []
@@ -636,6 +644,10 @@ def _component(layer: str, sl: dict, origin: dict, f: dict, result: dict) -> dic
         ex = dict(ex, paragraph=f"{pick['name']}. {ex.get('paragraph') or ''}".strip())
     if layer == "frontend":
         choice = mobile_name(pick["id"], choice, f["project.platforms"])
+    db, idp = _reused(result, f) if layer == "backend" and item.get("kind") != "none" else (None, None)
+    if db or idp:
+        extra = " It works with the existing " + " and ".join(
+            ([f"{db} for data"] if db else []) + ([f"{idp} for sign-in"] if idp else [])) + "."
     if layer == "frontend" and result.get("companion"):
         comp = result["companion"]
         apps = "/".join(x for x in ("Android", "iOS") if x.lower() in f["project.platforms"])
@@ -805,10 +817,8 @@ def _summary(result: dict, stack: dict, style: str, cost: dict, f: dict, a: dict
              + (f"; no {' or '.join(unused)} is needed" if unused else "") + ".")
     items = {l: load_kb()["index"].get(result["stack"][l]["pick"]["id"], {}) for l in LAYERS}
     reasons = []
-    kept = [names["database"]] if items["database"].get("id") in a.get("existing_systems", []) else []
-    idps = [i for i in _systems(f["infrastructure.existing_systems"])[1]
-            if i not in _cloud_only_identity([i], f)] if f["requirements.auth"] != "none" else []
-    kept += [f"{idps[0]} sign-in"] if idps else []
+    db, idp = _reused(result, f)
+    kept = ([names["database"]] if db else []) + ([f"{idp} sign-in"] if idp else [])
     if kept:
         reasons.append(f"keeps the existing {' and '.join(kept)}")
     cloud, deploy = f["infrastructure.cloud_preference"], f["infrastructure.deployment_model"]
