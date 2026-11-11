@@ -295,9 +295,11 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             f"a managed {kb['index'][dbid]['name']} service in the same region as your compute"
         return _redis_offering(text, env) if dbid == "redis" else text
 
-    def add(role, name, why, source, cost_id=None, cost_tier=None, system=None, trigger=None, usage=None):
+    def add(role, name, why, source, cost_id=None, cost_tier=None, system=None, trigger=None, usage=None,
+            tier_usage=None):
         out.append({"role": role, "name": name, "why": why, "source": source, "cost_id": cost_id,
-                    "cost_tier": cost_tier, "system": system, "trigger": trigger, "usage": usage})
+                    "cost_tier": cost_tier, "system": system, "trigger": trigger, "usage": usage,
+                    **({"tier_usage": tier_usage} if tier_usage else {})})
 
     # Candidates come first so they win ties. Every shape except analytical and search is part of the record, so its
     # secondary store must pass the same constraints as the primary.
@@ -751,7 +753,14 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
     dau30 = p["dau"] * 30
     if work & {"media_uploads", "video_on_demand"} and not has_storage():
         store, src = storage()
-        add("Object storage", store, "Uploaded files and video belong in object storage, not the database.", src)
+        files = d.get("files_12mo_gb") or 0
+        lo, hi, price_src = FILE_STORE_USD_PER_GB.get(env["cloud"] or "", FILE_STORE_USD_PER_GB[""])
+        held = (f"~{files:,.0f} GB of uploaded files (the stated total less the database's ~{d['data_12mo_gb']:,.0f} GB)"
+                if files else "")
+        usage = None if not files else (0.0, 0.0, f"{held} on your own disks: the hardware is outside this estimate") \
+            if env["onprem"] else (files * lo, files * hi, f"{held} at ${lo:g}-{hi:g}/GB-month ({price_src})")
+        add("Object storage", store, "Uploaded files and video belong in object storage, not the database.", src,
+            usage=usage, tier_usage=usage)
     if "media_uploads" in work and p["app_type"] != "internal_tool":  # staff files: the app serves them, no CDN
         gb = dau30 * MEDIA_GB_PER_USER_DAY
         add("Media delivery", "Your reverse proxy (nginx) serving files from the object store, images resized by "
@@ -841,6 +850,15 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
             "network limits on machines that hold no secrets.", "https://gvisor.dev/docs/", system="sandbox")
 
 
+# Object storage list prices in USD per GB-month, standard (hot) class, first volume tier: (low, high, source).
+# S3 Standard $0.023 (US East) to $0.025 (Mumbai); Cloud Storage Standard $0.020 (a regional bucket in Iowa) to $0.026
+# (the US multi-region); Blob Storage Hot LRS $0.0196 (West Europe) to $0.0208 (East US), from the Azure retail prices
+# API; other hosts from Cloudflare R2's $0.015 to S3's $0.025.
+FILE_STORE_USD_PER_GB = {"aws": (0.023, 0.025, "https://aws.amazon.com/s3/pricing/"),
+                         "gcp": (0.020, 0.026, "https://cloud.google.com/storage/pricing"),
+                         "azure": (0.0196, 0.0208, "https://azure.microsoft.com/en-us/pricing/details/storage/blobs/"),
+                         "": (0.015, 0.025, "https://developers.cloudflare.com/r2/pricing/ and "
+                                            "https://aws.amazon.com/s3/pricing/")}
 S3_DOCS = "https://aws.amazon.com/s3/"
 AWS_HIPAA_DOCS = "https://aws.amazon.com/compliance/hipaa-eligible-services-reference/"  # lists Amazon S3
 AZURE_HIPAA_DOCS = "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-hipaa-us"

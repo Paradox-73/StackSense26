@@ -498,6 +498,8 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
     if f["scale.data_volume_gb_12_months"] is not None:
         put("data_volume_gb", f["scale.data_volume_gb_12_months"], "scale.data_volume_gb_12_months")
         put("data_growth_gb_month", 0, "scale.data_volume_gb_12_months")
+        if f["requirements.file_media_storage"]:  # the total includes the uploads (engine/profile.py splits it)
+            put("data_includes_files", True, "scale.data_volume_gb_12_months", "requirements.file_media_storage")
 
     put("realtime", ("core" if ptype in ("realtime_collab", "gaming") else "some") if f["requirements.realtime"] else "none",
         "requirements.realtime", "project.type")

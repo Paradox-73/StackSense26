@@ -201,6 +201,11 @@ def _warn(code, severity, title, detail, resolution, fields):
             "resolution": resolution, "fields": fields}
 
 
+# Answers the scenario adapter sets that the questionnaire never asks: True when the data volume counts every stored
+# byte, uploaded files included (the scenario's total), not the database alone (the questionnaire's question).
+ADAPTER_FIELDS = ("data_includes_files",)
+
+
 def normalize(raw: dict | None) -> tuple[dict, list[dict], list[dict]]:
     """Apply defaults, coerce types, clamp extremes. Returns (profile, assumptions, warnings)."""
     raw = dict(raw or {})
@@ -209,7 +214,7 @@ def normalize(raw: dict | None) -> tuple[dict, list[dict], list[dict]]:
     assumptions: list[dict] = []
     warnings: list[dict] = []
 
-    unknown = sorted(str(k) for k in raw if k not in specs)
+    unknown = sorted(str(k) for k in raw if k not in specs and k not in ADAPTER_FIELDS)
     if unknown:
         warnings.append(_warn("UNKNOWN_FIELD", "info", "Ignored unknown input fields",
                               f"Not questions StackSense asks: {', '.join(unknown[:8])}.",
@@ -284,6 +289,7 @@ def normalize(raw: dict | None) -> tuple[dict, list[dict], list[dict]]:
         assumptions.append({"field": "deployment", "label": "Deployment model", "value": "on_prem", "kind": "derived",
                             "reason": "Air-gapped servers have no internet connection, so they run on your own premises."})
         profile["deployment"] = "on_prem"
+    profile["data_includes_files"] = raw.get("data_includes_files") is True
     profile["dau"] = int(profile["dau"])
     profile["team_size"] = max(1, int(round(profile["team_size"])))
     profile["timeline_weeks"] = max(1, int(round(profile["timeline_weeks"])))
@@ -497,6 +503,21 @@ def derive(profile: dict, assumptions: list[dict], warnings: list[dict]) -> dict
                                + (" (data at launch: one month's growth)." if a["field"] == "data_volume_gb" else "."))
         p["data_volume_gb"], p["data_growth_gb_month"] = vol, growth
     data_12mo = p["data_volume_gb"] + 12 * p["data_growth_gb_month"]
+    files_12mo = 0.0
+    if p["data_includes_files"] and "media_uploads" in work and not estimated:
+        # The stated total holds the uploaded files as well: the database keeps the rows the per-user estimate gives
+        # (at most the total) and the rest is files in object storage, priced there (engine/advice.py).
+        vol, growth = estimated_data(p, compute_tier, ["data_volume_gb", "data_growth_gb_month"], anchor)
+        rows = round(vol + 12 * growth, 1)
+        if rows < data_12mo:
+            files_12mo = round(data_12mo - rows, 1)
+            mb = DATA_MB_PER_USER_MONTH.get(app, DEFAULT_DATA_MB)
+            assumptions.append({"field": "data_volume_gb", "label": "Stored data", "value": rows, "kind": "derived",
+                                "reason": f"The stated {_gb(data_12mo)} counts uploaded files too. The database is sized "
+                                          f"for ~{_gb(rows)} of rows ({mb:g} MB per daily user a month for this app type, "
+                                          f"at ~{anchor[1]:,.0f} daily users, launch plus 12 months), and the other "
+                                          f"~{_gb(files_12mo)} of files is priced as object storage on the stack's cloud."})
+            data_12mo = rows
     data_tier = _tier(data_12mo, DATA_GB_THRESHOLDS)
     # Database load tracks traffic, but read-heavy traffic is largely absorbed by caches/CDN.
     db_tier = max(data_tier, compute_tier - (1 if p["read_write"] == "read_heavy" else 0))
@@ -558,6 +579,7 @@ def derive(profile: dict, assumptions: list[dict], warnings: list[dict]) -> dict
         "tier_label": tier_labels(compute_tier, dau_tier, data_tier, db_tier, conn_tier)[0],
         "db_tier_label": tier_labels(compute_tier, dau_tier, data_tier, db_tier, conn_tier)[1],
         "data_12mo_gb": round(data_12mo, 1),
+        "files_12mo_gb": files_12mo,
         "availability": availability,
         "skills": skills,
         "mobile": mobile,
