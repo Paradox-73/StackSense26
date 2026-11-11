@@ -116,7 +116,7 @@ Quick mode asks seven questions; Refine opens all 42. "Describe your project" fi
 
 ### 5.1 How technologies are represented
 
-`data/kb/*.json` holds 70 technologies: 17 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region (Appendix D prints such facts for the public scenarios' hosts). 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 378 URLs, and no end-of-life product is in the knowledge base.
+`data/kb/*.json` holds 70 technologies: 17 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region (Appendix D prints such facts for the public scenarios' hosts). 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 379 URLs, and no end-of-life product is in the knowledge base.
 
 ### 5.2 Scoring and filtering
 
@@ -171,40 +171,40 @@ Three intermediate engineers (JavaScript, TypeScript, Python) with nobody on ope
 - **Hosting.** Residency removes Netlify, Render, Railway, Fly.io and Hetzner (no Indian region) and Cloudflare (Enterprise add-on needed) before scoring. DigitalOcean App Platform in BLR1 (Bangalore) leads Google Cloud Run by 1.0 stack point on cost at this scale (3.9 against 3.5) and realtime fit (4.0 against 3.0), and runs Django as long-running processes for the chat WebSockets. `driven_by` lists the answers that added the most points (`team.size`, `team.languages`, `priorities.time_to_market`, `priorities.cost`), then the constraint fields that ruled rivals out (`compliance`, `infrastructure.data_residency`, and `requirements.auth`, since signed-in users rule out a static host).
 - **Frontend.** Critical SEO needs finished HTML. Next.js (SEO 5/5, in the team's languages) leads Nuxt by 2.3 points, and a React SPA loses 5.5 with a client-side rendering penalty. React Native (Expo) is the Android companion, because a mobile toolkit cannot be primary when web is a target.
 - **Backend.** Django matches the team and runs one process for the WebSockets (Channels), jobs and connection pools. FastAPI is 0.1 behind, inside the tie margin, and the output says either is defensible; Spring Boot loses 10.5 because nobody knows Java. Trade-offs: realtime fit 2/5, a sync-first ORM.
-- **Database.** The unstated data shape and consistency default to relational and strong, as `assumptions` notes. PostgreSQL (fit 5/5) on DigitalOcean Managed PostgreSQL costs $75 to $150 for about 50 GB with a standby; MySQL ties (0.3), MongoDB loses 6.5, and eventually consistent stores and single-node SQLite are ruled out.
-- **Supporting services.** Celery with a Valkey broker; PostgreSQL full-text search, since 50 GB fits its own index; S3-compatible storage in India behind a CDN; MSG91 or Twilio Verify with the DLT-registered templates Indian operators require; Razorpay or Cashfree hosted checkout, keeping card data off the servers (PCI DSS SAQ A). A team of three runs at most two extra systems; this stack adds Valkey, and sign-in uses Django's own accounts or a self-hosted Keycloak.
+- **Database.** The unstated data shape and consistency default to relational and strong, as `assumptions` notes. PostgreSQL (fit 5/5) on DigitalOcean Managed PostgreSQL costs $75 to $150 for about 34 GB with a standby; MySQL ties (0.3), MongoDB loses 6.4, and eventually consistent stores and single-node SQLite are ruled out.
+- **Supporting services.** Celery with a Valkey broker; PostgreSQL full-text search, since 34 GB fits its own index; DigitalOcean Spaces in Bangalore, a private bucket with short-lived signed URLs and no public CDN; MSG91 with the DLT-registered templates Indian operators require; Razorpay hosted checkout, keeping card data off the servers (PCI DSS SAQ A). A team of three runs at most two extra systems; this stack adds Valkey, and sign-in uses Django's built-in authentication with the users in India.
 - **Cost.** $207 to $851 a month. The floor (hosting $75 with redundancy for 99.9%, database $75, Valkey $30, media $9, SMS $18) exceeds the $150 budget, so the output carries `BUDGET_STRETCH` and `ok_with_warnings`, stating that a cheaper stack scored lower on the stated priorities.
 
 ### 6.3 P3 BoardRoom: realtime collaborative whiteboard
 
-![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io, $1,190 to $4,635 a month](screenshots/s-P3.png)
+![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io, $1,190 to $4,635 a month, with a no-SLA info warning](screenshots/s-P3.png)
 
-Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1. PostgreSQL leads Microsoft SQL Server by 2.1; MySQL takes a penalty because tenants share one database and its privileges stop at table and column level. Supporting services add Yjs shared documents (CRDTs), Redis pub/sub across instances, a cache, hosted checkout and social sign-in.
+Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1. PostgreSQL leads Microsoft SQL Server by 2.1; MySQL takes a penalty because tenants share one database and its privileges stop at table and column level. Supporting services add Yjs shared documents (CRDTs), Upstash Redis for the cache and pub/sub across instances, River jobs in PostgreSQL, Cloudflare R2 storage, Stripe hosted checkout and Auth0 sign-in. Fly.io publishes no SLA, so the output carries an info warning `NO_PUBLISHED_SLA`.
 
 ### 6.4 P4 QuickCredit: digital lending in India (in depth)
 
-![P4 QuickCredit: React SPA, Spring Boot, PostgreSQL and AWS ECS on Fargate, $1,960 to $7,240 a month](screenshots/s-P4.png)
+![P4 QuickCredit: React SPA, Spring Boot, PostgreSQL and AWS ECS on Fargate, $1,962 to $7,242 a month](screenshots/s-P4.png)
 
 P4 is the most constrained scenario: AWS required, RBI localisation, PCI DSS, ISO 27001 and 99.95%, for eight seniors (Java, Kotlin, TypeScript) who can run infrastructure, sized at about 60,000 daily users and 833 requests per second at peak.
 
 - **Hosting.** The explicit AWS removes Vercel, Netlify, Cloudflare, Render, Railway, Fly.io and Cloud Run before scoring, and S3 with CloudFront is static-only with a 99.9% SLA. ECS on Fargate leads Lambda by 2.9 stack points on performance and portability; its justification quotes the PCI DSS service-provider attestation, and the region is ap-south-1 (Mumbai). Trade-offs: AWS networking and IAM to learn, a load balancer and NAT gateway billed while idle, no AWS skill listed.
 - **Backend.** Spring Boot matches the team and scores 5/5 on scalability, maturity and structure, which the load, the 99.95% target and the scalability and maintainability priorities weight up; Go is 3.0 behind on skill match. Supabase (not on AWS, no ISO 27001) and Firebase (not on AWS) are ruled out.
-- **Database.** A double-entry ledger needs ACID, so eventually consistent stores are out; Firestore is off AWS and SQLite has no failover. PostgreSQL on Amazon RDS or Aurora in Mumbai costs $800 to $1,600 for about 500 GB with a standby; MySQL ties (0.1).
+- **Database.** A double-entry ledger needs ACID, so eventually consistent stores are out; Firestore is off AWS and SQLite has no failover. PostgreSQL on Amazon RDS or Aurora in Mumbai costs $800 to $1,600 for about 411 GB with a standby; MySQL ties (0.1).
 - **Frontend.** Behind a login SEO does not matter, so a React SPA ships as static files on S3 and CloudFront; Angular ties (0.8) and Next.js loses 1.2 for adding a Node.js server. Native iOS and Android apps (Swift, Kotlin) score best among mobile toolkits.
-- **Supporting services.** The credit-scoring model on an Amazon SageMaker endpoint in Mumbai ($75 to $180, CPU); Cognito in Mumbai with an SMS gateway; hosted checkout; KYC files in a separate S3 bucket; KMS, audit logging, least-privilege IAM and a WAF for PCI DSS.
-- **Cost.** $1,960 to $7,240 against $6,000, with hosting and the database doubled for 99.95%; the floor fits the budget, so the status is `ok` and the budget check reads "stretch".
+- **Supporting services.** The credit-scoring model on an Amazon SageMaker endpoint in Mumbai ($75 to $180, CPU); Cognito in Mumbai with MSG91 for SMS; Razorpay hosted checkout; SQS for jobs; uploads in a private S3 bucket with short-lived signed URLs; KMS, audit logging, least-privilege IAM and a WAF for PCI DSS.
+- **Cost.** $1,962 to $7,242 against $6,000, with hosting and the database doubled for 99.95%; the floor fits the budget, so the status is `ok` and the budget check reads "stretch".
 
 ### 6.5 P5 PeopleDesk: internal HR tool
 
-![P5 PeopleDesk: HTMX, ASP.NET Core, Microsoft SQL Server and Azure App Service, $44 to $375 a month](screenshots/s-P5.png)
+![P5 PeopleDesk: HTMX, ASP.NET Core, Microsoft SQL Server and Azure App Service, $30 to $172 a month](screenshots/s-P5.png)
 
-Two C# developers build a tool for 1,200 employees on Azure in India under ISO 27001, for $300 a month. Azure rules out every other host, and Supabase also lacks ISO 27001. ASP.NET Core leads Laravel by 3.7 points on the team's C# and a 2.0-point rule for Microsoft's tooling on Azure; both take the same identity-broker penalty for company sign-in. HTMX leads a React SPA by 1.4. Existing systems are reused: sign-in through Microsoft Entra ID over OpenID Connect, SQL Server kept as Azure SQL Database, Microsoft 365 through the Graph API; an info warning notes that SQL Server 2019 security updates end on 8 January 2030.
+Two C# developers build a tool for 1,200 employees on Azure in India under ISO 27001, for $300 a month. Azure rules out every other host, and Supabase also lacks ISO 27001. ASP.NET Core leads Laravel by 3.7 points on the team's C# and a 2.0-point rule for Microsoft's tooling on Azure. HTMX leads a React SPA by 1.4. Existing systems are reused: sign-in through Microsoft Entra ID over OpenID Connect, SQL Server kept as Azure SQL Database, Microsoft 365 through the Graph API; an info warning notes that SQL Server 2019 security updates end on 8 January 2030.
 
 ### 6.6 P6 KhetSurvey: offline-first crop survey app
 
-![P6 KhetSurvey: React Native, Django, PostgreSQL and DigitalOcean, $69 to $488 a month](screenshots/s-P6.png)
+![P6 KhetSurvey: React Native, Django, PostgreSQL and DigitalOcean, $35 to $105 a month](screenshots/s-P6.png)
 
-Two developers (JavaScript, Python) build an Android-only survey app that must work offline, in India, for $100 a month; type `other` on phones only is scored as a mobile-first app. React Native (Expo) leads Flutter by 3.5 points on skills, and PowerSync or ElectricSQL keeps a local SQLite copy in sync with PostgreSQL. Django and DigitalOcean in Bangalore win ties (0.5 and 0.6 points), and most of the cost is the database for about 100 GB of surveys and photos. The description's 2 GB phones and 2G/3G links are not read from the file; the offline flag carries that need.
+Two developers (JavaScript, Python) build an Android-only survey app that must work offline, in India, for $100 a month; type `other` on phones only is scored as a mobile-first app. React Native (Expo) leads Flutter by 3.5 points on skills, and PowerSync keeps a local SQLite copy in sync with PostgreSQL. Django and DigitalOcean in Bangalore win ties (0.5 and 0.6 points), and of about 100 GB in a year, the photos (about 97 GB) go to DigitalOcean Spaces and the survey records (about 3 GB) to PostgreSQL. The description's 2 GB phones and 2G/3G links are not read from the file; the offline flag carries that need.
 
 ## 7. Edge-case handling
 
@@ -246,7 +246,7 @@ Appendix F has the tables behind 8.1 to 8.3.
 
 ### 8.1 Tests
 
-The 1131 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1189 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -262,7 +262,7 @@ A language model with no rule engine picked the four layers for the same briefs 
 
 ### 8.5 One answer apart
 
-Pairs of projects one answer apart check that a change moves only the layers it should, each with the engine's reason; Appendix D has three. Adding HIPAA to the startup example, for instance, replaces Supabase, whose plan with a BAA costs far more than the budget, and Cloudflare Pages, which offers no BAA. Among the edge scenarios, E8 changes only P2's languages and moves three layers to the PHP team's skills, while E7 changes only P2's deployment and cloud fields and keeps Next.js and Django.
+Pairs of projects one answer apart check that a change moves only the layers it should, each with the engine's reason; Appendix D has three. Adding HIPAA to the startup example, for instance, replaces Supabase, whose plan with a BAA costs far more than the budget, and Cloudflare Pages, which offers no BAA. Among the edge scenarios, E8 changes only P2's languages and moves three layers to the PHP team's skills, while E7 changes only P2's deployment and cloud fields and keeps Django and PostgreSQL, now self-managed.
 
 ## 9. Limitations and future work
 
@@ -281,7 +281,7 @@ Next: an architect review of the answer key and the public outputs, scheduled re
 
 **APIs and datasets.** The optional Google Gemini API through its OpenAI-compatible endpoint (free tier, <https://ai.google.dev/gemini-api/docs/openai>); OpenRouter (<https://openrouter.ai/>) can be configured instead, and the client uses only the Python standard library. No dataset is shipped. The Stack Overflow Developer Survey 2025 (<https://survey.stackoverflow.co/2025/technology>) is the hiring-pool proxy, and INR budgets use a fixed planning rate of 96 INR to 1 USD from the FBIL reference rate (<https://www.fbil.org.in/>).
 
-**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 378 URLs is in `report/sources.md`. Appendix G prints the URL of every other source this report cites, from the methods behind the design to the HIPAA, PCI DSS, DPDP and RBI rules it encodes. The repository is <https://github.com/Paradox-73/StackSense26>; its README gives the commands that run the app, the tests and the studies, and rebuild this PDF.
+**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 379 URLs is in `report/sources.md`. Appendix G prints the URL of every other source this report cites, from the methods behind the design to the HIPAA, PCI DSS, DPDP and RBI rules it encodes. The repository is <https://github.com/Paradox-73/StackSense26>; its README gives the commands that run the app, the tests and the studies, and rebuild this PDF.
 
 ## 11. AI assistance declaration
 - Claude Code (Anthropic), an AI coding assistant: used to write code and tests, to gather sources for the knowledge base and to draft documentation.
@@ -356,7 +356,7 @@ The table prints the knowledge-base facts for the hosting options that the six p
 | Fly.io | none | no | yes | from $99 | no | no | 4/5 | $30–$250 | <https://fly.io/docs/about/healthcare/> |
 | AWS ECS on Fargate | 99.99% | yes | yes | yes | yes | yes | 3/5 | $120–$400 | <https://aws.amazon.com/compliance/programs/><br><https://aws.amazon.com/ecs/sla/> |
 | AWS Lambda + API Gateway | 99.95% | yes | yes | yes | yes | yes | 5/5 | $30–$400 | <https://aws.amazon.com/compliance/programs/><br><https://aws.amazon.com/lambda/sla/> |
-| Azure App Service / Container Apps | 99.99% | yes | yes | yes | yes | yes | 4/5 | $100–$500 | <https://learn.microsoft.com/azure/compliance/><br><https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services> |
+| Azure App Service | 99.99% | yes | yes | yes | yes | yes | 4/5 | $100–$500 | <https://learn.microsoft.com/azure/compliance/><br><https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services> |
 | PostgreSQL | host | host | host | host | host | host | 4/5 | $50–$400 | <https://www.postgresql.org/docs/current/> |
 | Microsoft SQL Server | host | host | host | host | host | host | 4/5 | $150–$800 | <https://learn.microsoft.com/en-us/sql/sql-server/> |
 <!-- END evidence -->
@@ -493,7 +493,7 @@ Top-1 is scored on 158 of the 160 layer picks, because the personas have no majo
 
 ## Appendix G. Sources and their URLs
 
-Section 10 prints the URLs of the libraries, fonts, APIs and datasets, and `report/sources.md` lists the 378 URLs behind the knowledge base, rules, questions and glossary. This appendix prints the URL of every other source: first the main references, then each source that sections 1 to 9 link to, with the section that first cites it.
+Section 10 prints the URLs of the libraries, fonts, APIs and datasets, and `report/sources.md` lists the 379 URLs behind the knowledge base, rules, questions and glossary. This appendix prints the URL of every other source: first the main references, then each source that sections 1 to 9 link to, with the section that first cites it.
 
 <div class="appx refs">
 
