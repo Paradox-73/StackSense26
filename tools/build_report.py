@@ -14,6 +14,7 @@ Build-only packages: requirements-dev.txt. Set CHROME to a browser path if Chrom
 """
 from __future__ import annotations
 
+import datetime
 import html
 import json
 import os
@@ -367,13 +368,14 @@ def _llm_baseline() -> str:
 
 def cover_html(cover: dict) -> str:
     links = "".join(f'<tr><td>{html.escape(k)}</td><td>{html.escape(v)}</td></tr>' for k, v in cover["links"].items())
+    today = datetime.date.today()
     return (f'<section class="cover"><div class="kicker">{html.escape(cover["event"])}</div>'
             f'<h1 class="cover-title">{html.escape(cover["title"])}</h1>'
             f'<p class="cover-pitch">{html.escape(cover["pitch"])}</p>'
             f'<table class="cover-meta"><tr><td>Full name</td><td>{html.escape(cover["author"])}</td></tr>'
             f'<tr><td>College</td><td>{html.escape(cover["institute"])}</td></tr>'
             f'<tr><td>Unstop registered email</td><td>{html.escape(cover.get("email") or "to be added by the entrant")}</td></tr>'
-            f'<tr><td>Date</td><td>{html.escape(cover["date"])}</td></tr>{links}</table></section>')
+            f'<tr><td>Date</td><td>{today.day} {today:%B %Y}</td></tr>{links}</table></section>')
 
 
 def assemble(pages: dict[str, int], toc_pages: dict[str, int]) -> tuple[str, list[tuple[int, str, str]], list[str], str]:
