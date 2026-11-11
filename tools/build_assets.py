@@ -4,7 +4,7 @@
   report/pairs.md              one-answer-apart project pairs
   report/inputs_appendix.md    Appendix B: question catalogue, what each answer changes, derived quantities
   report/report.md             the generated blocks between <!-- BEGIN x --> and <!-- END x --> markers:
-                               preset table, sample gallery, pairs, benchmark table
+                               test counts, knowledge-base evidence table, sample gallery, pairs, benchmark table
 
     python tools/build_assets.py            # rewrite everything
     python tools/build_assets.py --check    # change nothing; exit 1 and list files that differ
@@ -25,34 +25,44 @@ sys.path.insert(0, str(ROOT / "tools"))
 from engine import recommend  # noqa: E402
 from engine.export import to_markdown  # noqa: E402
 from engine.kb import LAYERS, load_glossary, load_kb, load_presets, load_questions  # noqa: E402
+from engine.profile import TIER_LABELS  # noqa: E402
 from engine.scoring import REGULATED_SOURCES  # noqa: E402
 
-
-def host_reason(r: dict) -> str:
-    """The criterion that most favours the chosen host, as the explanation panel states it."""
-    line = r["stack"]["hosting"]["explanation"]["why"][0]
-    head = line.split(":")[0]
-    return head if ":" in line and len(head) <= 48 else line.split(".")[0][:60]
+# Appendix D's evidence table: the hosts the six public scenarios pick or rank second, then their two database picks.
+EVIDENCE_ROWS = [("hosting", i) for i in ("netlify", "cloudflare", "digitalocean", "gcp_cloud_run", "flyio", "aws_ecs",
+                                          "aws_lambda", "azure_apps")] + [("database", "postgres"), ("database", "sqlserver")]
 
 
-def cost_text(r: dict) -> str:
-    c = r["cost"]
-    lo, hi = round(c["total_low"]), round(c["total_high"])
-    t = f"${lo:,}" if lo == hi else f"${lo:,}–${hi:,}"
-    return t + (" (over budget)" if c.get("status") == "over" else "")
-
-
-def presets_block(results: dict) -> str:
-    n = len(results)
-    lines = [f"The {n} built-in examples, as the engine recommends them today:", "",
-             "| Scenario | Frontend | Backend | Database | Hosting | Est. cost / month | Top reason for the host |",
-             "|---|---|---|---|---|---|---|"]
-    for p in load_presets():
-        r = results[p["id"]]
-        names = [r["stack"][l]["pick"]["name"] for l in LAYERS]
-        names = [re.sub(r" \(.*\)$", "", x) if i < 1 else x for i, x in enumerate(names)]
-        lines.append(f"| {p['name']} | " + " | ".join(names) + f" | {cost_text(r)} | {host_reason(r)} |")
-    return "\n".join(lines)
+def evidence_block() -> str:
+    """The knowledge-base facts behind the hard filters for EVIDENCE_ROWS, with the vendor pages they come from. The
+    compliance filter checks the host, not a database it manages (engine/scoring.py), so database rows say 'host'."""
+    kb = load_kb()
+    yes = lambda b: "yes" if b else "no"
+    out = ["The table prints the knowledge-base facts for the hosting options that the six public scenarios pick or rank second, "
+           "and for their two database picks; `tools/build_assets.py` generates it from `data/kb/`. SLA is the highest uptime that "
+           "the vendor's SLA page commits to. India and EU mark a region that meets a data-residency rule. A price in the BAA column "
+           "is the least a month at which the vendor signs one. Ops is the operations-burden score from Appendix C, where 5 means "
+           f"the least work. Cost is the monthly band at the scale tier {TIER_LABELS[2]}, for the app alone on a host and for the "
+           "managed service on a database. A managed database takes the SLA, regions and attestations of the host's service, so "
+           "those cells read host. The source column gives the vendor's compliance and SLA pages, or the database's documentation; "
+           "`report/sources.md` lists every other source.", "",
+           "| Option | SLA | India | EU | HIPAA BAA | PCI DSS | ISO 27001 | Ops | Cost a month | Source |",
+           "|---|---|---|---|---|---|---|---|---|---|"]
+    for layer, kid in EVIDENCE_ROWS:
+        it = next(x for x in kb[layer] if x["id"] == kid)
+        lo, hi = it["cost_usd"][2]
+        if layer == "database":
+            cells, urls = ["host"] * 6, it["sources"][:1]
+        else:
+            c, sla = it["compliance"], it.get("sla")
+            regions = it.get("residency_regions", it["regions"])  # the lookup the residency filter uses
+            baa = (f"from ${c['hipaa_min_usd']:,}" if c.get("hipaa_min_usd") else "yes") if c["hipaa"] else "no"
+            cells = [f"{sla['percent']:g}%" if sla else "none", yes("india" in regions), yes("europe" in regions), baa,
+                     yes(c["pci"]), yes(c["iso27001"])]
+            urls = c["maturity_sources"][:1] + ([sla["source"]] if sla else [])
+        out.append(f"| {it['name']} | " + " | ".join(cells) + f" | {it['scores']['ops']}/5 | ${lo:,}–${hi:,} | "
+                   + "<br>".join(f"<{u}>" for u in urls) + " |")
+    return "\n".join(out)
 
 
 def bench_block() -> str:
@@ -216,7 +226,7 @@ def build() -> dict[Path, str]:
     vtable, vfull = validation_files()
     files[ROOT / "report" / "validation.md"] = vfull
     kg, kp = build_pairs.KEY_GALLERY, build_pairs.KEY_PAIRS
-    for name, body in (("validation", vtable), ("presets", presets_block(results)),
+    for name, body in (("validation", vtable), ("evidence", evidence_block()),
                        ("gallery", build_pairs.gallery_markdown(0, kg).rstrip()), ("gallery_more", build_pairs.gallery_markdown(kg).rstrip()),
                        ("pairs", build_pairs.pairs_markdown(0, kp).rstrip()), ("pairs_more", build_pairs.pairs_markdown(kp).rstrip()),
                        ("bench", bench_block())):

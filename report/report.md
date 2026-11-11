@@ -116,7 +116,7 @@ Quick mode asks seven questions; Refine opens all 42. "Describe your project" fi
 
 ### 5.1 How technologies are represented
 
-`data/kb/*.json` holds 70 technologies: 17 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region. 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 379 URLs, and no end-of-life product is in the knowledge base.
+`data/kb/*.json` holds 70 technologies: 17 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region; Appendix D prints these facts and their sources for the public scenarios' hosts and databases. 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 378 URLs, and no end-of-life product is in the knowledge base.
 
 ### 5.2 Scoring and filtering
 
@@ -348,30 +348,30 @@ Every technology score is an integer from 1 (poor) to 5 (excellent) for that cri
 
 Scores of 2 and 4 sit between the anchors. The rubric is a reading guide: the sources for each technology are in `report/sources.md`, and the rules and weights that combine the scores are in the knowledge base and `engine/scoring.py`.
 
-## Appendix D. More sample recommendations
+## Appendix D. Knowledge-base evidence and more samples
 
-The guided questionnaire runs the same engine on its own answers. Below are all 14 built-in examples as the engine recommends them, two screenshots of the questionnaire's result page and three one-answer-apart pairs, with changed layers in bold and the engine's reason.
+<div class="appx">
 
-<!-- BEGIN presets -->
-The 14 built-in examples, as the engine recommends them today:
+<!-- BEGIN evidence -->
+The table prints the knowledge-base facts for the hosting options that the six public scenarios pick or rank second, and for their two database picks; `tools/build_assets.py` generates it from `data/kb/`. SLA is the highest uptime that the vendor's SLA page commits to. India and EU mark a region that meets a data-residency rule. A price in the BAA column is the least a month at which the vendor signs one. Ops is the operations-burden score from Appendix C, where 5 means the least work. Cost is the monthly band at the scale tier Medium (10k-100k daily users or 50-500 req/s at peak), for the app alone on a host and for the managed service on a database. A managed database takes the SLA, regions and attestations of the host's service, so those cells read host. The source column gives the vendor's compliance and SLA pages, or the database's documentation; `report/sources.md` lists every other source.
 
-| Scenario | Frontend | Backend | Database | Hosting | Est. cost / month | Top reason for the host |
-|---|---|---|---|---|---|---|
-| Startup SaaS MVP | Next.js | Supabase (BaaS on Postgres) | PostgreSQL | Cloudflare Pages + Workers | $26 | Low ops burden |
-| Indian e-commerce at scale | Next.js | Java/Kotlin + Spring Boot | MySQL | AWS EKS (Kubernetes) | $10,800–$57,000 | Realtime fit |
-| HIPAA telehealth platform | React SPA | Python + Django | PostgreSQL | AWS ECS on Fargate | $370–$1,815 | Realtime fit |
-| Realtime multiplayer game backend | React SPA | Go (net/http, chi or Gin) | MongoDB | Fly.io | $1,325–$4,800 | Realtime fit |
-| IoT telemetry pipeline | React SPA | Go (net/http, chi or Gin) | TimescaleDB (Postgres) | AWS ECS on Fargate | $1,365–$7,700 | Scalability |
-| On-prem internal tool | Server-rendered HTML + HTMX | Python + Django | SQLite (+ Litestream backups) | On-prem VMs + Docker Compose | $0–$150 | Learning curve |
-| AI document-search product (RAG) | Next.js | Python + FastAPI | PostgreSQL | Google Cloud Run | $367–$4,575 | Low ops burden |
-| Student project (zero budget) | React SPA | Firebase (BaaS on Google Cloud) | Cloud Firestore | Vercel | $0 | Cost at your scale |
-| SEO content site / blog | Next.js | No server code (static site) | No database (content files in git) | Netlify | $0 | Cost at your scale |
-| Mobile-first social app (India) | React Native | Firebase (BaaS on Google Cloud) | Cloud Firestore | Provided by Firebase | $613–$3,752 | Nothing of yours needs hosting |
-| College fest website (India) | Next.js | Serverless functions (Node/Python FaaS) | PostgreSQL | Cloudflare Pages + Workers | $15–$55 | Cost at your scale |
-| UPI payments app (India) | Native iOS + Android | Java/Kotlin + Spring Boot | PostgreSQL | AWS EKS (Kubernetes) | $3,700–$14,750 | Ecosystem maturity |
-| Food delivery platform (India) | Next.js | Node.js + NestJS | PostgreSQL | AWS EKS (Kubernetes) | $24,500–$125,000 | Realtime fit |
-| Edge case: contradictory inputs | Next.js | Node.js + Express | PostgreSQL | Azure App Service | $89,000–$330,000 (over budget) | Low ops burden |
-<!-- END presets -->
+| Option | SLA | India | EU | HIPAA BAA | PCI DSS | ISO 27001 | Ops | Cost a month | Source |
+|---|---|---|---|---|---|---|---|---|---|
+| Netlify | none | no | yes | no | yes | yes | 5/5 | $40–$300 | <https://www.netlify.com/security/> |
+| Cloudflare Pages + Workers | none | no | no | no | yes | yes | 5/5 | $5–$25 | <https://www.cloudflare.com/trust-hub/compliance-resources/> |
+| DigitalOcean (App Platform + Managed DBs) | 99.95% | yes | yes | no | no | no | 5/5 | $50–$250 | <https://www.digitalocean.com/trust><br><https://www.digitalocean.com/sla/app-platform> |
+| Google Cloud Run | 99.95% | yes | yes | yes | yes | yes | 5/5 | $60–$400 | <https://cloud.google.com/security/compliance/offerings><br><https://cloud.google.com/run/sla> |
+| Fly.io | none | no | yes | from $99 | no | no | 4/5 | $30–$250 | <https://fly.io/docs/about/healthcare/> |
+| AWS ECS on Fargate | 99.99% | yes | yes | yes | yes | yes | 3/5 | $120–$400 | <https://aws.amazon.com/compliance/programs/><br><https://aws.amazon.com/ecs/sla/> |
+| AWS Lambda + API Gateway | 99.95% | yes | yes | yes | yes | yes | 5/5 | $30–$400 | <https://aws.amazon.com/compliance/programs/><br><https://aws.amazon.com/lambda/sla/> |
+| Azure App Service / Container Apps | 99.99% | yes | yes | yes | yes | yes | 4/5 | $100–$500 | <https://learn.microsoft.com/azure/compliance/><br><https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services> |
+| PostgreSQL | host | host | host | host | host | host | 4/5 | $50–$400 | <https://www.postgresql.org/docs/current/> |
+| Microsoft SQL Server | host | host | host | host | host | host | 4/5 | $150–$800 | <https://learn.microsoft.com/en-us/sql/sql-server/> |
+<!-- END evidence -->
+
+</div>
+
+The guided questionnaire runs the same engine on its own answers. Two screenshots of its result page and three one-answer-apart pairs follow, with changed layers in bold and the engine's reason.
 
 <!-- BEGIN gallery -->
 ![Startup SaaS MVP](screenshots/gallery/startup_mvp.png)
