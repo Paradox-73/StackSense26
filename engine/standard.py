@@ -260,7 +260,7 @@ STYLE = [("Static site", "static"), ("BaaS-first, self-hosted", "other"), ("BaaS
 SERVICE_LAYER = {"Cache": "cache", "Realtime": "realtime", "Background jobs": "queue", "Ingestion buffer": "queue",
                  "Search": "search", "Payments": "payments", "Static frontend": "cdn", "CDN": "cdn",
                  "Media delivery": "cdn", "Object storage": "storage", "Authentication": "auth",
-                 "Enterprise SSO": "auth", "Phone login (SMS OTP)": "auth", "Model serving": "ml",
+                 "Enterprise SSO": "auth", "Phone login (SMS OTP)": "other", "Model serving": "ml",
                  "Vector search": "ml", "Observability": "observability", "Game servers": "realtime"}
 SERVICE_FIELDS = {
     "cache": ["scale.workload", "requirements.p95_latency_ms", "scale.users_12_months"],
@@ -276,6 +276,7 @@ SERVICE_FIELDS = {
     "other": ["project.type"],
 }
 OTHER_FIELDS = {"Offline sync": ["requirements.offline_support"], "Push notifications": ["project.platforms"],
+                "Phone login (SMS OTP)": ["requirements.auth", "infrastructure.data_residency"],
                 "Audit & security": ["compliance"], "Hybrid split": ["infrastructure.deployment_model"],
                 "Analytics": ["scale.workload", "project.type"],
                 "Collaboration sync": ["project.type", "requirements.realtime"], "Desktop app": ["project.platforms"],
@@ -920,6 +921,9 @@ def _component(layer: str, sl: dict, origin: dict, f: dict, result: dict) -> dic
             "tradeoffs": list(dict.fromkeys(ex.get("tradeoffs", []) + ex.get("risks", [])))}
 
 
+ONE_PER_LAYER = ("auth", "cdn", "storage")
+
+
 def _supporting(result: dict, f: dict) -> list[dict]:
     out = []
     services = [(s, False) for s in result.get("supporting_services", [])] + \
@@ -939,8 +943,18 @@ def _supporting(result: dict, f: dict) -> list[dict]:
         if s.get("trigger"):
             tradeoffs.append(f"Add it {s['trigger']}" if deferred else f"Can wait until {s['trigger']}")
         why = s["why"] + (" Deferred: the team's operations budget keeps it out of the first release." if deferred else "")
-        out.append({"layer": layer, "choice": s["name"], "justification": why, "driven_by": fields,
-                    "alternatives": [], "tradeoffs": tradeoffs, "source": s.get("source"), "role": s["role"]})
+        layer = s.get("layer") or layer
+        entry = {"layer": layer, "choice": s["name"], "justification": why, "driven_by": fields,
+                 "alternatives": [], "tradeoffs": tradeoffs, "source": s.get("source"), "role": s["role"]}
+        first = next((x for x in out if x["layer"] == layer), None) if layer in ONE_PER_LAYER else None
+        if first:  # one sign-in product, one CDN, one file store: a second line of the layer adds to the first
+            if s["role"] == "Static frontend":  # it names the bucket and the CDN, so it leads
+                first.update(choice=entry["choice"], source=entry["source"], role=entry["role"])
+            first["justification"] += " " + why
+            first["driven_by"] = list(dict.fromkeys(first["driven_by"] + fields))
+            first["tradeoffs"] = list(dict.fromkeys(first["tradeoffs"] + tradeoffs))
+            continue
+        out.append(entry)
     idps = _systems(f["infrastructure.existing_systems"])[1]
     idps = [i for i in idps if i not in _cloud_only_identity(idps, f)]
     if idps and f["requirements.auth"] != "none":

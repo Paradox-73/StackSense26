@@ -98,10 +98,11 @@ def test_self_hosted_baas_is_scored_as_self_operated():
 def test_small_team_defers_extra_systems_with_triggers(presets):
     r = recommend(presets["india_social_mobile"]["input"], with_counterfactuals=False)
     later = {s["role"]: s for s in r.get("deferred_services", [])}
-    assert "Secondary store (graph)" in later and "Neo4j" in later["Secondary store (graph)"]["name"]
+    # Firebase runs the app's code in its own cloud, so no cache takes a slot: the graph store fits the team's two.
     assert "Analytics" in later and "ClickHouse" in later["Analytics"]["name"]
+    assert "Secondary store (graph)" not in later and "Cache" not in {s["role"] for s in r["supporting_services"]}
     assert all(s["trigger"] for s in later.values())
-    assert not any("Neo4j" in x["component"] or "ClickHouse" in x["component"] for x in r["cost"]["lines"])
+    assert not any("ClickHouse" in x["component"] for x in r["cost"]["lines"])
     assert len(r["ops_budget"]["extra_systems"]) <= r["ops_budget"]["cap"]
 
 

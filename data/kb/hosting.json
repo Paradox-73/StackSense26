@@ -1504,7 +1504,7 @@
     },
     {
       "id": "azure_apps",
-      "name": "Azure App Service / Container Apps",
+      "name": "Azure App Service",
       "provider": "azure",
       "kind": "containers",
       "summary": "Microsoft's managed web hosting and serverless containers, integrated with Entra ID and Azure SQL/Postgres.",

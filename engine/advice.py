@@ -277,9 +277,9 @@ def _redis_offering(text: str, env: dict) -> str:
     if env["india"] and env["hipaa"] and ("Workers KV" in text or "Upstash" in text):
         return "Self-managed Valkey in your Indian region, on servers covered by your host's BAA"
     if env["india"] and ("Workers KV" in text or "Upstash" in text):
-        return "Upstash Redis in its Mumbai region, or self-managed Valkey in your Indian region"
+        return "Upstash Redis in its Mumbai region"
     if env["hipaa"] and "Upstash" in text:
-        return "Upstash Redis (Enterprise plan with a signed BAA), or keep sessions in the primary database"
+        return "Upstash Redis (Enterprise plan with a signed BAA)"
     return text
 
 
@@ -319,16 +319,17 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         return _redis_offering(text, env) if dbid == "redis" else text
 
     def add(role, name, why, source, cost_id=None, cost_tier=None, system=None, trigger=None, usage=None,
-            tier_usage=None):
+            tier_usage=None, layer=None):
         out.append({"role": role, "name": name, "why": why, "source": source, "cost_id": cost_id,
                     "cost_tier": cost_tier, "system": system, "trigger": trigger, "usage": usage,
-                    **({"tier_usage": tier_usage} if tier_usage else {})})
+                    **({"tier_usage": tier_usage} if tier_usage else {}), **({"layer": layer} if layer else {})})
 
     # Candidates come first so they win ties. Every shape except analytical and search is part of the record, so its
     # secondary store must pass the same constraints as the primary.
     analytics_pool = db_candidates + analytics_only_excluded(kb["database"], db_candidates, p, d)
     kv_hot = d["primary_shape"] == "key_value" and tier >= 1
-    if be.get("kind") != "none" and db["id"] != "redis" and ((p["read_write"] == "read_heavy" and tier >= 2) or (p["latency_target_ms"] <= 100 and tier >= 1) or kv_hot):
+    # A cache serves the app's own code: a backend-as-a-service runs in its vendor's cloud and a static site runs none.
+    if be.get("kind") not in ("none", "baas") and db["id"] != "redis" and ((p["read_write"] == "read_heavy" and tier >= 2) or (p["latency_target_ms"] <= 100 and tier >= 1) or kv_hot):
         add("Cache", f"Redis/Valkey ({offering('redis')})",
             "Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory "
             "in front of a durable primary database.",
@@ -342,7 +343,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         elif host.get("kind") in ("faas", "frontend_paas") or be.get("kind") == "faas":
             name = ("API Gateway WebSockets" if prov == "aws" else
                     "Managed pub/sub with a signed BAA (e.g. Ably or PubNub HIPAA plans)" if env["hipaa"] else
-                    "Managed pub/sub (Ably, Pusher, or API Gateway WebSockets)")
+                    "Ably (managed pub/sub over WebSockets)")
             add("Realtime", name,
                 "Your compute is request-scoped and cannot hold WebSocket connections; offload them to a managed realtime service.",
                 "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html")
@@ -436,13 +437,18 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             "https://kafka.apache.org/documentation/#design", system="ingestion",
             trigger=None if p["app_type"] == "iot_telemetry" else "when write bursts push database write latency up or requests start timing out")
     else:
-        jobs = {"node": "BullMQ (Redis)", "python": "Celery / RQ / Dramatiq (Redis/Valkey broker)", "ruby": "Sidekiq (Redis/Valkey)",
+        sqs = prov == "aws" and not env["hybrid"] and not env["self_managed"]
+        jobs = {"node": "BullMQ (Redis)", "python": "Celery (Redis/Valkey broker)", "ruby": "Sidekiq (Redis/Valkey)",
                 "elixir": "Oban",
-                "jvm": "Spring Batch / SQS listeners" if prov == "aws" and not env["hybrid"] and not env["self_managed"]
-                else "Spring Batch / JobRunr",
-                "dotnet": "Hangfire / Azure Queue" if prov == "azure" and not env["hybrid"] and not env["self_managed"]
-                else "Hangfire",
-                "go": "River / Asynq", "php": "Laravel Queues"}
+                # Spring Batch runs batch jobs, not a work queue: on AWS the queue is SQS, read by Spring listeners.
+                "jvm": "Amazon SQS with Spring Cloud AWS listeners" if sqs else "JobRunr",
+                "dotnet": "Hangfire",
+                "go": "River (jobs in PostgreSQL)" if db["id"] in ("postgres", "timescaledb") else "Asynq (Redis)",
+                "php": "Laravel Queues"}
+        job_docs = {"jvm": "https://docs.awspring.io/spring-cloud-aws/docs/3.3.0/reference/html/index.html#sqs-integration"
+                    if sqs else "https://www.jobrunr.io/en/documentation/",
+                    "go": "https://riverqueue.com/docs" if db["id"] in ("postgres", "timescaledb") else
+                    "https://github.com/hibiken/asynq", "dotnet": "https://docs.hangfire.io/en/latest/"}
         if be.get("kind") == "server" and host.get("kind") in ("faas", "frontend_paas") and not stack.get("api_host"):
             # Functions-only hosting has no always-on process to run a worker or hold a queue connection,
             # so the queue must be one the platform delivers to functions.
@@ -477,7 +483,8 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
                 add("Background jobs", jobs[lang] + worker_on, why, QUEUE_NEEDS_REDIS[lang][1],
                     None if already else "redis", None if already else tier, "redis")
             else:
-                add("Background jobs", jobs.get(lang, "A job queue") + worker_on, why, "https://12factor.net/processes")
+                add("Background jobs", jobs.get(lang, "A job queue") + worker_on, why,
+                    job_docs.get(lang, "https://12factor.net/processes"))
 
     static = be.get("kind") == "none"
     work = set(p.get("special_workloads") or [])
@@ -492,14 +499,14 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     if search_served:
         pass  # the stack already has its search engine
     elif not static and small_search:
-        add("Search", f"{builtin} to start; Meilisearch/Typesense/OpenSearch past ~{SEARCH_CORPUS_GB} GB or when "
-            "facets & typo-tolerance matter",
+        add("Search", builtin,
             f"About {d['data_12mo_gb']:,.0f} GB of data in a year fits the database's own text index; a separate search "
-            "cluster would add a second system and its bill before it is needed.", BUILTIN_SEARCH_DOCS[db["id"]])
+            "cluster would add a second system and its bill before it is needed. Move to Meilisearch past "
+            f"~{SEARCH_CORPUS_GB} GB or when facets and typo tolerance matter.", BUILTIN_SEARCH_DOCS[db["id"]])
     elif not static and ("text_search" in work or big_corpus):
         engine = ("OpenSearch (self-hosted)" if env["onprem"] or env["hybrid"] else
-                  {"aws": "Amazon OpenSearch Service", "gcp": "Elastic Cloud on Google Cloud, or self-managed OpenSearch on GKE",
-                   "azure": "Azure AI Search"}.get(env["cloud"] or "", "Meilisearch or Typesense (cloud or self-hosted); OpenSearch past ~10M documents"))
+                  {"aws": "Amazon OpenSearch Service", "gcp": "Elastic Cloud on Google Cloud",
+                   "azure": "Azure AI Search"}.get(env["cloud"] or "", "Meilisearch Cloud"))
         if big_corpus:
             size = (f"~{doc_gb:,.0f} GB of documents" if doc_gb >= d["data_12mo_gb"] else
                     f"~{doc_gb:,.0f} GB of documents (an estimate: the document share of your ~{d['data_12mo_gb']:,.0f} GB "
@@ -514,18 +521,24 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             add("Search", "Pagefind (a static search index built at deploy time)",
                 "Full-text search for a static site with no server: the index ships with the pages.", "https://pagefind.app/")
         elif builtin:
-            add("Search", f"{builtin} to start; Meilisearch/Typesense/OpenSearch when facets & typo-tolerance matter",
-                "Catalogue/content search with relevance tuning outgrows LIKE queries quickly.", "https://www.meilisearch.com/docs")
+            add("Search", builtin,
+                "Catalogue/content search with relevance tuning outgrows LIKE queries quickly; the database's own text "
+                "index starts it, and Meilisearch takes over when facets and typo tolerance matter.", "https://www.meilisearch.com/docs")
         else:
-            engine = ("Meilisearch / Typesense / OpenSearch (self-hosted)" if env["onprem"] else
-                      "Typesense or Algolia (Firebase extensions sync Firestore to them)" if db["id"] == "firestore" else
-                      "Meilisearch / Typesense / OpenSearch")
+            engine = ("Meilisearch (self-hosted)" if env["onprem"] else
+                      "Algolia, synced from Firestore by its Firebase extension" if db["id"] == "firestore" else
+                      "Meilisearch Cloud")
             add("Search", engine, f"{db['name']} has no full-text search, so text search needs a separate index.",
                 "https://www.meilisearch.com/docs", system="search",
                 trigger="when users need to search posts, products or people by text")
 
-    _special_workloads(p, d, env, add, has_storage=lambda: any(x["role"] == "Object storage" for x in out),
-                       storage=lambda: _object_storage(env, prov))
+    # A backend-as-a-service bundles its own file store, which its access rules already cover: uploads go there.
+    baas_store = (("Cloud Storage for Firebase (included in the Firebase project)", "https://firebase.google.com/docs/storage",
+                   " Firebase security rules cover both.") if be["id"] == "firebase" else
+                  ("Supabase Storage (included, with a CDN)", "https://supabase.com/docs/guides/storage",
+                   " Row-level security policies cover both.") if be["id"] == "supabase" and not env["onprem"] else None)
+    _special_workloads(p, d, env, add, prov=prov, has_storage=lambda: any(x["role"] == "Object storage" for x in out),
+                       storage=lambda: baas_store[:2] if baas_store else _object_storage(env, prov))
 
     takes_money = "pay" in d["user_actions"] or (p["app_type"] in ("ecommerce", "fintech") and "user_actions" in d["defaulted"])
     if takes_money and env["air_gapped"]:
@@ -534,10 +547,13 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             "keeping card data out entirely also keeps the isolated network out of PCI-DSS scope.",
             "https://www.pcisecuritystandards.org/document_library/")
     elif takes_money:
-        pg = "Razorpay / Cashfree (India) or Stripe" if "india" in p["regions"] else "Stripe / Adyen"
-        add("Payments", f"{pg} with hosted checkout (card tokens)",
-            "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).",
-            "https://www.pcisecuritystandards.org/document_library/")
+        india = "india" in p["regions"]
+        # Stripe takes new Indian businesses by invitation only (support.stripe.com, Stripe India support).
+        add("Payments", f"{'Razorpay' if india else 'Stripe'} with hosted checkout (card tokens)",
+            "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A)."
+            + (" Stripe accepts new businesses in India by invitation only, so an Indian gateway leads." if india else ""),
+            "https://razorpay.com/docs/payments/payment-gateway/web-integration/hosted/" if india else
+            "https://docs.stripe.com/payments/checkout")
 
     home = spa_static_home(p, d, stack) if d["web"] and not env["onprem"] else None
     if home:
@@ -559,7 +575,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             out[-1]["tier_usage"] = (typical, typical, f"the ${fee:g} monthly base fee plus the transfer of a typical "
                                      f"{TIER_NAMES[tier]} tier ({SPA_STATIC_PRICE_SOURCES[prov]})")
     if p.get("cacheable_share") == "most" and not static and be.get("kind") != "baas":
-        add("CDN", "Cloudflare or CloudFront in front of the app",
+        add("CDN", f"{CDN_BY_PROVIDER.get(env['cloud'] or prov, 'Cloudflare CDN')} in front of the app",
             "You said most requests return the same content to everyone; a CDN answers them without touching the servers, "
             "so the servers are sized for the remaining share.",
             "https://developers.cloudflare.com/cache/concepts/default-cache-behavior/")
@@ -579,21 +595,17 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     elif static:
         pass  # images live in the repository and are served by the host's CDN
     elif p["app_type"] in ("social_network", "content_site", "ecommerce", "healthcare", "ml_product") or d["mobile"]:
-        if be["id"] == "firebase":
-            add("Object storage", "Cloud Storage for Firebase (included in the Firebase project)",
-                "Media and documents belong in object storage, not the database; Firebase security rules cover both.",
-                "https://firebase.google.com/docs/storage")
-        elif be["id"] == "supabase" and not env["onprem"]:
-            add("Object storage", "Supabase Storage (included, with a CDN)",
-                "Media and documents belong in object storage, not the database; row-level security policies cover both.",
-                "https://supabase.com/docs/guides/storage")
-        elif not any(x["role"] == "Object storage" for x in out):
-            store, src = _object_storage(env, prov)
-            add("Object storage", store, "Media and documents belong in object storage, not the database.", src)
+        if not any(x["role"] == "Object storage" for x in out):
+            store, src, rules = baas_store or (*_object_storage(env, prov), "")
+            add("Object storage", store, "Media and documents belong in object storage, not the database." + rules, src)
 
-    if be.get("kind") != "baas" and "sign_in" in d["user_actions"]:
-        add("Authentication", _auth(env), "Do not hand-roll password storage, MFA or SSO.",
-            "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html")
+    # One identity provider: enterprise SSO is a feature of the sign-in product, not a second system beside it.
+    sso_needed = p.get("enterprise_sso") and not be.get("sso")
+    if (be.get("kind") != "baas" and "sign_in" in d["user_actions"]) or sso_needed:
+        name, src, system = _auth(env, p, d, be)
+        add("Authentication", name, "Do not hand-roll password storage, MFA or SSO."
+            + (" Customers sign in with their own identity provider (Entra ID, Okta, Google Workspace) over SAML 2.0 or "
+               "OIDC, and the API sees one token format." if sso_needed else ""), src, system=system)
     if p.get("enterprise_sso"):
         sso = be.get("sso")
         if sso:
@@ -609,18 +621,6 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             tier_extra = max(0.0, typical - sso["free_mau"]) * sso["usd_per_mau"]
             out[-1]["tier_usage"] = (tier_extra, tier_extra, f"~{typical:,.0f} monthly SSO users, typical of the "
                                      f"{TIER_NAMES[d['compute_tier']]} scale tier")
-        elif env["air_gapped"]:  # cloud identity providers are unreachable; the directory inside the network is not
-            add("Enterprise SSO", "Keycloak (self-hosted) federating your on-premises directory (Active Directory or "
-                "another LDAP server) over LDAPS or Kerberos",
-                "An air-gapped network cannot reach a cloud identity provider (Entra ID, Okta, Google Workspace); Keycloak's "
-                "user federation reads the accounts and groups from the directory inside the network and gives your API "
-                "one OIDC token format.", "https://www.keycloak.org/docs/latest/server_admin/#_user-storage-federation",
-                system="keycloak")
-        else:
-            add("Enterprise SSO", "Keycloak identity brokering (self-hosted, free): each customer's Entra ID / Azure AD, "
-                "Okta or Google Workspace over SAML 2.0 or OIDC",
-                "Customers log in with their own identity provider; the broker turns each SAML or OIDC login into one "
-                "token format for your API.", "https://www.keycloak.org/docs/latest/server_admin/", system="keycloak")
 
     if p["offline"]:
         if db["id"] == "firestore" or be["id"] == "firebase":
@@ -653,8 +653,10 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         if env["hipaa"]:
             why += (" Push services are not covered by a BAA: put no health information in the notification "
                     "text (e.g. 'You have a new message') and show the content only after the user signs in.")
-        add("Push notifications", "Firebase Cloud Messaging (+ APNs) or Expo Notifications", why,
-            "https://firebase.google.com/docs/cloud-messaging")
+        expo = stack["frontend"].get("id") == "react_native"  # Expo's push service exists only for Expo apps
+        add("Push notifications", "Expo push notifications (FCM and APNs underneath)" if expo else
+            "Firebase Cloud Messaging (+ APNs)", why,
+            "https://docs.expo.dev/push-notifications/overview/" if expo else "https://firebase.google.com/docs/cloud-messaging")
 
     if scoring_model(p):
         # A trained scoring or classification model (credit score, fraud score): a CPU endpoint, not an LLM service.
@@ -666,7 +668,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         ml, src = SCORING_SERVING.get(where, SCORING_SERVING["self"])
         add("Model serving", ml, SCORING_WHY.get(where, SCORING_WHY_DEFAULT), src)
     elif p["app_type"] == "ml_product" or p.get("ml_features", "none") != "none":
-        ml = {"gcp": "Vertex AI endpoints", "aws": "Amazon Bedrock / SageMaker", "azure": "Azure AI Foundry"}.get(
+        ml = {"gcp": "Vertex AI endpoints", "aws": "Amazon Bedrock", "azure": "Azure AI Foundry"}.get(
             "" if env["hybrid"] or env["self_managed"] else env["cloud"] or "")
         if not ml and env["self_managed"]:  # VMs you run: no managed model service
             ml = "a self-hosted inference server (vLLM or Hugging Face TGI) on GPU VMs you run"
@@ -790,12 +792,9 @@ MSG91_RESIDENCY = (" MSG91 stores its data only in India (Google Cloud, Mumbai) 
                    "audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify "
                    "runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would "
                    "be processed and stored outside India.")
-SMS_BY_CLOUD = {"aws": "Twilio Verify or Amazon SNS / Cognito SMS",
-                "gcp": "Twilio Verify or Identity Platform phone sign-in (SMS)",
-                "azure": "Twilio Verify or Azure Communication Services SMS"}
 
 
-def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -> None:
+def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, prov: str = "") -> None:
     """Services for workloads the four main picks do not cover, each with a usage-based cost."""
     work = set(p.get("special_workloads") or [])
     dau30 = p["dau"] * 30
@@ -819,7 +818,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
             # Under a residency rule (RBI's included) a CDN's edge caches would copy the files out of the country.
             "Short-lived signed URLs from the private bucket in your region, issued by the API after an access check "
             "(no public CDN)" if residency(env) else
-            "CDN in front of the object storage, with image resizing at the edge",
+            f"{CDN_BY_PROVIDER.get(env['cloud'] or prov, 'Cloudflare CDN')} in front of the uploads bucket",
             "Hand uploads out from the object storage, not the app server; each signed URL expires within minutes and "
             "every download is logged for the HIPAA audit trail." if env["hipaa"] and not env["onprem"] else
             "Hand uploads out from the bucket, not the app server; a public CDN would cache copies at edge sites outside "
@@ -831,7 +830,9 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
             "https://developers.cloudflare.com/r2/pricing/",
             usage=(gb * EGRESS_USD_PER_GB[0], gb * EGRESS_USD_PER_GB[1],
                    f"~{gb:,.0f} GB served a month ({MEDIA_GB_PER_USER_DAY * 1000:.0f} MB per active user a day) "
-                   f"at ${EGRESS_USD_PER_GB[0]}-{EGRESS_USD_PER_GB[1]}/GB"))
+                   f"at ${EGRESS_USD_PER_GB[0]}-{EGRESS_USD_PER_GB[1]}/GB"),
+            # Signed URLs and a reverse proxy hand files out of the store itself: part of the storage, not a CDN.
+            layer="storage" if env["onprem"] or env["hipaa"] or residency(env) else None)
     if "video_on_demand" in work:
         name = ("FFmpeg transcoding workers + Ceph Object Gateway + an HLS-serving web server (self-hosted)" if env["onprem"] else
                 "S3 + AWS Elemental MediaConvert + CloudFront under the AWS BAA" if env["hipaa"] else
@@ -865,8 +866,8 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
     if "live_video" in work:
         name = ("Self-hosted LiveKit or Jitsi (WebRTC SFU) on your servers, with a TURN relay" if env["onprem"] else
                 "Video with a signed BAA: Amazon Chime SDK, Twilio Video or Daily (HIPAA plans)" if env["hipaa"] else
-                "LiveKit (cloud in its India region, or self-hosted in your Indian region)" if env["india"] else
-                "Managed WebRTC video: LiveKit Cloud, Daily or Twilio Video")
+                "LiveKit, self-hosted in your Indian region" if env["india"] else
+                "LiveKit Cloud")
         mins = dau30 * VIDEO_MIN_PER_USER_DAY
         add("Live video", name, "Calls and live classes need a WebRTC selective forwarding unit (SFU) and TURN relays near "
             "users; a web server cannot relay media streams.", "https://docs.livekit.io/home/",
@@ -876,8 +877,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
     if "live_location" in work:
         loads = dau30 * MAP_LOADS_PER_USER_DAY
         name = ("Self-hosted OpenStreetMap tiles (OpenMapTiles) + location updates over your realtime channel" if env["onprem"] else
-                "Google Maps Platform, Mapbox or Ola Maps + location updates over the realtime channel" if "india" in p["regions"] else
-                "Google Maps Platform or Mapbox + location updates over the realtime channel")
+                "Google Maps Platform + location updates over the realtime channel")
         add("Maps & live location", name, "Send position updates every few seconds over WebSockets (not polling) and keep only "
             "the latest point per device in a fast store; map tiles and routing come from a maps provider.",
             "https://developers.google.com/maps/billing-and-pricing/pricing",
@@ -888,15 +888,20 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage) -
         india = "india" in p["regions"]
         price = OTP_USD["india" if india else "other"]
         sms = dau30 * OTP_PER_USER_DAY
-        add("Phone login (SMS OTP)", "An SMS gateway inside your network (a GSM modem driven by Kannel or Gammu), or "
-            "authenticator-app codes (TOTP) instead of SMS" if env["air_gapped"] else
+        # Cognito sends its own codes, so an AWS stack signing in with it needs no second SMS vendor.
+        cognito = env["cloud"] == "aws" and not env["self_managed"] and not env["hybrid"] and not india
+        add("Phone login (SMS OTP)", "An SMS gateway inside your network: a GSM modem driven by the Gammu SMS daemon"
+            if env["air_gapped"] else
             "MSG91, with DLT-registered SMS templates" if india or env["india"] else
-            # The cloud's own SMS service only on that cloud and when the team may use managed services there.
-            SMS_BY_CLOUD.get("" if env["self_managed"] or env["hybrid"] else env["cloud"] or "", "Twilio Verify or Vonage Verify"),
+            "Amazon Cognito SMS sign-in codes (sent through AWS End User Messaging SMS)" if cognito else "Twilio Verify",
             "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud"
             + ("; Indian operators deliver only DLT-registered templates." if india else ".")
-            + (MSG91_RESIDENCY if env["india"] and not env["air_gapped"] else ""),
-            MSG91_AUDIT if (india or env["india"]) and not env["air_gapped"] else "https://www.twilio.com/en-us/verify/pricing",
+            + (MSG91_RESIDENCY if env["india"] and not env["air_gapped"] else "")
+            + (" A phone number tied to a health service is PHI, so the gateway must sign a BAA." if env["hipaa"] else ""),
+            "https://wammu.eu/gammu/" if env["air_gapped"] else
+            MSG91_AUDIT if india or env["india"] else
+            "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html" if cognito else
+            "https://www.twilio.com/en-us/verify/pricing",
             usage=(sms * price[0], sms * price[1],
                    f"~{sms:,.0f} SMS a month (one login every ~20 days per active user) at ${price[0]}-{price[1]} each"))
     if "user_code" in work:
@@ -915,6 +920,9 @@ FILE_STORE_USD_PER_GB = {"aws": (0.023, 0.025, "https://aws.amazon.com/s3/pricin
                          "": (0.015, 0.025, "https://developers.cloudflare.com/r2/pricing/ and "
                                             "https://aws.amazon.com/s3/pricing/")}
 S3_DOCS = "https://aws.amazon.com/s3/"
+# The CDN each provider pairs with its object storage.
+CDN_BY_PROVIDER = {"aws": "Amazon CloudFront", "gcp": "Cloud CDN", "azure": "Azure Front Door",
+                   "cloudflare": "Cloudflare CDN", "digitalocean": "DigitalOcean Spaces CDN"}
 # The bucket of each cloud that holds a static site's media beside its pages.
 SITE_MEDIA_STORE = {"aws": ("Amazon S3", S3_DOCS),
                     "gcp": ("Cloud Storage", "https://cloud.google.com/storage/docs/hosting-static-website"),
@@ -974,8 +982,7 @@ def _object_storage(env: dict, prov: str) -> tuple[str, str]:
         if env["self_managed"]:  # the team runs its own servers
             return f"Ceph Object Gateway on your BAA-covered servers{where} (no public CDN for PHI)", CEPH_RGW_DOCS
         if not env["no_hyperscaler"]:
-            return (f"Amazon S3 or Google Cloud Storage{where} under a signed BAA (+ CDN for public, non-PHI files only)",
-                    AWS_HIPAA_DOCS)
+            return (f"Amazon S3{where} under the AWS BAA (a CDN for public, non-PHI files only)", AWS_HIPAA_DOCS)
         # The Security Rule's business associate clause, for a host with no HIPAA page listed above.
         src = HIPAA_HOST_DOCS.get(prov, "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C/section-164.308")
         if prov == "flyio" and not where:  # where Tigris keeps data is not checked here, so not under a residency rule
@@ -997,24 +1004,59 @@ def _object_storage(env: dict, prov: str) -> tuple[str, str]:
         return "Cloudflare R2 (+ Cloudflare CDN)", "https://developers.cloudflare.com/r2/buckets/public-buckets/"
     if prov == "digitalocean":
         return "DigitalOcean Spaces + built-in CDN", "https://docs.digitalocean.com/products/spaces/"
-    return "S3-compatible storage (Cloudflare R2 / Backblaze B2) + CDN", "https://developers.cloudflare.com/r2/api/s3/api/"
+    return "Cloudflare R2 (S3-compatible, no egress fees)", "https://developers.cloudflare.com/r2/pricing/"
 
 
-def _auth(env: dict) -> str:
-    if env["onprem"] or env["self_managed"]:
-        return "Keycloak (self-hosted)"
-    if env["hybrid"]:
-        return "Keycloak (runs on-premises and in the cloud; OIDC for every app)"
+AUTH_DOCS = "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+KEYCLOAK_DOCS = "https://www.keycloak.org/docs/latest/server_admin/"
+COGNITO_FEDERATION = "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-identity-federation.html"
+IDENTITY_PLATFORM_SAML = "https://cloud.google.com/identity-platform/docs/web/saml"
+AUTH0_ENTERPRISE = "https://auth0.com/docs/authenticate/enterprise-connections"
+
+
+def _auth(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None]:
+    """(product, source, system the team runs) of the project's one identity provider, enterprise SSO included.
+    A self-hosted Keycloak needs a team that runs servers and a budget for one; its identity brokering (one SAML or
+    OIDC connection per customer) is for multi-tenant B2B, while one customer's directory is a plain federation."""
+    sso, b2b = bool(p.get("enterprise_sso")), p.get("tenancy") in ("shared", "isolated")
+    keycloak_ok = bool(p["has_devops"]) and d["budget_usd"] > 0
+    if env["air_gapped"] and sso:  # cloud identity providers are unreachable; the directory inside the network is not
+        return ("Keycloak (self-hosted) federating your on-premises directory (Active Directory or another LDAP server) "
+                "over LDAPS or Kerberos", "https://www.keycloak.org/docs/latest/server_admin/#_user-storage-federation",
+                "keycloak")
+    if env["onprem"] or env["self_managed"] or env["hybrid"]:
+        where = "; runs on-premises and in the cloud, OIDC for every app" if env["hybrid"] and not env["onprem"] else ""
+        how = (", brokering each customer's SAML or OIDC identity provider" if sso and b2b else
+               ", federated with your SAML or OIDC identity provider" if sso else "")
+        return f"Keycloak (self-hosted{where}){how}", KEYCLOAK_DOCS, "keycloak"
+    if sso and b2b and keycloak_ok and not env["hipaa"]:
+        return ("Keycloak identity brokering (self-hosted): one SAML 2.0 or OIDC connection per customer (Entra ID, Okta, "
+                "Google Workspace)", KEYCLOAK_DOCS, "keycloak")
     if env["hipaa"]:
-        fallback = "Keycloak self-hosted in your Indian region (on BAA-covered servers)" if env["india"] else "Auth0 with a signed BAA"
-        return {"aws": "Amazon Cognito (HIPAA-eligible)", "gcp": "Identity Platform (covered by Google Cloud BAA)",
-                "azure": "Microsoft Entra External ID"}.get(env["cloud"] or "", fallback)
+        cloud = {"aws": ("Amazon Cognito (HIPAA-eligible)", COGNITO_FEDERATION if sso else AUTH_DOCS),
+                 "gcp": ("Identity Platform (covered by Google Cloud BAA)", IDENTITY_PLATFORM_SAML if sso else AUTH_DOCS),
+                 "azure": ("Microsoft Entra External ID", AUTH_DOCS)}.get(env["cloud"] or "")
+        if cloud:
+            return (*cloud, None)
+        if env["india"] and keycloak_ok:
+            return "Keycloak self-hosted in your Indian region (on BAA-covered servers)", KEYCLOAK_DOCS, "keycloak"
+        return "Auth0 with a signed BAA" + (" and enterprise connections (SAML or OIDC)" if sso else ""), AUTH0_ENTERPRISE, None
     if env["india"]:
-        return ("Amazon Cognito in the Mumbai region" if env["cloud"] == "aws" else
-                "Keycloak self-hosted in your Indian region, or framework built-in auth")
-    if env["eu"]:
-        return "Auth0 (EU tenant) / framework built-in auth"
-    return "Clerk / Auth0 / framework built-in auth"
+        if env["cloud"] != "aws" and be.get("id") == "django" and not sso:
+            # The users stay in the app's own database in India, with no second vendor to hold them.
+            return ("Django's built-in authentication (django.contrib.auth), with the users in your database in India",
+                    "https://docs.djangoproject.com/en/stable/topics/auth/", None)
+        return ("Amazon Cognito in the Mumbai region (ap-south-1)" + (", federated with your SAML or OIDC identity provider"
+                                                                      if sso else ""), COGNITO_FEDERATION, None)
+    if sso:
+        return {"aws": ("Amazon Cognito federated with your SAML or OIDC identity provider", COGNITO_FEDERATION, None),
+                "gcp": ("Identity Platform with SAML or OIDC sign-in", IDENTITY_PLATFORM_SAML, None)}.get(
+            env["cloud"] or "", ("Auth0" + (" (EU tenant)" if env["eu"] else "") + " with enterprise connections "
+                                 "(SAML or OIDC)", AUTH0_ENTERPRISE, None))
+    # On AWS the cloud's own user directory (it also sends the SMS codes of phone sign-in); elsewhere a hosted one.
+    if env["cloud"] == "aws":
+        return "Amazon Cognito", COGNITO_FEDERATION, None
+    return "Auth0" + (" (EU tenant)" if env["eu"] else ""), AUTH_DOCS, None
 
 
 def _observability(env: dict) -> str:
@@ -1029,7 +1071,7 @@ def _observability(env: dict) -> str:
     if env["india"]:
         return ("the host's built-in metrics and logs, kept in your Indian region; self-hosted Grafana + Prometheus + "
                 "Loki there once you outgrow them")
-    return "Grafana Cloud / Sentry"
+    return "Grafana Cloud"
 
 
 def apply_ops_budget(p: dict, services: list[dict]) -> tuple[list[dict], list[dict], dict]:

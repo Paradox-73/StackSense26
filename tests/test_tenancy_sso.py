@@ -67,10 +67,16 @@ def test_sso_raises_the_supabase_floor_to_pro_and_prices_users():
     assert any(s["role"] == "Enterprise SSO" for s in b["supporting_services"])
 
 
-def test_sso_on_a_server_backend_adds_an_identity_broker():
-    r = recommend(dict(BASE, team_skills=["python", "django"], enterprise_sso=True), with_counterfactuals=False)
-    sso = [s for s in r["supporting_services"] if s["role"] == "Enterprise SSO"]
-    assert sso and "Keycloak" in sso[0]["name"]
+def test_sso_on_a_server_backend_is_part_of_the_one_sign_in_product():
+    """One customer's directory is a federation of the sign-in product; Keycloak brokering is for many tenants' own
+    identity providers, and only with a team that runs servers and a budget for one."""
+    one = recommend(dict(BASE, team_skills=["python", "django"], enterprise_sso=True), with_counterfactuals=False)
+    auth = [s for s in one["supporting_services"] if s["role"] in ("Authentication", "Enterprise SSO")]
+    assert len(auth) == 1 and "SAML or OIDC" in auth[0]["name"] and "Keycloak" not in auth[0]["name"], auth
+    many = recommend(dict(BASE, team_skills=["python", "django"], enterprise_sso=True, tenancy="shared",
+                          has_devops=True), with_counterfactuals=False)
+    auth = [s for s in many["supporting_services"] if s["role"] in ("Authentication", "Enterprise SSO")]
+    assert len(auth) == 1 and "Keycloak identity brokering" in auth[0]["name"], auth
 
 
 def test_sso_counts_against_backends_that_need_a_broker():

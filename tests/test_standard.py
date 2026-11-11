@@ -526,10 +526,12 @@ def test_an_inference_api_is_a_cpu_scoring_endpoint_only_where_a_scoring_model_f
 
 def test_each_service_stays_on_the_named_cloud_and_the_deployment_model():
     sms = lambda out: [s["choice"] for s in out["stack"]["supporting"] if "Verify" in s["choice"]]
-    assert sms(edited("P2", infrastructure={"cloud_preference": "gcp", "data_residency": "eu"})) == [
-        "Twilio Verify or Identity Platform phone sign-in (SMS)"]
+    sms = lambda out: [s["choice"] for s in out["stack"]["supporting"] if "SMS" in s["choice"] or "Verify" in s["choice"]]
+    assert sms(edited("P2", infrastructure={"cloud_preference": "gcp", "data_residency": "eu"})) == ["Twilio Verify"]
+    assert sms(edited("P2", infrastructure={"cloud_preference": "aws", "data_residency": "eu"})) == [
+        "Amazon Cognito SMS sign-in codes (sent through AWS End User Messaging SMS)"]  # Cognito is the sign-in there
     assert sms(edited("P2", infrastructure={"deployment_model": "self_hosted_cloud_vm", "data_residency": "eu"})) == [
-        "Twilio Verify or Vonage Verify"]
+        "Twilio Verify"]
     for cloud in ("aws", "gcp", "none"):
         assert "Azure" not in edited("P5", infrastructure={"cloud_preference": cloud})["stack"]["database"]["choice"], cloud
     queue = [s["choice"] for s in edited("P4", infrastructure={"deployment_model": "self_hosted_cloud_vm"})["stack"][

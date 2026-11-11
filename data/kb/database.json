@@ -557,7 +557,7 @@
         "digitalocean": "DigitalOcean Managed Caching (Valkey)",
         "hetzner": "Self-managed Valkey",
         "onprem": "Self-managed Valkey / Redis Sentinel",
-        "cloudflare": "Workers KV for simple caching, or Upstash Redis"
+        "cloudflare": "Upstash Redis"
       },
       "strengths": [
         "Sub-millisecond reads; ideal cache and realtime pub/sub layer",
@@ -650,10 +650,10 @@
         ]
       ],
       "managed_offerings": {
-        "aws": "Amazon Keyspaces or ScyllaDB Cloud",
-        "gcp": "ScyllaDB Cloud / DataStax Astra",
+        "aws": "Amazon Keyspaces",
+        "gcp": "ScyllaDB Cloud",
         "azure": "Azure Managed Instance for Apache Cassandra",
-        "any": "ScyllaDB Cloud / DataStax Astra DB",
+        "any": "ScyllaDB Cloud",
         "onprem": "Self-managed ScyllaDB/Cassandra cluster (K8ssandra / Scylla Operator)"
       },
       "strengths": [
@@ -827,7 +827,7 @@
         "aws": "Amazon OpenSearch Service",
         "gcp": "Elastic Cloud on Google Cloud",
         "azure": "Elastic Cloud on Azure (Azure Native ISV Service)",
-        "any": "Elastic Cloud or Aiven for OpenSearch",
+        "any": "Elastic Cloud",
         "onprem": "Self-managed OpenSearch cluster (OpenSearch Kubernetes operator)"
       },
       "strengths": [

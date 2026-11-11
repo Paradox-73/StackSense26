@@ -184,7 +184,7 @@
       },
       {
         "layer": "queue",
-        "choice": "River / Asynq",
+        "choice": "River (jobs in PostgreSQL)",
         "justification": "Send emails, process uploads and call slow APIs outside the request path.",
         "driven_by": [
           "requirements.file_media_storage",
@@ -192,22 +192,22 @@
         ],
         "alternatives": [],
         "tradeoffs": [],
-        "source": "https://12factor.net/processes"
+        "source": "https://riverqueue.com/docs"
       },
       {
         "layer": "storage",
-        "choice": "S3-compatible storage (Cloudflare R2 / Backblaze B2) + CDN",
+        "choice": "Cloudflare R2 (S3-compatible, no egress fees)",
         "justification": "Uploaded files and video belong in object storage, not the database.",
         "driven_by": [
           "requirements.file_media_storage"
         ],
         "alternatives": [],
         "tradeoffs": [],
-        "source": "https://developers.cloudflare.com/r2/api/s3/api/"
+        "source": "https://developers.cloudflare.com/r2/pricing/"
       },
       {
         "layer": "cdn",
-        "choice": "CDN in front of the object storage, with image resizing at the edge",
+        "choice": "Cloudflare CDN in front of the uploads bucket",
         "justification": "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.",
         "driven_by": [
           "project.platforms",
@@ -219,7 +219,7 @@
       },
       {
         "layer": "payments",
-        "choice": "Stripe / Adyen with hosted checkout (card tokens)",
+        "choice": "Stripe with hosted checkout (card tokens)",
         "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).",
         "driven_by": [
           "requirements.payments",
@@ -227,11 +227,11 @@
         ],
         "alternatives": [],
         "tradeoffs": [],
-        "source": "https://www.pcisecuritystandards.org/document_library/"
+        "source": "https://docs.stripe.com/payments/checkout"
       },
       {
         "layer": "auth",
-        "choice": "Clerk / Auth0 / framework built-in auth",
+        "choice": "Auth0",
         "justification": "Do not hand-roll password storage, MFA or SSO.",
         "driven_by": [
           "requirements.auth"
@@ -242,7 +242,7 @@
       },
       {
         "layer": "observability",
-        "choice": "OpenTelemetry instrumentation -> Grafana Cloud / Sentry",
+        "choice": "OpenTelemetry instrumentation -> Grafana Cloud",
         "justification": "Traces, metrics and error tracking from day one; required to defend an availability target.",
         "driven_by": [
           "requirements.availability"

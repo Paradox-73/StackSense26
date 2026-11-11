@@ -146,7 +146,7 @@
     "supporting": [
       {
         "layer": "queue",
-        "choice": "Celery / RQ / Dramatiq (Redis/Valkey broker)",
+        "choice": "Celery (Redis/Valkey broker)",
         "justification": "Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (DigitalOcean Managed Caching (Valkey)).",
         "driven_by": [
           "requirements.file_media_storage",
@@ -159,29 +159,19 @@
       {
         "layer": "storage",
         "choice": "DigitalOcean Spaces in BLR1 (Bangalore), a private bucket with short-lived signed URLs (no public CDN)",
-        "justification": "Uploaded files and video belong in object storage, not the database.",
+        "justification": "Uploaded files and video belong in object storage, not the database. Hand uploads out from the bucket, not the app server; a public CDN would cache copies at edge sites outside the country your data must stay in, and each signed URL expires within minutes.",
         "driven_by": [
           "requirements.file_media_storage",
-          "infrastructure.data_residency"
+          "infrastructure.data_residency",
+          "project.platforms",
+          "scale.users_12_months"
         ],
         "alternatives": [],
         "tradeoffs": [],
         "source": "https://docs.digitalocean.com/products/spaces/details/availability/"
       },
       {
-        "layer": "cdn",
-        "choice": "Short-lived signed URLs from the private bucket in your region, issued by the API after an access check (no public CDN)",
-        "justification": "Hand uploads out from the bucket, not the app server; a public CDN would cache copies at edge sites outside the country your data must stay in, and each signed URL expires within minutes.",
-        "driven_by": [
-          "project.platforms",
-          "scale.users_12_months"
-        ],
-        "alternatives": [],
-        "tradeoffs": [],
-        "source": "https://developers.cloudflare.com/r2/pricing/"
-      },
-      {
-        "layer": "auth",
+        "layer": "other",
         "choice": "MSG91, with DLT-registered SMS templates",
         "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India.",
         "driven_by": [
@@ -194,7 +184,7 @@
       },
       {
         "layer": "auth",
-        "choice": "Keycloak self-hosted in your Indian region, or framework built-in auth",
+        "choice": "Django's built-in authentication (django.contrib.auth), with the users in your database in India",
         "justification": "Do not hand-roll password storage, MFA or SSO.",
         "driven_by": [
           "requirements.auth",
@@ -202,7 +192,7 @@
         ],
         "alternatives": [],
         "tradeoffs": [],
-        "source": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+        "source": "https://docs.djangoproject.com/en/stable/topics/auth/"
       },
       {
         "layer": "other",
@@ -217,14 +207,14 @@
       },
       {
         "layer": "other",
-        "choice": "Firebase Cloud Messaging (+ APNs) or Expo Notifications",
+        "choice": "Expo push notifications (FCM and APNs underneath)",
         "justification": "Standard channel for mobile engagement on Android and iOS.",
         "driven_by": [
           "project.platforms"
         ],
         "alternatives": [],
         "tradeoffs": [],
-        "source": "https://firebase.google.com/docs/cloud-messaging"
+        "source": "https://docs.expo.dev/push-notifications/overview/"
       },
       {
         "layer": "observability",
