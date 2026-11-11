@@ -72,7 +72,6 @@ const ICON = {
   chev: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>',
   info: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25"/><path d="M8 7.2v4M8 4.9v.1"/></svg>',
   check: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>',
-  fork: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13.5V9M8 9 4 5M8 9l4-4M4 5V2.5M12 5V2.5"/></svg>',
   ext: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 3h4v4M13 3 7.5 8.5M11.5 9.5v3.5h-8.5v-8.5h3.5"/></svg>',
   close: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>',
 };
@@ -270,7 +269,7 @@ function syncQuick() {
   paintBriefMarks();
 }
 
-/* ------------------------------------------------------------------ "Ask me only what matters" (adaptive next questions) */
+/* ------------------------------------------------------------------ "Find the questions that can still change a pick" (adaptive next questions) */
 const LAYER_NAME = { frontend: "Frontend", backend: "Backend", database: "Database", hosting: "Hosting" };
 async function askNext() {
   const box = $("#asknext-out"), btn = $("#asknext-btn");
@@ -381,7 +380,7 @@ function valText(k, v) {
   return lab(v);
 }
 
-/** A short cause for the gold "what changed" note, e.g. "the budget fell from $50/mo to $10/mo". */
+/** A short cause for the "what changed" note, e.g. "the budget fell from $50/mo to $10/mo". */
 function describeChange(from) {
   const ks = Object.keys(from).filter((k) => !same(from[k], S.answers[k]) || S.unknown.has(k));
   if (ks.length !== 1) return ks.length ? { text: `you changed ${ks.length} answers` } : null;
@@ -488,7 +487,7 @@ function updateCounts() {
     const el = $(`#gc-${i}`); if (el) el.innerHTML = `${st.fields.length} questions${n ? ` · <b>${n} edited</b>` : ""}${u ? ` · <i>${u} not sure</i>` : ""}`;
   });
   const u = S.unknown.size;
-  $("#refine-count").textContent = [total ? `${total} answers differ from defaults` : "optional · every one has a default", u ? `${u} marked not sure` : ""].filter(Boolean).join(" · ");
+  $("#refine-count").textContent = [total ? `${total} answers differ from defaults` : "Optional: each starts at its default", u ? `${u} marked not sure` : ""].filter(Boolean).join(" · ");
 }
 
 function updateOrd() {
@@ -703,7 +702,7 @@ async function run({ change = null, compare = true } = {}) {
 /** The first result's placeholder: the header (score, title, cost), four stations and the what-if block. */
 function skeleton() {
   return `<div class="skel" role="status" aria-busy="true" aria-label="Scoring every technology and stack combination">
-    <div class="sk-head"><i class="sk sk-dial"></i><div class="sk-lines"><i class="sk" style="--w:72%"></i><i class="sk" style="--w:44%"></i></div><div class="sk-lines"><i class="sk"></i><i class="sk" style="--w:64%"></i></div></div>
+    <div class="sk-head"><div class="sk-lines"><i class="sk" style="--w:72%"></i><i class="sk" style="--w:44%"></i></div><div class="sk-lines"><i class="sk"></i><i class="sk" style="--w:64%"></i></div></div>
     <ul class="sk-stns">${LAYERS.map(() => '<li><i class="sk"></i><i class="sk"></i><i class="sk"></i></li>').join("")}</ul>
     <i class="sk sk-block"></i></div>`;
 }
@@ -721,14 +720,6 @@ function oneLine(s) {
   const p = parseWhy(s.explanation.why[0]);
   if (!p) return esc(s.explanation.why[0] || s.pick.summary);
   return `<b>${esc(p.crit)}</b> ${esc(p.a)}/5 vs ${esc(p.b)} avg${p.because ? ` · ${esc(p.because)}` : ""}`;
-}
-
-function dial(score) {
-  const r = 27, C = 2 * Math.PI * r, p = Math.max(0, Math.min(100, score)) / 100;
-  return `<svg class="dial" viewBox="0 0 64 64" role="img" aria-label="Stack fit score ${score.toFixed(1)} out of 100">
-    <circle cx="32" cy="32" r="${r}" class="d-track"/>
-    <circle cx="32" cy="32" r="${r}" class="d-val" stroke-dasharray="${(C * p).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 32 32)"/>
-    <text x="32" y="37" class="d-num" id="score-num">${score.toFixed(1)}</text></svg>`;
 }
 
 function divChart(rows) {
@@ -765,7 +756,7 @@ function renderResults(prev, change) {
       <p class="run-error" id="run-error" role="alert" hidden></p>
       <div id="summary"></div>
       <div id="depends"></div>
-      <p class="trace"><span>${ICON.lock} Same answers → same stack. Scores follow a published 1–5 rubric.</span>
+      <p class="trace"><span>${ICON.lock} Scored with the published 1–5 rubric.</span>
         <button type="button" class="link-btn" data-open="why">Show the trace</button></p>
       <div id="whatif"></div>
       <div id="whatif-q"></div>
@@ -811,9 +802,8 @@ function renderHead(prev) {
   const status = { within: "within budget", stretch: "stretches the budget", over: "over budget" }[c.status] || c.status;
   const inr = pr.currency === "INR";
   $("#res-head").innerHTML = `<header class="rh">
-    <div class="rh-score">${dial(r.stack_score)}<span>fit score</span></div>
     <div class="rh-t"><h2 id="res-title" tabindex="-1">${esc(name)}</h2>
-      <p class="rh-meta">${esc(r.architecture.style)} · ${esc(d.tier_label || "")}</p></div>
+      <p class="rh-meta">${esc(r.architecture.style)} · ${esc(d.tier_label || "")} · fit <b class="mono" id="score-num">${r.stack_score.toFixed(1)}</b><span class="mono">/100</span></p></div>
     <div class="rh-cost"><span class="k">Monthly cost</span>
       <b class="mono" id="cost-num">${costText(r)}</b>
       <span class="st st-${esc(c.status)}">${esc(status)} · ${inr ? `₹${fmt(pr.budget_monthly)}` : usd(c.budget_usd)}</span></div>
@@ -852,7 +842,7 @@ function renderWarnings() {
     </li>`).join("")}</ol></details>`;
 }
 
-/** The four cards. Only cards whose pick changed since the previous run animate (gold + "was X"). */
+/** The four cards. Only cards whose pick changed since the previous run animate (highlighted, with "was X"). */
 function renderPicks(prev, change) {
   const r = S.result, el = $("#picks");
   if (!r.feasible) {
@@ -877,7 +867,7 @@ function renderPicks(prev, change) {
   if (prev) setNote(notes, prev, change);
 }
 
-/** The gold "what changed and why" line under the sliders. */
+/** The "what changed and why" line under the sliders. */
 function setNote(notes, prev, change) {
   const r = S.result;
   const cause = change ? change.text : "you changed your answers";
@@ -949,7 +939,7 @@ function renderDepends() {
   $$("[data-dep]").forEach((x) => { x.hidden = true; x.textContent = ""; });
   const unknown = unknownList();
   if (!unknown.length) {
-    box.innerHTML = `<p class="dep-tip">${ICON.fork}<span>Unsure about an answer? Choose <b>Not sure</b> on any question and StackSense shows which picks depend on it.</span></p>`;
+    box.innerHTML = "";
     return;
   }
   const names = unknown.map(noun);
@@ -1012,7 +1002,7 @@ function renderSummaryBar(prev) {
   bar.hidden = false;
   $("#sumbar-picks").innerHTML = LAYERS.map((l) => {
     const n = short(r.stack[l].pick.name), was = prev && prev.feasible ? prev.stack[l].pick.name : null;
-    return `<span class="sb-p${was && was !== r.stack[l].pick.name ? " changed" : ""}"><small>${cap(l).slice(0, 2)}</small>${esc(n)}</span>`;
+    return `<span class="sb-p${was && was !== r.stack[l].pick.name ? " changed" : ""}">${esc(n)}</span>`;
   }).join("");
   $("#sumbar-cost").textContent = costText(r);
   $("#sumbar-btn").setAttribute("aria-label", `Your stack: ${LAYERS.map((l) => `${l} ${r.stack[l].pick.name}`).join(", ")}; monthly cost ${costText(r)}. Show the full result`);
@@ -1043,10 +1033,10 @@ function renderWhatIf(force = false) {
   const box = $("#whatif");
   if (!box) return;
   if (!$(".wi", box) || force) {
-    box.innerHTML = `<div class="wi"><div class="wi-h"><h3>What if…</h3><span>Drag to re-run the engine live; the questions on the left move with you</span></div>
+    box.innerHTML = `<div class="wi"><div class="wi-h"><h3>What if…</h3><span>Drag to re-run the engine; your answers follow.</span></div>
       <div class="wi-grid">${SLIDERS.map((s) => `<div class="sl"><span class="sl-l"><label for="sl-${s.key}">${s.label}</label>${s.key === "dau" ? infoBtn("dau") : ""}</span><output id="so-${s.key}" for="sl-${s.key}" class="mono"></output>
         <input type="range" id="sl-${s.key}" data-k="${s.key}" min="${s.min}" max="${s.max}" step="${s.step}"></div>`).join("")}</div>
-      <ul class="wi-note" id="wi-note" aria-live="polite">${S.lastNote || "<li>Move a slider or change any answer: changed layers light up in gold, with the reason.</li>"}</ul></div>`;
+      <ul class="wi-note" id="wi-note" aria-live="polite">${S.lastNote}</ul></div>`;
     $$("input[type=range]", box).forEach((inp) => inp.addEventListener("input", onSlide));
   }
   syncSliders();
@@ -1162,7 +1152,7 @@ function renderSummary() {
   if (!s) {
     box.innerHTML = `<div class="sum"><div class="sum-h"><h3>Plain-English summary</h3>
       <button type="button" class="link-btn" id="sum-go">Write summary</button></div>
-      <p class="muted small" id="sum-note">A language model re-words the engine's own facts. Its text is shown only if every technology and number in it appears in those facts; otherwise you get the engine's template text.</p></div>`;
+      <p class="muted small" id="sum-note">A language model rewords the engine's facts. If its text names a technology or number the facts lack, the template text shows instead.</p></div>`;
     return;
   }
   const ok = s.source === "llm" && s.checked;
@@ -1202,7 +1192,7 @@ function renderWhatIfText() {
   $("#wq-form").onsubmit = (e) => { e.preventDefault(); askWhatIf(); };
 }
 
-/** Send the question to /api/whatif; apply the changes it returns through the normal answer model, so the engine re-runs and the gold change note shows. */
+/** Send the question to /api/whatif; apply the changes it returns through the normal answer model, so the engine re-runs and the change note shows. */
 async function askWhatIf() {
   const q = $("#wq-in").value.trim(), out = $("#wq-out"), btn = $("#wq-go");
   if (!q) return;
@@ -1307,7 +1297,7 @@ function whyPanel() {
         .map((b) => ({ html: `${esc(b.label)} <small class="mono">${b.score.toFixed(1)}/5 × w${fmt(b.weight, 1)}</small>`, value: b.points }));
       const srcs = [...new Set(p.sources.concat(r.compatibility.filter((c) => (c.layers || []).includes(l) && c.source).map((c) => c.source)))];
       return `<article class="why-l" id="why-${l}-p" role="tabpanel" data-layer="${l}" hidden>
-        <header class="wl-h"><div><p class="wl-layer">${esc(s.title)}</p><h3>${esc(p.name)}</h3>
+        <header class="wl-h"><div><h3><span class="wl-layer">${esc(s.title)}</span>${esc(p.name)}</h3>
           ${s.managed_offering ? `<p class="muted small">Offering: ${esc(s.managed_offering)}</p>` : ""}
           ${s.runs_here && !s.optional_host ? `<p class="muted small">${esc(s.runs_here)}</p>` : ""}
           ${s.api_host ? `<p class="muted small">API host: <b>${esc(s.api_host.name)}</b> (${s.api_host.score.toFixed(1)}). ${esc(s.api_host.why)}</p>` : ""}</div>
@@ -1316,7 +1306,7 @@ function whyPanel() {
         <div class="wl-grid">
           <section><h4>Why</h4>${list(e.why.concat(e.strengths.slice(0, 2)), "ticks")}</section>
           <section><h4>Which of your answers moved the score</h4>
-            <p class="eq mono">baseline (the score before your answers) ${fmt(base ? base.points : 0, 1)} ${sum >= 0 ? "+" : "−"} your answers ${fmt(Math.abs(sum), 1)} = <b>${p.score.toFixed(1)}</b></p>
+            <p class="eq">baseline (the score before your answers) <span class="mono">${fmt(base ? base.points : 0, 1)}</span> ${sum >= 0 ? "+" : "−"} your answers <span class="mono">${fmt(Math.abs(sum), 1)}</span> = <b class="mono">${p.score.toFixed(1)}</b></p>
             ${divChart(ans.slice(0, 8).map((c) => ({ label: plain(c.label), value: c.points })))}</section>
         </div>
         ${vs ? `<p class="vs"><b>vs ${esc(vs.runner_up)}:</b> ${esc(plain(vs.text))}</p>` : ""}
@@ -1502,7 +1492,7 @@ function growthHtml(g) {
   return `<p class="g-sum">${stays.length ? `<b>Stays:</b> ${esc(stays.join(", "))}. ` : ""}${moves.length ? `<b>Changes:</b> ${esc(moves.join("; "))}.` : "<b>No layer changes</b> up to 100× your users."}</p>
     <table class="tbl growth"><thead><tr><th scope="col"><span class="sr-only">Layer</span></th>${G_COLS.map((ci) => `<th scope="col"><span class="g-x mono">${G_MULT[ci]}×</span> ${compact(users(ci))} users/day</th>`).join("")}</tr></thead>
     <tbody>${rows}<tr class="g-meta"><th scope="row">Monthly cost</th>${costRow}</tr><tr class="g-meta"><th scope="row">Size of project</th>${tierRow}</tr><tr class="g-meta"><th scope="row">Score</th>${scoreRow}</tr></tbody></table>
-    <p class="muted small">Only daily users change; budget, team and every other answer stay as you set them. Gold cells mark a switch.</p>`;
+    <p class="muted small">Only daily users change; budget, team and every other answer stay as you set them. A marked cell is a switch.</p>`;
 }
 
 /* ------------------------------------------------------------------ architecture diagram (inline SVG) */
@@ -1619,8 +1609,8 @@ async function renderKb() {
     database: ["scalability", "ease", "ops", "maturity", "realtime", "performance", "hiring", "offline"],
     hosting: ["scalability", "ease", "ops", "maturity", "realtime", "performance"] };
   const total = LAYERS.map((l) => kb[l].length).reduce((a, b) => a + b);
-  el.innerHTML = `<div class="kb-head"><h1>${total} technologies. ${kb.rules.length} compatibility rules. Every technology cites its sources; scores follow a 1–5 rubric.</h1>
-    <p class="lead">Scores run 1–5 (5 = best; “ease” = gentle learning curve, “ops” = low operational burden). Each row links to the documentation it came from.</p></div>` +
+  el.innerHTML = `<div class="kb-head"><h1>Knowledge base: ${total} technologies, ${kb.rules.length} compatibility rules</h1>
+    <p class="lead">Every score runs from 1 to 5, and 5 is best: “ease” means a gentle learning curve, “ops” a low operating burden. The numbers in brackets link to each row's sources.</p></div>` +
     LAYERS.map((l) => `<section class="kb-sec" aria-labelledby="kb-${l}"><h2 id="kb-${l}">${cap(l)} <small>${kb[l].length} options</small></h2>
     <div class="table-wrap"><table class="tbl kb">
     <thead><tr><th scope="col">Technology</th>${crit[l].map((c) => `<th scope="col" class="num">${c}</th>`).join("")}${l === "database" ? '<th scope="col">consistency</th>' : ""}${l === "hosting" ? '<th scope="col">regions</th><th scope="col">HIPAA / PCI</th>' : ""}<th scope="col" class="num">lock-in</th><th scope="col">sources</th></tr></thead>

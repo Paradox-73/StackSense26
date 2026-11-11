@@ -26,7 +26,7 @@
 
 /* the output */
 .sc-out { min-width: 0; transition: opacity var(--t); }
-.sc-out[aria-busy="true"] { opacity: 0.6; }
+.sc-out[aria-busy="true"] { opacity: 0.93; }
 .sc-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
 .sc-status, .sc-style { font: 700 13px var(--font-mono); padding: 3px 10px; border-radius: var(--r-pill); background: var(--surface-2); color: var(--ink); }
 .sc-status.ok { background: var(--pos-soft); color: var(--pos); }
@@ -45,7 +45,6 @@
 .sc-sup > .sc-c:not(:last-child)::after { width: 0; background: none; border-left: 2px dashed var(--route); }
 .sc-c h3 { font-size: 15.5px; margin-bottom: 6px; line-height: 1.45; }
 .sc-c p { font-size: 14px; line-height: 1.55; margin: 0 0 6px; }
-.sc-layer { display: inline-block; font: 700 12px var(--font-mono); color: var(--accent-ink); background: var(--surface-2); border-radius: var(--r-sm); padding: 1px 7px; margin-right: 8px; vertical-align: 1px; }
 .sc-c ul { margin: 4px 0 0; padding-left: 18px; font-size: var(--fs-md); line-height: 1.5; }
 .sc-c .sc-k { font-size: 13px; font-weight: 700; color: var(--ink-2); margin-top: 8px; }
 .sc-list { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.55; }

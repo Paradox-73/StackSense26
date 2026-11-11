@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>StackSense: a tech stack you can defend</title>
-  <meta name="description" content="Answer a few questions (or say Not sure) and StackSense picks a frontend, backend, database and hosting platform with a deterministic, source-cited engine. The rules decide every pick, so the same answers always give the same stack.">
+  <title>StackSense: tech stack recommender</title>
+  <meta name="description" content="Answer a few questions or say Not sure, and StackSense picks a frontend, backend, database and hosting platform with a rule engine over a cited knowledge base. Each pick shows its runner-up, trade-offs and cost; the same answers always give the same stack.">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#2a313d" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#181d24" media="(prefers-color-scheme: dark)">
@@ -48,8 +48,8 @@
       <div class="work">
         <div class="side">
         <div class="intro">
-          <h1>Answer <span id="n-quick">a few</span> questions. Get a stack you can defend.</h1>
-          <p class="lead">Frontend, backend, database and hosting, scored by a rule engine against <span id="n-tech">many</span> technologies and <span id="n-rules">many</span> cited rules. The stack updates as you answer, and “Not sure” is always an option. The rules decide every pick, so the same answers always give the same stack; an optional language model only reads your free text and words the summary, and works with no key.</p>
+          <h1>Answer <span id="n-quick">a few</span> questions, get a stack with its reasons</h1>
+          <p class="lead">A rule engine scores <span id="n-tech">64</span> technologies against your answers and <span id="n-rules">65</span> compatibility rules, then picks the frontend, backend, database and hosting. The same answers always give the same stack.</p>
           <div class="examples" id="examples-wrap">
             <span class="ex-label">Try an example</span>
             <div class="ex-row" id="examples"></div>
@@ -60,18 +60,18 @@
           <section class="brief" aria-labelledby="brief-h">
             <h3 id="brief-h">Describe your project</h3>
             <label for="brief-text" class="sr-only">Project description</label>
-            <textarea id="brief-text" rows="4" maxlength="4000" placeholder="e.g. We are 3 students building a ticketing site for our college fest, about 20,000 visitors a day, ₹5,000 a month for hosting. We know React and Node."></textarea>
+            <textarea id="brief-text" rows="3" maxlength="4000" placeholder="e.g. We are 3 students building a ticketing site for our college fest, about 20,000 visitors a day, ₹5,000 a month for hosting. We know React and Node."></textarea>
             <div class="brief-row"><button type="button" id="brief-btn" class="btn">Fill from description</button><span id="brief-llm" class="muted small"></span></div>
             <div id="brief-out" hidden aria-live="polite"></div>
           </section>
           <form id="quick" autocomplete="off" novalidate></form>
           <div class="asknext">
-            <button type="button" id="asknext-btn" class="link-btn">Ask me only what matters</button>
+            <button type="button" id="asknext-btn" class="link-btn">Find the questions that can still change a pick</button>
             <div id="asknext-out" hidden aria-live="polite"></div>
           </div>
           <div class="refine-wrap">
             <button type="button" id="refine-toggle" class="refine-toggle" aria-expanded="false" aria-controls="refine">
-              <span>Refine with all <b id="n-q">the</b> questions</span><small id="refine-count">optional · every one has a default</small>
+              <span>All <b id="n-q">42</b> questions</span><small id="refine-count">Optional: each starts at its default</small>
               <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
             </button>
             <div id="refine" class="refine" hidden>
@@ -98,7 +98,7 @@
   <div id="gpop" class="gpop" role="dialog" tabindex="-1" hidden></div>
 
   <footer class="foot">
-    <span>StackSense · rule-based and deterministic · optional LLM for free text and summaries</span>
+    <span>Rules choose every pick. The optional language model only reads descriptions and words summaries.</span>
     <a href="/docs" target="_blank" rel="noopener">API docs</a>
   </footer>
   <script src="/static/share.js"></script>
