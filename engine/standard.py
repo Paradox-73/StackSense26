@@ -781,8 +781,9 @@ def _summary(result: dict, stack: dict, style: str, cost: dict) -> str:
 
 def run_text(text: str, capped: bool = True) -> dict | list[dict]:
     """run() on the text of a scenario file. A JSON array holds several scenarios (the organisers share the public ones
-    that way), and gives a list with one output per element; capped (the API) runs at most MAX_SCENARIOS_PER_FILE of
-    them, the command line any number. Text that is not JSON is one invalid_input result, not an exception."""
+    that way), and gives a list with one output per element. Capped (the API), an array longer than
+    MAX_SCENARIOS_PER_FILE is one invalid_input result instead; the command line runs any length. Text that is not
+    JSON is one invalid_input result, not an exception."""
     try:
         doc = json.loads(text)
     except (ValueError, RecursionError) as e:  # RecursionError: arrays or objects nested past Python's limit

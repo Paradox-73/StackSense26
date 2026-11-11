@@ -248,7 +248,7 @@ I checked the recommendations with a test suite, an answer key, an LLM-only base
 
 ### 8.1 Tests
 
-The 1005 tests cover scoring, constraints and cost; explanations against the engine's numbers; inputs, edge cases and warnings; stability properties; the language-model checks and fallbacks; accuracy against the answer key; and the app, packaging and documents. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1010 tests cover scoring, constraints and cost; explanations against the engine's numbers; inputs, edge cases and warnings; stability properties; the language-model checks and fallbacks; accuracy against the answer key; and the app, packaging and documents. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -465,12 +465,12 @@ Safety (new in 2023) is not scored: the four layers are infrastructure, and no o
 |---|---|
 | Scoring, constraints and cost | 321 |
 | Explanations match the engine | 116 |
-| Inputs, edge cases and warnings | 203 |
+| Inputs, edge cases and warnings | 208 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 189 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 91 |
-| **All** | **1005** |
+| **All** | **1010** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.

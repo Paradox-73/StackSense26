@@ -2,7 +2,7 @@
 
     python tools/build_report.py --facts      # write report/facts.json (every count the documents quote)
     python tools/build_report.py --sync       # rewrite quoted counts that disagree with the facts, then write facts.json
-    python tools/build_report.py --check      # exit 1 if facts.json is stale or README.md / report/report.md quote a wrong count
+    python tools/build_report.py --check      # exit 1 if facts.json is stale or a document in DOCS quotes a wrong count
     python tools/build_report.py --draft      # facts, check, then report/StackSense_Report.pdf; "TODO" placeholders allowed
     python tools/build_report.py              # final build: fails on any "TODO" or missing image
 
@@ -203,7 +203,8 @@ def doc_problems(facts: dict) -> list[str]:
 
 
 def sync_docs(facts: dict) -> list[str]:
-    """Rewrite every quoted count that disagrees with the facts (README.md, report/report.md, report/demo_script.md)."""
+    """Rewrite every quoted count that disagrees with the facts, in every file of DOCS (README.md, report/report.md,
+    report/demo_script.md, docs/REFERENCE.md)."""
     changed = []
     for doc in DOCS:
         raw = doc.read_bytes().decode("utf-8")
