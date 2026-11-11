@@ -202,8 +202,9 @@ def _warn(code, severity, title, detail, resolution, fields):
 
 
 # Answers the scenario adapter sets that the questionnaire never asks: True when the data volume counts every stored
-# byte, uploaded files included (the scenario's total), not the database alone (the questionnaire's question).
-ADAPTER_FIELDS = ("data_includes_files",)
+# byte, uploaded files included (the scenario's total), not the database alone (the questionnaire's question); True
+# when users sign in through an identity provider the project already runs (infrastructure.existing_systems).
+ADAPTER_FIELDS = ("data_includes_files", "identity_reused")
 
 
 def normalize(raw: dict | None) -> tuple[dict, list[dict], list[dict]]:
@@ -290,6 +291,7 @@ def normalize(raw: dict | None) -> tuple[dict, list[dict], list[dict]]:
                             "reason": "Air-gapped servers have no internet connection, so they run on your own premises."})
         profile["deployment"] = "on_prem"
     profile["data_includes_files"] = raw.get("data_includes_files") is True
+    profile["identity_reused"] = raw.get("identity_reused") is True  # sign-in goes through an identity provider kept
     profile["dau"] = int(profile["dau"])
     profile["team_size"] = max(1, int(round(profile["team_size"])))
     profile["timeline_weeks"] = max(1, int(round(profile["timeline_weeks"])))

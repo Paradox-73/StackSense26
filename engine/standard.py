@@ -627,6 +627,8 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
     dbs, idps, eol, other = _systems(f["infrastructure.existing_systems"])
     kept = {o["value"] for o in specs["existing_systems"]["options"]}
     put("existing_systems", [d for d in dbs if d in kept], "infrastructure.existing_systems")
+    if [i for i in idps if i not in _cloud_only_identity(idps, f)] and f["requirements.auth"] != "none":
+        put("identity_reused", True, "infrastructure.existing_systems")  # sign-in goes through it (_reuse_identity)
     for text, product, status in eol:
         warns.append(_std_warn("EOL_EXISTING_SYSTEM", "warning",
                                f"'{text}': {product} is past its vendor's support: {status}. Integrate with it through an "

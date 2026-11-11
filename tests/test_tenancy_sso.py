@@ -100,3 +100,16 @@ def test_the_budget_check_counts_sso_users_at_the_scale_tier():
 
     assert floor(100_000) > 1500
     assert floor(100_000) == floor(150_000)
+
+
+def test_an_identity_provider_already_run_adds_no_broker_penalty():
+    """P5 signs users in through its existing Entra ID, so no backend is marked down for needing an SSO broker."""
+    import json
+    from pathlib import Path
+    from engine.standard import run
+    doc = json.loads((Path(__file__).resolve().parent.parent / "scenarios" / "public" / "P5.json").read_text(encoding="utf-8"))
+    out = run(doc)
+    assert "broker" not in json.dumps(out["stack"]["backend"]), out["stack"]["backend"]["tradeoffs"]
+    assert out["stack"]["backend"]["choice"].startswith("C# + ASP.NET Core")
+    doc["infrastructure"]["existing_systems"] = []
+    assert "identity broker" in json.dumps(run(doc)["stack"]["backend"])  # without it, the broker is still a cost

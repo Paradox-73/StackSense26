@@ -1226,9 +1226,10 @@ def adjustments(layer: str, item: dict, p: dict, d: dict, best_fit: tuple | None
         else:
             a(-TENANT_ISOLATION_POINTS, "tenancy", f"Customers share one database and in {item['name']} {iso['how']}")
 
-    if layer == "backend" and p.get("enterprise_sso") and kind in ("server", "faas"):
+    if layer == "backend" and p.get("enterprise_sso") and kind in ("server", "faas") and not p.get("identity_reused"):
         # A BaaS that sells SAML/OIDC sign-in (item field `sso`) handles it; a backend of your own needs an identity
-        # broker (Keycloak) to run, patch and back up beside it (engine/advice.py, "Enterprise SSO").
+        # broker (Keycloak) to run, patch and back up beside it (engine/advice.py, "Enterprise SSO"). An identity
+        # provider the project already runs (Entra ID, Okta) signs users in directly, so no broker is added.
         a(-SSO_BROKER_POINTS, "enterprise_sso", "Company-account sign-in (SSO) needs an identity broker such as Keycloak "
           "that you run beside this backend")
 
