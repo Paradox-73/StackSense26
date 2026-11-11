@@ -150,7 +150,7 @@ Datasets:
 
 Sources:
 
-- Every technology, rule and question cites official documentation, pricing pages or vendor compliance pages. The register of 378 URLs is in [`report/sources.md`](report/sources.md).
+- Every technology, rule and question cites official documentation, pricing pages or vendor compliance pages. The register of 379 URLs is in [`report/sources.md`](report/sources.md).
 - Methods the design follows: [expert systems](https://en.wikipedia.org/wiki/Expert_system), the [weighted sum model](https://en.wikipedia.org/wiki/Weighted_sum_model), counterfactual explanations (Wachter, Mittelstadt and Russell, [2017](https://arxiv.org/abs/1711.00399)), and the quality attributes of [ISO/IEC 25010](https://www.iso.org/standard/78176.html) and the [AWS Well-Architected Framework](https://aws.amazon.com/architecture/well-architected/).
 - Key references: Google SRE book ([availability table](https://sre.google/sre-book/availability-table/)), Martin Fowler ([MonolithFirst](https://martinfowler.com/bliki/MonolithFirst.html)), [Team Topologies](https://teamtopologies.com/key-concepts), [HHS HIPAA cloud guidance](https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html), [PCI SSC document library](https://www.pcisecuritystandards.org/document_library/), [MeitY DPDP framework](https://www.meity.gov.in/data-protection-framework), [RBI storage of payment system data (2018)](https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244), [endoflife.date](https://endoflife.date/) and the [Microsoft lifecycle pages](https://learn.microsoft.com/lifecycle/) for end-of-life checks.
 
@@ -163,7 +163,7 @@ Sources:
 
 ## Key results
 
-- **Tests:** 1131 tests, including checks that every warning code is tested, that `outputs/` matches the engine and that the numbers in this file match the code (`tests/test_docs.py`).
+- **Tests:** 1187 tests, including checks that every warning code is tested, that `outputs/` matches the engine and that the numbers in this file match the code (`tests/test_docs.py`).
 - **Benchmark** (`python tools/bench.py`): 40 project briefs scored against an answer key written before measurement. Result: 82% top-1 (129 of the 158 layer picks that have a best pick) and 96% acceptable (154 of all 160 layer picks); held-out 72% and 95%. Ten briefs were held out and not used for tuning. The key was written by a language model playing three architect personas, blind to the engine, not by human architects.
 - **LLM-only comparison** (`python tools/llm_baseline.py --show`, an offline experiment, not part of the engine): the same 40 briefs answered by a language model alone, then graded by the rules. LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 82% and 96%, but the model breaks a hard requirement in 7 of the 40 briefs; the engine's own picks break none.
 - **Random projects** (`python tools/fuzz.py --n 1000 --growth-n 100`): 1,000 seeded random projects against 15 properties (hard constraints, the same output on a repeat, renaming and reordering changing nothing, no return to an earlier pick as users grow): 0 violations.

@@ -2,7 +2,7 @@
   "scenario_id": "P4",
   "engine_version": "1.0.0",
   "status": "ok",
-  "summary": "A modular monolith build: React SPA on the frontend, Java/Kotlin + Spring Boot for the backend, PostgreSQL for data, hosted on AWS ECS on Fargate for about $1,960-7,240 a month. It stays on AWS and keeps data in India under RBI localisation and PCI DSS, builds on the team's Java, and ships as one deployable that a team of 8 can build in 16 weeks.",
+  "summary": "A modular monolith build: React SPA on the frontend, Java/Kotlin + Spring Boot for the backend, PostgreSQL for data, hosted on AWS ECS on Fargate for about $1,962-7,242 a month. It stays on AWS and keeps data in India under RBI localisation and PCI DSS, builds on the team's Java, and ships as one deployable that a team of 8 can build in 16 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -75,7 +75,7 @@
     },
     "database": {
       "choice": "PostgreSQL: Amazon RDS / Aurora PostgreSQL",
-      "justification": "Your data is mainly relational and reaches about 500 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $800-$1,600 a month, against a total budget of $6,000 a month. MySQL is within 0.1 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.",
+      "justification": "Your data is mainly relational and reaches about 411 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $800-$1,600 a month, against a total budget of $6,000 a month. MySQL is within 0.1 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.",
       "driven_by": [
         "project.type",
         "priorities.security",
@@ -95,7 +95,7 @@
         },
         {
           "choice": "Redis / Valkey",
-          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data; In-memory store: ~500 GB within 12 months cannot sensibly live in RAM as the system of record (use it as a cache)"
+          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data; In-memory store: ~411 GB within 12 months cannot sensibly live in RAM as the system of record (use it as a cache)"
         },
         {
           "choice": "Apache Cassandra / ScyllaDB",
@@ -380,14 +380,15 @@
     ]
   },
   "estimated_monthly_cost_usd": {
-    "min": 1960,
-    "max": 7240,
+    "min": 1962,
+    "max": 7242,
     "assumptions": [
       "Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
       "Scale tier: Large (5,000-50,000 users online at once)",
       "Budget check: $6,000/month stated, status 'stretch'",
       "Hosting: AWS ECS on Fargate: $800-4,000 (Large (5,000-50,000 users online at once) price band; x2 for 99.95% availability (redundant instances))",
-      "Database: PostgreSQL: $800-1,600 (Large (5,000-50,000 users online at once) database tier (~500 GB in 12 months); upper end for ~500 GB of data: the band's top is priced for the largest data of the tier; x2 for 99.95% availability (standby/replicas))",
+      "Database: PostgreSQL: $800-1,600 (Large (5,000-50,000 users online at once) database tier (~411 GB in 12 months); upper end for ~411 GB of data: the band's top is priced for the largest data of the tier; x2 for 99.95% availability (standby/replicas))",
+      "Object storage: $2-2 (~89 GB of uploaded files (the stated total less the database's ~411 GB) at $0.023-0.025/GB-month (https://aws.amazon.com/s3/pricing/))",
       "Media delivery: $90-810 (~9,000 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)",
       "Phone login (SMS OTP): $180-450 (~90,000 SMS a month (one login every ~20 days per active user) at $0.002-0.005 each)",
       "Static frontend: AWS S3 + CloudFront (static): $15-200 (Large (5,000-50,000 users online at once) price band (the app's scale))",
@@ -406,7 +407,8 @@
     "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
     "Architecture preference: Not provided; using default 'auto'.",
     "Vendor lock-in tolerance: Not provided; using default 'medium'.",
-    "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Set infrastructure.data_residency to india if a sector rule (e.g. RBI) applies."
+    "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Set infrastructure.data_residency to india if a sector rule (e.g. RBI) applies.",
+    "Stored data: The stated 500 GB counts uploaded files too. The database is sized for ~411 GB of rows (0.5 MB per daily user a month for this app type, at ~64,782 daily users, launch plus 12 months), and the other ~89 GB of files is priced as object storage on the stack's cloud."
   ],
   "validation_errors": []
 }

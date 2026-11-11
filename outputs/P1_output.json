@@ -68,7 +68,7 @@
     },
     "database": {
       "choice": "None",
-      "justification": "No database (content files in git). The content is about 1.0 GB of files kept in git, so there is no database server to run, back up or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 7.0, the largest share of its score. It leads the runner-up, Cloud Firestore, by 8.8 stack points.",
+      "justification": "No database (content files in git). The content is about 1.0 GB of files: the pages are kept in git and any media past ~5 GB sit in object storage, so there is no database server to run, back up or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 7.0, the largest share of its score. It leads the runner-up, Cloud Firestore, by 8.8 stack points.",
       "driven_by": [
         "budget.monthly_infra_usd",
         "team.size",

@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Healthcare / telehealth' project at Hyperscale (>10M daily users) scale (~34,722 peak req/s) built by 1 engineer(s) in 2 weeks, StackSense recommends Next.js (React) + Node.js + Express + PostgreSQL + Azure App Service / Container Apps (architecture: Modular monolith). Estimated infrastructure cost: ₹8,544,000-₹31,680,000/month (over budget). 2 critical issue(s) need attention: HIPAA on a free-tier budget; Budget below estimated cost.
+For a 'Healthcare / telehealth' project at Hyperscale (>10M daily users) scale (~34,722 peak req/s) built by 1 engineer(s) in 2 weeks, StackSense recommends Next.js (React) + Node.js + Express + PostgreSQL + Azure App Service (architecture: Modular monolith). Estimated infrastructure cost: ₹8,544,000-₹31,680,000/month (over budget). 2 critical issue(s) need attention: HIPAA on a free-tier budget; Budget below estimated cost.
 
 ## Recommended stack
 
@@ -13,7 +13,7 @@ For a 'Healthcare / telehealth' project at Hyperscale (>10M daily users) scale (
 | Frontend | **Next.js (React)** | 81.7 | 1.1, close call (under 1.5) | SvelteKit (-1.1) |
 | Backend | **Node.js + Express** | 84.7 | 0.6, close call (under 1.5) | C# + ASP.NET Core (-0.6, tie) |
 | Database | **PostgreSQL** | 8.7 | 0.5, close call (under 1.5) | MySQL (-0.5, tie) |
-| Hosting | **Azure App Service / Container Apps** | 23.9 | 2.4, solid (1.5-4 points) | AWS ECS on Fargate (-2.4) |
+| Hosting | **Azure App Service** | 23.9 | 2.4, solid (1.5-4 points) | AWS ECS on Fargate (-2.4) |
 
 Stack score: **51.2** / 100 (average of layer scores plus compatibility adjustments).
 
@@ -25,10 +25,10 @@ Availability approach: Multi-AZ everywhere + multi-region failover drills, 24x7 
 
 ### How the parts fit
 
-1. **Request path**: The browser loads Next.js (React) from Azure App Service / Container Apps; it sends API calls to the Node.js + Express service on Azure App Service / Container Apps (~34,722 requests/s at peak), which queries PostgreSQL.
+1. **Request path**: The browser loads Next.js (React) from Azure App Service; it sends API calls to the Node.js + Express service on Azure App Service (~34,722 requests/s at peak), which queries PostgreSQL.
 2. **Sign-in**: Sign-in uses Microsoft Entra External ID; the Node.js + Express API checks the session or token on every request.
 3. **Data**: PostgreSQL is the system of record (about 11,000 GB within 12 months); uploaded files go to Blob Storage, after you confirm it is in scope for Microsoft's HIPAA BAA (Front Door for public, non-PHI files only). PHI (protected health information) stays in the database and object storage, encrypted at rest, on services covered by a signed BAA; keep it out of logs, analytics and push notification text. Every store above is placed in the region your residency rule requires.
-4. **Deploy**: CI builds a container image and rolls it out on Azure App Service / Container Apps with health checks and zero-downtime restarts. Database schema changes run as versioned migrations before the new code serves traffic.
+4. **Deploy**: CI builds a container image and rolls it out on Azure App Service with health checks and zero-downtime restarts. Database schema changes run as versioned migrations before the new code serves traffic.
 
 ## Inputs used
 
@@ -243,11 +243,11 @@ Suggested offering: Azure Database for PostgreSQL Flexible Server
 - No database (content files in git): Only for read-only sites; your users sign in, post or pay; Poor fit for 'relational' data as the primary store (1/5)
 - Google BigQuery: Eventually consistent; cannot be the system of record for ACID data
 
-### Hosting: Azure App Service / Container Apps (23.9)
+### Hosting: Azure App Service (23.9)
 
 Microsoft's managed web hosting and serverless containers, integrated with Entra ID and Azure SQL/Postgres.
 
-Azure App Service / Container Apps hosts the stack for users in North America and India at a 99.99% availability target. It runs the Node.js + Express API as long-running processes with WebSockets, sized for ~34,722 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is ₹3,456,000-₹20,160,000 a month, against a total budget of ₹0 a month. It leads the runner-up, AWS ECS on Fargate, by 2.4 stack points.
+Azure App Service hosts the stack for users in North America and India at a 99.99% availability target. It runs the Node.js + Express API as long-running processes with WebSockets, sized for ~34,722 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is ₹3,456,000-₹20,160,000 a month, against a total budget of ₹0 a month. It leads the runner-up, AWS ECS on Fargate, by 2.4 stack points.
 
 Runs here: Next.js (server rendering + static files), the Node.js + Express API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -267,7 +267,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 **Risks**
 - No free option at your scale (from ~$12,000/month).
 
-**Versus runner-up:** Azure App Service / Container Apps beats AWS ECS on Fargate by 2.4 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team size (+2.1), general quality (baseline weights) (+0.2), time to mvp (+0.2). AWS ECS on Fargate is stronger on monthly budget (+0.3).
+**Versus runner-up:** Azure App Service beats AWS ECS on Fargate by 2.4 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team size (+2.1), general quality (baseline weights) (+0.2), time to mvp (+0.2). AWS ECS on Fargate is stronger on monthly budget (+0.3).
 
 **Inputs that drove this score** (points out of 100)
 - Monthly budget: -52.5
@@ -297,8 +297,8 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 - AWS EKS (Kubernetes) (stack 45.3, -6.0): Scores 0.0 on its own; its stack is 6.0 stack points behind the pick.
 
 **Why not the others?**
-- Why not AWS ECS on Fargate? (runner-up) Swapping it in lowers the stack score by 2.4 points. Azure App Service / Container Apps is stronger on low ops burden (4.0 vs 3.0), learning curve (4.0 vs 3.0); AWS ECS on Fargate takes a penalty: Usually needs a team of 2+ to operate.
-- Why not Vercel? (popular choice) Swapping it in lowers the stack score by 7.4 points. Azure App Service / Container Apps is stronger on compliance maturity (audit, isolation) (5.0 vs 3.0), realtime fit (4.0 vs 2.0); Vercel is stronger on performance / latency (5.0 vs 4.0), low ops burden (5.0 vs 4.0); Vercel takes a penalty: No free option at your scale (from ~$12,000/month). 5.7 of the 7.4 points come from a stack compatibility rule: This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets.
+- Why not AWS ECS on Fargate? (runner-up) Swapping it in lowers the stack score by 2.4 points. Azure App Service is stronger on low ops burden (4.0 vs 3.0), learning curve (4.0 vs 3.0); AWS ECS on Fargate takes a penalty: Usually needs a team of 2+ to operate.
+- Why not Vercel? (popular choice) Swapping it in lowers the stack score by 7.4 points. Azure App Service is stronger on compliance maturity (audit, isolation) (5.0 vs 3.0), realtime fit (4.0 vs 2.0); Vercel is stronger on performance / latency (5.0 vs 4.0), low ops burden (5.0 vs 4.0); Vercel takes a penalty: No free option at your scale (from ~$12,000/month). 5.7 of the 7.4 points come from a stack compatibility rule: This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets.
 - Why not Render? (popular choice) Ruled out for your answers: No India region; data must stay in India.
 
 **Excluded by hard constraints**
@@ -308,10 +308,10 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 - Railway: No HIPAA Business Associate Agreement available; No India region; data must stay in India; Scale ceiling far below Hyperscale (>10M daily users)
 - Fly.io: No India region; data must stay in India
 - AWS Lambda + API Gateway: The provider's SLA is 99.95% (per region), below your 99.99% availability target
-- AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (CloudFront distribution), below your 99.99% availability target
-- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.95% (Firebase Hosting (service credits are a share of fees paid)), below your 99.99% availability target; No HIPAA Business Associate Agreement available
-- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.9% (Cloud Storage Standard class in one region (Cloud CDN: 99.95%)), below your 99.99% availability target
-- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay; The provider's SLA is 99.95% (Standard plan (the Free plan has none)), below your 99.99% availability target; No HIPAA Business Associate Agreement available
+- AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
+- Firebase Hosting (static): Only for read-only sites; your users sign in, post or pay; No HIPAA Business Associate Agreement available
+- Google Cloud Storage + Cloud CDN (static): Only for read-only sites; your users sign in, post or pay
+- Azure Static Web Apps: Only for read-only sites; your users sign in, post or pay; No HIPAA Business Associate Agreement available
 - Azure Blob Storage + Front Door (static): Only for read-only sites; your users sign in, post or pay; No HIPAA Business Associate Agreement available
 - Google Cloud Run: The provider's SLA is 99.95% (Cloud Run services in most regions), below your 99.99% availability target
 - Google Kubernetes Engine (Autopilot): The provider's SLA is 99.9% (Autopilot Pods in multiple zones (the control plane is 99.95%)), below your 99.99% availability target
@@ -329,8 +329,8 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 
 ## Supporting services
 
-- **Cache**: Redis/Valkey (Azure Cache for Redis): Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database.
-- **Realtime**: Redis pub/sub for cross-instance fan-out (Azure Cache for Redis): With several app instances, a message published on one must reach sockets on all others.
+- **Cache**: Redis/Valkey (Azure Managed Redis): Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database.
+- **Realtime**: Redis pub/sub for cross-instance fan-out (Azure Managed Redis): With several app instances, a message published on one must reach sockets on all others.
 - **Background jobs**: BullMQ (Redis): Send emails, process uploads and call slow APIs outside the request path. BullMQ keeps its jobs in Redis, so the app needs a Redis/Valkey instance (the one already listed above).
 - **Object storage**: Blob Storage, after you confirm it is in scope for Microsoft's HIPAA BAA (Front Door for public, non-PHI files only): Media and documents belong in object storage, not the database.
 - **Authentication**: Microsoft Entra External ID: Do not hand-roll password storage, MFA or SSO.
@@ -341,7 +341,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: Azure App Service / Container Apps | 36,000 | 210,000 | Hyperscale (>10M daily users) price band; x3 for 99.99% availability (redundant instances) |
+| Hosting: Azure App Service | 36,000 | 210,000 | Hyperscale (>10M daily users) price band; x3 for 99.99% availability (redundant instances) |
 | Database: PostgreSQL | 45,000 | 90,000 | Hyperscale (>10M daily users) database tier (~11,000 GB in 12 months); upper end for ~11,000 GB of data: the band's top is priced for the largest data of the tier; x3 for 99.99% availability (standby/replicas) |
 | Cache: Redis / Valkey | 8,000 | 30,000 | Hyperscale (>10M daily users) price band (the app's scale) |
 | **Total** | **89,000** | **330,000** | |
@@ -352,14 +352,14 @@ About ₹8,544,000-₹31,680,000 per month. Budget status: **over**. Planning es
 
 - **A team of 15 engineers**: backend: Node.js + Express -> C# + ASP.NET Core
   - Why backend changes: Structure for large teams moved the gap 3.6 points toward C# + ASP.NET Core (C# + ASP.NET Core 5.0/5 vs Node.js + Express 1.0/5, weight 0.3 -> 1.8).
-- **Must run on-premises**: hosting: Azure App Service / Container Apps -> On-prem Kubernetes (k3s / RKE2 / OpenShift)
-  - Why hosting changes: Azure App Service / Container Apps is now ruled out: Public-cloud service; deployment must be on-premises.
+- **Must run on-premises**: hosting: Azure App Service -> On-prem Kubernetes (k3s / RKE2 / OpenShift)
+  - Why hosting changes: Azure App Service is now ruled out: Public-cloud service; deployment must be on-premises.
 
 ## Next-best complete stacks
 
-- Next.js (React) + Node.js + Express + MySQL + Azure App Service / Container Apps (50.8, -0.5)
-- Next.js (React) + C# + ASP.NET Core + PostgreSQL + Azure App Service / Container Apps (50.7, -0.6)
-- Next.js (React) + C# + ASP.NET Core + MySQL + Azure App Service / Container Apps (50.2, -1.0)
+- Next.js (React) + Node.js + Express + MySQL + Azure App Service (50.8, -0.5)
+- Next.js (React) + C# + ASP.NET Core + PostgreSQL + Azure App Service (50.7, -0.6)
+- Next.js (React) + C# + ASP.NET Core + MySQL + Azure App Service (50.2, -1.0)
 
 ## Sources
 

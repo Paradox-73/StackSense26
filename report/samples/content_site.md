@@ -165,7 +165,7 @@ The site serves about 20,000 daily users read-only, so the pages are built once 
 
 No database server: pages and posts are Markdown or JSON files in the repository, built into static HTML at deploy time.
 
-The content is about 1.1 GB of files kept in git, so there is no database server to run, back up or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 4.0, the largest share of its score. It leads the runner-up, MongoDB, by 8.5 stack points.
+The content is about 1.1 GB of files: the pages are kept in git and any media past ~5 GB sit in object storage, so there is no database server to run, back up or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 4.0, the largest share of its score. It leads the runner-up, MongoDB, by 8.5 stack points.
 
 Suggested offering: Content files in the git repository, built into static pages at deploy time (no database to run)
 

@@ -116,7 +116,7 @@ Quick mode asks seven questions; Refine opens all 42. "Describe your project" fi
 
 ### 5.1 How technologies are represented
 
-`data/kb/*.json` holds 70 technologies: 17 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region. 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 378 URLs, and no end-of-life product is in the knowledge base.
+`data/kb/*.json` holds 70 technologies: 17 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region. 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 379 URLs, and no end-of-life product is in the knowledge base.
 
 ### 5.2 Scoring and filtering
 
@@ -248,7 +248,7 @@ I checked the recommendations with a test suite, an answer key, an LLM-only base
 
 ### 8.1 Tests
 
-The 1131 tests cover scoring, constraints and cost; explanations against the engine's numbers; inputs, edge cases and warnings; stability properties; the language-model checks and fallbacks; accuracy against the answer key; and the app, packaging and documents. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1187 tests cover scoring, constraints and cost; explanations against the engine's numbers; inputs, edge cases and warnings; stability properties; the language-model checks and fallbacks; accuracy against the answer key; and the app, packaging and documents. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -287,7 +287,7 @@ Next: an architect review of the answer key and the public outputs, scheduled re
 
 **Datasets.** None shipped. The [Stack Overflow Developer Survey 2025](https://survey.stackoverflow.co/2025/technology) is the hiring-pool proxy; INR budgets use a fixed planning rate of 96 INR to 1 USD from the FBIL reference rate.
 
-**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 378 URLs is in `report/sources.md`. Main references: [expert systems](https://en.wikipedia.org/wiki/Expert_system), the [weighted sum model](https://en.wikipedia.org/wiki/Weighted_sum_model), counterfactual explanations ([Wachter, Mittelstadt and Russell, 2017](https://arxiv.org/abs/1711.00399)), [ISO/IEC 25010](https://www.iso.org/standard/78176.html), [AWS Well-Architected](https://aws.amazon.com/architecture/well-architected/), [ATAM](https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/), the Google SRE book ([availability table](https://sre.google/sre-book/availability-table/)), Fowler's [MonolithFirst](https://martinfowler.com/bliki/MonolithFirst.html), [Team Topologies](https://teamtopologies.com/key-concepts), [DORA research](https://dora.dev/research/), [HHS on HIPAA and cloud computing](https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html), the [PCI SSC library](https://www.pcisecuritystandards.org/document_library/), the [MeitY data protection framework](https://www.meity.gov.in/data-protection-framework), the [RBI directive on payment data storage (2018)](https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244), [endoflife.date](https://endoflife.date/) and the [Microsoft lifecycle pages](https://learn.microsoft.com/lifecycle/).
+**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 379 URLs is in `report/sources.md`. Main references: [expert systems](https://en.wikipedia.org/wiki/Expert_system), the [weighted sum model](https://en.wikipedia.org/wiki/Weighted_sum_model), counterfactual explanations ([Wachter, Mittelstadt and Russell, 2017](https://arxiv.org/abs/1711.00399)), [ISO/IEC 25010](https://www.iso.org/standard/78176.html), [AWS Well-Architected](https://aws.amazon.com/architecture/well-architected/), [ATAM](https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/), the Google SRE book ([availability table](https://sre.google/sre-book/availability-table/)), Fowler's [MonolithFirst](https://martinfowler.com/bliki/MonolithFirst.html), [Team Topologies](https://teamtopologies.com/key-concepts), [DORA research](https://dora.dev/research/), [HHS on HIPAA and cloud computing](https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html), the [PCI SSC library](https://www.pcisecuritystandards.org/document_library/), the [MeitY data protection framework](https://www.meity.gov.in/data-protection-framework), the [RBI directive on payment data storage (2018)](https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244), [endoflife.date](https://endoflife.date/) and the [Microsoft lifecycle pages](https://learn.microsoft.com/lifecycle/).
 
 **Repository.** <https://github.com/Paradox-73/StackSense26>. `python run.py` starts the app, `python -m pytest` runs the tests, `python tools/bench.py`, `tools/fuzz.py` and `tools/question_influence.py` rerun the studies, and `python tools/build_assets.py` then `tools/build_report.py` rebuild the tables and this PDF.
 
@@ -366,11 +366,11 @@ The 14 built-in examples, as the engine recommends them today:
 | AI document-search product (RAG) | Next.js | Python + FastAPI | PostgreSQL | Google Cloud Run | $367–$4,575 | Low ops burden |
 | Student project (zero budget) | React SPA | Firebase (BaaS on Google Cloud) | Cloud Firestore | Vercel | $0 | Cost at your scale |
 | SEO content site / blog | Next.js | No server code (static site) | No database (content files in git) | Netlify | $0 | Cost at your scale |
-| Mobile-first social app (India) | React Native | Firebase (BaaS on Google Cloud) | Cloud Firestore | Provided by Firebase | $683–$4,552 | Nothing of yours needs hosting |
+| Mobile-first social app (India) | React Native | Firebase (BaaS on Google Cloud) | Cloud Firestore | Provided by Firebase | $613–$3,752 | Nothing of yours needs hosting |
 | College fest website (India) | Next.js | Serverless functions (Node/Python FaaS) | PostgreSQL | Cloudflare Pages + Workers | $15–$55 | Cost at your scale |
 | UPI payments app (India) | Native iOS + Android | Java/Kotlin + Spring Boot | PostgreSQL | AWS EKS (Kubernetes) | $3,700–$14,750 | Ecosystem maturity |
 | Food delivery platform (India) | Next.js | Node.js + NestJS | PostgreSQL | AWS EKS (Kubernetes) | $24,500–$125,000 | Realtime fit |
-| Edge case: contradictory inputs | Next.js | Node.js + Express | PostgreSQL | Azure App Service / Container Apps | $89,000–$330,000 (over budget) | Low ops burden |
+| Edge case: contradictory inputs | Next.js | Node.js + Express | PostgreSQL | Azure App Service | $89,000–$330,000 (over budget) | Low ops burden |
 <!-- END presets -->
 
 <!-- BEGIN gallery -->
@@ -463,14 +463,14 @@ Safety (new in 2023) is not scored: the four layers are infrastructure, and no o
 <!-- BEGIN validation -->
 | What is checked | Tests |
 |---|---|
-| Scoring, constraints and cost | 356 |
+| Scoring, constraints and cost | 412 |
 | Explanations match the engine | 130 |
 | Inputs, edge cases and warnings | 276 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 192 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 92 |
-| **All** | **1131** |
+| **All** | **1187** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.
