@@ -42,7 +42,7 @@ StackSense takes a software project's parameters (scale, team and skills, budget
 
 | Part | Technology and version |
 |---|---|
-| Language | Python 3.12.10 (the code runs on Python 3.9 to 3.14) |
+| Language | Python 3.12.10; CI also runs the tests on Python 3.10 and 3.13 (Windows, macOS, Linux) |
 | Web framework | FastAPI 0.142.2 on Starlette 1.7.0, Pydantic 2.13.5, served by Uvicorn 0.54.0 |
 | Tests | pytest 9.1.1, HTTPX 0.28.1 (the API test client) |
 | Frontend | HTML, CSS and JavaScript in the browser, no framework, no third-party script |
@@ -52,7 +52,7 @@ StackSense takes a software project's parameters (scale, team and skills, budget
 
 ## Prerequisites
 
-- Python 3.9 or newer (3.12 recommended) from <https://www.python.org/downloads/>. On Windows, the installer's `py` launcher is enough.
+- Python 3.10 to 3.13 (3.12 recommended) from <https://www.python.org/downloads/>. CI tests 3.10 and 3.13 on Windows, macOS and Linux, and the versions pinned in `requirements.lock.txt` need 3.10 or newer. On Windows, the installer's `py` launcher is enough.
 - Windows 10/11, macOS or Linux. Nothing else to install: no database and no Node.js. Docker is optional (see Docker Compose below).
 - Internet on the first run only, to install the Python packages. After that the app runs offline.
 - No API key is needed. Every feature works without one.
@@ -98,7 +98,7 @@ python cli.py --scenario scenarios/public --out outputs                 # every 
 
 - With a folder, or an `--out` that is not a `.json` file name, each output is written to `<out>/<scenario_id>_output.json`, for example `outputs/P2_output.json`. The command prints one line per scenario: its status, the four choices and the file written.
 - A file may hold a JSON array of scenarios, as the organisers' `stacksense_public_scenarios.json` does: each element is run on its own and gets its own `<scenario_id>_output.json` (printed, or written to an `--out` `.json` file, the outputs are one JSON array), and `POST /api/scenario` with an array returns an array of outputs. The command line runs any number of scenarios; one API request runs at most 100.
-- Use the same Python as the app: `.venv/bin/python cli.py ...` (Windows: `.venv\Scripts\python cli.py ...`) after the first `run.py`, or any Python 3.9+ (the command line needs no packages).
+- Use the same Python as the app: `.venv/bin/python cli.py ...` (Windows: `.venv\Scripts\python cli.py ...`) after the first `run.py`, or any Python 3.10 or newer (the command line needs no packages).
 - In the browser: **Scenario file** (`/scenario`) loads a JSON file or a public example, shows the result and downloads it with **Download output JSON**.
 - Over HTTP: `POST /api/scenario` with the scenario as the body returns the output JSON.
 - A file with invalid fields gives `"status": "invalid_input"`, every problem in `validation_errors` and `"stack": null`. A file that is not JSON at all gives the same status with the parse error.

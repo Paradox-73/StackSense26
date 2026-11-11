@@ -51,7 +51,7 @@ The questionnaire posts its answers to `POST /api/recommend` and joins at step 4
 
 | Part | Technology and version |
 |---|---|
-| Language | Python 3.12.10 (runs on Python 3.9 to 3.14) |
+| Language | Python 3.12.10; CI also runs the tests on Python 3.10 and 3.13 |
 | Web app | FastAPI 0.142.2 on Starlette 1.7.0 with Pydantic 2.13.5, served by Uvicorn 0.54.0 |
 | Browser pages | HTML, CSS and JavaScript; no framework, build step or third-party script |
 | Tests | pytest 9.1.1 and HTTPX 0.28.1 |

@@ -1,7 +1,7 @@
 """One-command launcher:  python run.py  [--port 8000] [--no-browser] [--no-llm]
 
 Creates .venv and installs requirements on first run, then starts the server at
-http://127.0.0.1:8000 . Works on Windows, macOS and Linux with Python 3.9 to 3.14.
+http://127.0.0.1:8000 . Works on Windows, macOS and Linux with Python 3.10 to 3.13 (CI tests 3.10 and 3.13).
 """
 from __future__ import annotations
 
@@ -85,8 +85,8 @@ def _open_browser_when_ready(url: str) -> None:
 
 
 def main() -> int:
-    if sys.version_info < (3, 9):
-        say(f"Python 3.9 or newer is needed; this is Python {sys.version.split()[0]}.")
+    if sys.version_info < (3, 10):
+        say(f"Python 3.10 or newer is needed; this is Python {sys.version.split()[0]}.")
         say("Install Python 3.12 from https://www.python.org/downloads/ and run: python3 run.py")
         return 1
     ap = argparse.ArgumentParser()
