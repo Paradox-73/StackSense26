@@ -78,3 +78,8 @@ def test_no_sla_warning_names_only_a_host_that_runs_the_app():
                    "budget_monthly": 300, "team_skills": ["javascript", "firebase"]}, with_counterfactuals=False)
     if r["stack"]["backend"]["pick"].get("kind") == "baas":
         assert not [w for w in r["warnings"] if w["code"] == "NO_PUBLISHED_SLA"], r["warnings"]
+
+
+def test_a_large_static_site_says_where_its_media_live():
+    db = _site(gb=40, budget=50)["stack"]["database"]
+    assert db["choice"] == "None" and "object storage" in db["justification"], db["justification"]

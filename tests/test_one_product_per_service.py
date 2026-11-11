@@ -105,3 +105,24 @@ def test_gpu_work_beside_azure_app_service_is_named_on_container_apps():
     out = run(doc)
     assert out["stack"]["hosting"]["choice"].startswith("Azure App Service"), out["stack"]["hosting"]["choice"]
     assert "Azure Container Apps serverless GPUs" in _choices(out), _choices(out)
+
+
+@pytest.mark.parametrize("role,name,alt", [
+    ("Game servers", "Amazon GameLift Servers (managed dedicated game servers, with FlexMatch matchmaking)", "Agones"),
+    ("Game servers", "Agones (dedicated game servers on Kubernetes)", "Amazon GameLift Servers"),
+    ("Desktop app", "Electron, packaging the web frontend as a Windows, macOS and Linux app", "Tauri"),
+    ("Desktop app", "Qt (C++), a native Windows, macOS and Linux app beside the web frontend", "Electron"),
+    ("Background jobs", "Apache Kafka (existing)", "A new message broker"),
+    ("Analytics", "Snowflake (existing)", "A new analytics store"),
+    ("Payments", "App Store In-App Purchase for digital goods and subscriptions sold in the app", "A card processor"),
+])
+def test_services_added_by_other_rules_get_an_alternative_and_a_tradeoff(role, name, alt):
+    from engine.advice import service_notes
+    alts, trade = service_notes({"role": role, "name": name})
+    assert any(a.startswith(alt) for a, _ in alts) and all(w for _, w in alts) and trade, (alts, trade)
+
+
+def test_uploads_on_azure_under_audits_and_india_residency_stay_private():
+    out = run(_doc("P5"))  # Azure, data_residency india, ISO 27001, uploads
+    store = [s["choice"] for s in _sup(out, "storage")]
+    assert store and "private container" in store[0] and "SAS" in store[0] and "Front Door" in store[0], store

@@ -965,7 +965,9 @@ def _object_storage(env: dict, prov: str, private: bool = True) -> tuple[str, st
         # Front Door holds none of these audits in data/kb/hosting.json (no public Microsoft page lists its scope);
         # Microsoft's Azure Storage page puts Blobs in Azure's ISO, SOC and PCI DSS audits.
         baa = ", after you confirm it is in scope for Microsoft's HIPAA BAA," if env["hipaa"] else ""
-        return (f"Blob Storage{baa} without Front Door (no public Microsoft page lists Front Door's audit scope)",
+        # Under a residency rule the uploads also stay private: short-lived SAS URLs, as on the other clouds.
+        lock = ", a private container in your required region with short-lived SAS URLs," if residency(env) else ""
+        return (f"Blob Storage{baa}{lock} without Front Door (no public Microsoft page lists Front Door's audit scope)",
                 AZURE_HIPAA_DOCS if env["hipaa"] else
                 "https://learn.microsoft.com/en-us/azure/storage/common/storage-compliance-offerings")
     if env["cloud"] and env["hipaa"]:  # uploads hold health information: a CDN may carry only public files
@@ -1170,8 +1172,10 @@ SERVICE_NOTES = {
     "Code sandbox": ([("Running submissions in the web server's process", "One submission could read secrets or take the "
                        "server down")],
                      ["Sandboxed workers start slower and need their own capacity"]),
-    "Desktop app": ([("Tauri", "Smaller installers, but native features need some Rust")],
-                    ["Electron bundles Chromium, so installers are large"]),
+    "Desktop app": ([], []),  # by toolkit, in service_notes
+    "Game servers": ([("Match state held on the API servers", "A restart drops every match an instance holds, and "
+                       "matchmaking by player latency is yours to build")],
+                     ["Each live match holds a server, and server hours are billed on top of the estimate shown"]),
     "Hybrid split": ([("Everything in one place", "Your rules keep the system of record on-premises, so the cloud cannot "
                        "hold all of it")],
                      ["Two environments to deploy, monitor and keep on the same versions"]),
@@ -1181,6 +1185,10 @@ SERVICE_NOTES = {
                            "encryption that defaults do not record")],
                          ["Audit logs and key management add a running cost and need regular review"]),
 }
+DESKTOP_TRADEOFFS = {"Electron": "Electron bundles Chromium, so installers are large",
+                     "Qt": "A native C++ desktop codebase to maintain beside the web frontend",
+                     "Tauri": "Each system's own web view renders the pages slightly differently",
+                     ".NET MAUI": ".NET MAUI has no Linux target"}
 SECONDARY_NOTES = ([("Querying that shape on the primary database", "It models this data less well, so those queries get "
                      "slow or awkward as the data grows")],
                    ["A second store to keep in sync with the system of record"])
@@ -1190,6 +1198,28 @@ def service_notes(s: dict, compliance=()) -> tuple[list[tuple[str, str]], list[s
     """(alternatives, trade-offs) of one supporting service, with the product alternatives its choice implies."""
     alts, trade = SECONDARY_NOTES if s["role"].startswith("Secondary store") else SERVICE_NOTES.get(s["role"], ([], []))
     name, extra = s["name"], []
+    if name.endswith("(existing)"):  # a platform the project already runs carries the service (engine/standard.py)
+        return (([("A new analytics store fed from the app database", "A second warehouse to run and pay for beside "
+                   "the existing one")], ["Analytics trail the app by the delay of the change feed"])
+                if s["role"] == "Analytics" else
+                ([("A new message broker or job queue for this app", "A second message system to run, secure and "
+                   "monitor beside the existing one")],
+                 ["The new app's jobs and events share the existing system's capacity and its change process"]))
+    if s["role"] == "Payments" and ("In-App Purchase" in name or "Google Play Billing" in name):
+        return ([("A card processor inside the app for digital goods", "The stores' rules send digital goods sold in "
+                  "the app through their own billing")], ["The store keeps a commission on each sale, set by its rules"])
+    if s["role"] == "Desktop app":
+        electron = name.startswith("Electron")
+        return ([("Tauri", "Smaller installers, but native features need some Rust")] if electron else
+                [("Electron, packaging the web frontend", "It bundles Chromium in every installer and leaves the "
+                  "team's own language for the web side only")],
+                [DESKTOP_TRADEOFFS.get(name.split(" (")[0].split(",")[0], "A desktop codebase to ship beside the web "
+                                                                           "frontend")])
+    if s["role"] == "Game servers":
+        other = (("Agones (dedicated game servers on Kubernetes)", "A Kubernetes cluster your team would run and scale "
+                  "for the match servers") if name.startswith("Amazon GameLift") else
+                 ("Amazon GameLift Servers", "A managed fleet on AWS, outside the cloud this stack runs on"))
+        extra.append(other)
     if name.startswith("MSG91"):
         extra.append(("Twilio Verify", "Twilio runs Verify in its US region, so codes and numbers would be processed and "
                       "stored outside India" if "data_residency_india" in compliance else

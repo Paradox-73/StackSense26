@@ -268,7 +268,7 @@
             "static"
           ]
         },
-        "text": "The content is about {data_gb} GB of files kept in git, so there is no database server to run, back up or pay for."
+        "text": "The content is about {data_gb} GB of files: the pages are kept in git and any media past ~5 GB sit in object storage, so there is no database server to run, back up or pay for."
       },
       {
         "open": true,
