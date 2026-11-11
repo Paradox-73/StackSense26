@@ -672,14 +672,16 @@ details.sub > summary { cursor: pointer; color: var(--accent-ink); font-weight: 
   .drawer-b { flex: none; }
   .drawer-b:focus-visible { outline-offset: -2px; box-shadow: none; } /* the scrolling row would clip a ring drawn outside */
 }
-@media (max-width: 640px) {
-  main { padding: 0 16px 40px; }
+@media (max-width: 720px) {  /* the one-row header needs about 690 px */
   .top-in { padding: 6px 16px 0; gap: 10px; flex-wrap: wrap; row-gap: 2px; }  /* brand and theme on one row, the tabs below: no sideways scroll at 320 px */
-  .brand span { display: none; }
   .nav { order: 3; flex: 1 0 100%; margin-left: 0; min-height: 40px; justify-content: flex-start; flex-wrap: wrap; }
   .nav-b { padding: 0 8px; font-size: 13.5px; }
   .nav-b[aria-current="page"]::after { left: 8px; right: 8px; }
   .theme { margin-left: auto; }
+}
+@media (max-width: 640px) {
+  main { padding: 0 16px 40px; }
+  .brand span { display: none; }
   .intro { padding-top: 18px; }
   .intro h1 { font-size: 25px; }
   .examples { flex-direction: column; gap: 6px; }

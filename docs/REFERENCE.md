@@ -18,7 +18,7 @@ Contents: [Troubleshooting](#troubleshooting), [Using the app](#using-the-app), 
 
 ## Using the app
 
-1. **Live result.** A stack for the default answers appears on page load. Every answer change re-runs the engine after 250 ms; older requests are cancelled and late responses ignored. Cards whose pick changed turn gold and show "was X", with the reason under the sliders.
+1. **Live result.** A stack for the default answers appears on page load. Every answer change re-runs the engine after 250 ms; older requests are cancelled and late responses ignored. A pick that changed is highlighted and shows "was X" struck through, with the reason under the sliders.
 2. **Seven quick questions** (what you build, daily users, budget, team and languages, compliance, where it must run, must-haves), or an example from the row above them. "Refine with all 42 questions" opens the full form; on desktop the result stays pinned beside it while you scroll.
 3. **Not sure.** Every question has a *Not sure* option. The default is used, and the *Depends on* panel re-runs the engine across that answer's plausible values (one answer at a time, at most 48 runs). It lists the layers that are robust, the value at which each other layer flips (e.g. "Hosting: Netlify up to 100/day, Vercel at 1k/day, ..."), and *Pick* buttons that set the answer. Each question also has a *Help me choose* hint.
 4. **Glossary.** Every technical term (HIPAA, GDPR, DPDP, PCI-DSS, SOC 2, DAU, peak req/s, p95 latency, consistency, availability, BaaS, serverless, lock-in, data residency, ...) has an (i) button with a plain-English definition, who it applies to, and an official source (`data/glossary.json`). Esc or a click outside closes it.
