@@ -837,6 +837,30 @@
               "label": "Elixir"
             },
             {
+              "value": "scala",
+              "label": "Scala"
+            },
+            {
+              "value": "rust",
+              "label": "Rust"
+            },
+            {
+              "value": "c",
+              "label": "C"
+            },
+            {
+              "value": "cpp",
+              "label": "C++"
+            },
+            {
+              "value": "r",
+              "label": "R"
+            },
+            {
+              "value": "other_language",
+              "label": "Another language, not listed here"
+            },
+            {
               "value": "dart",
               "label": "Dart/Flutter"
             },

@@ -15,7 +15,7 @@ import re
 
 from . import __version__
 from .advice import SSO_DAU_PER_MAU
-from .explain import mobile_name
+from .explain import LANG_LABELS, mobile_name
 from .kb import LAYERS, field_specs, load_kb
 from .recommender import recommend
 
@@ -113,7 +113,7 @@ APP_TYPE_NOTES = {
 PRIORITY_ENGINE = {"cost": "cost", "time_to_market": "speed", "scalability": "scale", "performance": "performance",
                    "maintainability": "maintainability", "security": "security"}
 LANGUAGE_ALIASES = {"js": "javascript", "ts": "typescript", "c#": "csharp", "cs": "csharp", ".net": "csharp",
-                    "dotnet": "csharp", "golang": "go", "nodejs": "node", "node.js": "node", "py": "python",
+                    "dotnet": "csharp", "golang": "go", "nodejs": "node", "node.js": "node", "py": "python", "c++": "cpp",
                     "postgresql": "postgres", "html5": "html"}
 TOP_PRIORITIES = 3
 # Engine notes that name a control of the web app's form, restated for a scenario file.
@@ -467,9 +467,15 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
     for lang in f["team.languages"]:
         name = LANGUAGE_ALIASES.get(lang.strip().lower(), lang.strip().lower())
         (skills if name in known_skills else ignored).append(name)
+    if ignored and not skills:
+        # Listed but unsupported: the team still knows only these, so every backend is in a language it must learn.
+        skills.append("other_language")
     put("team_skills", list(dict.fromkeys(skills)), "team.languages")
     if ignored:
-        notes.append(f"team.languages not in the knowledge base, so they move no score: {', '.join(ignored)}")
+        notes.append(f"team.languages not in the knowledge base: {', '.join(ignored)}; no candidate is written in "
+                     + ("them" if len(ignored) > 1 else "it") + ", so they match no option"
+                     + (", and a backend in any other language takes the unfamiliar-language penalty"
+                        if skills == ["other_language"] else ""))
     put("team_size", f["team.size"], "team.size")
     put("team_experience", f["team.experience"], "team.experience")
     put("has_devops", f["team.has_devops"], "team.has_devops")
@@ -602,6 +608,26 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
             continue
         notes.append(f"Existing system '{text}': integrated through {how}; it stays the system of record for its own data")
     return a, origin, notes, warns
+
+
+def _language_warning(result: dict, f: dict, a: dict) -> list[dict]:
+    """The team lists only languages no backend in the knowledge base is written in: name the one it must learn."""
+    kb = load_kb()
+    be = kb["index"].get(result["stack"]["backend"]["pick"]["id"], {})
+    skills = set(a.get("team_skills", []))
+    if not f["team.languages"] or be.get("kind") not in ("server", "faas") or \
+            skills & {s for it in kb["backend"] for s in it.get("skills", [])}:
+        return []
+    labels = {o["value"]: o["label"] for o in field_specs()["team_skills"]["options"]}
+    carry = sorted(labels.get(s, s) for s in skills & set(be.get("related_skills", [])))
+    lang = LANG_LABELS.get(be.get("language", ""), be["name"])
+    listed = ", ".join(f["team.languages"])
+    return [_std_warn("BACKEND_LANGUAGE_NOT_LISTED", "warning",
+                      f"Backend in a language the team did not list. team.languages lists {listed}, and no backend in "
+                      "the knowledge base is written in " + ("it" if len(f["team.languages"]) == 1 else "any of them")
+                      + (f"; {' and '.join(carry)} carr{'y' if len(carry) > 1 else 'ies'} over to {be['name']}" if carry else "")
+                      + f". The backend is {be['name']}: plan time for the team to learn {lang} before the first "
+                      "release.", ["team.languages"])]
 
 
 def _reused(result: dict, f: dict) -> tuple[str | None, str | None]:
@@ -900,6 +926,8 @@ def run(doc) -> dict:
     warnings += [_std_warn("UNKNOWN_FIELD", "info", f"{k} is not part of the standard schema and was ignored.", [k])
                  for k in unknown]
     warnings += extra + _warnings(result, origin)
+    if result.get("feasible"):
+        warnings += _language_warning(result, fields, answers)
     absent = [path for path, _kind, required, *_ in FIELDS if not required and _get(doc, path)[1] is None
               and not (path == "requirements.p95_latency_ms" and _get(doc, path)[0])]
     absent += [f"priorities.{k}" for k in PRIORITY_KEYS if (doc.get("priorities") or {}).get(k) is None]

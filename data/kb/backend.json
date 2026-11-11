@@ -168,7 +168,8 @@
       ],
       "related_skills": [
         "django",
-        "flask"
+        "flask",
+        "r"
       ],
       "scale_ceiling": 5,
       "team_min": 1,
@@ -242,7 +243,8 @@
       ],
       "related_skills": [
         "fastapi",
-        "flask"
+        "flask",
+        "r"
       ],
       "scale_ceiling": 5,
       "team_min": 1,
@@ -313,7 +315,8 @@
         "java",
         "csharp",
         "rust",
-        "c++"
+        "cpp",
+        "c"
       ],
       "scale_ceiling": 5,
       "team_min": 1,

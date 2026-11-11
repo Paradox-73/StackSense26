@@ -753,3 +753,30 @@ def test_a_hosting_rule_that_costs_the_team_its_language_says_so():
                 infrastructure={"cloud_preference": "none", "data_residency": "eu"})  # TypeScript is listed: Express
     for d in [kept] + [load(n) for n in ("P1", "P2", "P3", "P4", "P5", "P6")]:
         assert not [w for w in run(d)["warnings"] if w["code"] == "BACKEND_LANGUAGE_NOT_LISTED"], d["scenario_id"]
+
+
+@pytest.mark.parametrize("base,languages,backend", [("P3", ["Rust", "C"], "Go"), ("P3", ["C++"], "Go"),
+                                                    ("P4", ["Scala"], "Spring Boot")])
+def test_adjacent_languages_pick_the_nearest_backend_and_warn(base, languages, backend):
+    out = edited(base, team={"languages": languages})
+    assert backend in out["stack"]["backend"]["choice"], out["stack"]["backend"]["choice"]
+    warn = [w for w in out["warnings"] if w["code"] == "BACKEND_LANGUAGE_NOT_LISTED"]
+    assert len(warn) == 1 and warn[0]["fields"] == ["team.languages"], warn
+    assert "carr" in warn[0]["message"] and "plan time for the team to learn" in warn[0]["message"], warn
+
+
+def test_languages_outside_the_knowledge_base_are_kept_and_the_one_to_learn_is_named():
+    out = edited("P3", team={"languages": ["Objective-C", "COBOL"]})
+    warn = [w["message"] for w in out["warnings"] if w["code"] == "BACKEND_LANGUAGE_NOT_LISTED"]
+    assert warn and "Objective-C, COBOL" in warn[0] and "plan time for the team to learn" in warn[0], warn
+    assert any("objective-c, cobol" in a and "unfamiliar-language penalty" in a for a in out["assumptions"])
+    assert not [w for w in edited("P3")["warnings"] if w["code"] == "BACKEND_LANGUAGE_NOT_LISTED"]
+
+
+def test_r_carries_over_to_the_python_backends():
+    from engine.kb import load_kb
+    from engine.scoring import skill_fit
+    backends = load_kb()["backend"]
+    python = [b for b in backends if b.get("language") == "python"]
+    others = [b for b in backends if b.get("kind") == "server" and b.get("language") != "python"]
+    assert python and all(skill_fit(b, {"r"}) > max(skill_fit(o, {"r"}) for o in others) for b in python)
