@@ -346,8 +346,8 @@ def _core(raw: dict, kb: dict | None = None, light: bool = False) -> dict:
     by_budget = tb.get("budget_guard") or tb.get("decided_by") == FITS_BUDGET
     if by_budget and not _shown_fits(p, d, layer_scored["database"])(best):
         # The budget rules compare the bands' floors. A stack they moved to that is still over the budget once the usage
-        # terms are added gains nothing (P2: DigitalOcean at $150, Cloud Run at $165-179, DigitalOcean again from
-        # $180, all over until $192), so the stack is chosen without them.
+        # terms are added gains nothing, and as the budget rises the pick would flip to it and back while every option
+        # stays over, so the stack is chosen without them.
         best = choose(combos, lefts[k], holds[k], None, forbids[k])
     best = _pair_with_mobile(best, combos, kb, p, d, w)
     combos[:] = [c for c in combos if c is not best]
