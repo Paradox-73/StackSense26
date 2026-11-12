@@ -45,11 +45,18 @@ def test_a_third_party_offering_without_iso_27001_gives_way_to_self_managed():
 
 
 def test_offline_sync_under_hipaa_names_the_plan_and_the_baa():
-    r = recommend({"app_type": "healthcare", "platforms": ["android", "ios"], "offline": True, "compliance": ["hipaa"],
-                   "regions": ["north_america"], "dau": 2000})
+    raw = {"app_type": "healthcare", "platforms": ["android", "ios"], "offline": True, "compliance": ["hipaa"],
+           "regions": ["north_america"], "dau": 2000, "budget_monthly": 1500}
+    r = recommend(raw)
     sync = [s for s in r["supporting_services"] if s["role"] == "Offline sync"]
     assert sync and "ElectricSQL" not in sync[0]["name"], sync
     assert "PowerSync" in sync[0]["name"] and "BAA" in sync[0]["name"] and "HIPAA" in sync[0]["name"], sync
+    assert ("Offline sync", 599.0) in [(x["component"], x["low"]) for x in r["cost"]["lines"]], r["cost"]["lines"]
+    # At $100 the Postgres stack ties with a MySQL one and the $599 sync plan does not fit, so the tie goes to the stack
+    # whose offline copy is the app's own SQLite sync, with no subscription.
+    cheap = recommend(dict(raw, budget_monthly=100))
+    assert [s["name"] for s in cheap["supporting_services"] if s["role"] == "Offline sync"][0].startswith("Local SQLite")
+    assert cheap["tie_break"]["decided_by"] == "a minimum bill that fits your budget", cheap["tie_break"]
 
 
 def test_hipaa_in_india_without_a_devops_team_keeps_sign_in_in_india():

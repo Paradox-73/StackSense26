@@ -114,6 +114,16 @@ def test_offline_sync_follows_the_deployment_model_and_the_residency_region():
         assert "Open Edition, self-hosted" in s["choice"] and "self-hosting" in s["source"], (deploy, s)
 
 
+def test_the_hosted_sync_subscription_is_in_the_cost_band_and_the_self_hosted_one_is_not():
+    def sync_line(doc):
+        lines = run(doc)["estimated_monthly_cost_usd"]["assumptions"]
+        return next((a for a in lines if a.startswith("Offline sync")), None)
+    assert sync_line(_doc("P6")).startswith("Offline sync: $49-49 (PowerSync Cloud Pro plan"), sync_line(_doc("P6"))
+    assert run(_doc("P6"))["estimated_monthly_cost_usd"]["min"] >= 49
+    onprem = _with("P6", infrastructure={"deployment_model": "on_premise", "cloud_preference": "none"})
+    assert sync_line(onprem) is None
+
+
 def test_vercel_postgres_offering_under_india_residency_is_supabase_in_mumbai():
     from engine.advice import database_offering
     from engine.kb import load_kb

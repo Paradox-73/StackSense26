@@ -290,6 +290,9 @@ PLATFORM_QUEUES = {"aws": ("Amazon SQS with a Lambda consumer", "https://docs.aw
                         "https://upstash.com/docs/qstash/overall/getstarted")}
 POWERSYNC_REGIONS_DOCS = "https://docs.powersync.com/configuration/powersync-service/cloud-instances.md"
 POWERSYNC_SELF_HOST_DOCS = "https://docs.powersync.com/self-hosting/getting-started"
+# PowerSync Cloud's plans (https://www.powersync.com/pricing): Free pauses an instance after a week without activity
+# and is called a starter plan, Pro ("for production applications") is from $49 a month, Team (the HIPAA plan) from $599.
+POWERSYNC_PRO_USD, POWERSYNC_TEAM_USD = 49.0, 599.0
 # QStash runs in two regions, EU (the default) and US (upstash.com/docs/qstash/howto/multi-region); under a residency rule
 # it has no region for, the jobs stay in the app's own database and a scheduled function drains them.
 QSTASH_REGIONS = {"eu": "EU", "us": "US"}
@@ -674,6 +677,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
                                      f"{TIER_NAMES[d['compute_tier']]} scale tier")
 
     if p["offline"]:
+        sync_cost = None
         if db["id"] == "firestore" or be["id"] == "firebase":
             sync = ("Firestore offline persistence (built into the client SDKs)",
                     "https://firebase.google.com/docs/firestore/manage-data/enable-offline")
@@ -693,11 +697,17 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
                      "in sync with Postgres", "https://www.powersync.com/pricing") if env["hipaa"] else
                     (f"PowerSync Cloud{region}: a local SQLite copy on the device kept in sync with Postgres",
                      POWERSYNC_REGIONS_DOCS if region else "https://docs.powersync.com/"))
+            if sync[0].startswith("PowerSync Cloud"):  # a subscription beside the database bill
+                plan, usd = ("Team", POWERSYNC_TEAM_USD) if env["hipaa"] else ("Pro", POWERSYNC_PRO_USD)
+                sync_cost = (usd, usd, f"PowerSync Cloud {plan} plan, from ${usd:g}/month "
+                             "(https://www.powersync.com/pricing); the Free plan pauses an idle instance, so a "
+                             "production app starts here; data beyond the plan's allowance is billed per GB")
         else:
             sync = ("Local SQLite on the device plus a sync API with per-record version numbers",
                     "https://www.sqlite.org/whentouse.html")
         add("Offline sync", sync[0], "Offline use needs a local copy of the data and conflict handling when the device "
-            "reconnects; the primary database does not provide that by itself.", sync[1])
+            "reconnects; the primary database does not provide that by itself.", sync[1],
+            usage=sync_cost, tier_usage=sync_cost)
 
     if stack["frontend"].get("kind") == "game" and p["realtime"] != "none":  # a live game built in an engine
         add("Game servers", *(GAME_SERVERS["aws"] if "aws" in (prov, p.get("cloud_preference")) else GAME_SERVERS["any"]))
