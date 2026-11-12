@@ -269,3 +269,12 @@ def test_score_trade_offs_skip_what_another_part_of_the_stack_handles():
     p6 = run(_doc("P6"))["stack"]["database"]["tradeoffs"]  # offline is the sync service's job
     assert not [t for t in p6 if t.startswith("Offline support")], p6
     assert any("Realtime fit is only" in t for t in run(_doc("P2"))["stack"]["backend"]["tradeoffs"])  # still said
+
+
+def test_gdpr_and_dpdp_duties_are_info_warnings_that_leave_the_status_alone():
+    codes = lambda out: {w["code"]: w for w in out["warnings"]}  # noqa: E731
+    p3, p2 = codes(run(_doc("P3"))), codes(run(_doc("P2")))
+    assert p3["GDPR_DUTIES"]["severity"] == "info" and "72 hours" in p3["GDPR_DUTIES"]["message"]
+    assert p2["DPDP_DUTIES"]["severity"] == "info" and "Data Protection Board" in p2["DPDP_DUTIES"]["message"]
+    assert "DPDP_DUTIES" not in p3 and "GDPR_DUTIES" not in p2
+    assert run(_doc("P5"))["status"] == "ok"  # P5 lists iso27001 only: no duty warning, status untouched

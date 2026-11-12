@@ -381,6 +381,14 @@
         "requirements.payments",
         "compliance"
       ]
+    },
+    {
+      "code": "GDPR_DUTIES",
+      "severity": "info",
+      "message": "GDPR: sign a data processing agreement with every vendor that handles personal data, honour access and deletion requests, and report a breach within 72 hours; a vendor outside the EU needs Standard Contractual Clauses or the EU-US Data Privacy Framework.",
+      "fields": [
+        "compliance"
+      ]
     }
   ],
   "assumptions": [

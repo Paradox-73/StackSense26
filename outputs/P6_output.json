@@ -340,6 +340,14 @@
         "budget.monthly_infra_usd",
         "scale.users_12_months"
       ]
+    },
+    {
+      "code": "DPDP_DUTIES",
+      "severity": "info",
+      "message": "DPDP Act 2023: collect personal data with a clear notice and consent, let users see, correct and erase it, and report a breach to the Data Protection Board and the people affected.",
+      "fields": [
+        "compliance"
+      ]
     }
   ],
   "assumptions": [

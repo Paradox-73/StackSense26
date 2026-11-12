@@ -940,6 +940,16 @@ def _compliance_info(result: dict, f: dict, warnings: list[dict]) -> list[dict]:
                              "Card payments: the hosted checkout collects card numbers on the payment provider's page, so "
                              "your PCI DSS check is the shortest self-assessment (SAQ A). Putting card fields on your own "
                              "pages, or storing card numbers, widens the audit.", ["requirements.payments", "compliance"]))
+    if "gdpr" in comp:
+        out.append(_std_warn("GDPR_DUTIES", "info",
+                             "GDPR: sign a data processing agreement with every vendor that handles personal data, honour "
+                             "access and deletion requests, and report a breach within 72 hours; a vendor outside the EU "
+                             "needs Standard Contractual Clauses or the EU-US Data Privacy Framework.", ["compliance"]))
+    if "dpdp" in comp:
+        out.append(_std_warn("DPDP_DUTIES", "info",
+                             "DPDP Act 2023: collect personal data with a clear notice and consent, let users see, correct "
+                             "and erase it, and report a breach to the Data Protection Board and the people affected.",
+                             ["compliance"]))
     if "rbi_localisation" in comp:
         out.append(_std_warn("RBI_COPIES_IN_INDIA", "info",
                              "RBI localisation: the entire payment data must be stored only in India, so backups, "

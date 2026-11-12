@@ -420,6 +420,14 @@
       ]
     },
     {
+      "code": "DPDP_DUTIES",
+      "severity": "info",
+      "message": "DPDP Act 2023: collect personal data with a clear notice and consent, let users see, correct and erase it, and report a breach to the Data Protection Board and the people affected.",
+      "fields": [
+        "compliance"
+      ]
+    },
+    {
       "code": "RBI_COPIES_IN_INDIA",
       "severity": "info",
       "message": "RBI localisation: the entire payment data must be stored only in India, so backups, replicas and logs that hold it must also be in an Indian region; check each destination before go-live (https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244).",
