@@ -2,7 +2,7 @@
   "scenario_id": "P5",
   "engine_version": "1.0.0",
   "status": "ok",
-  "summary": "A modular monolith build: Server-rendered HTML + HTMX on the frontend, C# + ASP.NET Core for the backend, Microsoft SQL Server for data, hosted on Azure App Service for about $30-172 a month. It keeps the existing Microsoft SQL Server and Microsoft Entra ID sign-in, stays on Azure and keeps data in India under ISO 27001, builds on the team's C#/.NET, and ships as one deployable that a team of 2 can build in 6 weeks.",
+  "summary": "A modular monolith build: Server-rendered HTML + HTMX on the frontend, C# + ASP.NET Core for the backend, Microsoft SQL Server for data, hosted on Azure App Service for about $30-259 a month. It keeps the existing Microsoft SQL Server and Microsoft Entra ID sign-in, stays on Azure and keeps data in India under ISO 27001, builds on the team's C#/.NET, and ships as one deployable that a team of 2 can build in 6 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -76,7 +76,7 @@
     },
     "database": {
       "choice": "Microsoft SQL Server: Azure SQL Database (General Purpose, serverless or provisioned)",
-      "justification": "Your data is mainly relational and reaches about 3.4 GB within 12 months; Microsoft SQL Server fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and Microsoft SQL Server gives it: a read after a write always sees that write. Its share of the estimated bill is $8-$22 a month, against a total budget of $300 a month. It leads the runner-up, PostgreSQL, by 2.0 stack points.",
+      "justification": "Your data is mainly relational and reaches about 3.4 GB within 12 months; Microsoft SQL Server fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and Microsoft SQL Server gives it: a read after a write always sees that write. Its share of the estimated bill is $8-$24 a month, against a total budget of $300 a month. It leads the runner-up, PostgreSQL, by 2.0 stack points.",
       "driven_by": [
         "infrastructure.existing_systems",
         "team.languages",
@@ -110,7 +110,7 @@
     },
     "hosting": {
       "choice": "Azure App Service, region Central India (Pune)",
-      "justification": "Azure App Service hosts the stack for users in India at a 99.9% availability target. It runs the C# + ASP.NET Core API as long-running processes, sized for ~1.6 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is $22-$150 a month, against a total budget of $300 a month.",
+      "justification": "Azure App Service hosts the stack for users in India at a 99.9% availability target. It runs the C# + ASP.NET Core API as long-running processes, sized for ~1.6 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is $22-$235 a month, against a total budget of $300 a month.",
       "driven_by": [
         "infrastructure.cloud_preference",
         "priorities.time_to_market",
@@ -241,13 +241,13 @@
   },
   "estimated_monthly_cost_usd": {
     "min": 30,
-    "max": 172,
+    "max": 259,
     "assumptions": [
-      "Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
+      "Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
       "Scale tier: Small (50-500 users online at once)",
       "Budget check: $300/month stated, status 'within'",
-      "Hosting: Azure App Service: $22-150 (Small (50-500 users online at once) price band; x1.5 for 99.9% availability (redundant instances))",
-      "Database: Microsoft SQL Server: $8-22 (Hobby (one tier below the traffic: read-heavy, caches absorb most reads) database tier (~3 GB in 12 months); x1.5 for 99.9% availability (standby/replicas))",
+      "Hosting: Azure App Service: $22-235 (Small (50-500 users online at once) price band, from the band's floor up to its price at ~3x the load, for 300 users online at once (78% of the way up the tier, log scale); x1.5 for 99.9% availability (redundant instances))",
+      "Database: Microsoft SQL Server: $8-24 (Hobby (one tier below the traffic: read-heavy, caches absorb most reads) database tier (~3 GB in 12 months), from the band's floor up to its price at ~3x the load, for ~3 GB of data (53% of the way up the tier, log scale); x1.5 for 99.9% availability (standby/replicas))",
       "Object storage: $0-0 (~17 GB of uploaded files (the stated total less the database's ~3 GB) at $0.0196-0.0208/GB-month (https://azure.microsoft.com/en-us/pricing/details/storage/blobs/))"
     ]
   },

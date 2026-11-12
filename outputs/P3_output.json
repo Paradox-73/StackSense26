@@ -1,8 +1,8 @@
 {
   "scenario_id": "P3",
   "engine_version": "1.0.0",
-  "status": "ok",
-  "summary": "A modular monolith build: React SPA on the frontend, Go for the backend, PostgreSQL for data, hosted on Fly.io for about $1,190-4,635 a month. It plans for GDPR, builds on the team's Go, pushes live updates, and ships as one deployable that a team of 5 can build in 12 weeks.",
+  "status": "ok_with_warnings",
+  "summary": "A modular monolith build: React SPA on the frontend, Go for the backend, PostgreSQL for data, hosted on Fly.io for about $1,190-2,792 a month. It plans for GDPR, builds on the team's Go, pushes live updates, and ships as one deployable that a team of 5 can build in 12 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -74,7 +74,7 @@
     },
     "database": {
       "choice": "PostgreSQL: Fly Managed Postgres",
-      "justification": "Your data is mainly relational and reaches about 200 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $600-$1,200 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server, by 2.1 stack points.",
+      "justification": "Your data is mainly relational and reaches about 200 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $600-$1,244 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server, by 2.1 stack points.",
       "driven_by": [
         "priorities.scalability",
         "priorities.performance",
@@ -111,7 +111,7 @@
     },
     "hosting": {
       "choice": "Fly.io",
-      "justification": "Fly.io hosts the stack for users in regions you did not state at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~521 requests/s at peak. Its share of the estimated bill is $375-$1,800 a month, against a total budget of $1,500 a month. It leads the runner-up, Google Cloud Run, by 3.1 stack points.",
+      "justification": "Fly.io hosts the stack for users in regions you did not state at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~521 requests/s at peak. Its share of the estimated bill is $375-$845 a month, against a total budget of $1,500 a month. It leads the runner-up, Google Cloud Run, by 3.1 stack points.",
       "driven_by": [
         "requirements.realtime",
         "project.type",
@@ -345,18 +345,27 @@
   },
   "estimated_monthly_cost_usd": {
     "min": 1190,
-    "max": 4635,
+    "max": 2792,
     "assumptions": [
-      "Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
+      "Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
       "Scale tier: Large (5,000-50,000 users online at once)",
       "Budget check: $1,500/month stated, status 'stretch'",
-      "Hosting: Fly.io: $375-1,800 (Large (5,000-50,000 users online at once) price band; x1.5 for 99.9% availability (redundant instances))",
-      "Database: PostgreSQL: $600-1,200 (Large (5,000-50,000 users online at once) database tier (~200 GB in 12 months); upper end for ~200 GB of data: the band's top is priced for the largest data of the tier; x1.5 for 99.9% availability (standby/replicas))",
-      "Cache: Redis / Valkey: $200-1,500 (Large (5,000-50,000 users online at once) price band (the app's scale))",
+      "Hosting: Fly.io: $375-845 (Large (5,000-50,000 users online at once) price band, from the band's floor up to its price at ~3x the load, for 521 req/s at peak (2% of the way up the tier, log scale); x1.5 for 99.9% availability (redundant instances))",
+      "Database: PostgreSQL: $600-1,244 (Large (5,000-50,000 users online at once) database tier (~200 GB in 12 months), from the band's floor up to its price at ~3x the load, for 521 req/s at peak (2% of the way up the tier, log scale); upper end for ~200 GB of data: the band's top is priced for the largest data of the tier; x1.5 for 99.9% availability (standby/replicas))",
+      "Cache: Redis / Valkey: $200-568 (Large (5,000-50,000 users online at once) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 521 req/s at peak (2% of the way up the tier, log scale))",
       "Media delivery: $15-135 (~1,500 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)"
     ]
   },
   "warnings": [
+    {
+      "code": "BUDGET_RANGE_OVER",
+      "severity": "warning",
+      "message": "Budget below the top of the estimate. The estimate is $1,190-$2,792/month against a budget of $1,500/month: the low end fits, the top end does not, and its middle ($1,991/month) is above it too. The top end is the price at ~3x today's load in the Large (5,000-50,000 users online at once) tier; the lines that grow most: Database: PostgreSQL ($600-$1,244/month); Hosting: Fly.io ($375-$845/month). Plan for the low end and watch those lines; raise the budget before the load grows, or lower the availability target or scale inputs if they were set high.",
+      "fields": [
+        "budget.monthly_infra_usd",
+        "scale.users_12_months"
+      ]
+    },
     {
       "code": "NO_PUBLISHED_SLA",
       "severity": "info",

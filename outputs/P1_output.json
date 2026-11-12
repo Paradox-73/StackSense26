@@ -176,10 +176,10 @@
     "min": 0,
     "max": 0,
     "assumptions": [
-      "Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
+      "Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
       "Scale tier: Small (50-500 users online at once)",
       "Budget check: $0/month stated, status 'within'",
-      "Hosting: Netlify: $0-0 (free static plan: pre-built files only)"
+      "Hosting: Netlify: $0-0 (static-site plan (pre-built files only) price band, from the band's floor up to its price at ~3x the load, for 50 users online at once (the bottom of the tier))"
     ]
   },
   "warnings": [],

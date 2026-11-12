@@ -1,8 +1,8 @@
 {
   "scenario_id": "P6",
   "engine_version": "1.0.0",
-  "status": "ok",
-  "summary": "A modular monolith build: React Native on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $35-105 a month. It keeps data in India under DPDP, builds on the team's Python, keeps working offline, and ships as one deployable that a team of 2 can build in 10 weeks.",
+  "status": "ok_with_warnings",
+  "summary": "A modular monolith build: React Native on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $35-120 a month. It keeps data in India under DPDP, builds on the team's Python, keeps working offline, and ships as one deployable that a team of 2 can build in 10 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -110,7 +110,7 @@
     },
     "hosting": {
       "choice": "DigitalOcean (App Platform + Managed DBs), region BLR1 (Bangalore)",
-      "justification": "DigitalOcean (App Platform + Managed DBs) hosts the stack for users in India at a 99% availability target. It runs the Python + Django API as long-running processes, sized for ~8.3 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is $12-$50 a month, against a total budget of $100 a month. Google Cloud Run is within 0.6 stack points, inside the tie margin (stacks this close count as tied); DigitalOcean (App Platform + Managed DBs) has the higher stack score.",
+      "justification": "DigitalOcean (App Platform + Managed DBs) hosts the stack for users in India at a 99% availability target. It runs the Python + Django API as long-running processes, sized for ~8.3 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is $12-$59 a month, against a total budget of $100 a month. Google Cloud Run is within 0.6 stack points, inside the tie margin (stacks this close count as tied); DigitalOcean (App Platform + Managed DBs) has the higher stack score.",
       "driven_by": [
         "priorities.cost",
         "priorities.time_to_market",
@@ -320,20 +320,30 @@
   },
   "estimated_monthly_cost_usd": {
     "min": 35,
-    "max": 105,
+    "max": 120,
     "assumptions": [
-      "Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
+      "Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
       "Scale tier: Small (50-500 users online at once)",
       "Budget check: $100/month stated, status 'stretch'",
-      "Hosting: DigitalOcean (App Platform + Managed DBs): $12-50 (Small (50-500 users online at once) price band)",
-      "Database: PostgreSQL: $15-15 (Small (50-500 users online at once) database tier (~3 GB in 12 months))",
-      "Background jobs: Redis / Valkey: $5-30 (Small (50-500 users online at once) price band (the app's scale))",
+      "Hosting: DigitalOcean (App Platform + Managed DBs): $12-59 (Small (50-500 users online at once) price band, from the band's floor up to its price at ~3x the load, for 200 users online at once (60% of the way up the tier, log scale))",
+      "Database: PostgreSQL: $15-15 (Small (50-500 users online at once) database tier (~3 GB in 12 months), from the band's floor up to its price at ~3x the load, for 8 req/s at peak (22% of the way up the tier, log scale))",
+      "Background jobs: Redis / Valkey: $5-36 (Small (50-500 users online at once) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 200 users online at once (60% of the way up the tier, log scale))",
       "Object storage: $1-2 (~97 GB of uploaded files (the stated total less the database's ~3 GB) at $0.015-0.025/GB-month (https://developers.cloudflare.com/r2/pricing/ and https://aws.amazon.com/s3/pricing/))",
       "Media delivery: $1-5 (~60 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)",
       "Phone login (SMS OTP): $1-3 (~600 SMS a month (one login every ~20 days per active user) at $0.002-0.005 each)"
     ]
   },
-  "warnings": [],
+  "warnings": [
+    {
+      "code": "BUDGET_RANGE_OVER",
+      "severity": "warning",
+      "message": "Budget below the top of the estimate. The estimate is $35-$120/month against a budget of $100/month: the low end fits, the top end does not, and its middle ($78/month) still fits. The top end is the price at ~3x today's load in the Small (50-500 users online at once) tier; the lines that grow most: Hosting: DigitalOcean (App Platform + Managed DBs) ($12-$59/month); Background jobs: Redis / Valkey ($5-$36/month). Plan for the low end and watch those lines; raise the budget before the load grows, or lower the availability target or scale inputs if they were set high.",
+      "fields": [
+        "budget.monthly_infra_usd",
+        "scale.users_12_months"
+      ]
+    }
+  ],
   "assumptions": [
     "project.type 'other' with only phone platforms is scored as a mobile-first app",
     "project.description is not parsed for a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm)",

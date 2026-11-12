@@ -1586,10 +1586,9 @@ def scale_places(p: dict, d: dict) -> dict[str, tuple[float, str]]:
 def place_text(place: tuple[float, str], tier: int) -> str:
     """How a line was read from its band: where in the tier the project sits, and the measure that puts it there."""
     share = min(max(place[0] - tier, 0.0), 1.0)
-    where = ("at the bottom of the tier" + (" (that measure alone is below it)" if place[0] < tier else "")
-             if share == 0 else f"{share:.0%} of the way up the tier (log scale)")
-    return (f"from the band's floor up to its price at ~{10 ** PLACED_WINDOW:.0f}x the load where {place[1]} puts "
-            f"the project ({where})")
+    where = ("the bottom of the tier" + (": that measure alone is below it" if place[0] < tier else "")
+             if share == 0 else f"{share:.0%} of the way up the tier, log scale")
+    return f"from the band's floor up to its price at ~{10 ** PLACED_WINDOW:.0f}x the load, for {place[1]} ({where})"
 
 
 def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bool = True) -> dict:
@@ -1619,7 +1618,7 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
     one = single_instance(stack)
     if not baas_hosts_everything(d, stack):  # otherwise the optional landing page fits a free tier
         lo, hi = band(host, tier, at)
-        basis = [band_text("Static-site plan (pre-built files only)" if host.get("static_cost_usd") and static_site(p)
+        basis = [band_text("static-site plan (pre-built files only)" if host.get("static_cost_usd") and static_site(p)
                            else d["tier_label"], "scale", tier)]
         seats = seat_cost(host, lo, p)
         if seats:
