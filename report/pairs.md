@@ -21,7 +21,7 @@
 | Backend | Go (net/http, chi or Gin) | Go (net/http, chi or Gin) |
 | Database | TimescaleDB (Postgres) | TimescaleDB (Postgres) |
 | Hosting | AWS ECS on Fargate | AWS ECS on Fargate |
-| Est. cost / month | $4,215–$17,581 | $413,350–$532,178 |
+| Est. cost / month | $1,365–$14,731 | $38,500–$157,328 |
 
 
 **Internal tool, own servers vs cloud** (preset `internal_tool`; changed answer: `deployment`: on_prem → cloud)

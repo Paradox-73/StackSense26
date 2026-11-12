@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~25,000 peak req/s) built by 25 engineer(s) in 26 weeks, StackSense recommends Next.js (React) + Java/Kotlin + Spring Boot + MySQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹15,422,400-₹21,876,864/month (over budget). The highest-scoring stack (Next.js (React) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes), 93.9) is only 0.3 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on adjacent team skills (19.5 vs 19, summed skill fit). 1 critical issue(s) need attention: Budget below estimated cost.
+For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~25,000 peak req/s) built by 25 engineer(s) in 26 weeks, StackSense recommends Next.js (React) + Java/Kotlin + Spring Boot + MySQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹1,036,800-₹7,491,264/month (stretch budget). The highest-scoring stack (Next.js (React) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes), 93.9) is only 0.3 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on adjacent team skills (19.5 vs 19, summed skill fit).
 
 ## Recommended stack
 
@@ -27,7 +27,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 ### How the parts fit
 
 1. **Request path**: The browser loads Next.js (React) from AWS EKS (Kubernetes); it sends API calls to the Java/Kotlin + Spring Boot service on AWS EKS (Kubernetes) (~25,000 requests/s at peak), which queries MySQL.
-2. **Sign-in**: Sign-in uses Amazon Cognito in the Mumbai region (ap-south-1); the Java/Kotlin + Spring Boot API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses Spring Security's one-time token login in your API, with the users in your database in your Indian region: Amazon Cognito would cost about $149,850 a month at ~10,000,000 monthly users; the Java/Kotlin + Spring Boot API checks the session or token on every request.
 3. **Data**: MySQL is the system of record (about 1,520 GB within 12 months); uploaded files go to Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN). Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens. Every store above is placed in the region your residency rule requires.
 4. **Deploy**: CI builds container images and rolls them out on AWS EKS (Kubernetes) (manifests or Helm), one service at a time. Database schema changes run as versioned migrations before the new code serves traffic.
 
@@ -40,7 +40,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 
 ## Warnings and how they were resolved
 
-- **[CRITICAL] Budget below estimated cost**: Estimated minimum spend ₹15,422,400/month exceeds your budget of ₹2,500,000/month at Very large (1M-10M daily users) scale. *Resolution:* A cheaper stack exists but scored lower on your other priorities: hosting + database from about ₹460,800/month (AWS ECS on Fargate with PostgreSQL); see the 'Budget cut' scenario under 'What would change'.
+- **[WARNING] Budget below the top of the estimate**: ₹1,036,800-₹7,491,264/month against ₹2,500,000/month: the top (~3x today's load) and the middle are over, most of the rise in AWS EKS and ClickHouse. *Resolution:* Raise the budget before the load grows.
 
 ## Per-layer reasoning
 
@@ -328,7 +328,7 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 - **Search**: Amazon OpenSearch Service: Search across ~507 GB of documents (an estimate: the document share of your ~1,520 GB total, from your 2 data shapes) needs an inverted index with relevance ranking, highlighting and filters; database text indexes slow down and rank poorly at this size.
 - **Payments**: Razorpay with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.
 - **Object storage**: Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN): Media and documents belong in object storage, not the database.
-- **Authentication**: Amazon Cognito in the Mumbai region (ap-south-1): Do not hand-roll password storage, MFA or SSO.
+- **Authentication**: Spring Security's one-time token login in your API, with the users in your database in your Indian region: Amazon Cognito would cost about $149,850 a month at ~10,000,000 monthly users: Do not hand-roll password storage, MFA or SSO.
 - **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 - **Audit & security**: Encrypted storage (KMS), audit logging, least-privilege IAM, WAF: PCI-DSS requires access controls, audit trails and encryption.
@@ -342,10 +342,9 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 | Cache: Redis / Valkey | 1,500 | 10,407 | Very large (1M-10M daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 25,000 req/s at peak (70% of the way up the tier, log scale) |
 | Secondary store (document): MongoDB | 500 | 5,510 | Large (1-10 TB of data) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 25,000 req/s at peak (70% of the way up the tier, log scale) |
 | Analytics: ClickHouse | 3,000 | 19,764 | Very large (1M-10M daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 25,000 req/s at peak (70% of the way up the tier, log scale); a copy of data that MySQL also stores (fed by a continuous copy of changes), so that data is paid for in both stores |
-| Authentication | 149,850 | 149,850 | Amazon Cognito Essentials: 10,000 monthly active users free, then $0.015 each (~10,000,000 here; https://aws.amazon.com/cognito/pricing/) |
-| **Total** | **160,650** | **227,884** | |
+| **Total** | **10,800** | **78,034** | |
 
-About ₹15,422,400-₹21,876,864 per month. Budget status: **over**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹1,036,800-₹7,491,264 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

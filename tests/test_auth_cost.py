@@ -44,3 +44,10 @@ def test_phone_codes_at_scale_move_into_the_app_instead_of_a_per_user_service():
     small = _out("P4", scale={"users_at_launch": 2000, "users_12_months": 30000, "peak_concurrent_users": 500})
     assert _auth(small).startswith("Amazon Cognito"), _auth(small)
     assert _line(small).startswith("Authentication: $300-300 (Amazon Cognito Essentials"), _line(small)
+
+
+def test_a_team_with_no_one_to_run_servers_keeps_costly_sign_in_inside_its_api():
+    out = _out("P3", team={"has_devops": False}, scale={"users_at_launch": 20000, "users_12_months": 200000})
+    choice = _auth(out)  # 200,000 users: Clerk Pro would be about $3,025 a month and nobody can run Keycloak
+    assert "in your API, with the users in your database" in choice and "Clerk would cost about" in choice, choice
+    assert not choice.startswith("Keycloak") and _line(out) is None

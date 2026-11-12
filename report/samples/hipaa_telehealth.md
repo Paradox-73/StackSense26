@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Healthcare / telehealth' project at Medium (10k-100k daily users) scale (~69 peak req/s) built by 5 engineer(s) in 20 weeks, StackSense recommends React SPA (Vite) + Python + Django + PostgreSQL + AWS ECS on Fargate (architecture: Modular monolith). Estimated infrastructure cost: $1,720-$2,846/month (within budget).
+For a 'Healthcare / telehealth' project at Medium (10k-100k daily users) scale (~69 peak req/s) built by 5 engineer(s) in 20 weeks, StackSense recommends React SPA (Vite) + Python + Django + PostgreSQL + AWS ECS on Fargate (architecture: Modular monolith). Estimated infrastructure cost: $370-$1,496/month (within budget).
 
 ## Recommended stack
 
@@ -27,7 +27,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 ### How the parts fit
 
 1. **Request path**: The browser loads React SPA (Vite)'s built files from Amazon S3 + CloudFront; it sends API calls to the Python + Django service on AWS ECS on Fargate (~69 requests/s at peak), which queries PostgreSQL.
-2. **Sign-in**: Sign-in uses Amazon Cognito (HIPAA-eligible); the Python + Django API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses Django's built-in authentication (django.contrib.auth) in your API, with the users in your database, on BAA-covered servers: Amazon Cognito would cost about $1,350 a month at ~100,000 monthly users; the Python + Django API checks the session or token on every request.
 3. **Data**: PostgreSQL is the system of record (about 280 GB within 12 months); uploaded files go to Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only). PHI (protected health information) stays in the database and object storage, encrypted at rest, on services covered by a signed BAA; keep it out of logs, analytics and push notification text.
 4. **Deploy**: CI builds a container image and rolls it out on AWS ECS on Fargate with health checks and zero-downtime restarts. The frontend's built files are uploaded to Amazon S3 and the CDN cache is invalidated. Database schema changes run as versioned migrations before the new code serves traffic.
 
@@ -311,7 +311,7 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 - **Background jobs**: Celery (Redis/Valkey broker): Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (ElastiCache (Valkey)).
 - **Static frontend**: Amazon S3 + CloudFront: React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Python + Django instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.
 - **Object storage**: Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only): Media and documents belong in object storage, not the database.
-- **Authentication**: Amazon Cognito (HIPAA-eligible): Do not hand-roll password storage, MFA or SSO.
+- **Authentication**: Django's built-in authentication (django.contrib.auth) in your API, with the users in your database, on BAA-covered servers: Amazon Cognito would cost about $1,350 a month at ~100,000 monthly users: Do not hand-roll password storage, MFA or SSO.
 - **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS. Push services are not covered by a BAA: put no health information in the notification text (e.g. 'You have a new message') and show the content only after the user signs in.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 - **Audit & security**: Encrypted storage (KMS), audit logging, least-privilege IAM, WAF: The HIPAA Security Rule requires access controls, audit trails and encryption.
@@ -324,10 +324,9 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 | Database: PostgreSQL | 100 | 717 | Medium (100 GB-1 TB of data) database tier (~280 GB in 12 months), from the band's floor up to its price at ~3x the load, for ~280 GB of data (45% of the way up the tier, log scale); priced as Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless): HIPAA needs a plan whose vendor signs a BAA, which no free or entry plan of this database does; x2 for 99.95% availability (standby/replicas) |
 | Background jobs: Redis / Valkey | 30 | 137 | Medium (10k-100k daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 20,000 daily users (30% of the way up the tier, log scale) |
 | Static frontend: AWS S3 + CloudFront (static) | 0 | 12 | Medium (10k-100k daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 20,000 daily users (30% of the way up the tier, log scale) |
-| Authentication | 1,350 | 1,350 | Amazon Cognito Essentials: 10,000 monthly active users free, then $0.015 each (~100,000 here; https://aws.amazon.com/cognito/pricing/) |
-| **Total** | **1,720** | **2,846** | |
+| **Total** | **370** | **1,496** | |
 
-About ₹165,120-₹273,216 per month. Budget status: **within**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹35,520-₹143,616 per month. Budget status: **within**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

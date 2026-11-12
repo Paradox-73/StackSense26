@@ -1174,7 +1174,11 @@ FRAMEWORK_AUTH = {"spring_boot": ("Spring Security's one-time token login", "htt
                   "django": ("Django's built-in authentication (django.contrib.auth)", "https://docs.djangoproject.com/en/stable/topics/auth/"),
                   "dotnet": ("ASP.NET Core Identity", "https://learn.microsoft.com/aspnet/core/security/authentication/identity"),
                   "rails": ("Rails' built-in authentication generator", "https://guides.rubyonrails.org/security.html"),
-                  "laravel": ("Laravel's starter-kit authentication", "https://laravel.com/docs/authentication")}
+                  "laravel": ("Laravel's starter-kit authentication", "https://laravel.com/docs/authentication"),
+                  "express": ("Passport.js sessions", "https://www.passportjs.org/docs/"),
+                  "nestjs": ("NestJS authentication with Passport", "https://docs.nestjs.com/security/authentication"),
+                  "fastapi": ("FastAPI's OAuth2 password flow with hashed passwords",
+                              "https://fastapi.tiangolo.com/tutorial/security/")}
 
 
 def _auth(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None]:
@@ -1183,18 +1187,19 @@ def _auth(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None]:
     sign-in moves to Keycloak, self-hosted in the same place, when the team runs servers."""
     name, src, system = _auth_pick(env, p, d, be)
     cost = auth_cost(name, env, p)
-    if not cost or cost[0] <= AUTH_SELF_HOST_ABOVE_USD or env["hipaa"]:
+    if not cost or cost[0] <= AUTH_SELF_HOST_ABOVE_USD or p.get("enterprise_sso"):
         return name, src, system
     why = (f"{name.split(' (')[0].split(' in ')[0]} would cost about ${cost[0]:,.0f} a month at "
            f"~{p.get('dau', 0) / SSO_DAU_PER_MAU:,.0f} monthly users")
-    where = " in your Indian region" if env["india"] else " in your EU region" if env["eu"] else ""
-    if "phone_otp" in p.get("special_workloads", ()):
-        lib, lib_src = FRAMEWORK_AUTH.get(be.get("id"), ("Your backend framework's built-in authentication", AUTH_DOCS))
-        return (f"{lib} in your API, with one-time codes sent through the SMS gateway and the users in your database"
-                f"{where}: {why}", lib_src, None)
-    if p.get("has_devops"):
+    where = (" in your Indian region" if env["india"] else " in your EU region" if env["eu"] else "") + (
+        ", on BAA-covered servers" if env["hipaa"] else "")
+    if p.get("has_devops") and "phone_otp" not in p.get("special_workloads", ()):
         return f"Keycloak (self-hosted{where}): {why}", KEYCLOAK_DOCS, "keycloak"
-    return name, src, system
+    # No one to run an identity server, or phone codes (which Keycloak needs an extension for): sign-in moves into the
+    # API's own framework library, with the users in the app's database and no per-user bill.
+    lib, lib_src = FRAMEWORK_AUTH.get(be.get("id"), ("Your backend framework's built-in authentication", AUTH_DOCS))
+    codes = "one-time codes sent through the SMS gateway and " if "phone_otp" in p.get("special_workloads", ()) else ""
+    return f"{lib} in your API, with {codes}the users in your database{where}: {why}", lib_src, None
 
 
 def _auth_pick(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None]:
