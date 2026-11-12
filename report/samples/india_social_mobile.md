@@ -91,7 +91,7 @@ React Native (Expo) is the app for a Social network / UGC feed project with abou
 
 **Alternatives**
 - Flutter (stack 86.5, -1.7): Loses: Mobile SDKs handle auth, storage and push without a custom API. Note: FlutterFire is maintained by Google, giving first-party auth, Firestore offline sync and push notifications.
-- Native iOS + Android (Swift / Kotlin) (stack 84.4, -3.8): Scores 59.5 on its own; its stack is 3.8 stack points behind the pick.
+- Native iOS + Android (Swift / Kotlin) (stack 82.4, -5.8): Scores 51.5 on its own; its stack is 5.8 stack points behind the pick.
 
 **Why not the others?**
 - Why not Flutter? (runner-up) Swapping it in lowers the stack score by 1.7 points. React Native (Expo) is stronger on team skill match (5.0 vs 1.5), learning curve (5.0 vs 3.0); Flutter is stronger on performance / latency (4.0 vs 3.0).
@@ -331,12 +331,12 @@ About ₹58,848-₹321,024 per month. Budget status: **stretch**. Planning estim
   - Why backend changes: Firebase (BaaS on Google Cloud) is now ruled out: No HIPAA Business Associate Agreement available.
   - Why hosting changes: Cloudflare Pages + Workers is now ruled out: No HIPAA Business Associate Agreement available.
 - **Team has no relevant prior skills**: frontend: React Native (Expo) -> Native iOS + Android (Swift / Kotlin)
-  - Why frontend changes: Team skill match moved the gap 9.6 points toward Native iOS + Android (Swift / Kotlin) (Native iOS + Android (Swift / Kotlin) 3.0/5 vs React Native (Expo) 3.0/5, weight 2.5 -> 0.0, was 1.5 vs 5.0).
+  - Why frontend changes: Native iOS + Android (Swift / Kotlin) no longer takes a penalty (One app per platform, each in its own language (Swift for iOS, Kotlin for Android): nobody on the team listed Kotlin or Swift, so it learns 2 new languages where a cross-platform toolkit needs none), moving the gap 16.0 points toward Native iOS + Android (Swift / Kotlin); team skill match moved the gap 9.6 points toward Native iOS + Android (Swift / Kotlin) (Native iOS + Android (Swift / Kotlin) 3.0/5 vs React Native (Expo) 3.0/5, weight 2.5 -> 0.0, was 1.5 vs 5.0).
 
 ## Next-best complete stacks
 
 - Flutter + Firebase (BaaS on Google Cloud) + Cloud Firestore + Provided by Firebase (86.5, -1.7)
-- Native iOS + Android (Swift / Kotlin) + Firebase (BaaS on Google Cloud) + Cloud Firestore + Provided by Firebase (84.4, -3.8)
+- Native iOS + Android (Swift / Kotlin) + Firebase (BaaS on Google Cloud) + Cloud Firestore + Provided by Firebase (82.4, -5.8)
 - React Native (Expo) + Node.js + Express + Cloud Firestore + Google Cloud Run (80.6, -7.6)
 
 ## Sources

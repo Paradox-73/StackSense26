@@ -1,4 +1,5 @@
 """Counts stated in the README match the data files."""
+import json
 import re
 from pathlib import Path
 
@@ -205,3 +206,18 @@ def test_svg_files_are_well_formed():
     import xml.dom.minidom
     for f in list((ROOT / "docs").glob("*.svg")) + list((ROOT / "report").glob("*.svg")):
         xml.dom.minidom.parse(str(f))
+
+
+def test_the_report_quotes_each_public_scenarios_cost_as_its_output_gives_it():
+    """Section 6 figure captions and Cost lines name each public scenario's band; they must be the output's numbers."""
+    import re as _re
+    text = (ROOT / "report" / "report.md").read_text(encoding="utf-8")
+    for i in range(1, 7):
+        cost = json.loads((ROOT / "outputs" / f"P{i}_output.json").read_text(encoding="utf-8"))["estimated_monthly_cost_usd"]
+        want = f"${cost['min']:,.0f} to ${cost['max']:,.0f}" if cost["max"] else "$0 a month"
+        caption = next(ln for ln in text.splitlines() if ln.startswith(f"![P{i} "))
+        assert want in caption, (i, want, caption[:160])
+        section = text.split(f"### 6.{i} P{i} ", 1)[1].split("\n### ", 1)[0].split("\n## ", 1)[0]
+        for a, b in _re.findall(r"\$([\d,]+) to \$([\d,]+) a month", section):
+            if a == f"{cost['min']:,.0f}":  # the scenario's own band, not a line item inside it
+                assert b == f"{cost['max']:,.0f}", (i, a, b)
