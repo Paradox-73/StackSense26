@@ -279,9 +279,10 @@
       {
         "layer": "auth",
         "choice": "Clerk",
-        "justification": "Do not hand-roll password storage, MFA or SSO. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Social sign-in (Google, Apple, GitHub) needs OAuth 2.0 and OpenID Connect flows, account linking and token refresh, which a maintained sign-in product handles. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
-          "requirements.auth"
+          "requirements.auth",
+          "scale.users_12_months"
         ],
         "alternatives": [
           {

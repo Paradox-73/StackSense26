@@ -278,10 +278,11 @@
       {
         "layer": "auth",
         "choice": "Django's built-in authentication (django.contrib.auth), with the users in your database in India",
-        "justification": "Do not hand-roll password storage, MFA or SSO. Sized for the 30,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Phone sign-in needs one-time codes with expiry, retry limits and lockouts against SMS-pumping fraud; the codes go out through the SMS gateway listed with the services. Sized for the 30,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.auth",
-          "infrastructure.data_residency"
+          "infrastructure.data_residency",
+          "scale.users_12_months"
         ],
         "alternatives": [
           {

@@ -298,3 +298,14 @@ def test_every_supporting_service_of_the_public_scenarios_names_two_alternatives
             if "(existing)" in s["choice"]:
                 continue  # a system the project already runs: the alternative is a second one beside it
             assert len(s["alternatives"]) >= 2 and all(a["why_not"] for a in s["alternatives"]), (name, s["choice"])
+
+
+def test_the_sign_in_justification_names_what_the_chosen_method_needs():
+    def auth(name, **sections):
+        out = run(_with(name, **sections) if sections else _doc(name))
+        return next(s for s in out["stack"]["supporting"] if s["layer"] == "auth")
+    assert auth("P3")["justification"].startswith("Social sign-in (Google, Apple, GitHub) needs OAuth 2.0")
+    assert auth("P2")["justification"].startswith("Phone sign-in needs one-time codes")
+    assert auth("P3", requirements={"auth": "email_password"})["justification"].startswith("Password sign-in needs")
+    assert "Amazon Cognito would cost about $4,350" in auth("P4")["justification"]
+    assert "scale.users_12_months" in auth("P3")["driven_by"]

@@ -1129,6 +1129,16 @@ def _deferred(result: dict, f: dict) -> list[str]:
             if not _left_out(s, f)]
 
 
+AUTH_WHY = {
+    "email_password": "Password sign-in needs salted hashing, email verification, password resets and optional MFA, "
+                      "which a maintained sign-in product or library does correctly.",
+    "social": "Social sign-in (Google, Apple, GitHub) needs OAuth 2.0 and OpenID Connect flows, account linking and token "
+              "refresh, which a maintained sign-in product handles.",
+    "phone_otp": "Phone sign-in needs one-time codes with expiry, retry limits and lockouts against SMS-pumping fraud; the "
+                 "codes go out through the SMS gateway listed with the services.",
+}
+
+
 def _supporting(result: dict, f: dict) -> list[dict]:
     out = []
     for s in result.get("supporting_services", []):
@@ -1145,6 +1155,11 @@ def _supporting(result: dict, f: dict) -> list[dict]:
         if s.get("trigger"):
             tradeoffs.append(f"Can wait until {s['trigger']}")
         why = s["why"]
+        if s["role"] == "Authentication" and f["requirements.auth"] in AUTH_WHY:
+            # Say what this sign-in method needs, and where a per-user price decided the product, the users it is for.
+            why = AUTH_WHY[f["requirements.auth"]] + (f" {s['name'].split(': ', 1)[1][0].upper()}"
+                                                      f"{s['name'].split(': ', 1)[1][1:]}." if ": " in s["name"] else "")
+            fields = fields + ["scale.users_12_months"]
         layer = s.get("layer") or layer
         alts = [{"choice": c, "why_not": w} for c, w in alts if c.split(" (")[0] not in s["name"]]
         entry = {"layer": layer, "choice": s["name"], "justification": why, "driven_by": fields,
