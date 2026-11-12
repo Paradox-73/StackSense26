@@ -61,7 +61,8 @@
             <h3 id="brief-h">Describe your project</h3>
             <label for="brief-text" class="sr-only">Project description</label>
             <textarea id="brief-text" rows="3" maxlength="4000" placeholder="e.g. We are 3 students building a ticketing site for our college fest, about 20,000 visitors a day, ₹5,000 a month for hosting. We know React and Node."></textarea>
-            <div class="brief-row"><button type="button" id="brief-btn" class="btn">Fill from description</button><span id="brief-llm" class="muted small"></span></div>
+            <p id="brief-stale" class="muted small" hidden>An earlier description, not applied to the answers below.</p>
+            <div class="brief-row"><button type="button" id="brief-btn" class="btn btn-go">Fill from description</button><span id="brief-llm" class="muted small"></span></div>
             <div id="brief-out" hidden aria-live="polite"></div>
           </section>
           <form id="quick" autocomplete="off" novalidate></form>

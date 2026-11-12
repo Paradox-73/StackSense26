@@ -83,6 +83,13 @@ function readControl(el) {
 }
 
 const codes = (list) => list.map((x) => `<code>${esc(x)}</code>`).join(" ");
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+/** The output's status in words. The status code itself stays in the JSON; only a warning or critical one counts. */
+function statusWords(o) {
+  const n = o.warnings.filter((w) => w.severity !== "info").length;
+  return { ok: "OK", ok_with_warnings: `OK, ${plural(n, "warning")}`, infeasible: "No stack meets every requirement",
+    invalid_input: `Invalid input: ${plural(o.validation_errors.length, "field")} to fix` }[o.status] || o.status;
+}
 
 function component(layer, c) {
   return `<article class="sc-c"><h3><span class="sc-layer">${esc(layer)}</span>${esc(c.choice)}</h3><p>${esc(c.justification)}</p>
@@ -106,8 +113,8 @@ function renderOut() {
   box.removeAttribute("aria-busy");
   if (!o) { box.innerHTML = `<p class="sc-empty">Load a scenario file or pick an example; the result shows here.</p>`; return; }
   const list = (items, fn) => `<ul class="sc-list">${items.map(fn).join("")}</ul>`;
-  let h = `<div class="sc-head"><span class="sc-status ${esc(o.status)}">${esc(o.status)}</span>${
-    o.architecture_style ? `<span class="sc-style">${esc(o.architecture_style)}</span>` : ""}${
+  let h = `<div class="sc-head" id="sc-res" tabindex="-1"><span class="sc-status ${esc(o.status)}">${esc(statusWords(o))}</span>${
+    o.architecture_style ? `<span class="sc-style">${esc(o.architecture_style.replace(/_/g, " "))}</span>` : ""}${
     o.scenario_id !== null ? `<span class="muted small">scenario_id ${esc(o.scenario_id)}, engine ${esc(o.engine_version)}</span>` : ""}</div>
     <p class="sc-sum">${esc(o.summary)}</p>`;
   if (o.validation_errors.length) h += `<h2>Validation errors</h2>${list(o.validation_errors, (e) => `<li><code>${esc(e.field)}</code> ${esc(e.message)}</li>`)}`;
@@ -150,8 +157,13 @@ async function runScenario() {
   try { out = await api("/api/scenario", S.doc); } catch (e) { err = e; }
   if (run !== S.run) return;  /* a later run or load replaced this one */
   S.out = out; S.outFor = sent;
-  say(err ? `Could not run the scenario: ${err.message}.` : `Done: ${out.status}.`);
+  say(err ? `Could not run the scenario: ${err.message}.` : `Done: ${statusWords(out)}.`);
   renderOut();
+  /* one column (phone): the result sits below the whole form, so bring it into view and move focus to it */
+  if (out && matchMedia("(max-width: 860px)").matches) {
+    $("#sc-res").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    $("#sc-res").focus({ preventScroll: true });
+  }
 }
 
 function load(doc, name) {

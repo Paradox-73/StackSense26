@@ -142,14 +142,14 @@ SCENARIO_SHOTS = [(f"s-P{i}", f"P{i}", None, None) for i in range(1, 7)] + [
 ]
 
 
-def scenario_expect(stem: str) -> list[str]:
-    """Text the page must show for this scenario: the engine's own status and choices, or its field errors."""
+def scenario_expect(stem: str) -> tuple[str, list[str]]:
+    """The engine's own status for this scenario, and text the page must show: its choices, or its field errors."""
     from engine.standard import run
     path = next(p for p in (ROOT / "scenarios").glob(f"*/{stem}.json"))
     out = run(json.loads(path.read_text(encoding="utf-8")))
     if out["stack"] is None:
-        return [out["status"]] + [e["field"] for e in out["validation_errors"]]
-    return [out["status"]] + [out["stack"][l]["choice"] for l in LAYERS]
+        return out["status"], [e["field"] for e in out["validation_errors"]]
+    return out["status"], [out["stack"][l]["choice"] for l in LAYERS]
 
 
 def scenario_clip(page, first: str | None, last: str | None) -> dict:
@@ -205,7 +205,10 @@ def capture_scenarios(browser, port: int, only: str | None, check_only: bool) ->
         page.wait_for_timeout(500)
         page.wait_for_function(NO_SKELETON, timeout=30000)
         text = page.evaluate("document.querySelector('#sc-out').innerText")
-        missing = [f"page lacks {t!r}" for t in scenario_expect(stem) if t.lower() not in text.lower()]
+        status, expect = scenario_expect(stem)
+        missing = [f"page lacks {t!r}" for t in expect if t.lower() not in text.lower()]
+        if status not in page.get_attribute("#sc-out .sc-status", "class").split():  # the badge words the status; its class is the code
+            missing.append(f"the status badge is not {status!r}")
         clip = scenario_clip(page, first, last)
         pt, problems = print_problems(page, clip)
         mismatches += report(name, missing + problems, pt)

@@ -26,8 +26,8 @@
 
 /* the output */
 .sc-out { min-width: 0; transition: opacity var(--t); }
-.sc-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
-.sc-status, .sc-style { font: 700 13px var(--font-mono); padding: 3px 10px; border-radius: var(--r-pill); background: var(--surface-2); color: var(--ink); }
+.sc-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; outline: none; scroll-margin-top: 12px; } /* focused by script after a run on a phone */
+.sc-status, .sc-style { font: 700 13px var(--font-ui); padding: 3px 10px; border-radius: var(--r-pill); background: var(--surface-2); color: var(--ink); }
 .sc-status.ok { background: var(--pos-soft); color: var(--pos); }
 .sc-status.ok_with_warnings { background: var(--warn-soft); color: var(--warn); }
 .sc-status.infeasible, .sc-status.invalid_input { background: var(--crit-soft); color: var(--crit); }

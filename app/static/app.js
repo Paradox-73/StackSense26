@@ -8,7 +8,7 @@
 
 const S = {
   questions: null, presets: [], health: null, glossary: null, answers: {}, result: null,
-  reqId: 0, ctl: null, timer: 0, pending: null, panel: null, whyLayer: "frontend",
+  reqId: 0, ctl: null, timer: 0, pending: null, panel: "why", whyLayer: "frontend", /* the reasoning is open from the first result */
   growth: null, growthKey: null, growthBusy: null, lastNote: "",
   unknown: new Set(), touched: new Set(), sens: null, sensKey: "", sensCtl: null, sensId: 0,
   briefSrc: {}, summary: null, cause: null, /* where each answer was read from; the last plain-English summary; wording for the next change note */
@@ -68,12 +68,12 @@ const ICON = {
   edit: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 2.5l3 3-8 8h-3v-3z"/></svg>',
   reset: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.5-3.5M3 2.5v3h3"/></svg>',
   warn: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2 14.5 13.5h-13z M8 6.5v3.2M8 11.6v.1"/></svg>',
-  lock: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 7.5h8v6H4zM5.75 7.5V5.25a2.25 2.25 0 0 1 4.5 0V7.5"/></svg>',
   chev: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>',
   info: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25"/><path d="M8 7.2v4M8 4.9v.1"/></svg>',
   check: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>',
   ext: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 3h4v4M13 3 7.5 8.5M11.5 9.5v3.5h-8.5v-8.5h3.5"/></svg>',
   close: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>',
+  next: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg>',
 };
 
 async function api(path, body, signal) {
@@ -140,6 +140,9 @@ const SKILLS = [
 const COMP = [["gdpr", "GDPR"], ["dpdp", "India DPDP"], ["hipaa", "HIPAA"], ["pci_dss", "PCI-DSS"], ["soc2", "SOC 2"]];
 const JS_KEYS = ["javascript", "typescript", "react", "node", "nextjs"];
 const NS = "__ns"; /* value of every "Not sure" chip */
+/* quick chip group (input name) -> the answer it sets; each must-have chip sets its own answer (MUST_KEY) */
+const QMAP = { "q-app": "app_type", "q-users": "dau", "q-budget": "budget_monthly", "q-team": "team_size", "q-skills": "team_skills", "q-comp": "compliance", "q-where": "deployment", "q-must": "must" };
+const MUST_KEY = { realtime: "realtime", offline: "offline", seo: "seo", mobile: "platforms" };
 /* quick question id -> the answer(s) it sets; hints come from questions.json */
 const QUICK = [
   { id: "app", key: "app_type", title: "What are you building?" },
@@ -266,6 +269,11 @@ function syncQuick() {
     fs.classList.toggle("unsure", unsure);
     fs.classList.toggle("set", !!Q && !unsure && quickKeys(Q).some((k) => S.touched.has(k))); /* a filled station: answered */
   });
+  /* a chip whose answer nobody gave shows the default: drawn hollow, so it never reads as a choice */
+  $$("#quick .chip input").forEach((i) => {
+    const k = i.name === "q-must" ? MUST_KEY[i.value] : QMAP[i.name];
+    i.parentElement.classList.toggle("dflt", !S.touched.has(k) && !U.has(k));
+  });
   paintBriefMarks();
 }
 
@@ -290,8 +298,7 @@ async function askNext() {
 
 function onQuickChange(e) {
   const t = e.target, A = S.answers;
-  const map = { "q-app": "app_type", "q-users": "dau", "q-budget": "budget_monthly", "q-team": "team_size", "q-skills": "team_skills", "q-comp": "compliance", "q-where": "deployment", "q-must": "must" };
-  const key = map[t.name];
+  const key = QMAP[t.name];
   if (!key || t.value === "custom") return;
   if (t.value === NS) {
     if (t.type === "checkbox" && !t.checked) { setUnknown(key, false); return; }
@@ -315,7 +322,7 @@ function onQuickChange(e) {
   } else if (key === "deployment") A.deployment = t.value;
   else if (key === "must") {
     const m = MUST.find((x) => x[0] === t.value);
-    const keys = { realtime: ["realtime"], offline: ["offline"], seo: ["seo"], mobile: ["platforms"] }[t.value];
+    const keys = [MUST_KEY[t.value]];
     const bef = {}; keys.forEach((k) => (bef[k] = structuredClone(A[k])));
     m[3](A, t.checked);
     commit(keys, bef);
@@ -642,7 +649,11 @@ function renderExamples() {
 
 /** Replace every answer with `input` (a project from a preset, a link or a file); `unknown` are marked "Not sure". */
 function loadProject(input, unknown = [], presetId = null) {
-  clearTimeout(S.timer); S.pending = null; S.briefSrc = {};
+  clearTimeout(S.timer); S.pending = null; S.briefSrc = {}; S.cause = null;
+  /* what the description, the question check and the typed what-if said was about the answers this replaces */
+  $("#brief-out").hidden = true; $("#asknext-out").hidden = true;
+  const wq = $("#wq-out"); if (wq) wq.textContent = "";
+  $("#brief-stale").hidden = !$("#brief-text").value.trim();
   S.answers = Object.assign(defaults(), structuredClone(input));
   S.unknown.clear();
   /* Every answer the project states is sent, even one equal to this page's default: the engine's
@@ -679,6 +690,10 @@ function setBusy(on) {
  */
 async function run({ change = null, compare = true } = {}) {
   const id = ++S.reqId, out = $("#out"), prev = S.result;
+  if (!compare) { /* a new set of answers: no earlier "what changed" note may stay on screen */
+    S.lastNote = "";
+    const note = $("#wi-note"); if (note) { note.innerHTML = ""; note.classList.remove("hit"); }
+  }
   if (S.ctl) S.ctl.abort();
   const ctl = (S.ctl = new AbortController());
   if (!prev) out.innerHTML = skeleton();
@@ -687,7 +702,6 @@ async function run({ change = null, compare = true } = {}) {
     const r = await api("/api/recommend", sent(), ctl.signal);
     if (id !== S.reqId) return; /* a newer request superseded this one */
     S.result = r;
-    if (!compare) S.lastNote = "";
     renderResults(compare ? prev : null, change);
     loadSensitivity();
   } catch (e) {
@@ -709,6 +723,14 @@ function skeleton() {
 
 /* ================================================================== result: small parts */
 const confWord = { high: "clear winner", medium: "solid lead", low: "close call" };
+/** The pick's lead over its runner-up in words. vs.margin is in whole-stack points; below 0 the runner-up's stack scored
+ *  higher and a tie-break or stack rule kept the pick (vs.text below says which). */
+function leadText(vs, confidence) {
+  if (!vs) return "no runner-up";
+  const g = fmt(Math.abs(vs.margin), 1), pts = g === "1" ? "1 point" : `${g} points`, other = short(vs.runner_up);
+  if (vs.tie) return g === "0" ? `tied with ${other} (same score)` : `tied with ${other} (${pts} apart)`;
+  return vs.margin >= 0 ? `${pts} ahead of ${other} (${confWord[confidence] || confidence})` : `${pts} behind ${other}, kept for the whole stack`;
+}
 
 /** "Cost at your scale: 5.0/5 vs 2.8 average for this layer - weighted up because: Modest budget; X." -> parts */
 function parseWhy(line) {
@@ -754,14 +776,13 @@ function renderResults(prev, change) {
       <p class="upd" id="upd" aria-hidden="true"><i></i>Updating…</p>
       <div id="res-head"></div><div id="res-warn"></div><ol class="picks" id="picks"></ol>
       <p class="run-error" id="run-error" role="alert" hidden></p>
-      <div id="summary"></div>
       <div id="depends"></div>
-      <p class="trace"><span>${ICON.lock} Scored with the published 1–5 rubric.</span>
-        <button type="button" class="link-btn" data-open="why">Show the trace</button></p>
-      <div id="whatif"></div>
-      <div id="whatif-q"></div>
+      <p class="trace"><button type="button" class="link-btn" data-open="why">How this was scored${ICON.next}</button></p>
       <div class="drawers" role="group" aria-label="Details">${PANELS.map(([id, l]) => `<button type="button" class="drawer-b" data-open="${id}" aria-expanded="false" aria-controls="panel-${id}">${l}</button>`).join("")}</div>
       <div class="panels">${PANELS.map(([id, l]) => `<section class="panel" id="panel-${id}" data-title="${esc(l)}" aria-label="${esc(l)}" hidden></section>`).join("")}</div>
+      <div id="summary"></div>
+      <div id="whatif"></div>
+      <div id="whatif-q"></div>
       <div class="exports"><span>Export</span>
         <button class="link-btn" type="button" id="exp-json">${ICON.down}JSON</button>
         <button class="link-btn" type="button" id="exp-md">${ICON.down}Markdown</button>
@@ -793,9 +814,11 @@ function renderResults(prev, change) {
 
 function renderHead(prev) {
   const r = S.result, pr = r.profile || {}, d = r.derived || {};
-  const name = pr.project_name && pr.project_name !== "My project" ? pr.project_name : "Your stack";
+  const starter = !S.touched.size && !S.unknown.size; /* nothing answered: the engine ran on the page's default answers */
+  const name = starter ? "Starter stack (default answers)" : pr.project_name && pr.project_name !== "My project" ? pr.project_name : "Your stack";
+  const startLine = starter ? `<p class="rh-start" id="res-starter">Nothing answered yet: try an example, describe your project, or answer the ${QUICK.length} questions.</p>` : "";
   if (!r.feasible) {
-    $("#res-head").innerHTML = `<header class="rh"><div class="rh-t"><h2 id="res-title" tabindex="-1">${esc(name)}</h2><p class="rh-meta">No feasible stack</p></div></header>`;
+    $("#res-head").innerHTML = `<header class="rh"><div class="rh-t"><h2 id="res-title" tabindex="-1">${esc(name)}</h2><p class="rh-meta">No feasible stack</p>${startLine}</div></header>`;
     return;
   }
   const c = r.cost;
@@ -803,7 +826,7 @@ function renderHead(prev) {
   const inr = pr.currency === "INR";
   $("#res-head").innerHTML = `<header class="rh">
     <div class="rh-t"><h2 id="res-title" tabindex="-1">${esc(name)}</h2>
-      <p class="rh-meta">${esc(r.architecture.style)} · ${esc(d.tier_label || "")} · fit <b class="mono" id="score-num">${r.stack_score.toFixed(1)}</b><span class="mono">/100</span></p></div>
+      <p class="rh-meta">${esc(r.architecture.style)} · ${esc(d.tier_label || "")} · fit score <b class="mono" id="score-num">${r.stack_score.toFixed(1)}</b> of 100</p>${startLine}</div>
     <div class="rh-cost"><span class="k">Monthly cost</span>
       <b class="mono" id="cost-num">${costText(r)}</b>
       <span class="st st-${esc(c.status)}">${esc(status)} · ${inr ? `₹${fmt(pr.budget_monthly)}` : usd(c.budget_usd)}</span></div>
@@ -856,8 +879,8 @@ function renderPicks(prev, change) {
     const changed = was && was !== s.pick.name;
     if (changed) notes.push({ layer: l, from: was, to: s.pick.name, s });
     return `<li class="pick${first ? " enter" : ""}${changed ? " changed" : ""}" style="--i:${i}" data-layer="${l}">
-      <button type="button" class="pick-b" data-open="why" data-layer="${l}" aria-label="${esc(cap(l))}: ${esc(s.pick.name)}${changed ? `, changed from ${esc(was)}` : ""}, fit ${s.pick.score.toFixed(0)} of 100. Show reasoning">
-        <span class="p-l">${esc(s.title)}</span><span class="p-s mono">${s.pick.score.toFixed(0)}</span>
+      <button type="button" class="pick-b" data-open="why" data-layer="${l}" aria-label="${esc(cap(l))}: ${esc(s.pick.name)}${changed ? `, changed from ${esc(was)}` : ""}, fit ${s.pick.score.toFixed(0)} of 100. Why: show the reasoning">
+        <span class="p-l">${esc(s.title)}</span><span class="p-s mono">${s.pick.score.toFixed(0)}</span><span class="p-go" aria-hidden="true">Why${ICON.next}</span>
         <span class="p-n">${esc(short(s.pick.name))}${s.api_host ? ` <small>+ API on ${esc(short(s.api_host.name))}</small>` : ""}</span>
         ${changed ? `<span class="p-was">was <s>${esc(short(was))}</s></span>` : ""}
         <span class="p-r">${oneLine(s)}</span>
@@ -1092,7 +1115,7 @@ function setLlmNote(llm) {
 /* ------------------------------------------------------------------ describe your project */
 async function fillFromBrief() {
   const text = $("#brief-text").value.trim(), out = $("#brief-out"), btn = $("#brief-btn");
-  out.hidden = false;
+  out.hidden = false; $("#brief-stale").hidden = true;
   if (!text) { out.innerHTML = `<p class="muted small">Write a sentence or two about your project first.</p>`; return; }
   btn.disabled = true;
   out.innerHTML = skLines(4, "Reading your description");
@@ -1150,9 +1173,8 @@ function renderSummary() {
   const box = $("#summary");
   if (!box) return;
   const s = S.summary && S.summary.key === summaryKey() ? S.summary.data : null;
-  if (!s) {
-    box.innerHTML = `<div class="sum"><div class="sum-h"><h3>Plain-English summary</h3>
-      <button type="button" class="link-btn" id="sum-go">Write summary</button></div></div>`;
+  if (!s) { /* no heading over an empty block: one action until a summary exists */
+    box.innerHTML = `<div class="sum"><button type="button" class="link-btn" id="sum-go">Write a plain-English summary</button></div>`;
     return;
   }
   const ok = s.source === "llm" && s.checked;
@@ -1254,8 +1276,8 @@ function bindExports() {
   $("#do-print").onclick = async () => { try { await loadGrowth(); } catch (e) { /* print without it */ } window.print(); };
 }
 
-function openPanel(id, { keep = false, layer = null, focus = false } = {}) {
-  if (!keep && S.panel === id && !layer) id = null; /* clicking the open drawer closes it */
+function openPanel(id, { keep = false, layer = null, focus = false, toggle = false } = {}) {
+  if (toggle && S.panel === id && !layer) id = null; /* clicking the open drawer's tab closes it; links to a drawer only open it */
   S.panel = id;
   if (layer) S.whyLayer = layer;
   $$(".drawer-b").forEach((b) => b.setAttribute("aria-expanded", String(b.dataset.open === id)));
@@ -1301,7 +1323,7 @@ function whyPanel() {
           ${s.managed_offering ? `<p class="muted small">Offering: ${esc(s.managed_offering)}</p>` : ""}
           ${s.runs_here && !s.optional_host ? `<p class="muted small">${esc(s.runs_here)}</p>` : ""}
           ${s.api_host ? `<p class="muted small">API host: <b>${esc(s.api_host.name)}</b> (${s.api_host.score.toFixed(1)}). ${esc(s.api_host.why)}</p>` : ""}</div>
-          <p class="wl-s"><b class="mono">${p.score.toFixed(1)}</b><small>/100 · ${vs ? `margin over runner-up ${vs.margin.toFixed(1)}: ${confWord[e.confidence] || e.confidence}` : "no runner-up"}</small></p></header>
+          <p class="wl-s"><b class="mono">${p.score.toFixed(1)}</b><small>of 100 · ${esc(leadText(vs, e.confidence))}</small></p></header>
         ${e.paragraph ? `<p class="wl-para">${esc(plain(e.paragraph))}</p>` : ""}
         <div class="wl-grid">
           <section><h4>Why</h4>${list(e.why.concat(e.strengths.slice(0, 2)), "ticks")}</section>
@@ -1608,12 +1630,16 @@ async function renderKb() {
     backend: ["scalability", "ease", "ops", "maturity", "realtime", "performance", "velocity", "hiring", "structure"],
     database: ["scalability", "ease", "ops", "maturity", "realtime", "performance", "hiring", "offline"],
     hosting: ["scalability", "ease", "ops", "maturity", "realtime", "performance"] };
+  /* column names: the criterion labels the Why drawer uses (engine/kb.py CRITERION_LABELS) */
+  const critName = { scalability: "Scalability", ease: "Learning curve", ops: "Low ops burden", maturity: "Ecosystem maturity",
+    realtime: "Realtime fit", performance: "Performance / latency", seo: "SEO", velocity: "Development speed", hiring: "Hiring pool",
+    offline: "Offline support", structure: "Structure for large teams", interactivity: "Rich client interactivity" };
   const total = LAYERS.map((l) => kb[l].length).reduce((a, b) => a + b);
   el.innerHTML = `<div class="kb-head"><h1>Knowledge base: ${total} technologies, ${kb.rules.length} compatibility rules</h1>
-    <p class="lead">Every score runs from 1 to 5, and 5 is best: “ease” means a gentle learning curve, “ops” a low operating burden. The numbers in brackets link to each row's sources.</p></div>` +
+    <p class="lead">Every score runs from 1 to 5, and 5 is best: a 5 for learning curve means easy to learn, a 5 for low ops burden means little to run. Vendor lock-in is the one column where lower is better. The numbers in brackets link to each row's sources.</p></div>` +
     LAYERS.map((l) => `<section class="kb-sec" aria-labelledby="kb-${l}"><h2 id="kb-${l}">${cap(l)} <small>${kb[l].length} options</small></h2>
     <div class="table-wrap"><table class="tbl kb">
-    <thead><tr><th scope="col">Technology</th>${crit[l].map((c) => `<th scope="col" class="num">${c}</th>`).join("")}${l === "database" ? '<th scope="col">consistency</th>' : ""}${l === "hosting" ? '<th scope="col">regions</th><th scope="col">HIPAA / PCI</th>' : ""}<th scope="col" class="num">lock-in</th><th scope="col">sources</th></tr></thead>
+    <thead><tr><th scope="col">Technology</th>${crit[l].map((c) => `<th scope="col" class="num">${critName[c] || c}</th>`).join("")}${l === "database" ? '<th scope="col">Consistency</th>' : ""}${l === "hosting" ? '<th scope="col">Regions</th><th scope="col">HIPAA / PCI</th>' : ""}<th scope="col" class="num">Vendor lock-in</th><th scope="col">Sources</th></tr></thead>
     <tbody>${kb[l].map((t) => `<tr><th scope="row"><b>${esc(t.name)}</b><span class="muted">${esc(t.summary)}</span></th>${crit[l].map((c) => `<td class="num heat" style="--h:${((t.scores[c] ?? 0) / 5).toFixed(2)}"><span class="mono">${t.scores[c] ?? "-"}</span></td>`).join("")}
       ${l === "database" ? `<td>${esc(t.consistency)}</td>` : ""}${l === "hosting" ? `<td class="small">${esc((t.regions || []).join(", "))}</td><td>${t.compliance.hipaa ? "BAA" : "-"} / ${t.compliance.pci ? "yes" : "-"}</td>` : ""}
       <td class="num mono">${t.lock_in ?? "-"}</td><td class="srcs">${t.sources.map((s, i) => `<a href="${esc(s)}" target="_blank" rel="noopener" aria-label="${esc(t.name)} source ${i + 1}">[${i + 1}]</a>`).join(" ")}</td></tr>`).join("")}</tbody></table></div></section>`).join("");
@@ -1727,6 +1753,7 @@ async function settled() { /* deep links: wait for the debounce, the live run an
   $("#quick").addEventListener("change", onQuickChange);
   $("#asknext-btn").onclick = askNext;
   $("#brief-btn").onclick = fillFromBrief;
+  $("#brief-text").addEventListener("input", () => ($("#brief-stale").hidden = true));
   $("#refine-toggle").onclick = () => toggleRefine();
   $("#reset").onclick = () => {
     const before = S.answers;
@@ -1750,7 +1777,7 @@ async function settled() { /* deep links: wait for the debounce, the live run an
     const hb = e.target.closest("[data-hint]");
     if (hb) { const box = $(`#hint-${hb.dataset.hint}`), open = box.hidden; box.hidden = !open; hb.setAttribute("aria-expanded", String(open)); return; }
     const op = e.target.closest("[data-open]");
-    if (op) { openPanel(op.dataset.open, { layer: op.dataset.layer || null, focus: !op.classList.contains("drawer-b") }); return; }
+    if (op) { const tab = op.classList.contains("drawer-b"); openPanel(op.dataset.open, { layer: op.dataset.layer || null, focus: !tab, toggle: tab }); return; }
     if (e.target.closest("#rob-go")) { runRobustness(); return; }
     if (e.target.closest("#sum-go")) { loadSummary(); return; }
     const wn = e.target.closest("[data-whynot]");

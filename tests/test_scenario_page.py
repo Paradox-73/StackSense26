@@ -34,7 +34,9 @@ def base_url():
     port = _free_port()
     env = {k: v for k, v in os.environ.items() if not k.startswith("STACKSENSE_LLM") and k != "OPENROUTER_API_KEY"}
     env["STACKSENSE_LLM"] = "off"
-    server = subprocess.Popen([sys.executable, "-m", "uvicorn", "app.main:app", "--port", str(port), "--log-level", "warning"],
+    # The app's own .venv when there is one: the Python running these tests may have Playwright but not the app's packages.
+    py = next((str(p) for p in (ROOT / ".venv" / "Scripts" / "python.exe", ROOT / ".venv" / "bin" / "python") if p.exists()), sys.executable)
+    server = subprocess.Popen([py, "-m", "uvicorn", "app.main:app", "--port", str(port), "--log-level", "warning"],
                               cwd=ROOT, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         for _ in range(80):
@@ -68,8 +70,9 @@ def page(browser):
 
 
 def _result(page):
-    """Wait for a run to finish and return the status badge text."""
-    return page.wait_for_selector("#sc-out .sc-status", timeout=30000).inner_text()
+    """Wait for a run to finish and return the output's status code (the badge says it in words)."""
+    page.wait_for_selector("#sc-out .sc-status", timeout=30000)
+    return page.evaluate("S.out.status")
 
 
 def test_an_array_file_offers_each_scenario_and_runs_the_chosen_one(page, base_url, tmp_path):
@@ -160,8 +163,38 @@ def test_the_home_page_links_to_the_scenario_page_and_hands_scenario_files_to_it
     page.set_input_files("#share-file", str(ROOT / "scenarios" / "public" / "P2.json"))
     page.wait_for_url(f"{base_url}/scenario", timeout=5000)
     assert _result(page) == "ok_with_warnings" and page.input_value("#f-project-name") == "FixIt Now"
+    n = page.evaluate("S.out.warnings.filter(w => w.severity !== 'info').length")
+    assert page.inner_text("#sc-out .sc-status") == f"OK, {n} warning{'' if n == 1 else 's'}", "the status in words, not the code"
     assert page.evaluate("S.doc") == json.loads((ROOT / "scenarios" / "public" / "P2.json").read_text(encoding="utf-8"))
     assert page.evaluate("sessionStorage.getItem('ss-scenario')") is None, "the hand-over is read once"
+
+
+def test_the_first_screen_says_it_shows_default_answers_and_opens_the_reasoning(page, base_url):
+    page.goto(f"{base_url}/")
+    page.wait_for_selector("#out .pick-b")
+    assert page.inner_text("#res-title") == "Starter stack (default answers)" and page.is_visible("#res-starter")
+    assert page.is_visible("#panel-why"), "the reasoning is open on the first result"
+    chips = "#quick .chip:has(input:checked)"
+    assert page.locator(chips).count() and page.locator(f"{chips}:not(.dflt)").count() == 0, "untouched defaults are drawn hollow"
+    page.click("#quick label.chip:has(input[name=q-budget][value='500'])")
+    page.wait_for_function("() => document.querySelector('#res-title').innerText === 'Your stack'")
+    assert page.locator(f"{chips}:not(.dflt)").all_inner_texts() == ["$500"], "only the answer the user gave is filled"
+    page.click(".trace .link-btn")
+    assert page.is_visible("#panel-why"), "a link to the open drawer keeps it open"
+
+
+def test_loading_an_example_clears_notes_about_the_answers_it_replaced(page, base_url):
+    """The change note and the description's panel describe the answers an example replaces, so neither may stay."""
+    page.goto(f"{base_url}/")
+    page.wait_for_selector("#out .pick-b")
+    page.fill("#brief-text", "We are 3 students building a ticketing site, about 20,000 visitors a day, $100 a month. We know React and Node.")
+    page.click("#brief-btn")
+    page.wait_for_function("() => document.querySelector('#wi-note').innerText.includes('after your project description')", timeout=30000)
+    page.click(".ex[data-preset] >> nth=0")
+    page.wait_for_function("() => document.querySelector('.ex[aria-pressed=true]') && !document.querySelector('#out.busy')", timeout=30000)
+    assert page.inner_text("#wi-note") == ""
+    assert page.is_hidden("#brief-out") and page.is_hidden("#asknext-out")
+    assert page.is_visible("#brief-stale"), "the typed description stays, marked as not applied"
 
 
 def test_the_home_page_says_the_model_is_switched_off_not_keyless(page, base_url):
