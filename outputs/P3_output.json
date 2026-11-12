@@ -7,7 +7,7 @@
   "stack": {
     "frontend": {
       "choice": "React SPA (Vite)",
-      "justification": "React SPA (Vite) is the frontend for a Realtime chat / collaboration / multiplayer project with about 10,000 daily users (~521 requests/s at peak), built by a team of 5 in 12 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. Next.js (React) is within 0.7 stack points, inside the tie margin (stacks this close count as tied); the tie went to React SPA (Vite) on lower vendor lock-in (5 vs 6, summed lock-in).",
+      "justification": "React SPA (Vite) is the frontend for a Realtime chat / collaboration / multiplayer project with about 10,000 daily users (~521 requests/s at peak), built by a team of 5 in 12 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. Next.js (React) is within 0.7 points, inside the tie margin (stacks this close count as tied); the tie went to React SPA (Vite) on lower vendor lock-in (5 vs 6, summed lock-in).",
       "driven_by": [
         "team.languages",
         "requirements.realtime",
@@ -28,7 +28,7 @@
     },
     "backend": {
       "choice": "Go (net/http, chi or Gin)",
-      "justification": "Go (net/http, chi or Gin) serves the API at about 521 requests/s at peak (Large (5,000-50,000 users online at once)) for a team of 5. The team lists Go, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Go service, so background jobs, WebSockets and database connection pools live in one deployable process. Realtime is core, and it scores 4.0/5 on realtime fit. It leads the runner-up, Elixir + Phoenix, by 3.1 stack points (points of the overall stack score, the average of the four layer scores).",
+      "justification": "Go (net/http, chi or Gin) serves the API at about 521 requests/s at peak (Large (5,000-50,000 users online at once)) for a team of 5. The team lists Go, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Go service, so background jobs, WebSockets and database connection pools live in one deployable process. Realtime is core, and it scores 4.0/5 on realtime fit. It leads the runner-up, Elixir + Phoenix, by 3.1 points (out of 100 on the whole-stack score, the average of the four layer scores).",
       "driven_by": [
         "team.languages",
         "priorities.scalability",
@@ -58,7 +58,7 @@
     },
     "database": {
       "choice": "PostgreSQL: Fly Managed Postgres",
-      "justification": "Your data is mainly relational and reaches about 200 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $600-$1,244 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server, by 2.2 stack points.",
+      "justification": "Your data is mainly relational and reaches about 200 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $600-$1,244 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server, by 2.2 points.",
       "driven_by": [
         "priorities.scalability",
         "priorities.performance",
@@ -85,7 +85,7 @@
     },
     "hosting": {
       "choice": "Fly.io, region fra (Frankfurt)",
-      "justification": "Fly.io hosts the stack for users in Europe at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~521 requests/s at peak. Its share of the estimated bill is $375-$845 a month, against a total budget of $1,500 a month. It leads the runner-up, Google Cloud Run, by 3.1 stack points.",
+      "justification": "Fly.io hosts the stack for users in Europe at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~521 requests/s at peak. Its share of the estimated bill is $375-$845 a month, against a total budget of $1,500 a month. It leads the runner-up, Google Cloud Run, by 3.1 points.",
       "driven_by": [
         "requirements.realtime",
         "project.type",

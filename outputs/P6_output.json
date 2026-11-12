@@ -7,7 +7,7 @@
   "stack": {
     "frontend": {
       "choice": "React Native (Expo)",
-      "justification": "React Native (Expo) is the app for a Mobile-first app project with about 400 daily users (~8.3 requests/s at peak), built by a team of 2 in 10 weeks. It builds the Android app now, and the same code can ship an iOS app later without a rewrite. It leads the runner-up, Flutter, by 3.5 stack points (points of the overall stack score, the average of the four layer scores).",
+      "justification": "React Native (Expo) is the app for a Mobile-first app project with about 400 daily users (~8.3 requests/s at peak), built by a team of 2 in 10 weeks. It builds the Android app now, and the same code can ship an iOS app later without a rewrite. It leads the runner-up, Flutter, by 3.5 points (out of 100 on the whole-stack score, the average of the four layer scores).",
       "driven_by": [
         "requirements.offline_support",
         "team.languages",
@@ -28,7 +28,7 @@
     },
     "backend": {
       "choice": "Python + Django",
-      "justification": "Python + Django serves the API at about 8.3 requests/s at peak (Small (50-500 users online at once)) for a team of 2. The team lists Python, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Python service, so background jobs and database connection pools live in one deployable process. Python + FastAPI is within 0.5 stack points, inside the tie margin (stacks this close count as tied); Python + Django has the higher stack score.",
+      "justification": "Python + Django serves the API at about 8.3 requests/s at peak (Small (50-500 users online at once)) for a team of 2. The team lists Python, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Python service, so background jobs and database connection pools live in one deployable process. Python + FastAPI is within 0.5 points, inside the tie margin (stacks this close count as tied); Python + Django has the higher stack score.",
       "driven_by": [
         "priorities.cost",
         "priorities.time_to_market",
@@ -56,7 +56,7 @@
     },
     "database": {
       "choice": "PostgreSQL: DigitalOcean Managed PostgreSQL",
-      "justification": "Your data is mainly relational and reaches about 2.7 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $15 a month, against a total budget of $100 a month. MySQL is within less than 0.05 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.",
+      "justification": "Your data is mainly relational and reaches about 2.7 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $15 a month, against a total budget of $100 a month. MySQL is within less than 0.05 points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.",
       "driven_by": [
         "priorities.cost",
         "priorities.time_to_market",
@@ -83,7 +83,7 @@
     },
     "hosting": {
       "choice": "DigitalOcean (App Platform + Managed DBs), region BLR1 (Bangalore)",
-      "justification": "DigitalOcean (App Platform + Managed DBs) hosts the stack for users in India at a 99% availability target. It runs the Python + Django API as long-running processes, sized for ~8.3 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is $12-$59 a month, against a total budget of $100 a month. Google Cloud Run is within 0.6 stack points, inside the tie margin (stacks this close count as tied); DigitalOcean (App Platform + Managed DBs) has the higher stack score.",
+      "justification": "DigitalOcean (App Platform + Managed DBs) hosts the stack for users in India at a 99% availability target. It runs the Python + Django API as long-running processes, sized for ~8.3 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is $12-$59 a month, against a total budget of $100 a month. Google Cloud Run is within 0.6 points, inside the tie margin (stacks this close count as tied); DigitalOcean (App Platform + Managed DBs) has the higher stack score.",
       "driven_by": [
         "priorities.cost",
         "priorities.time_to_market",

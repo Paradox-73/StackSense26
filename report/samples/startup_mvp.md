@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'B2B / B2C SaaS' project at Hobby (<1k daily users) scale (~4.3 peak req/s) built by 2 engineer(s) in 8 weeks, StackSense recommends Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Cloudflare Pages + Workers (architecture: BaaS-first (managed backend + thin server-side functions)). Estimated infrastructure cost: $26-$28/month (within budget). The stack that would otherwise be chosen (Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Vercel, 86.8) has a minimum of about $66/month at the price bands' floors, above your budget of $50/month; this stack keeps its backend and database, scores 1.8 stack points lower and fits the budget (about $26/month), so it was chosen (a stack that fits is preferred when it is within 5 points).
+For a 'B2B / B2C SaaS' project at Hobby (<1k daily users) scale (~4.3 peak req/s) built by 2 engineer(s) in 8 weeks, StackSense recommends Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Cloudflare Pages + Workers (architecture: BaaS-first (managed backend + thin server-side functions)). Estimated infrastructure cost: $26-$28/month (within budget). The stack that would otherwise be chosen (Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Vercel, 86.8) has a minimum of about $66/month at the price bands' floors, above your budget of $50/month; this stack keeps its backend and database, scores 1.8 points lower and fits the budget (about $26/month), so it was chosen (a stack that fits is preferred when it is within 5 points).
 
 ## Recommended stack
 
@@ -46,7 +46,7 @@ Availability approach: Supabase runs the backend on a paid plan; turn on point-i
 
 React meta-framework with server rendering, static generation, React Server Components and file-based routing.
 
-Next.js (React) is the frontend for a B2B / B2C SaaS project with about 500 daily users (~4.3 requests/s at peak), built by a team of 2 in 8 weeks. Search visibility is marked important (landing/product pages), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. React SPA (Vite) is within 0.4 stack points, inside the tie margin (stacks this close count as tied); the tie went to Next.js (React) on your most important inputs (SEO need: 2.7 vs 0.7 stack points, the heaviest answer on which they differ).
+Next.js (React) is the frontend for a B2B / B2C SaaS project with about 500 daily users (~4.3 requests/s at peak), built by a team of 2 in 8 weeks. Search visibility is marked important (landing/product pages), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. React SPA (Vite) is within 0.4 points, inside the tie margin (stacks this close count as tied); the tie went to Next.js (React) on your most important inputs (SEO need: 2.7 vs 0.7 points, the heaviest answer on which they differ).
 
 **Why**
 - Development speed: 5.0/5 vs 4.0 average for this layer - weighted up because: 8-week MVP.
@@ -64,7 +64,7 @@ Next.js (React) is the frontend for a B2B / B2C SaaS project with about 500 dail
 **Risks**
 - Next.js runs on Cloudflare through the OpenNext adapter; some features (e.g. certain ISR/image paths) differ from Vercel.
 
-**Versus runner-up:** Next.js (React) and React SPA (Vite) are within 0.4 stack points of each other, inside the 1-point tie margin, so they count as tied. Next.js (React) is stronger on SEO (5.0 vs 2.0), development speed (5.0 vs 4.0); React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), portability (low lock-in) (5.0 vs 4.0). Choose React SPA (Vite) instead if less to operate matters more to you than search traffic. The tie went to Next.js (React) on your most important inputs (SEO need: 2.7 vs 0.7 stack points, the heaviest answer on which they differ). Either is defensible.
+**Versus runner-up:** Next.js (React) and React SPA (Vite) are within 0.4 points of each other, inside the 1-point tie margin, so they count as tied. Next.js (React) is stronger on SEO (5.0 vs 2.0), development speed (5.0 vs 4.0); React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), portability (low lock-in) (5.0 vs 4.0). Choose React SPA (Vite) instead if less to operate matters more to you than search traffic. The tie went to Next.js (React) on your most important inputs (SEO need: 2.7 vs 0.7 points, the heaviest answer on which they differ). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +29.9
@@ -112,7 +112,7 @@ Next.js (React) is the frontend for a B2B / B2C SaaS project with about 500 dail
 
 Open-source backend-as-a-service: Postgres, auth, row-level security, storage, realtime, edge functions.
 
-Supabase (BaaS on Postgres) serves the API at about 4.3 requests/s at peak (Hobby (<1k daily users)) for a team of 2. As a hosted backend it supplies sign-in, the database API and file storage, so a team of 2 only needs to write the business rules in the 8 weeks available. Its share of the estimated bill is $26 a month, against a total budget of $50 a month. It leads the runner-up, Serverless functions (Node/Python FaaS), by 1.0 stack points (points of the overall stack score, the average of the four layer scores).
+Supabase (BaaS on Postgres) serves the API at about 4.3 requests/s at peak (Hobby (<1k daily users)) for a team of 2. As a hosted backend it supplies sign-in, the database API and file storage, so a team of 2 only needs to write the business rules in the 8 weeks available. Its share of the estimated bill is $26 a month, against a total budget of $50 a month. It leads the runner-up, Serverless functions (Node/Python FaaS), by 1.0 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Low ops burden: 5.0/5 vs 4.2 average for this layer - weighted up because: Small team (2).
@@ -128,7 +128,7 @@ Supabase (BaaS on Postgres) serves the API at about 4.3 requests/s at peak (Hobb
 - Complex business logic ends up in SQL/edge functions
 - Free projects pause after inactivity
 
-**Versus runner-up:** Supabase (BaaS on Postgres) beats Serverless functions (Node/Python FaaS) by 1.0 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on realtime needs (+1.1), general quality (baseline weights) (+0.6), time to mvp (+0.4). Serverless functions (Node/Python FaaS) is stronger on stack compatibility (+1.0), team skills (+0.5). Close call: either is defensible.
+**Versus runner-up:** Supabase (BaaS on Postgres) beats Serverless functions (Node/Python FaaS) by 1.0 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on realtime needs (+1.1), general quality (baseline weights) (+0.6), time to mvp (+0.4). Serverless functions (Node/Python FaaS) is stronger on stack compatibility (+1.0), team skills (+0.5). Close call: either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +35.3
@@ -170,7 +170,7 @@ Supabase (BaaS on Postgres) serves the API at about 4.3 requests/s at peak (Hobb
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 14 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. It leads the runner-up, MySQL, by 13.8 stack points.
+Your data is mainly relational and reaches about 14 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. It leads the runner-up, MySQL, by 13.8 points.
 
 Suggested offering: Included with Supabase (BaaS on Postgres)
 
@@ -188,7 +188,7 @@ Suggested offering: Included with Supabase (BaaS on Postgres)
 - Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless
 - Connection-per-process model needs PgBouncer/RDS Proxy under serverless
 
-**Versus runner-up:** PostgreSQL beats MySQL by 13.8 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on stack compatibility (+13.5), realtime needs (+0.3).
+**Versus runner-up:** PostgreSQL beats MySQL by 13.8 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on stack compatibility (+13.5), realtime needs (+0.3).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +49.3
@@ -237,7 +237,7 @@ Suggested offering: Included with Supabase (BaaS on Postgres)
 
 Edge platform: static hosting with unmetered bandwidth, Workers (V8 isolates) at 300+ locations, Durable Objects for stateful/WebSocket workloads.
 
-Cloudflare Pages + Workers hosts the stack for users in North America and Europe at a 99.9% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~4.3 requests/s at peak without servers to manage. Its share of the estimated bill is $0-$2 a month, against a total budget of $50 a month. Vercel would give a stack 1.8 stack points higher, but Cloudflare Pages + Workers stays as part of the stack chosen by the budget rule (a stack whose minimum bill fits your budget is preferred when it scores only a few points lower).
+Cloudflare Pages + Workers hosts the stack for users in North America and Europe at a 99.9% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~4.3 requests/s at peak without servers to manage. Its share of the estimated bill is $0-$2 a month, against a total budget of $50 a month. Vercel would give a stack 1.8 points higher, but Cloudflare Pages + Workers stays as part of the stack chosen by the budget rule (a stack whose minimum bill fits your budget is preferred when it scores only a few points lower).
 
 Runs here: Next.js (server rendering + static files). Supabase runs the API, auth and database as its own managed service.
 
@@ -257,7 +257,7 @@ Runs here: Next.js (server rendering + static files). Supabase runs the API, aut
 **Risks**
 - Next.js runs on Cloudflare through the OpenNext adapter; some features (e.g. certain ISR/image paths) differ from Vercel.
 
-**Versus runner-up:** Vercel would give a stack 1.8 stack points higher (stack points: points on the 0-100 stack score), but Cloudflare Pages + Workers was kept as part of the stack chosen by the budget rule (a stack whose minimum bill fits your budget is preferred when it scores only a few points lower), mainly on realtime needs (+0.4), monthly budget (+0.4), general quality (baseline weights) (+0.1). Vercel is stronger on stack compatibility (+2.2), team size (+0.2). Close call: either is defensible.
+**Versus runner-up:** Vercel would give a stack 1.8 points higher (out of 100 on the whole-stack score), but Cloudflare Pages + Workers was kept as part of the stack chosen by the budget rule (a stack whose minimum bill fits your budget is preferred when it scores only a few points lower), mainly on realtime needs (+0.4), monthly budget (+0.4), general quality (baseline weights) (+0.1). Vercel is stronger on stack compatibility (+2.2), team size (+0.2). Close call: either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +38.1
@@ -282,7 +282,7 @@ Runs here: Next.js (server rendering + static files). Supabase runs the API, aut
 
 **Alternatives**
 - Vercel (stack 86.8, +1.8): Note: Vercel builds Next.js: ISR, image optimisation, middleware and preview deploys work with zero configuration.
-- Netlify (stack 85.0, -0.1): Scores 80.0 on its own; its stack is 0.1 stack points behind the pick.
+- Netlify (stack 85.0, -0.1): Scores 80.0 on its own; its stack is 0.1 points behind the pick.
 
 **Why not the others?**
 - Why not Vercel? (runner-up) Swapped into this stack it scores 1.8 points higher, but Cloudflare Pages + Workers stays as part of the stack chosen by the budget rule (a stack whose minimum bill fits your budget is preferred when it scores only a few points lower). Cloudflare Pages + Workers is stronger on cost at your scale (5.0 vs 4.4), realtime fit (3.0 vs 2.0); Vercel is stronger on learning curve (5.0 vs 4.0).

@@ -46,7 +46,7 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 
 Client-rendered single-page React app built with Vite; deploys as static files to any CDN.
 
-React SPA (Vite) is the frontend for an IoT / telemetry ingestion project with about 40,000 active devices (~4,000 requests/s at peak), built by a team of 6 in 16 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. It leads the runner-up, Next.js (React), by 1.8 stack points (points of the overall stack score, the average of the four layer scores).
+React SPA (Vite) is the frontend for an IoT / telemetry ingestion project with about 40,000 active devices (~4,000 requests/s at peak), built by a team of 6 in 16 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. It leads the runner-up, Next.js (React), by 1.8 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Ecosystem maturity: 5.0/5 vs 4.0 average for this layer - weighted up because: Regulated workload.
@@ -65,7 +65,7 @@ React SPA (Vite) is the frontend for an IoT / telemetry ingestion project with a
 **Risks**
 - Nobody on the team listed React SPA (Vite) or a closely related skill; plan 2-4 weeks to learn it.
 
-**Versus runner-up:** React SPA (Vite) beats Next.js (React) by 1.8 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on seo need (+2.0), team size (+0.3). Next.js (React) is stronger on scale (dau / peak rps) (+0.3), general quality (baseline weights) (+0.2).
+**Versus runner-up:** React SPA (Vite) beats Next.js (React) by 1.8 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on seo need (+2.0), team size (+0.3). Next.js (React) is stronger on scale (dau / peak rps) (+0.3), general quality (baseline weights) (+0.2).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +41.8
@@ -92,8 +92,8 @@ React SPA (Vite) is the frontend for an IoT / telemetry ingestion project with a
 | Adjustment: Your team lists no frontend skill, so it will hire or learn for this frontend: hiring pool 5/5 | | | +5.0 |
 
 **Alternatives**
-- Next.js (React) (stack 84.2, -1.8): Scores 64.7 on its own; its stack is 1.8 stack points behind the pick.
-- Angular (stack 83.8, -2.3): Scores 62.9 on its own; its stack is 2.3 stack points behind the pick.
+- Next.js (React) (stack 84.2, -1.8): Scores 64.7 on its own; its stack is 1.8 points behind the pick.
+- Angular (stack 83.8, -2.3): Scores 62.9 on its own; its stack is 2.3 points behind the pick.
 
 **Why not the others?**
 - Why not Next.js (React)? (runner-up) Swapping it in lowers the stack score by 1.8 points. React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), portability (low lock-in) (5.0 vs 4.0); Next.js (React) is stronger on performance / latency (4.0 vs 3.0), development speed (5.0 vs 4.0); Next.js (React) takes a penalty: No search visibility needed: server rendering adds a Node.js server for pages that React SPA (Vite) serves as static files.
@@ -114,7 +114,7 @@ React SPA (Vite) is the frontend for an IoT / telemetry ingestion project with a
 
 Compiled, statically typed language with built-in concurrency; ships as a single static binary.
 
-Go (net/http, chi or Gin) serves the API at about 4,000 requests/s at peak (Large (500-5,000 req/s at peak)) for a team of 6. The team lists Go, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Go service, so background jobs, WebSockets and database connection pools live in one deployable process. It leads the runner-up, Python + FastAPI, by 2.0 stack points.
+Go (net/http, chi or Gin) serves the API at about 4,000 requests/s at peak (Large (500-5,000 req/s at peak)) for a team of 6. The team lists Go, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Go service, so background jobs, WebSockets and database connection pools live in one deployable process. It leads the runner-up, Python + FastAPI, by 2.0 points.
 
 **Why**
 - Scalability: 5.0/5 vs 4.3 average for this layer - weighted up because: Large (500-5,000 req/s at peak); Continuous device ingestion.
@@ -130,7 +130,7 @@ Go (net/http, chi or Gin) serves the API at about 4,000 requests/s at peak (Larg
 - More code for CRUD than Rails/Django
 - Smaller web-framework ecosystem
 
-**Versus runner-up:** Go (net/http, chi or Gin) beats Python + FastAPI by 2.0 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on scale (dau / peak rps) (+0.8), application type (+0.4), realtime needs (+0.4).
+**Versus runner-up:** Go (net/http, chi or Gin) beats Python + FastAPI by 2.0 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on scale (dau / peak rps) (+0.8), application type (+0.4), realtime needs (+0.4).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +41.5
@@ -157,8 +157,8 @@ Go (net/http, chi or Gin) serves the API at about 4,000 requests/s at peak (Larg
 | Adjustment: Your team already ships Go (net/http, chi or Gin) (go listed in team skills) | | | +6.0 |
 
 **Alternatives**
-- Python + FastAPI (stack 84.1, -2.0): Scores 85.1 on its own; its stack is 2.0 stack points behind the pick.
-- Python + Django (stack 84.0, -2.0): Scores 84.9 on its own; its stack is 2.0 stack points behind the pick.
+- Python + FastAPI (stack 84.1, -2.0): Scores 85.1 on its own; its stack is 2.0 points behind the pick.
+- Python + Django (stack 84.0, -2.0): Scores 84.9 on its own; its stack is 2.0 points behind the pick.
 
 **Why not the others?**
 - Why not Python + FastAPI? (runner-up) Swapping it in lowers the stack score by 2.0 points. Go (net/http, chi or Gin) is stronger on scalability (5.0 vs 4.0), low ops burden (5.0 vs 4.0); Python + FastAPI is stronger on development speed (5.0 vs 3.0), hiring pool (4.0 vs 3.0).
@@ -173,7 +173,7 @@ Go (net/http, chi or Gin) serves the API at about 4,000 requests/s at peak (Larg
 
 Postgres extension adding hypertables, compression and continuous aggregates for time-series.
 
-Your data is mainly time-series and reaches about 5,600 GB within 12 months; TimescaleDB (Postgres) fits time-series data 5/5. The workload is write-heavy, and its write scaling scores 4/5. Its share of the estimated bill is $750-$8,609 a month, against a total budget of $4,000 a month. It leads the runner-up, PostgreSQL, by 4.2 stack points.
+Your data is mainly time-series and reaches about 5,600 GB within 12 months; TimescaleDB (Postgres) fits time-series data 5/5. The workload is write-heavy, and its write scaling scores 4/5. Its share of the estimated bill is $750-$8,609 a month, against a total budget of $4,000 a month. It leads the runner-up, PostgreSQL, by 4.2 points.
 
 Suggested offering: Timescale Cloud (Tiger Data) on AWS
 
@@ -194,7 +194,7 @@ Suggested offering: Timescale Cloud (Tiger Data) on AWS
 **Risks**
 - Timescale Cloud (Tiger Data) on AWS is a separate service from AWS ECS on Fargate: create it in the cloud region where AWS ECS on Fargate runs your app, or every query crosses between regions.
 
-**Versus runner-up:** TimescaleDB (Postgres) beats PostgreSQL by 4.2 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on data shape (+3.5), general quality (baseline weights) (+0.8), read/write mix (+0.3). PostgreSQL is stronger on realtime needs (+0.3), compliance (+0.1).
+**Versus runner-up:** TimescaleDB (Postgres) beats PostgreSQL by 4.2 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on data shape (+3.5), general quality (baseline weights) (+0.8), read/write mix (+0.3). PostgreSQL is stronger on realtime needs (+0.3), compliance (+0.1).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +47.3
@@ -220,8 +220,8 @@ Suggested offering: Timescale Cloud (Tiger Data) on AWS
 | Realtime fit | 2.0 | 1.2 | 1.4 |
 
 **Alternatives**
-- PostgreSQL (stack 81.8, -4.2): Scores 62.5 on its own; its stack is 4.2 stack points behind the pick.
-- Microsoft SQL Server (stack 80.5, -5.5): Scores 57.3 on its own; its stack is 5.5 stack points behind the pick.
+- PostgreSQL (stack 81.8, -4.2): Scores 62.5 on its own; its stack is 4.2 points behind the pick.
+- Microsoft SQL Server (stack 80.5, -5.5): Scores 57.3 on its own; its stack is 5.5 points behind the pick.
 
 **Why not the others?**
 - Why not PostgreSQL? (runner-up) Swapping it in lowers the stack score by 4.2 points. TimescaleDB (Postgres) is stronger on data-model fit (4.5 vs 3.5); PostgreSQL is stronger on ecosystem maturity (5.0 vs 4.0), realtime fit (3.0 vs 2.0); PostgreSQL takes a penalty: Only 3/5 fit for your primary 'time series' data.
@@ -241,7 +241,7 @@ Suggested offering: Timescale Cloud (Tiger Data) on AWS
 
 Serverless containers on AWS: no nodes to manage, integrates with ALB, RDS, IAM, CloudWatch.
 
-AWS ECS on Fargate hosts the stack for users in Europe at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~4,000 requests/s at peak. Its share of the estimated bill is $600-$5,739 a month, against a total budget of $4,000 a month. It leads the runner-up, Fly.io, by 3.1 stack points.
+AWS ECS on Fargate hosts the stack for users in Europe at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~4,000 requests/s at peak. Its share of the estimated bill is $600-$5,739 a month, against a total budget of $4,000 a month. It leads the runner-up, Fly.io, by 3.1 points.
 
 Runs here: the Go API as long-running processes. React SPA is built to static files that are served from Amazon S3 + CloudFront, not from these instances (see Supporting services). The database runs as a separate managed service (see Database).
 
@@ -257,7 +257,7 @@ Runs here: the Go API as long-running processes. React SPA is built to static fi
 - AWS networking/IAM learning curve
 - ALB + NAT gateway base costs even when idle
 
-**Versus runner-up:** AWS ECS on Fargate beats Fly.io by 3.1 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on cloud preference (+3.0), team skills (+0.5), application type (+0.4). Fly.io is stronger on stack compatibility (+1.0), realtime needs (+0.4).
+**Versus runner-up:** AWS ECS on Fargate beats Fly.io by 3.1 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on cloud preference (+3.0), team skills (+0.5), application type (+0.4). Fly.io is stronger on stack compatibility (+1.0), realtime needs (+0.4).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +37.2
@@ -283,7 +283,7 @@ Runs here: the Go API as long-running processes. React SPA is built to static fi
 
 **Alternatives**
 - Fly.io (stack 82.9, -3.1): Note: Tiny static binaries give near-instant cold starts on scale-to-zero platforms.
-- AWS EKS (Kubernetes) (stack 82.7, -3.3): Scores 86.7 on its own; its stack is 3.3 stack points behind the pick.
+- AWS EKS (Kubernetes) (stack 82.7, -3.3): Scores 86.7 on its own; its stack is 3.3 points behind the pick.
 
 **Why not the others?**
 - Why not Fly.io? (runner-up) Swapping it in lowers the stack score by 3.1 points. AWS ECS on Fargate is stronger on scalability (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Fly.io is stronger on low ops burden (4.0 vs 3.0), realtime fit (5.0 vs 4.0).

@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~6,944 peak req/s) built by 20 engineer(s) in 30 weeks, StackSense recommends Next.js (React) + Node.js + NestJS + PostgreSQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹2,352,000-₹10,333,248/month (stretch budget). The highest-scoring stack (Next.js (React) + Go (net/http, chi or Gin) + PostgreSQL + AWS ECS on Fargate, 89.0) is only 0.4 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on lower vendor lock-in (6 vs 7, summed lock-in).
+For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~6,944 peak req/s) built by 20 engineer(s) in 30 weeks, StackSense recommends Next.js (React) + Node.js + NestJS + PostgreSQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹2,352,000-₹10,333,248/month (stretch budget). The highest-scoring stack (Next.js (React) + Go (net/http, chi or Gin) + PostgreSQL + AWS ECS on Fargate, 89.0) is only 0.4 points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on lower vendor lock-in (6 vs 7, summed lock-in).
 
 ## Recommended stack
 
@@ -47,7 +47,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 
 React meta-framework with server rendering, static generation, React Server Components and file-based routing.
 
-Next.js (React) is the frontend for an E-commerce / marketplace project with about 1,000,000 daily users (~6,944 requests/s at peak), built by a team of 20 in 30 weeks. Search visibility is marked important (landing/product pages), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. It leads the runner-up, Angular, by 1.2 stack points (points of the overall stack score, the average of the four layer scores).
+Next.js (React) is the frontend for an E-commerce / marketplace project with about 1,000,000 daily users (~6,944 requests/s at peak), built by a team of 20 in 30 weeks. Search visibility is marked important (landing/product pages), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. It leads the runner-up, Angular, by 1.2 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Ecosystem maturity: 5.0/5 vs 4.0 average for this layer - weighted up because: 99.95% target; Regulated workload.
@@ -62,7 +62,7 @@ Next.js (React) is the frontend for an E-commerce / marketplace project with abo
 - App Router + Server Components add conceptual load
 - Some features (ISR, image optimisation, middleware) are smoothest on Vercel
 
-**Versus runner-up:** Next.js (React) beats Angular by 1.2 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on general quality (baseline weights) (+1.1), seo need (+0.5), team skills (+0.3). Angular is stronger on stack compatibility (+1.0), team size (+0.4). Close call: either is defensible.
+**Versus runner-up:** Next.js (React) beats Angular by 1.2 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on general quality (baseline weights) (+1.1), seo need (+0.5), team skills (+0.3). Angular is stronger on stack compatibility (+1.0), team size (+0.4). Close call: either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +23.5
@@ -89,7 +89,7 @@ Next.js (React) is the frontend for an E-commerce / marketplace project with abo
 
 **Alternatives**
 - Angular (stack 87.4, -1.2): Note: Same architectural style (modules, DI) on both sides; common in enterprise teams.
-- SvelteKit (stack 86.0, -2.6): Scores 72.2 on its own; its stack is 2.6 stack points behind the pick.
+- SvelteKit (stack 86.0, -2.6): Scores 72.2 on its own; its stack is 2.6 points behind the pick.
 
 **Why not the others?**
 - Why not Angular? (runner-up) Swapping it in lowers the stack score by 1.2 points. Next.js (React) is stronger on performance / latency (4.0 vs 3.0), SEO (5.0 vs 4.0); Angular is stronger on structure for large teams (5.0 vs 3.0).
@@ -111,7 +111,7 @@ Next.js (React) is the frontend for an E-commerce / marketplace project with abo
 
 Opinionated TypeScript framework (modules, DI, decorators) on top of Express/Fastify.
 
-Node.js + NestJS serves the API at about 6,944 requests/s at peak (Very large (1M-10M daily users)) for a team of 20. The team lists nestjs and Node.js and TypeScript, so it needs no new server language (team skill match 5.0/5). It runs as a few long-running Node.js services, one per team, each deployed on its own with its own background jobs, WebSockets and database connection pools. Realtime is core, and it scores 4.0/5 on realtime fit. Go (net/http, chi or Gin) is within 0.4 stack points, inside the tie margin (stacks this close count as tied); the tie went to Node.js + NestJS on adjacent team skills (19 vs 18.5, summed skill fit).
+Node.js + NestJS serves the API at about 6,944 requests/s at peak (Very large (1M-10M daily users)) for a team of 20. The team lists nestjs and Node.js and TypeScript, so it needs no new server language (team skill match 5.0/5). It runs as a few long-running Node.js services, one per team, each deployed on its own with its own background jobs, WebSockets and database connection pools. Realtime is core, and it scores 4.0/5 on realtime fit. Go (net/http, chi or Gin) is within 0.4 points, inside the tie margin (stacks this close count as tied); the tie went to Node.js + NestJS on adjacent team skills (19 vs 18.5, summed skill fit).
 
 **Why**
 - Structure for large teams: 5.0/5 vs 3.2 average for this layer - weighted up because: 20 engineers need enforced conventions.
@@ -127,7 +127,7 @@ Node.js + NestJS serves the API at about 6,944 requests/s at peak (Very large (1
 - More boilerplate than Express/FastAPI
 - Decorator/DI concepts slow down beginners
 
-**Versus runner-up:** Node.js + NestJS and Go (net/http, chi or Gin) are within 0.4 stack points of each other, inside the 1-point tie margin, so they count as tied. Node.js + NestJS is stronger on structure for large teams (5.0 vs 2.0), hiring pool (4.0 vs 3.0); Go (net/http, chi or Gin) is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0). Choose Go (net/http, chi or Gin) instead if raw speed matters more to you than structure for a growing team. The tie went to Node.js + NestJS on adjacent team skills (19 vs 18.5, summed skill fit). Either is defensible.
+**Versus runner-up:** Node.js + NestJS and Go (net/http, chi or Gin) are within 0.4 points of each other, inside the 1-point tie margin, so they count as tied. Node.js + NestJS is stronger on structure for large teams (5.0 vs 2.0), hiring pool (4.0 vs 3.0); Go (net/http, chi or Gin) is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0). Choose Go (net/http, chi or Gin) instead if raw speed matters more to you than structure for a growing team. The tie went to Node.js + NestJS on adjacent team skills (19 vs 18.5, summed skill fit). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - Scale (DAU / peak RPS): +22.3
@@ -155,8 +155,8 @@ Node.js + NestJS serves the API at about 6,944 requests/s at peak (Very large (1
 | Adjustment: Your team already ships Node.js + NestJS (nestjs, node listed in team skills) | | | +6.0 |
 
 **Alternatives**
-- Go (net/http, chi or Gin) (stack 89.0, +0.4): Scores 90.1 on its own; its stack is 0.4 stack points ahead of the pick.
-- Node.js + Express (stack 87.9, -0.7): Scores 85.5 on its own; its stack is 0.7 stack points behind the pick.
+- Go (net/http, chi or Gin) (stack 89.0, +0.4): Scores 90.1 on its own; its stack is 0.4 points ahead of the pick.
+- Node.js + Express (stack 87.9, -0.7): Scores 85.5 on its own; its stack is 0.7 points behind the pick.
 
 **Why not the others?**
 - Why not Go (net/http, chi or Gin)? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.4 points higher; the tie went to Node.js + NestJS on adjacent team skills (19 vs 18.5, summed skill fit); either is defensible. Node.js + NestJS is stronger on structure for large teams (5.0 vs 2.0), team skill match (5.0 vs 4.5); Go (net/http, chi or Gin) is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0).
@@ -171,7 +171,7 @@ Node.js + NestJS serves the API at about 6,944 requests/s at peak (Very large (1
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 2,800 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹576,000-₹1,449,312 a month, against a total budget of ₹4,000,000 a month. It leads the runner-up, MySQL, by 2.0 stack points.
+Your data is mainly relational and reaches about 2,800 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹576,000-₹1,449,312 a month, against a total budget of ₹4,000,000 a month. It leads the runner-up, MySQL, by 2.0 points.
 
 Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
@@ -188,7 +188,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 - Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless
 - Connection-per-process model needs PgBouncer/RDS Proxy under serverless
 
-**Versus runner-up:** PostgreSQL beats MySQL by 2.0 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on realtime needs (+0.7), team skills (+0.6), general quality (baseline weights) (+0.5).
+**Versus runner-up:** PostgreSQL beats MySQL by 2.0 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on realtime needs (+0.7), team skills (+0.6), general quality (baseline weights) (+0.5).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +38.8
@@ -214,8 +214,8 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 | Cost at your scale | 4.5 | 0.5 | 1.6 |
 
 **Alternatives**
-- MySQL (stack 86.6, -2.0): Scores 75.7 on its own; its stack is 2.0 stack points behind the pick.
-- Microsoft SQL Server (stack 86.0, -2.7): Scores 72.9 on its own; its stack is 2.7 stack points behind the pick.
+- MySQL (stack 86.6, -2.0): Scores 75.7 on its own; its stack is 2.0 points behind the pick.
+- Microsoft SQL Server (stack 86.0, -2.7): Scores 72.9 on its own; its stack is 2.7 points behind the pick.
 
 **Why not the others?**
 - Why not MySQL? (runner-up) Swapping it in lowers the stack score by 2.0 points. PostgreSQL is stronger on team skill match (4.5 vs 3.5), realtime fit (3.0 vs 2.0).
@@ -237,7 +237,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 Managed Kubernetes control plane on AWS.
 
-AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Node.js + NestJS API as long-running processes with WebSockets, sized for ~6,944 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is ₹480,000-₹1,315,392 a month, against a total budget of ₹4,000,000 a month. AWS ECS on Fargate is within less than 0.05 stack points, inside the tie margin (stacks this close count as tied); the tie went to AWS EKS (Kubernetes) on lower vendor lock-in (6 vs 7, summed lock-in).
+AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Node.js + NestJS API as long-running processes with WebSockets, sized for ~6,944 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is ₹480,000-₹1,315,392 a month, against a total budget of ₹4,000,000 a month. AWS ECS on Fargate is within less than 0.05 points, inside the tie margin (stacks this close count as tied); the tie went to AWS EKS (Kubernetes) on lower vendor lock-in (6 vs 7, summed lock-in).
 
 Runs here: Next.js (server rendering + static files), the Node.js + NestJS API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -255,7 +255,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + NestJS API a
 - Control-plane fee (~$73/mo) plus nodes
 - Needs dedicated platform/DevOps skills
 
-**Versus runner-up:** AWS EKS (Kubernetes) and AWS ECS on Fargate score the same (less than 0.05 stack points apart), inside the 1-point tie margin, so they count as tied. AWS EKS (Kubernetes) is stronger on portability (low lock-in) (4.0 vs 3.0); AWS ECS on Fargate is stronger on low ops burden (3.0 vs 1.0). Choose AWS ECS on Fargate instead if less to operate matters more to you than low lock-in. The tie went to AWS EKS (Kubernetes) on lower vendor lock-in (6 vs 7, summed lock-in). Either is defensible.
+**Versus runner-up:** AWS EKS (Kubernetes) and AWS ECS on Fargate score the same (less than 0.05 points apart), inside the 1-point tie margin, so they count as tied. AWS EKS (Kubernetes) is stronger on portability (low lock-in) (4.0 vs 3.0); AWS ECS on Fargate is stronger on low ops burden (3.0 vs 1.0). Choose AWS ECS on Fargate instead if less to operate matters more to you than low lock-in. The tie went to AWS EKS (Kubernetes) on lower vendor lock-in (6 vs 7, summed lock-in). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - Scale (DAU / peak RPS): +28.8
@@ -281,8 +281,8 @@ Runs here: Next.js (server rendering + static files), the Node.js + NestJS API a
 | Adjustment: Runs on your preferred cloud (AWS) | | | +12.0 |
 
 **Alternatives**
-- AWS ECS on Fargate (stack 88.6, +0.0): Scores 100.0 on its own; its stack is less than 0.05 stack points behind the pick.
-- Azure App Service (stack 84.2, -4.4): Scores 82.5 on its own; its stack is 4.4 stack points behind the pick.
+- AWS ECS on Fargate (stack 88.6, +0.0): Scores 100.0 on its own; its stack is less than 0.05 points behind the pick.
+- Azure App Service (stack 84.2, -4.4): Scores 82.5 on its own; its stack is 4.4 points behind the pick.
 
 **Why not the others?**
 - Why not AWS ECS on Fargate? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores the same (less than 0.05 points apart); either is defensible. AWS EKS (Kubernetes) is stronger on portability (low lock-in) (4.0 vs 3.0); AWS ECS on Fargate is stronger on low ops burden (3.0 vs 1.0).

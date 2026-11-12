@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~25,000 peak req/s) built by 25 engineer(s) in 26 weeks, StackSense recommends Next.js (React) + Java/Kotlin + Spring Boot + MySQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹1,036,800-₹7,491,264/month (stretch budget). The highest-scoring stack (Next.js (React) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes), 93.9) is only 0.3 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on adjacent team skills (19.5 vs 19, summed skill fit).
+For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~25,000 peak req/s) built by 25 engineer(s) in 26 weeks, StackSense recommends Next.js (React) + Java/Kotlin + Spring Boot + MySQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹1,036,800-₹7,491,264/month (stretch budget). The highest-scoring stack (Next.js (React) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes), 93.9) is only 0.3 points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on adjacent team skills (19.5 vs 19, summed skill fit).
 
 ## Recommended stack
 
@@ -48,7 +48,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 
 React meta-framework with server rendering, static generation, React Server Components and file-based routing.
 
-Next.js (React) is the frontend for an E-commerce / marketplace project with about 2,000,000 daily users (~25,000 requests/s at peak), built by a team of 25 in 26 weeks. Search visibility is marked critical (organic traffic is the business), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. It leads the runner-up, Angular, by 1.9 stack points (points of the overall stack score, the average of the four layer scores).
+Next.js (React) is the frontend for an E-commerce / marketplace project with about 2,000,000 daily users (~25,000 requests/s at peak), built by a team of 25 in 26 weeks. Search visibility is marked critical (organic traffic is the business), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. It leads the runner-up, Angular, by 1.9 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Ecosystem maturity: 5.0/5 vs 4.0 average for this layer - weighted up because: 99.95% target; Regulated workload.
@@ -63,7 +63,7 @@ Next.js (React) is the frontend for an E-commerce / marketplace project with abo
 - App Router + Server Components add conceptual load
 - Some features (ISR, image optimisation, middleware) are smoothest on Vercel
 
-**Versus runner-up:** Next.js (React) beats Angular by 1.9 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on general quality (baseline weights) (+1.2), seo need (+1.1), team skills (+0.4). Angular is stronger on stack compatibility (+1.0), team size (+0.4).
+**Versus runner-up:** Next.js (React) beats Angular by 1.9 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on general quality (baseline weights) (+1.2), seo need (+1.1), team skills (+0.4). Angular is stronger on stack compatibility (+1.0), team size (+0.4).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +24.8
@@ -90,7 +90,7 @@ Next.js (React) is the frontend for an E-commerce / marketplace project with abo
 
 **Alternatives**
 - Angular (stack 91.8, -1.9): Note: Same architectural style (modules, DI) on both sides; common in enterprise teams.
-- SvelteKit (stack 90.9, -2.8): Scores 75.3 on its own; its stack is 2.8 stack points behind the pick.
+- SvelteKit (stack 90.9, -2.8): Scores 75.3 on its own; its stack is 2.8 points behind the pick.
 
 **Why not the others?**
 - Why not Angular? (runner-up) Swapping it in lowers the stack score by 1.9 points. Next.js (React) is stronger on SEO (5.0 vs 4.0), performance / latency (4.0 vs 3.0); Angular is stronger on structure for large teams (5.0 vs 3.0).
@@ -112,7 +112,7 @@ Next.js (React) is the frontend for an E-commerce / marketplace project with abo
 
 Enterprise JVM framework: DI, Spring Data, Spring Security, transactions, observability.
 
-Java/Kotlin + Spring Boot serves the API at about 25,000 requests/s at peak (Very large (1M-10M daily users)) for a team of 25. The team lists Java and Spring, so it needs no new server language (team skill match 5.0/5). It runs as a few long-running Java/Kotlin services, one per team, each deployed on its own with its own background jobs, WebSockets and database connection pools. It leads the runner-up, Node.js + NestJS, by 3.9 stack points.
+Java/Kotlin + Spring Boot serves the API at about 25,000 requests/s at peak (Very large (1M-10M daily users)) for a team of 25. The team lists Java and Spring, so it needs no new server language (team skill match 5.0/5). It runs as a few long-running Java/Kotlin services, one per team, each deployed on its own with its own background jobs, WebSockets and database connection pools. It leads the runner-up, Node.js + NestJS, by 3.9 points.
 
 **Why**
 - Structure for large teams: 5.0/5 vs 3.2 average for this layer - weighted up because: 25 engineers need enforced conventions.
@@ -128,7 +128,7 @@ Java/Kotlin + Spring Boot serves the API at about 25,000 requests/s at peak (Ver
 - Higher memory footprint, slow JVM cold starts (mitigated by GraalVM/SnapStart)
 - Verbose for small MVPs
 
-**Versus runner-up:** Java/Kotlin + Spring Boot beats Node.js + NestJS by 3.9 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team skills (+1.8), scale (dau / peak rps) (+1.0), team size (+0.4). Node.js + NestJS is stronger on realtime needs (+0.2).
+**Versus runner-up:** Java/Kotlin + Spring Boot beats Node.js + NestJS by 3.9 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on team skills (+1.8), scale (dau / peak rps) (+1.0), team size (+0.4). Node.js + NestJS is stronger on realtime needs (+0.2).
 
 **Inputs that drove this score** (points out of 100)
 - Scale (DAU / peak RPS): +28.1
@@ -156,8 +156,8 @@ Java/Kotlin + Spring Boot serves the API at about 25,000 requests/s at peak (Ver
 | Adjustment: Your team already ships Java/Kotlin + Spring Boot (java, spring listed in team skills) | | | +6.0 |
 
 **Alternatives**
-- Node.js + NestJS (stack 89.8, -3.9): Scores 81.5 on its own; its stack is 3.9 stack points behind the pick.
-- Go (net/http, chi or Gin) (stack 89.5, -4.2): Scores 80.3 on its own; its stack is 4.2 stack points behind the pick.
+- Node.js + NestJS (stack 89.8, -3.9): Scores 81.5 on its own; its stack is 3.9 points behind the pick.
+- Go (net/http, chi or Gin) (stack 89.5, -4.2): Scores 80.3 on its own; its stack is 4.2 points behind the pick.
 
 **Why not the others?**
 - Why not Node.js + NestJS? (runner-up) Swapping it in lowers the stack score by 3.9 points. Java/Kotlin + Spring Boot is stronger on scalability (5.0 vs 4.0), performance / latency (4.0 vs 3.0); Node.js + NestJS is stronger on realtime fit (4.0 vs 3.0), low ops burden (4.0 vs 3.0).
@@ -171,7 +171,7 @@ Java/Kotlin + Spring Boot serves the API at about 25,000 requests/s at peak (Ver
 
 Widely deployed relational database; horizontally shardable with Vitess.
 
-Your data is mainly relational and reaches about 1,520 GB within 12 months; MySQL fits relational data 5/5. You need strong consistency, and MySQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹793,440 a month, against a total budget of ₹2,500,000 a month. PostgreSQL is within 0.3 stack points, inside the tie margin (stacks this close count as tied); the tie went to MySQL on adjacent team skills (19.5 vs 19, summed skill fit).
+Your data is mainly relational and reaches about 1,520 GB within 12 months; MySQL fits relational data 5/5. You need strong consistency, and MySQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹793,440 a month, against a total budget of ₹2,500,000 a month. PostgreSQL is within 0.3 points, inside the tie margin (stacks this close count as tied); the tie went to MySQL on adjacent team skills (19.5 vs 19, summed skill fit).
 
 Suggested offering: Amazon RDS / Aurora MySQL
 
@@ -189,7 +189,7 @@ Suggested offering: Amazon RDS / Aurora MySQL
 - Fewer advanced types and extensions than Postgres
 - Weaker JSON and analytical query support
 
-**Versus runner-up:** MySQL and PostgreSQL are within 0.3 stack points of each other, inside the 1-point tie margin, so they count as tied; PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0). Choose PostgreSQL instead if data-model fit matters more to you. The tie went to MySQL on adjacent team skills (19.5 vs 19, summed skill fit). Either is defensible.
+**Versus runner-up:** MySQL and PostgreSQL are within 0.3 points of each other, inside the 1-point tie margin, so they count as tied; PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0). Choose PostgreSQL instead if data-model fit matters more to you. The tie went to MySQL on adjacent team skills (19.5 vs 19, summed skill fit). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +40.6
@@ -215,8 +215,8 @@ Suggested offering: Amazon RDS / Aurora MySQL
 | Realtime fit | 2.0 | 1.2 | 1.1 |
 
 **Alternatives**
-- PostgreSQL (stack 93.9, +0.3): Scores 86.3 on its own; its stack is 0.3 stack points ahead of the pick.
-- Microsoft SQL Server (stack 92.6, -1.0): Scores 81.1 on its own; its stack is 1.0 stack points behind the pick.
+- PostgreSQL (stack 93.9, +0.3): Scores 86.3 on its own; its stack is 0.3 points ahead of the pick.
+- Microsoft SQL Server (stack 92.6, -1.0): Scores 81.1 on its own; its stack is 1.0 points behind the pick.
 
 **Why not the others?**
 - Why not PostgreSQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.3 points higher; the tie went to MySQL on adjacent team skills (19.5 vs 19, summed skill fit); either is defensible. MySQL is stronger on team skill match (5.0 vs 4.5); PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0).
@@ -238,7 +238,7 @@ Suggested offering: Amazon RDS / Aurora MySQL
 
 Managed Kubernetes control plane on AWS.
 
-AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes with WebSockets, sized for ~25,000 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is ₹480,000-₹3,272,448 a month, against a total budget of ₹2,500,000 a month. It leads the runner-up, AWS ECS on Fargate, by 1.5 stack points.
+AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes with WebSockets, sized for ~25,000 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is ₹480,000-₹3,272,448 a month, against a total budget of ₹2,500,000 a month. It leads the runner-up, AWS ECS on Fargate, by 1.5 points.
 
 Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring Boot API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -258,7 +258,7 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 - Control-plane fee (~$73/mo) plus nodes
 - Needs dedicated platform/DevOps skills
 
-**Versus runner-up:** AWS EKS (Kubernetes) beats AWS ECS on Fargate by 1.5 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on stack compatibility (+1.5), score limit (scores stop at 0 and 100) (+0.4). AWS ECS on Fargate is stronger on general quality (baseline weights) (+0.4).
+**Versus runner-up:** AWS EKS (Kubernetes) beats AWS ECS on Fargate by 1.5 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on stack compatibility (+1.5), score limit (scores stop at 0 and 100) (+0.4). AWS ECS on Fargate is stronger on general quality (baseline weights) (+0.4).
 
 **Inputs that drove this score** (points out of 100)
 - Scale (DAU / peak RPS): +30.9

@@ -42,7 +42,7 @@ Availability approach: Firebase runs the backend; keep daily backups/exports of 
 
 Client-rendered single-page React app built with Vite; deploys as static files to any CDN.
 
-React SPA (Vite) is the frontend for a Prototype / student / hackathon project with about 50 daily users (~0.1 requests/s at peak), built by a solo developer in 2 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. It leads the runner-up, Next.js (React), by 1.2 stack points (points of the overall stack score, the average of the four layer scores).
+React SPA (Vite) is the frontend for a Prototype / student / hackathon project with about 50 daily users (~0.1 requests/s at peak), built by a solo developer in 2 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. It leads the runner-up, Next.js (React), by 1.2 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Learning curve: 5.0/5 vs 4.1 average for this layer - weighted up because: 2-week MVP: no time to learn new tools; Prototype: learnability.
@@ -58,7 +58,7 @@ React SPA (Vite) is the frontend for a Prototype / student / hackathon project w
 - Client-side rendering: the first screen waits for the JavaScript bundle to download and run
 - Routing, data fetching and state are your own architecture decisions
 
-**Versus runner-up:** React SPA (Vite) beats Next.js (React) by 1.2 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on seo need (+2.0), team size (+0.8). Next.js (React) is stronger on time to mvp (+0.6), application type (+0.3). Close call: either is defensible.
+**Versus runner-up:** React SPA (Vite) beats Next.js (React) by 1.2 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on seo need (+2.0), team size (+0.8). Next.js (React) is stronger on time to mvp (+0.6), application type (+0.3). Close call: either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +26.9
@@ -106,7 +106,7 @@ React SPA (Vite) is the frontend for a Prototype / student / hackathon project w
 
 Google's mobile/web BaaS: Firestore, Auth, Cloud Functions, FCM push, Crashlytics, Remote Config.
 
-Firebase (BaaS on Google Cloud) serves the API at about 0.1 requests/s at peak (Hobby (<1k daily users)) for a solo developer. As a hosted backend it supplies sign-in, the database API and file storage, so a solo developer only needs to write the business rules in the 2 weeks available. Its share of the estimated bill is ₹0 a month, against a total budget of ₹0 a month. It leads the runner-up, Serverless functions (Node/Python FaaS), by 4.5 stack points.
+Firebase (BaaS on Google Cloud) serves the API at about 0.1 requests/s at peak (Hobby (<1k daily users)) for a solo developer. As a hosted backend it supplies sign-in, the database API and file storage, so a solo developer only needs to write the business rules in the 2 weeks available. Its share of the estimated bill is ₹0 a month, against a total budget of ₹0 a month. It leads the runner-up, Serverless functions (Node/Python FaaS), by 4.5 points.
 
 **Why**
 - Learning curve: 5.0/5 vs 3.8 average for this layer - weighted up because: 2-week MVP: no time to learn new tools; Prototype: learnability.
@@ -125,7 +125,7 @@ Firebase (BaaS on Google Cloud) serves the API at about 0.1 requests/s at peak (
 **Risks**
 - High vendor lock-in: migrating away later means rewriting data access code.
 
-**Versus runner-up:** Firebase (BaaS on Google Cloud) beats Serverless functions (Node/Python FaaS) by 4.5 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on stack compatibility (+1.5), realtime needs (+1.0), time to mvp (+0.7). Serverless functions (Node/Python FaaS) is stronger on team skills (+0.3).
+**Versus runner-up:** Firebase (BaaS on Google Cloud) beats Serverless functions (Node/Python FaaS) by 4.5 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on stack compatibility (+1.5), realtime needs (+1.0), time to mvp (+0.7). Serverless functions (Node/Python FaaS) is stronger on team skills (+0.3).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +25.1
@@ -167,7 +167,7 @@ Firebase (BaaS on Google Cloud) serves the API at about 0.1 requests/s at peak (
 
 Google's serverless document database with realtime listeners and offline client caching.
 
-Your data is mainly document and reaches about 1.7 GB within 12 months; Cloud Firestore fits document data 5/5. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 6.5, the largest share of its score. It leads the runner-up, MongoDB, by 19.1 stack points.
+Your data is mainly document and reaches about 1.7 GB within 12 months; Cloud Firestore fits document data 5/5. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 6.5, the largest share of its score. It leads the runner-up, MongoDB, by 19.1 points.
 
 Suggested offering: Included with Firebase (BaaS on Google Cloud)
 
@@ -187,7 +187,7 @@ Suggested offering: Included with Firebase (BaaS on Google Cloud)
 **Risks**
 - High vendor lock-in: migrating away later means rewriting data access code.
 
-**Versus runner-up:** Cloud Firestore beats MongoDB by 19.1 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on stack compatibility (+13.5), monthly budget (+3.3), application type (+0.9). MongoDB is stronger on general quality (baseline weights) (+0.1).
+**Versus runner-up:** Cloud Firestore beats MongoDB by 19.1 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on stack compatibility (+13.5), monthly budget (+3.3), application type (+0.9). MongoDB is stronger on general quality (baseline weights) (+0.1).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +39.5
@@ -231,7 +231,7 @@ Suggested offering: Included with Firebase (BaaS on Google Cloud)
 
 Frontend cloud: global CDN, SSR and serverless/edge functions; made by the Next.js team.
 
-Vercel hosts the stack for users in India at a 99% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~0.1 requests/s at peak without servers to manage. Its share of the estimated bill is ₹0 a month, against a total budget of ₹0 a month. Cloudflare Pages + Workers is within 0.9 stack points, inside the tie margin (stacks this close count as tied); Vercel has the higher stack score.
+Vercel hosts the stack for users in India at a 99% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~0.1 requests/s at peak without servers to manage. Its share of the estimated bill is ₹0 a month, against a total budget of ₹0 a month. Cloudflare Pages + Workers is within 0.9 points, inside the tie margin (stacks this close count as tied); Vercel has the higher stack score.
 
 Runs here: React SPA (static files). Firebase runs the API, auth and database as its own managed service.
 
@@ -249,7 +249,7 @@ Runs here: React SPA (static files). Firebase runs the API, auth and database as
 - Hobby tier is non-commercial; bandwidth/function overages get expensive at scale
 - WebSockets on Functions are in public beta: a connection pins to one instance, so fan-out needs a shared pub/sub
 
-**Versus runner-up:** Vercel and Cloudflare Pages + Workers are within 0.9 stack points of each other, inside the 1-point tie margin, so they count as tied. Vercel is stronger on learning curve (5.0 vs 4.0); Cloudflare Pages + Workers is stronger on realtime fit (3.0 vs 2.0). Choose Cloudflare Pages + Workers instead if live updates matters more to you than a gentler learning curve. Vercel has the higher stack score. Either is defensible.
+**Versus runner-up:** Vercel and Cloudflare Pages + Workers are within 0.9 points of each other, inside the 1-point tie margin, so they count as tied. Vercel is stronger on learning curve (5.0 vs 4.0); Cloudflare Pages + Workers is stronger on realtime fit (3.0 vs 2.0). Choose Cloudflare Pages + Workers instead if live updates matters more to you than a gentler learning curve. Vercel has the higher stack score. Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +27.6
@@ -273,8 +273,8 @@ Runs here: React SPA (static files). Firebase runs the API, auth and database as
 | Portability (low lock-in) | 3.0 | 0.2 | 0.5 |
 
 **Alternatives**
-- Cloudflare Pages + Workers (stack 90.8, -0.9): Scores 87.1 on its own; its stack is 0.9 stack points behind the pick.
-- Netlify (stack 90.4, -1.4): Scores 85.2 on its own; its stack is 1.4 stack points behind the pick.
+- Cloudflare Pages + Workers (stack 90.8, -0.9): Scores 87.1 on its own; its stack is 0.9 points behind the pick.
+- Netlify (stack 90.4, -1.4): Scores 85.2 on its own; its stack is 1.4 points behind the pick.
 
 **Why not the others?**
 - Why not Cloudflare Pages + Workers? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.9 points lower; either is defensible. Vercel is stronger on learning curve (5.0 vs 4.0); Cloudflare Pages + Workers is stronger on realtime fit (3.0 vs 2.0).

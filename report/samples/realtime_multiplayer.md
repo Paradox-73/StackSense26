@@ -48,7 +48,7 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 
 Client-rendered single-page React app built with Vite; deploys as static files to any CDN.
 
-React SPA (Vite) is the frontend for a Realtime chat / collaboration / multiplayer project with about 200,000 daily users (~3,472 requests/s at peak), built by a team of 4 in 16 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. It leads the runner-up, Next.js (React), by 1.4 stack points (points of the overall stack score, the average of the four layer scores).
+React SPA (Vite) is the frontend for a Realtime chat / collaboration / multiplayer project with about 200,000 daily users (~3,472 requests/s at peak), built by a team of 4 in 16 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. It leads the runner-up, Next.js (React), by 1.4 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Rich client interactivity: 5.0/5 vs 4.1 average for this layer - weighted up because: App-like realtime UI; Realtime UIs update without page loads.
@@ -63,7 +63,7 @@ React SPA (Vite) is the frontend for a Realtime chat / collaboration / multiplay
 - Client-side rendering: the first screen waits for the JavaScript bundle to download and run
 - Routing, data fetching and state are your own architecture decisions
 
-**Versus runner-up:** React SPA (Vite) beats Next.js (React) by 1.4 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on seo need (+2.0), lock-in tolerance (+0.6), team size (+0.1). Next.js (React) is stronger on latency target (+0.7), general quality (baseline weights) (+0.3). Close call: either is defensible.
+**Versus runner-up:** React SPA (Vite) beats Next.js (React) by 1.4 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on seo need (+2.0), lock-in tolerance (+0.6), team size (+0.1). Next.js (React) is stronger on latency target (+0.7), general quality (baseline weights) (+0.3). Close call: either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +24.6
@@ -89,8 +89,8 @@ React SPA (Vite) is the frontend for a Realtime chat / collaboration / multiplay
 | SEO | 2.0 | 0.2 | 0.2 |
 
 **Alternatives**
-- Next.js (React) (stack 84.8, -1.4): Scores 70.5 on its own; its stack is 1.4 stack points behind the pick.
-- SvelteKit (stack 84.6, -1.6): Scores 69.9 on its own; its stack is 1.6 stack points behind the pick.
+- Next.js (React) (stack 84.8, -1.4): Scores 70.5 on its own; its stack is 1.4 points behind the pick.
+- SvelteKit (stack 84.6, -1.6): Scores 69.9 on its own; its stack is 1.6 points behind the pick.
 
 **Why not the others?**
 - Why not Next.js (React)? (runner-up) Swapping it in lowers the stack score by 1.4 points. React SPA (Vite) is stronger on portability (low lock-in) (5.0 vs 4.0), low ops burden (5.0 vs 4.0); Next.js (React) is stronger on performance / latency (4.0 vs 3.0), development speed (5.0 vs 4.0); Next.js (React) takes a penalty: No search visibility needed: server rendering adds a Node.js server for pages that React SPA (Vite) serves as static files.
@@ -111,7 +111,7 @@ React SPA (Vite) is the frontend for a Realtime chat / collaboration / multiplay
 
 Compiled, statically typed language with built-in concurrency; ships as a single static binary.
 
-Go (net/http, chi or Gin) serves the API at about 3,472 requests/s at peak (Large (100k-1M daily users)) for a team of 4. The team lists Go, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Go service, so background jobs, WebSockets and database connection pools live in one deployable process. Realtime is core, and it scores 4.0/5 on realtime fit. It leads the runner-up, Node.js + Express, by 5.2 stack points.
+Go (net/http, chi or Gin) serves the API at about 3,472 requests/s at peak (Large (100k-1M daily users)) for a team of 4. The team lists Go, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Go service, so background jobs, WebSockets and database connection pools live in one deployable process. Realtime is core, and it scores 4.0/5 on realtime fit. It leads the runner-up, Node.js + Express, by 5.2 points.
 
 **Why**
 - Performance / latency: 5.0/5 vs 3.7 average for this layer - weighted up because: p95 target 50 ms; Large (100k-1M daily users).
@@ -128,7 +128,7 @@ Go (net/http, chi or Gin) serves the API at about 3,472 requests/s at peak (Larg
 - More code for CRUD than Rails/Django
 - Smaller web-framework ecosystem
 
-**Versus runner-up:** Go (net/http, chi or Gin) beats Node.js + Express by 5.2 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team skills (+1.5), latency target (+1.4), stack compatibility (+1.0).
+**Versus runner-up:** Go (net/http, chi or Gin) beats Node.js + Express by 5.2 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on team skills (+1.5), latency target (+1.4), stack compatibility (+1.0).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +28.9
@@ -231,7 +231,7 @@ Suggested offering: MongoDB Atlas (runs on AWS, GCP or Azure in the same region 
 
 Runs Docker images as Firecracker micro-VMs close to users in many regions, with Anycast networking.
 
-Fly.io hosts the stack for users worldwide at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~3,472 requests/s at peak. Its share of the estimated bill is $375-$3,119 a month, against a total budget of $2,000 a month. It leads the runner-up, AWS ECS on Fargate, by 4.2 stack points.
+Fly.io hosts the stack for users worldwide at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~3,472 requests/s at peak. Its share of the estimated bill is $375-$3,119 a month, against a total budget of $2,000 a month. It leads the runner-up, AWS ECS on Fargate, by 4.2 points.
 
 Runs here: React SPA (static files), the Go API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -248,7 +248,7 @@ Runs here: React SPA (static files), the Go API as long-running processes. The d
 - No India region (Singapore is closest); the region list has none in India
 - More hands-on than Render/Railway
 
-**Versus runner-up:** Fly.io beats AWS ECS on Fargate by 4.2 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on stack compatibility (+2.0), realtime needs (+1.0), latency target (+0.7). AWS ECS on Fargate is stronger on scale (dau / peak rps) (+0.3), general quality (baseline weights) (+0.1).
+**Versus runner-up:** Fly.io beats AWS ECS on Fargate by 4.2 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on stack compatibility (+2.0), realtime needs (+1.0), latency target (+0.7). AWS ECS on Fargate is stronger on scale (dau / peak rps) (+0.3), general quality (baseline weights) (+0.1).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +24.5

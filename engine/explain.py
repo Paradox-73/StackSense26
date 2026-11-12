@@ -8,7 +8,7 @@ from .scoring import INPUT_LABELS, Weights, shape_models, write_scale
 from .stack import TIE_MARGIN, TIE_ORDER_TEXT, decided_text, tie_reason
 
 # How the paragraphs' closing sentence defines "stack points" (data/explain_templates.json); said once per result.
-STACK_POINTS_DEF = " (points of the overall stack score, the average of the four layer scores)"
+STACK_POINTS_DEF = " (out of 100 on the whole-stack score, the average of the four layer scores)"
 
 RULE_LAYER_KEYS = {"frontend": "frontend", "backend": "backend", "backend_kind": "backend",
                    "database": "database", "hosting": "hosting", "hosting_kind": "hosting",
@@ -160,8 +160,9 @@ def _skill_text(pick: dict, skills: set) -> str | None:
     return None
 
 
-def points(x: float, unit: str = "stack points") -> str:
-    """A score gap in words: '1.3 stack points', or 'less than 0.05 stack points' where one decimal would print 0.0."""
+def points(x: float, unit: str = "points") -> str:
+    """A score gap in words: '1.3 points', or 'less than 0.05 points' where one decimal would print 0.0 (points out of
+    100 on the whole-stack score, defined once per result by STACK_POINTS_DEF)."""
     return f"{abs(x):.1f} {unit}" if round(abs(x), 1) > 0 else f"less than 0.05 {unit}"
 
 
@@ -187,10 +188,10 @@ def _vs_text(a, b, fa, fb, margin, best=None):
     fa, fb = [x for x in fa if x["input"] != "remainder"], [x for x in fb if x["input"] != "remainder"]
     if margin < 0:
         # The runner-up's stack scores higher; the pick stays because the stack-level choice kept it.
-        s = (f"{b} would give a stack {abs(margin):.1f} stack points higher (stack points: points on the 0-100 stack score), but {a} was kept as part of "
+        s = (f"{b} would give a stack {abs(margin):.1f} points higher (out of 100 on the whole-stack score), but {a} was kept as part of "
              f"the stack chosen by {stack_rule(best)}")
     else:
-        s = f"{a} beats {b} by {margin:.1f} stack points (points on the 0-100 stack score, the average of the four layer scores)"
+        s = f"{a} beats {b} by {margin:.1f} points (out of 100 on the whole-stack score, the average of the four layer scores)"
     if fa:
         s += ", mainly on " + ", ".join(f"{x['label'].lower()} (+{x['points']:.1f})" for x in fa[:3])
     if fb:
@@ -243,7 +244,7 @@ def _tie_text(layer, a, alt_cand, fa, fb, margin, best, pick=None):
     b = alt_cand["name"]
     fa, fb = [x for x in fa if x["input"] != "remainder"], [x for x in fb if x["input"] != "remainder"]
     s = (f"{a} and {b} are within {points(margin)} of each other" if round(abs(margin), 1) > 0 else
-         f"{a} and {b} score the same (less than 0.05 stack points apart)")
+         f"{a} and {b} score the same (less than 0.05 points apart)")
     s += f", inside the {TIE_MARGIN:g}-point tie margin, so they count as tied"
     diffs = _crit_diffs(pick, alt_cand) if pick else []
     lab = lambda c: CRITERION_LABELS[c] if CRITERION_LABELS[c][:3].isupper() else CRITERION_LABELS[c].lower()  # noqa: E731

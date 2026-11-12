@@ -185,7 +185,7 @@ def tie_reason(winner: dict, other: dict) -> str | None:
             if sa.get(inp, 0.0) < sb.get(inp, 0.0):
                 return None
             return (f"{label} ({INPUT_LABELS.get(inp, inp)}: {sa.get(inp, 0.0):.1f} vs {sb.get(inp, 0.0):.1f} "
-                    "stack points, the heaviest answer on which they differ)")
+                    "points, the heaviest answer on which they differ)")
         a, b = _tb_value(winner, attr), _tb_value(other, attr)
         if abs(a - b) > 1e-9:
             if (a - b) * sign > 0:

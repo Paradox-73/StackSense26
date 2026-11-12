@@ -186,8 +186,8 @@ def test_no_zero_point_gaps_in_text(runs):
 
 def test_points_wording():
     from engine.explain import points
-    assert points(1.26) == "1.3 stack points" and points(-0.4) == "0.4 stack points"
-    assert points(0.01) == "less than 0.05 stack points" and points(0) == "less than 0.05 stack points"
+    assert points(1.26) == "1.3 points" and points(-0.4) == "0.4 points"
+    assert points(0.01) == "less than 0.05 points" and points(0) == "less than 0.05 points"
 
 
 def test_free_tier_warning_matches_the_estimate(runs):

@@ -7,7 +7,7 @@
   "stack": {
     "frontend": {
       "choice": "Astro",
-      "justification": "Astro is the frontend for a Content / blog / marketing (SEO) project with about 600 daily users (~0.2 requests/s at peak), built by a solo developer in 2 weeks. Search visibility is marked critical (organic traffic is the business), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. It leads the runner-up, SvelteKit, by 1.1 stack points (points of the overall stack score, the average of the four layer scores).",
+      "justification": "Astro is the frontend for a Content / blog / marketing (SEO) project with about 600 daily users (~0.2 requests/s at peak), built by a solo developer in 2 weeks. Search visibility is marked critical (organic traffic is the business), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. It leads the runner-up, SvelteKit, by 1.1 points (out of 100 on the whole-stack score, the average of the four layer scores).",
       "driven_by": [
         "requirements.seo_critical",
         "timeline.mvp_weeks",
@@ -36,7 +36,7 @@
     },
     "backend": {
       "choice": "None",
-      "justification": "No server code (static site). The site serves about 600 daily users read-only, so the pages are built once and served as files: there is no API server to run, patch or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 7.0, the largest share of its score. It leads the runner-up, Serverless functions (Node/Python FaaS), by 2.3 stack points.",
+      "justification": "No server code (static site). The site serves about 600 daily users read-only, so the pages are built once and served as files: there is no API server to run, patch or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 7.0, the largest share of its score. It leads the runner-up, Serverless functions (Node/Python FaaS), by 2.3 points.",
       "driven_by": [
         "timeline.mvp_weeks",
         "team.languages",
@@ -64,7 +64,7 @@
     },
     "database": {
       "choice": "None",
-      "justification": "No database (content files in git). The content is about 1.0 GB of files: the pages are kept in git and any media past ~5 GB sit in object storage, so there is no database server to run, back up or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 7.0, the largest share of its score. It leads the runner-up, Cloud Firestore, by 8.8 stack points.",
+      "justification": "No database (content files in git). The content is about 1.0 GB of files: the pages are kept in git and any media past ~5 GB sit in object storage, so there is no database server to run, back up or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 7.0, the largest share of its score. It leads the runner-up, Cloud Firestore, by 8.8 points.",
       "driven_by": [
         "budget.monthly_infra_usd",
         "team.size",
@@ -93,7 +93,7 @@
     },
     "hosting": {
       "choice": "Netlify",
-      "justification": "Netlify hosts the stack for users in regions you did not state at a 99% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~0.2 requests/s at peak without servers to manage. Its share of the estimated bill is $0 a month, against a total budget of $0 a month. It leads the runner-up, Cloudflare Pages + Workers, by 1.1 stack points.",
+      "justification": "Netlify hosts the stack for users in regions you did not state at a 99% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~0.2 requests/s at peak without servers to manage. Its share of the estimated bill is $0 a month, against a total budget of $0 a month. It leads the runner-up, Cloudflare Pages + Workers, by 1.1 points.",
       "driven_by": [
         "budget.monthly_infra_usd",
         "team.size",

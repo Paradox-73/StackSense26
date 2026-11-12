@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Content / blog / marketing (SEO)' project at Small (1k-10k daily users) scale (~2.2 peak req/s) built by 3 engineer(s) in 4 weeks, StackSense recommends Next.js (React) + Serverless functions (Node/Python FaaS) + PostgreSQL + Cloudflare Pages + Workers (architecture: Serverless, event-driven). Estimated infrastructure cost: ₹1,440-₹6,528/month (stretch budget). The highest-scoring stack (Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Vercel, 85.7) is only 0.8 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on a minimum bill that fits your budget.
+For a 'Content / blog / marketing (SEO)' project at Small (1k-10k daily users) scale (~2.2 peak req/s) built by 3 engineer(s) in 4 weeks, StackSense recommends Next.js (React) + Serverless functions (Node/Python FaaS) + PostgreSQL + Cloudflare Pages + Workers (architecture: Serverless, event-driven). Estimated infrastructure cost: ₹1,440-₹6,528/month (stretch budget). The highest-scoring stack (Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Vercel, 85.7) is only 0.8 points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on a minimum bill that fits your budget.
 
 ## Recommended stack
 
@@ -47,7 +47,7 @@ Availability approach: The platform runs the functions across zones, with no ins
 
 React meta-framework with server rendering, static generation, React Server Components and file-based routing.
 
-Next.js (React) is the frontend for a Content / blog / marketing (SEO) project with about 8,000 daily users (~2.2 requests/s at peak), built by a team of 3 in 4 weeks. Search visibility is marked important (landing/product pages), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. Astro is within 0.4 stack points, inside the tie margin (stacks this close count as tied); the tie went to Next.js (React) on team skill match (2 vs 1, layers the team already uses).
+Next.js (React) is the frontend for a Content / blog / marketing (SEO) project with about 8,000 daily users (~2.2 requests/s at peak), built by a team of 3 in 4 weeks. Search visibility is marked important (landing/product pages), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. Astro is within 0.4 points, inside the tie margin (stacks this close count as tied); the tie went to Next.js (React) on team skill match (2 vs 1, layers the team already uses).
 
 **Why**
 - Development speed: 5.0/5 vs 4.0 average for this layer - weighted up because: 4-week MVP: speed dominates.
@@ -66,7 +66,7 @@ Next.js (React) is the frontend for a Content / blog / marketing (SEO) project w
 **Risks**
 - Next.js runs on Cloudflare through the OpenNext adapter; some features (e.g. certain ISR/image paths) differ from Vercel.
 
-**Versus runner-up:** Next.js (React) and Astro are within 0.4 stack points of each other, inside the 1-point tie margin, so they count as tied. Next.js (React) is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Astro is stronger on low ops burden (5.0 vs 4.0), performance / latency (5.0 vs 4.0). Choose Astro instead if less to operate matters more to you than development speed. The tie went to Next.js (React) on team skill match (2 vs 1, layers the team already uses). Either is defensible.
+**Versus runner-up:** Next.js (React) and Astro are within 0.4 points of each other, inside the 1-point tie margin, so they count as tied. Next.js (React) is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Astro is stronger on low ops burden (5.0 vs 4.0), performance / latency (5.0 vs 4.0). Choose Astro instead if less to operate matters more to you than development speed. The tie went to Next.js (React) on team skill match (2 vs 1, layers the team already uses). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +27.7
@@ -115,7 +115,7 @@ Next.js (React) is the frontend for a Content / blog / marketing (SEO) project w
 
 Request-scoped functions (AWS Lambda, Vercel/Netlify Functions, Cloud Run functions, Azure Functions).
 
-Serverless functions (Node/Python FaaS) serves the API at about 2.2 requests/s at peak (Small (1k-10k daily users)) for a team of 3. Nobody listed Node.js, but JavaScript carries over (team skill match 3.5/5). Functions scale per request and cost nothing while idle, which suits ~2.2 requests/s of uneven traffic. Supabase (BaaS on Postgres) is within 0.2 stack points, inside the tie margin (stacks this close count as tied); the tie went to Serverless functions (Node/Python FaaS) on adjacent team skills (16.5 vs 16, summed skill fit).
+Serverless functions (Node/Python FaaS) serves the API at about 2.2 requests/s at peak (Small (1k-10k daily users)) for a team of 3. Nobody listed Node.js, but JavaScript carries over (team skill match 3.5/5). Functions scale per request and cost nothing while idle, which suits ~2.2 requests/s of uneven traffic. Supabase (BaaS on Postgres) is within 0.2 points, inside the tie margin (stacks this close count as tied); the tie went to Serverless functions (Node/Python FaaS) on adjacent team skills (16.5 vs 16, summed skill fit).
 
 **Why**
 - Low ops burden: 5.0/5 vs 4.2 average for this layer - weighted up because: Small team (3).
@@ -135,7 +135,7 @@ Serverless functions (Node/Python FaaS) serves the API at about 2.2 requests/s a
 **Risks**
 - Serverless functions need a pooled/HTTP driver (Neon serverless driver, Supabase pooler, PlanetScale) to avoid connection exhaustion.
 
-**Versus runner-up:** Serverless functions (Node/Python FaaS) and Supabase (BaaS on Postgres) are within 0.2 stack points of each other, inside the 1-point tie margin, so they count as tied. Serverless functions (Node/Python FaaS) is stronger on cost at your scale (5.0 vs 4.6), scalability (5.0 vs 4.0); Supabase (BaaS on Postgres) is stronger on development speed (5.0 vs 4.0), learning curve (5.0 vs 4.0). Choose Supabase (BaaS on Postgres) instead if development speed matters more to you than a lower bill. The tie went to Serverless functions (Node/Python FaaS) on adjacent team skills (16.5 vs 16, summed skill fit). Either is defensible.
+**Versus runner-up:** Serverless functions (Node/Python FaaS) and Supabase (BaaS on Postgres) are within 0.2 points of each other, inside the 1-point tie margin, so they count as tied. Serverless functions (Node/Python FaaS) is stronger on cost at your scale (5.0 vs 4.6), scalability (5.0 vs 4.0); Supabase (BaaS on Postgres) is stronger on development speed (5.0 vs 4.0), learning curve (5.0 vs 4.0). Choose Supabase (BaaS on Postgres) instead if development speed matters more to you than a lower bill. The tie went to Serverless functions (Node/Python FaaS) on adjacent team skills (16.5 vs 16, summed skill fit). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +27.8
@@ -177,7 +177,7 @@ Serverless functions (Node/Python FaaS) serves the API at about 2.2 requests/s a
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 14 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹1,440-₹3,168 a month, against a total budget of ₹2,000 a month. MySQL is within 0.5 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
+Your data is mainly relational and reaches about 14 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹1,440-₹3,168 a month, against a total budget of ₹2,000 a month. MySQL is within 0.5 points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
 
 Suggested offering: Supabase Postgres connected through Hyperdrive
 
@@ -198,7 +198,7 @@ Suggested offering: Supabase Postgres connected through Hyperdrive
 - Minimum ~$15/month uses most of the budget.
 - Serverless functions need a pooled/HTTP driver (Neon serverless driver, Supabase pooler, PlanetScale) to avoid connection exhaustion.
 
-**Versus runner-up:** PostgreSQL and MySQL are within 0.5 stack points of each other, inside the 1-point tie margin, so they count as tied. PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0). PostgreSQL has the higher stack score. Either is defensible.
+**Versus runner-up:** PostgreSQL and MySQL are within 0.5 points of each other, inside the 1-point tie margin, so they count as tied. PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0). PostgreSQL has the higher stack score. Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +42.5
@@ -225,8 +225,8 @@ Suggested offering: Supabase Postgres connected through Hyperdrive
 | Adjustment: Minimum ~$15/month uses most of the budget | | | -3.5 |
 
 **Alternatives**
-- MySQL (stack 84.4, -0.5): Scores 78.3 on its own; its stack is 0.5 stack points behind the pick.
-- Microsoft SQL Server (stack 83.3, -1.6): Scores 73.7 on its own; its stack is 1.6 stack points behind the pick.
+- MySQL (stack 84.4, -0.5): Scores 78.3 on its own; its stack is 0.5 points behind the pick.
+- Microsoft SQL Server (stack 83.3, -1.6): Scores 73.7 on its own; its stack is 1.6 points behind the pick.
 
 **Why not the others?**
 - Why not MySQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.5 points lower; either is defensible. PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0); MySQL takes a penalty: Minimum ~$15/month uses most of the budget.
@@ -247,7 +247,7 @@ Suggested offering: Supabase Postgres connected through Hyperdrive
 
 Edge platform: static hosting with unmetered bandwidth, Workers (V8 isolates) at 300+ locations, Durable Objects for stateful/WebSocket workloads.
 
-Cloudflare Pages + Workers hosts the stack for users in India at a 99% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~2.2 requests/s at peak without servers to manage. Its share of the estimated bill is ₹0-₹960 a month, against a total budget of ₹2,000 a month. Vercel is within 0.7 stack points, inside the tie margin (stacks this close count as tied); Cloudflare Pages + Workers stays as part of the stack chosen by the tie-break on a minimum bill that fits your budget.
+Cloudflare Pages + Workers hosts the stack for users in India at a 99% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~2.2 requests/s at peak without servers to manage. Its share of the estimated bill is ₹0-₹960 a month, against a total budget of ₹2,000 a month. Vercel is within 0.7 points, inside the tie margin (stacks this close count as tied); Cloudflare Pages + Workers stays as part of the stack chosen by the tie-break on a minimum bill that fits your budget.
 
 Runs here: Next.js (server rendering + static files), the serverless functions. The database runs as a separate managed service (see Database).
 
@@ -269,7 +269,7 @@ Runs here: Next.js (server rendering + static files), the serverless functions. 
 - Serverless functions need a pooled/HTTP driver (Neon serverless driver, Supabase pooler, PlanetScale) to avoid connection exhaustion.
 - Next.js runs on Cloudflare through the OpenNext adapter; some features (e.g. certain ISR/image paths) differ from Vercel.
 
-**Versus runner-up:** Cloudflare Pages + Workers and Vercel are within 0.7 stack points of each other, inside the 1-point tie margin, so they count as tied. Cloudflare Pages + Workers is stronger on cost at your scale (4.8 vs 3.6), realtime fit (3.0 vs 2.0); Vercel is stronger on learning curve (5.0 vs 4.0). Choose Vercel instead if a gentler learning curve matters more to you than a lower bill. Cloudflare Pages + Workers stays as part of the stack chosen by the tie-break on a minimum bill that fits your budget. Either is defensible.
+**Versus runner-up:** Cloudflare Pages + Workers and Vercel are within 0.7 points of each other, inside the 1-point tie margin, so they count as tied. Cloudflare Pages + Workers is stronger on cost at your scale (4.8 vs 3.6), realtime fit (3.0 vs 2.0); Vercel is stronger on learning curve (5.0 vs 4.0). Choose Vercel instead if a gentler learning curve matters more to you than a lower bill. Cloudflare Pages + Workers stays as part of the stack chosen by the tie-break on a minimum bill that fits your budget. Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +33.1
@@ -294,7 +294,7 @@ Runs here: Next.js (server rendering + static files), the serverless functions. 
 
 **Alternatives**
 - Vercel (stack 85.6, +0.7): Note: Vercel builds Next.js: ISR, image optimisation, middleware and preview deploys work with zero configuration.
-- Netlify (stack 82.9, -2.0): Scores 75.3 on its own; its stack is 2.0 stack points behind the pick.
+- Netlify (stack 82.9, -2.0): Scores 75.3 on its own; its stack is 2.0 points behind the pick.
 
 **Why not the others?**
 - Why not Vercel? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.7 points higher; Cloudflare Pages + Workers stays as part of the stack chosen by the tie-break on a minimum bill that fits your budget; either is defensible. Cloudflare Pages + Workers is stronger on cost at your scale (4.8 vs 3.6), realtime fit (3.0 vs 2.0); Vercel is stronger on learning curve (5.0 vs 4.0); Vercel takes a penalty: Minimum ~$20/month uses most of the budget.

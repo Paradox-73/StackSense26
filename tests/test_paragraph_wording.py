@@ -13,7 +13,7 @@ def test_stack_points_defined_once():
     paras = _paras({"app_type": "iot_telemetry", "dau": 15_000, "team_skills": ["python", "aws"],
                     "budget_monthly": 1500, "team_size": 4})
     assert sum(STACK_POINTS_DEF in x for x in paras) <= 1
-    assert " ".join(paras).count("stack points") >= 2
+    assert " ".join(paras).count("out of 100 on the whole-stack score") >= 1
 
 
 def test_iot_counts_devices():

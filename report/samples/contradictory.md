@@ -55,7 +55,7 @@ Availability approach: Multi-AZ everywhere + multi-region failover drills, 24x7 
 
 React meta-framework with server rendering, static generation, React Server Components and file-based routing.
 
-Next.js (React) is the frontend for a Healthcare / telehealth project with about 10,000,000 daily users (~34,722 requests/s at peak), built by a solo developer in 2 weeks. Search visibility is marked critical (organic traffic is the business), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. It leads the runner-up, SvelteKit, by 1.1 stack points (points of the overall stack score, the average of the four layer scores).
+Next.js (React) is the frontend for a Healthcare / telehealth project with about 10,000,000 daily users (~34,722 requests/s at peak), built by a solo developer in 2 weeks. Search visibility is marked critical (organic traffic is the business), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. It leads the runner-up, SvelteKit, by 1.1 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Hiring pool: 5.0/5 vs 3.6 average for this layer - weighted up because: No team skills listed: you will hire for this stack, so the hiring pool counts.
@@ -70,7 +70,7 @@ Next.js (React) is the frontend for a Healthcare / telehealth project with about
 - App Router + Server Components add conceptual load
 - Some features (ISR, image optimisation, middleware) are smoothest on Vercel
 
-**Versus runner-up:** Next.js (React) beats SvelteKit by 1.1 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team skills (+1.0), general quality (baseline weights) (+0.5), application type (+0.4). SvelteKit is stronger on latency target (+0.5), lock-in tolerance (+0.4). Close call: either is defensible.
+**Versus runner-up:** Next.js (React) beats SvelteKit by 1.1 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on team skills (+1.0), general quality (baseline weights) (+0.5), application type (+0.4). SvelteKit is stronger on latency target (+0.5), lock-in tolerance (+0.4). Close call: either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +15.9
@@ -95,8 +95,8 @@ Next.js (React) is the frontend for a Healthcare / telehealth project with about
 | Structure for large teams | 3.0 | 0.3 | 0.5 |
 
 **Alternatives**
-- SvelteKit (stack 50.1, -1.1): Scores 77.1 on its own; its stack is 1.1 stack points behind the pick.
-- Nuxt (Vue) (stack 49.9, -1.3): Scores 76.3 on its own; its stack is 1.3 stack points behind the pick.
+- SvelteKit (stack 50.1, -1.1): Scores 77.1 on its own; its stack is 1.1 points behind the pick.
+- Nuxt (Vue) (stack 49.9, -1.3): Scores 76.3 on its own; its stack is 1.3 points behind the pick.
 
 **Why not the others?**
 - Why not SvelteKit? (runner-up) Swapping it in lowers the stack score by 1.1 points. Next.js (React) is stronger on ecosystem maturity (5.0 vs 3.0), hiring pool (5.0 vs 3.0); SvelteKit is stronger on performance / latency (5.0 vs 4.0), learning curve (4.0 vs 3.0).
@@ -118,7 +118,7 @@ Next.js (React) is the frontend for a Healthcare / telehealth project with about
 
 Minimal, unopinionated HTTP framework on Node.js.
 
-Node.js + Express serves the API at about 34,722 requests/s at peak (Hyperscale (>10M daily users)) for a solo developer. It runs as a long-running Node.js service, so background jobs, WebSockets and database connection pools live in one deployable process. Realtime is core, and it scores 4.0/5 on realtime fit. C# + ASP.NET Core is within 0.6 stack points, inside the tie margin (stacks this close count as tied); the tie went to Node.js + Express on hiring pool (18 vs 17, summed across layers).
+Node.js + Express serves the API at about 34,722 requests/s at peak (Hyperscale (>10M daily users)) for a solo developer. It runs as a long-running Node.js service, so background jobs, WebSockets and database connection pools live in one deployable process. Realtime is core, and it scores 4.0/5 on realtime fit. C# + ASP.NET Core is within 0.6 points, inside the tie margin (stacks this close count as tied); the tie went to Node.js + Express on hiring pool (18 vs 17, summed across layers).
 
 **Why**
 - Hiring pool: 5.0/5 vs 3.6 average for this layer - weighted up because: No team skills listed: you will hire for this stack, so the hiring pool counts.
@@ -133,7 +133,7 @@ Node.js + Express serves the API at about 34,722 requests/s at peak (Hyperscale 
 - No structure: large codebases drift without conventions
 - CPU-heavy work blocks the event loop
 
-**Versus runner-up:** Node.js + Express and C# + ASP.NET Core are within 0.6 stack points of each other, inside the 1-point tie margin, so they count as tied. Node.js + Express is stronger on learning curve (5.0 vs 3.0), hiring pool (5.0 vs 4.0); C# + ASP.NET Core is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0). Choose C# + ASP.NET Core instead if raw speed matters more to you than a gentler learning curve. The tie went to Node.js + Express on hiring pool (18 vs 17, summed across layers). Either is defensible.
+**Versus runner-up:** Node.js + Express and C# + ASP.NET Core are within 0.6 points of each other, inside the 1-point tie margin, so they count as tied. Node.js + Express is stronger on learning curve (5.0 vs 3.0), hiring pool (5.0 vs 4.0); C# + ASP.NET Core is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0). Choose C# + ASP.NET Core instead if raw speed matters more to you than a gentler learning curve. The tie went to Node.js + Express on hiring pool (18 vs 17, summed across layers). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - Scale (DAU / peak RPS): +15.1
@@ -175,7 +175,7 @@ Node.js + Express serves the API at about 34,722 requests/s at peak (Hyperscale 
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 11,000 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹4,320,000-₹8,640,000 a month, against a total budget of ₹0 a month. MySQL is within 0.5 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
+Your data is mainly relational and reaches about 11,000 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹4,320,000-₹8,640,000 a month, against a total budget of ₹0 a month. MySQL is within 0.5 points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
 
 Suggested offering: Azure Database for PostgreSQL Flexible Server
 
@@ -197,7 +197,7 @@ Suggested offering: Azure Database for PostgreSQL Flexible Server
 - No free option at your scale (from ~$15,000/month).
 - PostgreSQL has one writable primary: across regions at 99.99% with strong consistency, a region failover loses or delays writes. If writes must survive a region outage, evaluate a distributed SQL database (Google Spanner, CockroachDB or YugabyteDB; not scored by StackSense).
 
-**Versus runner-up:** PostgreSQL and MySQL are within 0.5 stack points of each other, inside the 1-point tie margin, so they count as tied. PostgreSQL is stronger on realtime fit (3.0 vs 2.0). PostgreSQL has the higher stack score. Either is defensible.
+**Versus runner-up:** PostgreSQL and MySQL are within 0.5 points of each other, inside the 1-point tie margin, so they count as tied. PostgreSQL is stronger on realtime fit (3.0 vs 2.0). PostgreSQL has the higher stack score. Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - Monthly budget: -53.9
@@ -224,8 +224,8 @@ Suggested offering: Azure Database for PostgreSQL Flexible Server
 | Adjustment: No free option at your scale (from ~$15,000/month) | | | -53.9 |
 
 **Alternatives**
-- MySQL (stack 50.8, -0.5): Scores 6.8 on its own; its stack is 0.5 stack points behind the pick.
-- Microsoft SQL Server (stack 49.0, -2.2): Scores 0.0 on its own; its stack is 2.2 stack points behind the pick.
+- MySQL (stack 50.8, -0.5): Scores 6.8 on its own; its stack is 0.5 points behind the pick.
+- Microsoft SQL Server (stack 49.0, -2.2): Scores 0.0 on its own; its stack is 2.2 points behind the pick.
 
 **Why not the others?**
 - Why not MySQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.5 points lower; either is defensible. PostgreSQL is stronger on realtime fit (3.0 vs 2.0); MySQL takes a penalty: Near its practical scale ceiling at your traffic/data size (needs sharding or re-architecture).
@@ -247,7 +247,7 @@ Suggested offering: Azure Database for PostgreSQL Flexible Server
 
 Microsoft's managed web hosting and serverless containers, integrated with Entra ID and Azure SQL/Postgres.
 
-Azure App Service hosts the stack for users in North America and India at a 99.99% availability target. It runs the Node.js + Express API as long-running processes with WebSockets, sized for ~34,722 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is ₹3,456,000-₹8,347,008 a month, against a total budget of ₹0 a month. It leads the runner-up, AWS ECS on Fargate, by 2.4 stack points.
+Azure App Service hosts the stack for users in North America and India at a 99.99% availability target. It runs the Node.js + Express API as long-running processes with WebSockets, sized for ~34,722 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is ₹3,456,000-₹8,347,008 a month, against a total budget of ₹0 a month. It leads the runner-up, AWS ECS on Fargate, by 2.4 points.
 
 Runs here: Next.js (server rendering + static files), the Node.js + Express API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -267,7 +267,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 **Risks**
 - No free option at your scale (from ~$12,000/month).
 
-**Versus runner-up:** Azure App Service beats AWS ECS on Fargate by 2.4 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team size (+2.1), general quality (baseline weights) (+0.2), time to mvp (+0.2). AWS ECS on Fargate is stronger on monthly budget (+0.3).
+**Versus runner-up:** Azure App Service beats AWS ECS on Fargate by 2.4 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on team size (+2.1), general quality (baseline weights) (+0.2), time to mvp (+0.2). AWS ECS on Fargate is stronger on monthly budget (+0.3).
 
 **Inputs that drove this score** (points out of 100)
 - Monthly budget: -52.5
@@ -293,8 +293,8 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 | Adjustment: No free option at your scale (from ~$12,000/month) | | | -52.5 |
 
 **Alternatives**
-- AWS ECS on Fargate (stack 48.9, -2.4): Scores 14.4 on its own; its stack is 2.4 stack points behind the pick.
-- AWS EKS (Kubernetes) (stack 45.3, -6.0): Scores 0.0 on its own; its stack is 6.0 stack points behind the pick.
+- AWS ECS on Fargate (stack 48.9, -2.4): Scores 14.4 on its own; its stack is 2.4 points behind the pick.
+- AWS EKS (Kubernetes) (stack 45.3, -6.0): Scores 0.0 on its own; its stack is 6.0 points behind the pick.
 
 **Why not the others?**
 - Why not AWS ECS on Fargate? (runner-up) Swapping it in lowers the stack score by 2.4 points. Azure App Service is stronger on low ops burden (4.0 vs 3.0), learning curve (4.0 vs 3.0); AWS ECS on Fargate takes a penalty: Usually needs a team of 2+ to operate.

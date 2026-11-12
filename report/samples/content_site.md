@@ -46,7 +46,7 @@ Availability approach: The CDN serves the pre-built pages from many locations; t
 
 React meta-framework with server rendering, static generation, React Server Components and file-based routing.
 
-Next.js (React) is the frontend for a Content / blog / marketing (SEO) project with about 20,000 daily users (~5.6 requests/s at peak), built by a solo developer in 4 weeks. Search visibility is marked critical (organic traffic is the business), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. Astro is within 0.5 stack points, inside the tie margin (stacks this close count as tied); the tie went to Next.js (React) on team skill match (3 vs 2, layers the team already uses).
+Next.js (React) is the frontend for a Content / blog / marketing (SEO) project with about 20,000 daily users (~5.6 requests/s at peak), built by a solo developer in 4 weeks. Search visibility is marked critical (organic traffic is the business), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. Astro is within 0.5 points, inside the tie margin (stacks this close count as tied); the tie went to Next.js (React) on team skill match (3 vs 2, layers the team already uses).
 
 **Why**
 - Development speed: 5.0/5 vs 4.0 average for this layer - weighted up because: 4-week MVP: speed dominates.
@@ -61,7 +61,7 @@ Next.js (React) is the frontend for a Content / blog / marketing (SEO) project w
 - App Router + Server Components add conceptual load
 - Some features (ISR, image optimisation, middleware) are smoothest on Vercel
 
-**Versus runner-up:** Next.js (React) and Astro are within 0.5 stack points of each other, inside the 1-point tie margin, so they count as tied. Next.js (React) is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Astro is stronger on low ops burden (5.0 vs 4.0), performance / latency (5.0 vs 4.0). Choose Astro instead if less to operate matters more to you than development speed. The tie went to Next.js (React) on team skill match (3 vs 2, layers the team already uses). Either is defensible.
+**Versus runner-up:** Next.js (React) and Astro are within 0.5 points of each other, inside the 1-point tie margin, so they count as tied. Next.js (React) is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Astro is stronger on low ops burden (5.0 vs 4.0), performance / latency (5.0 vs 4.0). Choose Astro instead if less to operate matters more to you than development speed. The tie went to Next.js (React) on team skill match (3 vs 2, layers the team already uses). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +22.7
@@ -110,7 +110,7 @@ Next.js (React) is the frontend for a Content / blog / marketing (SEO) project w
 
 No API server: the frontend is pre-built into static files at deploy time and served from a CDN.
 
-The site serves about 20,000 daily users read-only, so the pages are built once and served as files: there is no API server to run, patch or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 4.0, the largest share of its score. It leads the runner-up, Serverless functions (Node/Python FaaS), by 3.0 stack points (points of the overall stack score, the average of the four layer scores).
+The site serves about 20,000 daily users read-only, so the pages are built once and served as files: there is no API server to run, patch or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 4.0, the largest share of its score. It leads the runner-up, Serverless functions (Node/Python FaaS), by 3.0 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Learning curve: 5.0/5 vs 3.9 average for this layer - weighted up because: 4-week MVP: no time to learn new tools; Solo developer.
@@ -125,7 +125,7 @@ The site serves about 20,000 daily users read-only, so the pages are built once 
 - No sign-in, posting, payments or per-user pages: add server code or a BaaS when those arrive
 - Contact forms and comments need a third-party service or one serverless function
 
-**Versus runner-up:** No server code (static site) beats Serverless functions (Node/Python FaaS) by 3.0 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team skills (+2.2), general quality (baseline weights) (+1.5), time to mvp (+1.2). Serverless functions (Node/Python FaaS) is stronger on stack compatibility (+2.5), score limit (scores stop at 0 and 100) (+0.7).
+**Versus runner-up:** No server code (static site) beats Serverless functions (Node/Python FaaS) by 3.0 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on team skills (+2.2), general quality (baseline weights) (+1.5), time to mvp (+1.2). Serverless functions (Node/Python FaaS) is stronger on stack compatibility (+2.5), score limit (scores stop at 0 and 100) (+0.7).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +30.0
@@ -165,7 +165,7 @@ The site serves about 20,000 daily users read-only, so the pages are built once 
 
 No database server: pages and posts are Markdown or JSON files in the repository, built into static HTML at deploy time.
 
-The content is about 1.1 GB of files: the pages are kept in git and any media past ~5 GB sit in object storage, so there is no database server to run, back up or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 4.0, the largest share of its score. It leads the runner-up, MongoDB, by 8.5 stack points.
+The content is about 1.1 GB of files: the pages are kept in git and any media past ~5 GB sit in object storage, so there is no database server to run, back up or pay for. Its strongest weighted criterion for your answers is cost at your scale: 5.0/5 at weight 4.0, the largest share of its score. It leads the runner-up, MongoDB, by 8.5 points.
 
 Suggested offering: Content files in the git repository, built into static pages at deploy time (no database to run)
 
@@ -181,7 +181,7 @@ Suggested offering: Content files in the git repository, built into static pages
 - Only for content the team publishes: as soon as users sign in, post or pay, add a real database
 - Every content change needs a rebuild and deploy (seconds to minutes)
 
-**Versus runner-up:** No database (content files in git) beats MongoDB by 8.5 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on stack compatibility (+5.0), monthly budget (+1.4), team size (+0.8). MongoDB is stronger on general quality (baseline weights) (+0.3).
+**Versus runner-up:** No database (content files in git) beats MongoDB by 8.5 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on stack compatibility (+5.0), monthly budget (+1.4), team size (+0.8). MongoDB is stronger on general quality (baseline weights) (+0.3).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +39.6
@@ -226,7 +226,7 @@ Suggested offering: Content files in the git repository, built into static pages
 
 Jamstack platform: CDN hosting, serverless/edge functions, forms, deploy previews.
 
-Netlify hosts the stack for users worldwide at a 99.9% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~5.6 requests/s at peak without servers to manage. Its share of the estimated bill is $0 a month, against a total budget of $20 a month. It leads the runner-up, Cloudflare Pages + Workers, by 1.2 stack points.
+Netlify hosts the stack for users worldwide at a 99.9% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~5.6 requests/s at peak without servers to manage. Its share of the estimated bill is $0 a month, against a total budget of $20 a month. It leads the runner-up, Cloudflare Pages + Workers, by 1.2 points.
 
 Runs here: Next.js as pre-built static pages. No server code and no database: content files are built into pages at deploy time, and the free static plan covers the traffic.
 
@@ -242,7 +242,7 @@ Runs here: Next.js as pre-built static pages. No server code and no database: co
 - Paid plans bill in credits (Personal $9/month with 1,000 credits, Pro $20/month for unlimited members with 3,000, no per-seat charge) spent on deploys, bandwidth and requests, so the bill follows usage once the credits run out
 - Function regions are limited (no India region by default)
 
-**Versus runner-up:** Netlify beats Cloudflare Pages + Workers by 1.2 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on stack compatibility (+1.0), time to mvp (+0.3), team size (+0.3). Cloudflare Pages + Workers is stronger on team skills (+0.4). Close call: either is defensible.
+**Versus runner-up:** Netlify beats Cloudflare Pages + Workers by 1.2 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on stack compatibility (+1.0), time to mvp (+0.3), team size (+0.3). Cloudflare Pages + Workers is stronger on team skills (+0.4). Close call: either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +28.6
@@ -267,7 +267,7 @@ Runs here: Next.js as pre-built static pages. No server code and no database: co
 
 **Alternatives**
 - Cloudflare Pages + Workers (stack 91.8, -1.2): Note: Next.js runs on Cloudflare through the OpenNext adapter; some features (e.g. certain ISR/image paths) differ from Vercel.
-- AWS S3 + CloudFront (static) (stack 91.2, -1.9): Scores 82.4 on its own; its stack is 1.9 stack points behind the pick.
+- AWS S3 + CloudFront (static) (stack 91.2, -1.9): Scores 82.4 on its own; its stack is 1.9 points behind the pick.
 
 **Why not the others?**
 - Why not Cloudflare Pages + Workers? (runner-up) Swapping it in lowers the stack score by 1.2 points. Netlify is stronger on learning curve (5.0 vs 4.0); Cloudflare Pages + Workers is stronger on team skill match (4.0 vs 3.5), realtime fit (3.0 vs 1.0).

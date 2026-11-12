@@ -47,7 +47,7 @@ Availability approach: Firebase runs the backend on a paid plan; turn on point-i
 
 Cross-platform native mobile apps in React/TypeScript; Expo provides builds, OTA updates and native modules.
 
-React Native (Expo) is the app for a Social network / UGC feed project with about 100,000 daily users (~1,389 requests/s at peak), built by a team of 3 in 10 weeks. One codebase builds both the iOS and the Android app, which halves the work for a team of 3. It leads the runner-up, Flutter, by 1.7 stack points (points of the overall stack score, the average of the four layer scores).
+React Native (Expo) is the app for a Social network / UGC feed project with about 100,000 daily users (~1,389 requests/s at peak), built by a team of 3 in 10 weeks. One codebase builds both the iOS and the Android app, which halves the work for a team of 3. It leads the runner-up, Flutter, by 1.7 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Learning curve: 5.0/5 vs 3.3 average for this layer - weighted up because: 10-week MVP; Small team (3).
@@ -63,7 +63,7 @@ React Native (Expo) is the app for a Social network / UGC feed project with abou
 - Heavy animations / complex native integrations need native modules
 - App-store review cycle still applies to native changes
 
-**Versus runner-up:** React Native (Expo) beats Flutter by 1.7 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team skills (+2.4), team size (+0.3), time to mvp (+0.3). Flutter is stronger on stack compatibility (+1.0), latency target (+0.1).
+**Versus runner-up:** React Native (Expo) beats Flutter by 1.7 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on team skills (+2.4), team size (+0.3), time to mvp (+0.3). Flutter is stronger on stack compatibility (+1.0), latency target (+0.1).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +19.8
@@ -91,7 +91,7 @@ React Native (Expo) is the app for a Social network / UGC feed project with abou
 
 **Alternatives**
 - Flutter (stack 86.5, -1.7): Loses: Mobile SDKs handle auth, storage and push without a custom API. Note: FlutterFire is maintained by Google, giving first-party auth, Firestore offline sync and push notifications.
-- Native iOS + Android (Swift / Kotlin) (stack 82.4, -5.8): Scores 51.5 on its own; its stack is 5.8 stack points behind the pick.
+- Native iOS + Android (Swift / Kotlin) (stack 82.4, -5.8): Scores 51.5 on its own; its stack is 5.8 points behind the pick.
 
 **Why not the others?**
 - Why not Flutter? (runner-up) Swapping it in lowers the stack score by 1.7 points. React Native (Expo) is stronger on team skill match (5.0 vs 1.5), learning curve (5.0 vs 3.0); Flutter is stronger on performance / latency (4.0 vs 3.0).
@@ -116,7 +116,7 @@ React Native (Expo) is the app for a Social network / UGC feed project with abou
 
 Google's mobile/web BaaS: Firestore, Auth, Cloud Functions, FCM push, Crashlytics, Remote Config.
 
-Firebase (BaaS on Google Cloud) serves the API at about 1,389 requests/s at peak (Large (100k-1M daily users)) for a team of 3. As a hosted backend it supplies sign-in, the database API and file storage, so a team of 3 only needs to write the business rules in the 10 weeks available. Realtime is core, and it scores 5.0/5 on realtime fit. Its share of the estimated bill is ₹46,368-₹257,952 a month, against a total budget of ₹80,000 a month. It leads the runner-up, Node.js + Express, by 11.5 stack points.
+Firebase (BaaS on Google Cloud) serves the API at about 1,389 requests/s at peak (Large (100k-1M daily users)) for a team of 3. As a hosted backend it supplies sign-in, the database API and file storage, so a team of 3 only needs to write the business rules in the 10 weeks available. Realtime is core, and it scores 5.0/5 on realtime fit. Its share of the estimated bill is ₹46,368-₹257,952 a month, against a total budget of ₹80,000 a month. It leads the runner-up, Node.js + Express, by 11.5 points.
 
 **Why**
 - Realtime fit: 5.0/5 vs 3.5 average for this layer - weighted up because: Realtime is core to the product; Feeds and notifications.
@@ -137,7 +137,7 @@ Firebase (BaaS on Google Cloud) serves the API at about 1,389 requests/s at peak
 **Risks**
 - High vendor lock-in: migrating away later means rewriting data access code.
 
-**Versus runner-up:** Firebase (BaaS on Google Cloud) beats Node.js + Express by 11.5 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on stack compatibility (+7.5), team skills (+1.1), realtime needs (+1.0). Node.js + Express is stronger on monthly budget (+0.2), general quality (baseline weights) (+0.1).
+**Versus runner-up:** Firebase (BaaS on Google Cloud) beats Node.js + Express by 11.5 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on stack compatibility (+7.5), team skills (+1.1), realtime needs (+1.0). Node.js + Express is stronger on monthly budget (+0.2), general quality (baseline weights) (+0.1).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +28.1
@@ -179,7 +179,7 @@ Firebase (BaaS on Google Cloud) serves the API at about 1,389 requests/s at peak
 
 Google's serverless document database with realtime listeners and offline client caching.
 
-Your data is mainly document and reaches about 290 GB within 12 months; Cloud Firestore fits document data 5/5. Realtime is core, and it can push changes to clients (realtime fit 5.0/5). It leads the runner-up, MongoDB, by 16.9 stack points.
+Your data is mainly document and reaches about 290 GB within 12 months; Cloud Firestore fits document data 5/5. Realtime is core, and it can push changes to clients (realtime fit 5.0/5). It leads the runner-up, MongoDB, by 16.9 points.
 
 Suggested offering: Included with Firebase (BaaS on Google Cloud)
 
@@ -199,7 +199,7 @@ Suggested offering: Included with Firebase (BaaS on Google Cloud)
 **Risks**
 - High vendor lock-in: migrating away later means rewriting data access code.
 
-**Versus runner-up:** Cloud Firestore beats MongoDB by 16.9 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on stack compatibility (+13.5), offline support (+2.0), realtime needs (+0.7). MongoDB is stronger on general quality (baseline weights) (+0.3), compliance (+0.1).
+**Versus runner-up:** Cloud Firestore beats MongoDB by 16.9 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on stack compatibility (+13.5), offline support (+2.0), realtime needs (+0.7). MongoDB is stronger on general quality (baseline weights) (+0.3), compliance (+0.1).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +36.5

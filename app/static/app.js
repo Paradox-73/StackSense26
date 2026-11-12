@@ -30,7 +30,7 @@ const PLAIN_TERMS = [
   [/summed lock-in/g, "lock-in scores added up over the four layers (lower is better)"],
   [/summed skill fit/g, "skill-fit scores added up over the four layers"],
   [/summed across layers/g, "added up over the four layers"],
-  [/\bstack points, the heaviest answer/g, "stack points (points on the 0-100 stack score), the heaviest answer"],
+  [/\bpoints, the heaviest answer/g, "points (out of 100 on the whole-stack score), the heaviest answer"],
   [/General quality \(baseline weights\)/g, "General quality (the standard weights every project starts from, before your answers change them)"],
 ];
 const plain = (s) => PLAIN_TERMS.reduce((t, [re, to]) => t.replace(re, to), String(s ?? ""));

@@ -210,7 +210,7 @@ def test_opening_why_not_netlify_is_what_the_script_shows():
     inp = _page_answers("hipaa_telehealth")
     w = why_not(inp, {"hosting": "netlify"})
     assert "ruled out" in w["verdict"] and "No HIPAA Business Associate Agreement available" in w["verdict"] and w["approximate"]
-    assert f"{w['gap']:.1f}" == "7.8" and "7.8 stack points below the recommendation" in SCRIPT and "7.8 points behind" in _row_at(37)[1]
+    assert f"{w['gap']:.1f}" == "7.8" and "7.8 points below the recommendation" in SCRIPT and "7.8 points behind" in _row_at(37)[1]
     assert w["layers"]["hosting"]["excluded"] and "approximate: scored despite a hard constraint" in SCRIPT
     link = re.search(r"`(#preset=hipaa_telehealth&whynot=hosting:netlify&at=wn-out-hosting)`", SCRIPT)
     assert link, "the opening link is missing"

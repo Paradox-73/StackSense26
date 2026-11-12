@@ -46,7 +46,7 @@ Availability approach: The platform runs the functions across zones, with no ins
 
 React meta-framework with server rendering, static generation, React Server Components and file-based routing.
 
-Next.js (React) is the frontend for an ML / AI product project with about 30,000 daily users (~69 requests/s at peak), built by a team of 4 in 12 weeks. Search visibility is marked important (landing/product pages), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. It leads the runner-up, Nuxt (Vue), by 3.0 stack points (points of the overall stack score, the average of the four layer scores).
+Next.js (React) is the frontend for an ML / AI product project with about 30,000 daily users (~69 requests/s at peak), built by a team of 4 in 12 weeks. Search visibility is marked important (landing/product pages), and it serves full HTML from the server or the build (SEO 5.0/5), so crawlers read the content without running JavaScript. It leads the runner-up, Nuxt (Vue), by 3.0 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Development speed: 5.0/5 vs 4.0 average for this layer - weighted up because: 12-week MVP; Fast iteration on models.
@@ -61,7 +61,7 @@ Next.js (React) is the frontend for an ML / AI product project with about 30,000
 - App Router + Server Components add conceptual load
 - Some features (ISR, image optimisation, middleware) are smoothest on Vercel
 
-**Versus runner-up:** Next.js (React) beats Nuxt (Vue) by 3.0 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on general quality (baseline weights) (+1.1), team skills (+0.9), time to mvp (+0.6).
+**Versus runner-up:** Next.js (React) beats Nuxt (Vue) by 3.0 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on general quality (baseline weights) (+1.1), team skills (+0.9), time to mvp (+0.6).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +33.0
@@ -87,8 +87,8 @@ Next.js (React) is the frontend for an ML / AI product project with about 30,000
 | Structure for large teams | 3.0 | 0.3 | 0.9 |
 
 **Alternatives**
-- Nuxt (Vue) (stack 91.1, -3.0): Scores 75.7 on its own; its stack is 3.0 stack points behind the pick.
-- React SPA (Vite) (stack 91.0, -3.1): Scores 75.4 on its own; its stack is 3.1 stack points behind the pick.
+- Nuxt (Vue) (stack 91.1, -3.0): Scores 75.7 on its own; its stack is 3.0 points behind the pick.
+- React SPA (Vite) (stack 91.0, -3.1): Scores 75.4 on its own; its stack is 3.1 points behind the pick.
 
 **Why not the others?**
 - Why not Nuxt (Vue)? (runner-up) Swapping it in lowers the stack score by 3.0 points. Next.js (React) is stronger on development speed (5.0 vs 4.0), team skill match (4.5 vs 3.5); Nuxt (Vue) is stronger on portability (low lock-in) (5.0 vs 4.0).
@@ -110,7 +110,7 @@ Next.js (React) is the frontend for an ML / AI product project with about 30,000
 
 Async Python API framework with type-hint validation (Pydantic) and automatic OpenAPI docs.
 
-Python + FastAPI serves the API at about 69 requests/s at peak (Medium (10k-100k daily users)) for a team of 4. The team lists fastapi and Python, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + Django is within 0.7 stack points, inside the tie margin (stacks this close count as tied); the tie went to Python + FastAPI on adjacent team skills (19 vs 18.5, summed skill fit).
+Python + FastAPI serves the API at about 69 requests/s at peak (Medium (10k-100k daily users)) for a team of 4. The team lists fastapi and Python, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + Django is within 0.7 points, inside the tie margin (stacks this close count as tied); the tie went to Python + FastAPI on adjacent team skills (19 vs 18.5, summed skill fit).
 
 **Why**
 - Development speed: 5.0/5 vs 4.3 average for this layer - weighted up because: 12-week MVP; Fast iteration on models.
@@ -127,7 +127,7 @@ Python + FastAPI serves the API at about 69 requests/s at peak (Medium (10k-100k
 - No built-in admin/ORM/auth (bring SQLAlchemy, etc.)
 - Python is slower than Go/.NET for CPU-bound request handling
 
-**Versus runner-up:** Python + FastAPI and Python + Django are within 0.7 stack points of each other, inside the 1-point tie margin, so they count as tied. Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), performance / latency (4.0 vs 3.0); Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0). Choose Python + Django instead if a mature ecosystem matters more to you than live updates. The tie went to Python + FastAPI on adjacent team skills (19 vs 18.5, summed skill fit). Either is defensible.
+**Versus runner-up:** Python + FastAPI and Python + Django are within 0.7 points of each other, inside the 1-point tie margin, so they count as tied. Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), performance / latency (4.0 vs 3.0); Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0). Choose Python + Django instead if a mature ecosystem matters more to you than live updates. The tie went to Python + FastAPI on adjacent team skills (19 vs 18.5, summed skill fit). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +39.1
@@ -154,7 +154,7 @@ Python + FastAPI serves the API at about 69 requests/s at peak (Medium (10k-100k
 | Adjustment: Your team already ships Python + FastAPI (fastapi, python listed in team skills) | | | +6.0 |
 
 **Alternatives**
-- Python + Django (stack 93.5, -0.7): Scores 87.4 on its own; its stack is 0.7 stack points behind the pick.
+- Python + Django (stack 93.5, -0.7): Scores 87.4 on its own; its stack is 0.7 points behind the pick.
 - Node.js + Express (stack 89.2, -5.0): Loses: Model inference and pipelines stay in Python (PyTorch, Hugging Face, scikit-learn), so no second runtime is needed.
 
 **Why not the others?**
@@ -169,7 +169,7 @@ Python + FastAPI serves the API at about 69 requests/s at peak (Medium (10k-100k
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 560 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $75-$989 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server, by 1.6 stack points.
+Your data is mainly relational and reaches about 560 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $75-$989 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server, by 1.6 points.
 
 Suggested offering: Cloud SQL / AlloyDB for PostgreSQL
 
@@ -186,7 +186,7 @@ Suggested offering: Cloud SQL / AlloyDB for PostgreSQL
 - Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless
 - Connection-per-process model needs PgBouncer/RDS Proxy under serverless
 
-**Versus runner-up:** PostgreSQL beats Microsoft SQL Server by 1.6 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on general quality (baseline weights) (+1.1), realtime needs (+0.3), application type (+0.1).
+**Versus runner-up:** PostgreSQL beats Microsoft SQL Server by 1.6 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on general quality (baseline weights) (+1.1), realtime needs (+0.3), application type (+0.1).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +53.5
@@ -212,8 +212,8 @@ Suggested offering: Cloud SQL / AlloyDB for PostgreSQL
 | Portability (low lock-in) | 5.0 | 0.5 | 2.4 |
 
 **Alternatives**
-- Microsoft SQL Server (stack 92.5, -1.6): Scores 80.5 on its own; its stack is 1.6 stack points behind the pick.
-- MySQL (stack 90.1, -4.0): Scores 70.8 on its own; its stack is 4.0 stack points behind the pick.
+- Microsoft SQL Server (stack 92.5, -1.6): Scores 80.5 on its own; its stack is 1.6 points behind the pick.
+- MySQL (stack 90.1, -4.0): Scores 70.8 on its own; its stack is 4.0 points behind the pick.
 
 **Why not the others?**
 - Why not Microsoft SQL Server? (runner-up) Swapping it in lowers the stack score by 1.6 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0), data-model fit (4.7 vs 4.3).
@@ -236,7 +236,7 @@ Suggested offering: Cloud SQL / AlloyDB for PostgreSQL
 
 Serverless containers: any Docker image, request-based autoscaling to zero, WebSockets supported.
 
-Google Cloud Run hosts the stack for users in North America and Europe at a 99.9% availability target. It runs the Python + FastAPI API as long-running processes with WebSockets, sized for ~69 requests/s at peak. Its share of the estimated bill is $60-$383 a month, against a total budget of $1,500 a month. It leads the runner-up, DigitalOcean (App Platform + Managed DBs), by 2.8 stack points.
+Google Cloud Run hosts the stack for users in North America and Europe at a 99.9% availability target. It runs the Python + FastAPI API as long-running processes with WebSockets, sized for ~69 requests/s at peak. Its share of the estimated bill is $60-$383 a month, against a total budget of $1,500 a month. It leads the runner-up, DigitalOcean (App Platform + Managed DBs), by 2.8 points.
 
 Runs here: Next.js (server rendering + static files), the Python + FastAPI API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -253,7 +253,7 @@ Runs here: Next.js (server rendering + static files), the Python + FastAPI API a
 - Request timeout (max 60 min) limits very long-lived connections
 - Cold starts when scaled to zero
 
-**Versus runner-up:** Google Cloud Run beats DigitalOcean (App Platform + Managed DBs) by 2.8 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on cloud preference (+3.0), team skills (+0.6), general quality (baseline weights) (+0.6). DigitalOcean (App Platform + Managed DBs) is stronger on stack compatibility (+1.0), realtime needs (+0.5).
+**Versus runner-up:** Google Cloud Run beats DigitalOcean (App Platform + Managed DBs) by 2.8 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on cloud preference (+3.0), team skills (+0.6), general quality (baseline weights) (+0.6). DigitalOcean (App Platform + Managed DBs) is stronger on stack compatibility (+1.0), realtime needs (+0.5).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +44.7
@@ -279,7 +279,7 @@ Runs here: Next.js (server rendering + static files), the Python + FastAPI API a
 
 **Alternatives**
 - DigitalOcean (App Platform + Managed DBs) (stack 91.3, -2.8): Note: Git-push deploys with managed database add-ons are the shortest path to production for a monolith.
-- Google Kubernetes Engine (Autopilot) (stack 90.8, -3.4): Scores 86.4 on its own; its stack is 3.4 stack points behind the pick.
+- Google Kubernetes Engine (Autopilot) (stack 90.8, -3.4): Scores 86.4 on its own; its stack is 3.4 points behind the pick.
 
 **Why not the others?**
 - Why not DigitalOcean (App Platform + Managed DBs)? (runner-up) Swapping it in lowers the stack score by 2.8 points. Google Cloud Run is stronger on scalability (5.0 vs 4.0), team skill match (5.0 vs 4.5); DigitalOcean (App Platform + Managed DBs) is stronger on realtime fit (4.0 vs 3.0), cost at your scale (4.8 vs 4.7).

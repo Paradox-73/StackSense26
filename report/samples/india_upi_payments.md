@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Fintech / payments / ledger' project at Large (100k-1M daily users) scale (~2,315 peak req/s) built by 12 engineer(s) in 24 weeks, StackSense recommends Native iOS + Android (Swift / Kotlin) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes) (architecture: Modular monolith). Estimated infrastructure cost: ₹355,200-₹1,767,744/month (stretch budget). The highest-scoring stack (Native iOS + Android (Swift / Kotlin) + Java/Kotlin + Spring Boot + PostgreSQL + AWS ECS on Fargate, 91.7) is only less than 0.05 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on lower vendor lock-in (5 vs 6, summed lock-in).
+For a 'Fintech / payments / ledger' project at Large (100k-1M daily users) scale (~2,315 peak req/s) built by 12 engineer(s) in 24 weeks, StackSense recommends Native iOS + Android (Swift / Kotlin) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes) (architecture: Modular monolith). Estimated infrastructure cost: ₹355,200-₹1,767,744/month (stretch budget). The highest-scoring stack (Native iOS + Android (Swift / Kotlin) + Java/Kotlin + Spring Boot + PostgreSQL + AWS ECS on Fargate, 91.7) is only less than 0.05 points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on lower vendor lock-in (5 vs 6, summed lock-in).
 
 ## Recommended stack
 
@@ -46,7 +46,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 
 Two native codebases using SwiftUI and Jetpack Compose.
 
-Native iOS + Android (Swift / Kotlin) is the app for a Fintech / payments / ledger project with about 500,000 daily users (~2,315 requests/s at peak), built by a team of 12 in 24 weeks. Native Swift and Kotlin apps give full platform APIs and the best performance, at the cost of two codebases. It leads the runner-up, Flutter, by 2.9 stack points (points of the overall stack score, the average of the four layer scores).
+Native iOS + Android (Swift / Kotlin) is the app for a Fintech / payments / ledger project with about 500,000 daily users (~2,315 requests/s at peak), built by a team of 12 in 24 weeks. Native Swift and Kotlin apps give full platform APIs and the best performance, at the cost of two codebases. It leads the runner-up, Flutter, by 2.9 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Ecosystem maturity: 5.0/5 vs 4.3 average for this layer - weighted up because: Financial systems favour proven tech; 99.95% target.
@@ -61,7 +61,7 @@ Native iOS + Android (Swift / Kotlin) is the app for a Fintech / payments / ledg
 - Two codebases, roughly double the effort
 - Needs at least one specialist per platform
 
-**Versus runner-up:** Native iOS + Android (Swift / Kotlin) beats Flutter by 2.9 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team size (+1.0), general quality (baseline weights) (+0.4), realtime needs (+0.4).
+**Versus runner-up:** Native iOS + Android (Swift / Kotlin) beats Flutter by 2.9 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on team size (+1.0), general quality (baseline weights) (+0.4), realtime needs (+0.4).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +27.8
@@ -87,8 +87,8 @@ Native iOS + Android (Swift / Kotlin) is the app for a Fintech / payments / ledg
 | SEO | 1.0 | 0.2 | 0.0 |
 
 **Alternatives**
-- Flutter (stack 88.8, -2.9): Scores 67.1 on its own; its stack is 2.9 stack points behind the pick.
-- React Native (Expo) (stack 85.4, -6.3): Scores 53.6 on its own; its stack is 6.3 stack points behind the pick.
+- Flutter (stack 88.8, -2.9): Scores 67.1 on its own; its stack is 2.9 points behind the pick.
+- React Native (Expo) (stack 85.4, -6.3): Scores 53.6 on its own; its stack is 6.3 points behind the pick.
 
 **Why not the others?**
 - Why not Flutter? (runner-up) Swapping it in lowers the stack score by 2.9 points. Native iOS + Android (Swift / Kotlin) is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 3.0); Flutter is stronger on development speed (4.0 vs 2.0), low ops burden (4.0 vs 3.0).
@@ -114,7 +114,7 @@ Native iOS + Android (Swift / Kotlin) is the app for a Fintech / payments / ledg
 
 Enterprise JVM framework: DI, Spring Data, Spring Security, transactions, observability.
 
-Java/Kotlin + Spring Boot serves the API at about 2,315 requests/s at peak (Large (100k-1M daily users)) for a team of 12. The team lists Java and Kotlin and Spring, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Java/Kotlin service, so background jobs, WebSockets and database connection pools live in one deployable process. It leads the runner-up, Node.js + NestJS, by 5.4 stack points.
+Java/Kotlin + Spring Boot serves the API at about 2,315 requests/s at peak (Large (100k-1M daily users)) for a team of 12. The team lists Java and Kotlin and Spring, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Java/Kotlin service, so background jobs, WebSockets and database connection pools live in one deployable process. It leads the runner-up, Node.js + NestJS, by 5.4 points.
 
 **Why**
 - Structure for large teams: 5.0/5 vs 3.2 average for this layer - weighted up because: 12 engineers need enforced conventions.
@@ -130,7 +130,7 @@ Java/Kotlin + Spring Boot serves the API at about 2,315 requests/s at peak (Larg
 - Higher memory footprint, slow JVM cold starts (mitigated by GraalVM/SnapStart)
 - Verbose for small MVPs
 
-**Versus runner-up:** Java/Kotlin + Spring Boot beats Node.js + NestJS by 5.4 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team skills (+2.7), team size (+0.8), scale (dau / peak rps) (+0.6). Node.js + NestJS is stronger on realtime needs (+0.3).
+**Versus runner-up:** Java/Kotlin + Spring Boot beats Node.js + NestJS by 5.4 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on team skills (+2.7), team size (+0.8), scale (dau / peak rps) (+0.6). Node.js + NestJS is stronger on realtime needs (+0.3).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +32.2
@@ -157,8 +157,8 @@ Java/Kotlin + Spring Boot serves the API at about 2,315 requests/s at peak (Larg
 | Adjustment: Your team already ships Java/Kotlin + Spring Boot (java, kotlin, spring listed in team skills) | | | +6.0 |
 
 **Alternatives**
-- Node.js + NestJS (stack 86.3, -5.4): Scores 74.4 on its own; its stack is 5.4 stack points behind the pick.
-- Go (net/http, chi or Gin) (stack 86.0, -5.7): Scores 73.3 on its own; its stack is 5.7 stack points behind the pick.
+- Node.js + NestJS (stack 86.3, -5.4): Scores 74.4 on its own; its stack is 5.4 points behind the pick.
+- Go (net/http, chi or Gin) (stack 86.0, -5.7): Scores 73.3 on its own; its stack is 5.7 points behind the pick.
 
 **Why not the others?**
 - Why not Node.js + NestJS? (runner-up) Swapping it in lowers the stack score by 5.4 points. Java/Kotlin + Spring Boot is stronger on team skill match (5.0 vs 3.5), scalability (5.0 vs 4.0); Node.js + NestJS is stronger on realtime fit (4.0 vs 3.0), low ops burden (4.0 vs 3.0).
@@ -172,7 +172,7 @@ Java/Kotlin + Spring Boot serves the API at about 2,315 requests/s at peak (Larg
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 1,460 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹751,872 a month, against a total budget of ₹1,500,000 a month. MySQL is within 0.7 stack points, inside the tie margin (stacks this close count as tied); the tie went to PostgreSQL on adjacent team skills (19 vs 18.5, summed skill fit).
+Your data is mainly relational and reaches about 1,460 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹751,872 a month, against a total budget of ₹1,500,000 a month. MySQL is within 0.7 points, inside the tie margin (stacks this close count as tied); the tie went to PostgreSQL on adjacent team skills (19 vs 18.5, summed skill fit).
 
 Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
@@ -189,7 +189,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 - Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless
 - Connection-per-process model needs PgBouncer/RDS Proxy under serverless
 
-**Versus runner-up:** PostgreSQL and MySQL are within 0.7 stack points of each other, inside the 1-point tie margin, so they count as tied. PostgreSQL is stronger on realtime fit (3.0 vs 2.0). The tie went to PostgreSQL on adjacent team skills (19 vs 18.5, summed skill fit). Either is defensible.
+**Versus runner-up:** PostgreSQL and MySQL are within 0.7 points of each other, inside the 1-point tie margin, so they count as tied. PostgreSQL is stronger on realtime fit (3.0 vs 2.0). The tie went to PostgreSQL on adjacent team skills (19 vs 18.5, summed skill fit). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +43.5
@@ -215,8 +215,8 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 | Portability (low lock-in) | 5.0 | 0.5 | 1.9 |
 
 **Alternatives**
-- MySQL (stack 91.0, -0.7): Scores 89.4 on its own; its stack is 0.7 stack points behind the pick.
-- Microsoft SQL Server (stack 90.3, -1.3): Scores 86.8 on its own; its stack is 1.3 stack points behind the pick.
+- MySQL (stack 91.0, -0.7): Scores 89.4 on its own; its stack is 0.7 points behind the pick.
+- Microsoft SQL Server (stack 90.3, -1.3): Scores 86.8 on its own; its stack is 1.3 points behind the pick.
 
 **Why not the others?**
 - Why not MySQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.7 points lower; either is defensible. PostgreSQL is stronger on team skill match (5.0 vs 4.5), realtime fit (3.0 vs 2.0).
@@ -238,7 +238,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 Managed Kubernetes control plane on AWS.
 
-AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes with WebSockets, sized for ~2,315 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is ₹134,400-₹655,872 a month, against a total budget of ₹1,500,000 a month. AWS ECS on Fargate is within less than 0.05 stack points, inside the tie margin (stacks this close count as tied); the tie went to AWS EKS (Kubernetes) on lower vendor lock-in (5 vs 6, summed lock-in).
+AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes with WebSockets, sized for ~2,315 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is ₹134,400-₹655,872 a month, against a total budget of ₹1,500,000 a month. AWS ECS on Fargate is within less than 0.05 points, inside the tie margin (stacks this close count as tied); the tie went to AWS EKS (Kubernetes) on lower vendor lock-in (5 vs 6, summed lock-in).
 
 Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -256,7 +256,7 @@ Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The data
 - Control-plane fee (~$73/mo) plus nodes
 - Needs dedicated platform/DevOps skills
 
-**Versus runner-up:** AWS EKS (Kubernetes) and AWS ECS on Fargate score the same (less than 0.05 stack points apart), inside the 1-point tie margin, so they count as tied. AWS EKS (Kubernetes) is stronger on portability (low lock-in) (4.0 vs 3.0); AWS ECS on Fargate is stronger on low ops burden (3.0 vs 1.0). Choose AWS ECS on Fargate instead if less to operate matters more to you than low lock-in. The tie went to AWS EKS (Kubernetes) on lower vendor lock-in (5 vs 6, summed lock-in). Either is defensible.
+**Versus runner-up:** AWS EKS (Kubernetes) and AWS ECS on Fargate score the same (less than 0.05 points apart), inside the 1-point tie margin, so they count as tied. AWS EKS (Kubernetes) is stronger on portability (low lock-in) (4.0 vs 3.0); AWS ECS on Fargate is stronger on low ops burden (3.0 vs 1.0). Choose AWS ECS on Fargate instead if less to operate matters more to you than low lock-in. The tie went to AWS EKS (Kubernetes) on lower vendor lock-in (5 vs 6, summed lock-in). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +31.1
@@ -281,8 +281,8 @@ Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The data
 | Adjustment: Runs on your preferred cloud (AWS) | | | +12.0 |
 
 **Alternatives**
-- AWS ECS on Fargate (stack 91.7, +0.0): Scores 100.0 on its own; its stack is less than 0.05 stack points behind the pick.
-- DigitalOcean (App Platform + Managed DBs) (stack 87.1, -4.5): Scores 81.8 on its own; its stack is 4.5 stack points behind the pick.
+- AWS ECS on Fargate (stack 91.7, +0.0): Scores 100.0 on its own; its stack is less than 0.05 points behind the pick.
+- DigitalOcean (App Platform + Managed DBs) (stack 87.1, -4.5): Scores 81.8 on its own; its stack is 4.5 points behind the pick.
 
 **Why not the others?**
 - Why not AWS ECS on Fargate? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores the same (less than 0.05 points apart); either is defensible. AWS EKS (Kubernetes) is stronger on portability (low lock-in) (4.0 vs 3.0); AWS ECS on Fargate is stronger on low ops burden (3.0 vs 1.0).

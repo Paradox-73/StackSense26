@@ -7,7 +7,7 @@
   "stack": {
     "frontend": {
       "choice": "React SPA (Vite) + React Native (Expo) for the Android/iOS app",
-      "justification": "React SPA (Vite) is the frontend for a Fintech / payments / ledger project with about 60,000 daily users (~833 requests/s at peak), built by a team of 8 in 16 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. Angular is within 0.8 stack points, inside the tie margin (stacks this close count as tied); the tie went to React SPA (Vite) on lower vendor lock-in (6 vs 7, summed lock-in). You also target iOS/Android. React Native (Expo) scored best among mobile toolkits with the same weights and backend; it shares skills/types with React SPA (Vite).",
+      "justification": "React SPA (Vite) is the frontend for a Fintech / payments / ledger project with about 60,000 daily users (~833 requests/s at peak), built by a team of 8 in 16 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. Angular is within 0.8 points, inside the tie margin (stacks this close count as tied); the tie went to React SPA (Vite) on lower vendor lock-in (6 vs 7, summed lock-in). You also target iOS/Android. React Native (Expo) scored best among mobile toolkits with the same weights and backend; it shares skills/types with React SPA (Vite).",
       "driven_by": [
         "team.languages",
         "priorities.security",
@@ -32,7 +32,7 @@
     },
     "backend": {
       "choice": "Java/Kotlin + Spring Boot",
-      "justification": "Java/Kotlin + Spring Boot serves the API at about 833 requests/s at peak (Large (5,000-50,000 users online at once)) for a team of 8. The team lists Java and Kotlin, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Java/Kotlin service, so background jobs and database connection pools live in one deployable process. It leads the runner-up, Go (net/http, chi or Gin), by 3.0 stack points (points of the overall stack score, the average of the four layer scores).",
+      "justification": "Java/Kotlin + Spring Boot serves the API at about 833 requests/s at peak (Large (5,000-50,000 users online at once)) for a team of 8. The team lists Java and Kotlin, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Java/Kotlin service, so background jobs and database connection pools live in one deployable process. It leads the runner-up, Go (net/http, chi or Gin), by 3.0 points (out of 100 on the whole-stack score, the average of the four layer scores).",
       "driven_by": [
         "priorities.security",
         "priorities.scalability",
@@ -67,7 +67,7 @@
     },
     "database": {
       "choice": "PostgreSQL: Amazon RDS / Aurora PostgreSQL",
-      "justification": "Your data is mainly relational and reaches about 411 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $800-$2,502 a month, against a total budget of $6,000 a month. MySQL is within 0.1 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.",
+      "justification": "Your data is mainly relational and reaches about 411 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $800-$2,502 a month, against a total budget of $6,000 a month. MySQL is within 0.1 points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.",
       "driven_by": [
         "project.type",
         "priorities.security",
@@ -93,7 +93,7 @@
     },
     "hosting": {
       "choice": "AWS ECS on Fargate, region ap-south-1 (Mumbai)",
-      "justification": "AWS ECS on Fargate hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes, sized for ~833 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is $800-$2,904 a month, against a total budget of $6,000 a month. It leads the runner-up, AWS Lambda + API Gateway, by 2.9 stack points.",
+      "justification": "AWS ECS on Fargate hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes, sized for ~833 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is $800-$2,904 a month, against a total budget of $6,000 a month. It leads the runner-up, AWS Lambda + API Gateway, by 2.9 points.",
       "driven_by": [
         "priorities.security",
         "priorities.scalability",

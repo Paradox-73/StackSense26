@@ -23,7 +23,7 @@ Other claims shown on screen, each checked by the test:
 - With the key set the summary for this stack is badged "checked against engine facts" (the model's text passed the check; its reply is saved in `data/llm_cache/`, so the take repeats it).
 - The summary panel is badged "checked against engine facts" when the model's text passed the check, and "template fallback" when it did not or when no key is set. The model fills nothing that is not quoted from the text and picks nothing.
 
-- Why not Netlify (case 1, hosting): "Netlify is ruled out by your answers: Netlify: No HIPAA Business Associate Agreement available.", "its best stack is 7.8 stack points below the recommendation", "(approximate: scored despite a hard constraint)".
+- Why not Netlify (case 1, hosting): "Netlify is ruled out by your answers: Netlify: No HIPAA Business Associate Agreement available.", "its best stack is 7.8 points below the recommendation", "(approximate: scored despite a hard constraint)".
 - Case 2 backend card: "Structure for large teams 5.0/5 vs 3.2 avg" and "25 engineers need enforced conventions".
 - Not sure on daily users (Startup SaaS MVP): "Robust: Frontend, Database, Hosting." Backend: Supabase up to 1M/day, Node.js + Express from 10M/day.
 - Growth path (TrailNotes, content_site): the panel reruns the engine at 1×, 3×, 10×, 30× and 100× the 20,000 daily users and shows 1×, 10× and 100×. Frontend (Next.js), backend (no server code) and database (none) stay; hosting is Netlify at 1× and Cloudflare Pages + Workers from 10× (about 200k users), with cost $0 throughout.

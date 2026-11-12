@@ -460,7 +460,7 @@
           "tie": false,
           "behind": false
         },
-        "text": "It leads the runner-up, {runner}, by {margin} (points of the overall stack score, the average of the four layer scores)."
+        "text": "It leads the runner-up, {runner}, by {margin} (out of 100 on the whole-stack score, the average of the four layer scores)."
       },
       {
         "when": {

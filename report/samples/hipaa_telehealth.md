@@ -43,7 +43,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 
 Client-rendered single-page React app built with Vite; deploys as static files to any CDN.
 
-React SPA (Vite) is the frontend for a Healthcare / telehealth project with about 20,000 daily users (~69 requests/s at peak), built by a team of 5 in 20 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. It leads the runner-up, Next.js (React), by 1.6 stack points (points of the overall stack score, the average of the four layer scores).
+React SPA (Vite) is the frontend for a Healthcare / telehealth project with about 20,000 daily users (~69 requests/s at peak), built by a team of 5 in 20 weeks. Search visibility is marked not needed (behind login), so rendering in the browser is acceptable, and it scores 5.0/5 for rich, app-like interaction. It leads the runner-up, Next.js (React), by 1.6 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Ecosystem maturity: 5.0/5 vs 4.0 average for this layer - weighted up because: Clinical systems favour proven tech; 99.95% target.
@@ -58,7 +58,7 @@ React SPA (Vite) is the frontend for a Healthcare / telehealth project with abou
 - Client-side rendering: the first screen waits for the JavaScript bundle to download and run
 - Routing, data fetching and state are your own architecture decisions
 
-**Versus runner-up:** React SPA (Vite) beats Next.js (React) by 1.6 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on seo need (+2.0), team size (+0.2). Next.js (React) is stronger on general quality (baseline weights) (+0.4), latency target (+0.2).
+**Versus runner-up:** React SPA (Vite) beats Next.js (React) by 1.6 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on seo need (+2.0), team size (+0.2). Next.js (React) is stronger on general quality (baseline weights) (+0.4), latency target (+0.2).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +41.1
@@ -84,8 +84,8 @@ React SPA (Vite) is the frontend for a Healthcare / telehealth project with abou
 | SEO | 2.0 | 0.2 | 0.4 |
 
 **Alternatives**
-- Next.js (React) (stack 87.0, -1.6): Scores 77.7 on its own; its stack is 1.6 stack points behind the pick.
-- Angular (stack 86.1, -2.4): Scores 74.2 on its own; its stack is 2.4 stack points behind the pick.
+- Next.js (React) (stack 87.0, -1.6): Scores 77.7 on its own; its stack is 1.6 points behind the pick.
+- Angular (stack 86.1, -2.4): Scores 74.2 on its own; its stack is 2.4 points behind the pick.
 
 **Why not the others?**
 - Why not Next.js (React)? (runner-up) Swapping it in lowers the stack score by 1.6 points. React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), portability (low lock-in) (5.0 vs 4.0); Next.js (React) is stronger on performance / latency (4.0 vs 3.0), development speed (5.0 vs 4.0); Next.js (React) takes a penalty: No search visibility needed: server rendering adds a Node.js server for pages that React SPA (Vite) serves as static files.
@@ -106,7 +106,7 @@ React SPA (Vite) is the frontend for a Healthcare / telehealth project with abou
 
 Batteries-included Python web framework: ORM, migrations, admin, auth, forms, templates.
 
-Python + Django serves the API at about 69 requests/s at peak (Medium (10k-100k daily users)) for a team of 5. The team lists Python, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + FastAPI is within 0.6 stack points, inside the tie margin (stacks this close count as tied); Python + Django has the higher stack score.
+Python + Django serves the API at about 69 requests/s at peak (Medium (10k-100k daily users)) for a team of 5. The team lists Python, so it needs no new server language (team skill match 4.5/5). It runs as a long-running Python service, so background jobs, WebSockets and database connection pools live in one deployable process. Python + FastAPI is within 0.6 points, inside the tie margin (stacks this close count as tied); Python + Django has the higher stack score.
 
 **Why**
 - Ecosystem maturity: 5.0/5 vs 4.4 average for this layer - weighted up because: Clinical systems favour proven tech; 99.95% target.
@@ -123,7 +123,7 @@ Python + Django serves the API at about 69 requests/s at peak (Medium (10k-100k 
 - Realtime needs Django Channels + Redis
 - Sync-first ORM; async support is partial
 
-**Versus runner-up:** Python + Django and Python + FastAPI are within 0.6 stack points of each other, inside the 1-point tie margin, so they count as tied. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), performance / latency (4.0 vs 3.0). Choose Python + FastAPI instead if live updates matters more to you than a mature ecosystem. Python + Django has the higher stack score. Either is defensible.
+**Versus runner-up:** Python + Django and Python + FastAPI are within 0.6 points of each other, inside the 1-point tie margin, so they count as tied. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), performance / latency (4.0 vs 3.0). Choose Python + FastAPI instead if live updates matters more to you than a mature ecosystem. Python + Django has the higher stack score. Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +40.0
@@ -151,8 +151,8 @@ Python + Django serves the API at about 69 requests/s at peak (Medium (10k-100k 
 | Adjustment: Your team already ships Python + Django (python listed in team skills) | | | +6.0 |
 
 **Alternatives**
-- Python + FastAPI (stack 88.0, -0.6): Scores 86.4 on its own; its stack is 0.6 stack points behind the pick.
-- Node.js + Express (stack 87.5, -1.1): Scores 84.1 on its own; its stack is 1.1 stack points behind the pick.
+- Python + FastAPI (stack 88.0, -0.6): Scores 86.4 on its own; its stack is 0.6 points behind the pick.
+- Node.js + Express (stack 87.5, -1.1): Scores 84.1 on its own; its stack is 1.1 points behind the pick.
 
 **Why not the others?**
 - Why not Python + FastAPI? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.6 points lower; either is defensible. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), performance / latency (4.0 vs 3.0).
@@ -167,7 +167,7 @@ Python + Django serves the API at about 69 requests/s at peak (Medium (10k-100k 
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 280 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $100-$717 a month, against a total budget of $3,000 a month. MySQL is within 0.8 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
+Your data is mainly relational and reaches about 280 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $100-$717 a month, against a total budget of $3,000 a month. MySQL is within 0.8 points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
 
 Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
@@ -184,7 +184,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 - Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless
 - Connection-per-process model needs PgBouncer/RDS Proxy under serverless
 
-**Versus runner-up:** PostgreSQL and MySQL are within 0.8 stack points of each other, inside the 1-point tie margin, so they count as tied. PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0). PostgreSQL has the higher stack score. Either is defensible.
+**Versus runner-up:** PostgreSQL and MySQL are within 0.8 points of each other, inside the 1-point tie margin, so they count as tied. PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0). PostgreSQL has the higher stack score. Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +49.6
@@ -210,8 +210,8 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 | Portability (low lock-in) | 5.0 | 0.5 | 2.2 |
 
 **Alternatives**
-- MySQL (stack 87.8, -0.8): Scores 85.5 on its own; its stack is 0.8 stack points behind the pick.
-- Microsoft SQL Server (stack 87.3, -1.3): Scores 83.6 on its own; its stack is 1.3 stack points behind the pick.
+- MySQL (stack 87.8, -0.8): Scores 85.5 on its own; its stack is 0.8 points behind the pick.
+- Microsoft SQL Server (stack 87.3, -1.3): Scores 83.6 on its own; its stack is 1.3 points behind the pick.
 
 **Why not the others?**
 - Why not MySQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.8 points lower; either is defensible. PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0).
@@ -233,7 +233,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 Serverless containers on AWS: no nodes to manage, integrates with ALB, RDS, IAM, CloudWatch.
 
-AWS ECS on Fargate hosts the stack for users in North America at a 99.95% availability target. It runs the Python + Django API as long-running processes with WebSockets, sized for ~69 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is $240-$630 a month, against a total budget of $3,000 a month. It leads the runner-up, Azure App Service, by 3.0 stack points.
+AWS ECS on Fargate hosts the stack for users in North America at a 99.95% availability target. It runs the Python + Django API as long-running processes with WebSockets, sized for ~69 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is $240-$630 a month, against a total budget of $3,000 a month. It leads the runner-up, Azure App Service, by 3.0 points.
 
 Runs here: the Python + Django API as long-running processes. React SPA is built to static files that are served from Amazon S3 + CloudFront, not from these instances (see Supporting services). The database runs as a separate managed service (see Database).
 
@@ -250,7 +250,7 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 - AWS networking/IAM learning curve
 - ALB + NAT gateway base costs even when idle
 
-**Versus runner-up:** AWS ECS on Fargate beats Azure App Service by 3.0 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on team skills (+3.4). Azure App Service is stronger on team size (+0.2), general quality (baseline weights) (+0.2).
+**Versus runner-up:** AWS ECS on Fargate beats Azure App Service by 3.0 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on team skills (+3.4). Azure App Service is stronger on team size (+0.2), general quality (baseline weights) (+0.2).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +37.7
@@ -276,8 +276,8 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 | Adjustment: Your team already operates AWS (listed in team skills) | | | +3.5 |
 
 **Alternatives**
-- Azure App Service (stack 85.5, -3.0): Scores 80.9 on its own; its stack is 3.0 stack points behind the pick.
-- AWS EKS (Kubernetes) (stack 85.0, -3.6): Scores 78.7 on its own; its stack is 3.6 stack points behind the pick.
+- Azure App Service (stack 85.5, -3.0): Scores 80.9 on its own; its stack is 3.0 points behind the pick.
+- AWS EKS (Kubernetes) (stack 85.0, -3.6): Scores 78.7 on its own; its stack is 3.6 points behind the pick.
 
 **Why not the others?**
 - Why not Azure App Service? (runner-up) Swapping it in lowers the stack score by 3.0 points. AWS ECS on Fargate is stronger on team skill match (5.0 vs 2.5), learning curve (5.0 vs 4.0); Azure App Service is stronger on low ops burden (4.0 vs 3.0).

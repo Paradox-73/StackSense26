@@ -7,7 +7,7 @@
   "stack": {
     "frontend": {
       "choice": "Server-rendered HTML + HTMX",
-      "justification": "Server-rendered HTML + HTMX is the frontend for an Internal tool / admin panel project with about 300 daily users (~1.6 requests/s at peak), built by a team of 2 in 6 weeks. Its strongest weighted criterion for your answers is low ops burden: 5.0/5 at weight 4.0, the largest share of its score. It leads the runner-up, React SPA (Vite), by 1.4 stack points (points of the overall stack score, the average of the four layer scores).",
+      "justification": "Server-rendered HTML + HTMX is the frontend for an Internal tool / admin panel project with about 300 daily users (~1.6 requests/s at peak), built by a team of 2 in 6 weeks. Its strongest weighted criterion for your answers is low ops burden: 5.0/5 at weight 4.0, the largest share of its score. It leads the runner-up, React SPA (Vite), by 1.4 points (out of 100 on the whole-stack score, the average of the four layer scores).",
       "driven_by": [
         "priorities.time_to_market",
         "priorities.maintainability",
@@ -33,7 +33,7 @@
     },
     "backend": {
       "choice": "C# + ASP.NET Core",
-      "justification": "C# + ASP.NET Core serves the API at about 1.6 requests/s at peak (Small (50-500 users online at once)) for a team of 2. The team lists C#/.NET, so it needs no new server language (team skill match 4.5/5). It runs as a long-running C#/.NET service, so background jobs and database connection pools live in one deployable process. It leads the runner-up, PHP + Laravel, by 3.7 stack points. It works with the existing Microsoft SQL Server for data and Microsoft Entra ID for sign-in.",
+      "justification": "C# + ASP.NET Core serves the API at about 1.6 requests/s at peak (Small (50-500 users online at once)) for a team of 2. The team lists C#/.NET, so it needs no new server language (team skill match 4.5/5). It runs as a long-running C#/.NET service, so background jobs and database connection pools live in one deployable process. It leads the runner-up, PHP + Laravel, by 3.7 points. It works with the existing Microsoft SQL Server for data and Microsoft Entra ID for sign-in.",
       "driven_by": [
         "priorities.time_to_market",
         "priorities.maintainability",
@@ -68,7 +68,7 @@
     },
     "database": {
       "choice": "Microsoft SQL Server: Azure SQL Database (General Purpose, serverless or provisioned)",
-      "justification": "Your data is mainly relational and reaches about 3.4 GB within 12 months; Microsoft SQL Server fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and Microsoft SQL Server gives it: a read after a write always sees that write. Its share of the estimated bill is $8-$24 a month, against a total budget of $300 a month. It leads the runner-up, PostgreSQL, by 2.0 stack points.",
+      "justification": "Your data is mainly relational and reaches about 3.4 GB within 12 months; Microsoft SQL Server fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and Microsoft SQL Server gives it: a read after a write always sees that write. Its share of the estimated bill is $8-$24 a month, against a total budget of $300 a month. It leads the runner-up, PostgreSQL, by 2.0 points.",
       "driven_by": [
         "infrastructure.existing_systems",
         "team.languages",

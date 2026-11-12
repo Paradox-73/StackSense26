@@ -46,7 +46,7 @@ Availability approach: Single server + nightly backups copied off the machine
 
 HTML rendered by the backend (Django/Rails/Phoenix/Go templates) with HTMX attributes for partial page updates; no SPA build step.
 
-Server-rendered HTML + HTMX is the frontend for an Internal tool / admin panel project with about 200 daily users (~1.7 requests/s at peak), built by a solo developer in 3 weeks. Its strongest weighted criterion for your answers is low ops burden: 5.0/5 at weight 3.5, the largest share of its score. It leads the runner-up, Astro, by 3.3 stack points (points of the overall stack score, the average of the four layer scores).
+Server-rendered HTML + HTMX is the frontend for an Internal tool / admin panel project with about 200 daily users (~1.7 requests/s at peak), built by a solo developer in 3 weeks. Its strongest weighted criterion for your answers is low ops burden: 5.0/5 at weight 3.5, the largest share of its score. It leads the runner-up, Astro, by 3.3 points (out of 100 on the whole-stack score, the average of the four layer scores).
 
 **Why**
 - Learning curve: 5.0/5 vs 3.7 average for this layer - weighted up because: 3-week MVP: no time to learn new tools; Solo developer.
@@ -62,7 +62,7 @@ Server-rendered HTML + HTMX is the frontend for an Internal tool / admin panel p
 - Rich client interactions (drag-drop editors, offline) get awkward
 - Requires a server-rendering backend; does not pair with BaaS
 
-**Versus runner-up:** Server-rendered HTML + HTMX beats Astro by 3.3 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on stack compatibility (+1.2), time to mvp (+0.8), team skills (+0.8).
+**Versus runner-up:** Server-rendered HTML + HTMX beats Astro by 3.3 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on stack compatibility (+1.2), time to mvp (+0.8), team skills (+0.8).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +21.9
@@ -112,7 +112,7 @@ Server-rendered HTML + HTMX is the frontend for an Internal tool / admin panel p
 
 Batteries-included Python web framework: ORM, migrations, admin, auth, forms, templates.
 
-Python + Django serves the API at about 1.7 requests/s at peak (Hobby (<1k daily users)) for a solo developer. The team lists Django and Python, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Python service, so background jobs and database connection pools live in one deployable process. Python + FastAPI is within 0.8 stack points, inside the tie margin (stacks this close count as tied); the tie went to Python + Django on adjacent team skills (18.5 vs 18, summed skill fit).
+Python + Django serves the API at about 1.7 requests/s at peak (Hobby (<1k daily users)) for a solo developer. The team lists Django and Python, so it needs no new server language (team skill match 5.0/5). It runs as a long-running Python service, so background jobs and database connection pools live in one deployable process. Python + FastAPI is within 0.8 points, inside the tie margin (stacks this close count as tied); the tie went to Python + Django on adjacent team skills (18.5 vs 18, summed skill fit).
 
 **Why**
 - Learning curve: 5.0/5 vs 3.7 average for this layer - weighted up because: 3-week MVP: no time to learn new tools; Solo developer.
@@ -129,7 +129,7 @@ Python + Django serves the API at about 1.7 requests/s at peak (Hobby (<1k daily
 **Trade-offs**
 - Sync-first ORM; async support is partial
 
-**Versus runner-up:** Python + Django and Python + FastAPI are within 0.8 stack points of each other, inside the 1-point tie margin, so they count as tied. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + FastAPI is stronger on performance / latency (4.0 vs 3.0), realtime fit (3.0 vs 2.0). Choose Python + FastAPI instead if raw speed matters more to you than a mature ecosystem. The tie went to Python + Django on adjacent team skills (18.5 vs 18, summed skill fit). Either is defensible.
+**Versus runner-up:** Python + Django and Python + FastAPI are within 0.8 points of each other, inside the 1-point tie margin, so they count as tied. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + FastAPI is stronger on performance / latency (4.0 vs 3.0), realtime fit (3.0 vs 2.0). Choose Python + FastAPI instead if raw speed matters more to you than a mature ecosystem. The tie went to Python + Django on adjacent team skills (18.5 vs 18, summed skill fit). Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +25.6
@@ -157,8 +157,8 @@ Python + Django serves the API at about 1.7 requests/s at peak (Hobby (<1k daily
 | Adjustment: Generated admin/CRUD scaffolding fits internal tools | | | +4.0 |
 
 **Alternatives**
-- Python + FastAPI (stack 86.9, -0.8): Scores 97.0 on its own; its stack is 0.8 stack points behind the pick.
-- PHP + Laravel (stack 85.0, -2.7): Scores 89.3 on its own; its stack is 2.7 stack points behind the pick.
+- Python + FastAPI (stack 86.9, -0.8): Scores 97.0 on its own; its stack is 0.8 points behind the pick.
+- PHP + Laravel (stack 85.0, -2.7): Scores 89.3 on its own; its stack is 2.7 points behind the pick.
 
 **Why not the others?**
 - Why not Python + FastAPI? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.8 points lower; either is defensible. Python + Django is stronger on team skill match (5.0 vs 4.5), ecosystem maturity (5.0 vs 4.0); Python + FastAPI is stronger on performance / latency (4.0 vs 3.0), realtime fit (3.0 vs 2.0).
@@ -174,7 +174,7 @@ Python + Django serves the API at about 1.7 requests/s at peak (Hobby (<1k daily
 
 Embedded, serverless SQL database in a single file; replicate with Litestream or use Turso/libSQL.
 
-Your data is mainly relational and reaches about 3.4 GB within 12 months; SQLite (+ Litestream backups) fits relational data 4/5. You need strong consistency, and SQLite (+ Litestream backups) gives it: a read after a write always sees that write. Its share of the estimated bill is ₹0 a month, against a total budget of ₹0 a month. It leads the runner-up, PostgreSQL, by 3.4 stack points.
+Your data is mainly relational and reaches about 3.4 GB within 12 months; SQLite (+ Litestream backups) fits relational data 4/5. You need strong consistency, and SQLite (+ Litestream backups) gives it: a read after a write always sees that write. Its share of the estimated bill is ₹0 a month, against a total budget of ₹0 a month. It leads the runner-up, PostgreSQL, by 3.4 points.
 
 Suggested offering: SQLite file on local disk with Litestream backups
 
@@ -191,7 +191,7 @@ Suggested offering: SQLite file on local disk with Litestream backups
 - Single writer; does not suit multi-instance or serverless deployments without Turso/LiteFS
 - No built-in network access control
 
-**Versus runner-up:** SQLite (+ Litestream backups) beats PostgreSQL by 3.4 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on monthly budget (+2.3), stack compatibility (+1.5), team size (+0.6). PostgreSQL is stronger on general quality (baseline weights) (+1.4).
+**Versus runner-up:** SQLite (+ Litestream backups) beats PostgreSQL by 3.4 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on monthly budget (+2.3), stack compatibility (+1.5), team size (+0.6). PostgreSQL is stronger on general quality (baseline weights) (+1.4).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +34.1
@@ -240,7 +240,7 @@ Suggested offering: SQLite file on local disk with Litestream backups
 
 Your own servers or private data centre running containers with Compose/systemd and a reverse proxy.
 
-On-prem VMs + Docker Compose hosts the stack for users in India at a 99% availability target. It runs the Python + Django API as long-running processes, sized for ~1.7 requests/s at peak. Its share of the estimated bill is ₹0-₹14,688 a month, against a total budget of ₹0 a month. It leads the runner-up, On-prem Kubernetes (k3s / RKE2 / OpenShift), by 23.5 stack points.
+On-prem VMs + Docker Compose hosts the stack for users in India at a 99% availability target. It runs the Python + Django API as long-running processes, sized for ~1.7 requests/s at peak. Its share of the estimated bill is ₹0-₹14,688 a month, against a total budget of ₹0 a month. It leads the runner-up, On-prem Kubernetes (k3s / RKE2 / OpenShift), by 23.5 points.
 
 Runs here: Server-rendered HTML + HTMX (server rendering + static files), the Python + Django API as long-running processes. The database is SQLite, an embedded single-file database: one file on this host's disk that the Python + Django process opens directly, with no separate database server (copy the file to object storage for backups).
 
@@ -260,7 +260,7 @@ Runs here: Server-rendered HTML + HTMX (server rendering + static files), the Py
 - Manual scaling and failover
 - Hardware capex + sysadmin time
 
-**Versus runner-up:** On-prem VMs + Docker Compose beats On-prem Kubernetes (k3s / RKE2 / OpenShift) by 23.5 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on monthly budget (+10.2), stack compatibility (+7.5), team size (+6.4). On-prem Kubernetes (k3s / RKE2 / OpenShift) is stronger on score limit (scores stop at 0 and 100) (+6.5).
+**Versus runner-up:** On-prem VMs + Docker Compose beats On-prem Kubernetes (k3s / RKE2 / OpenShift) by 23.5 points (out of 100 on the whole-stack score, the average of the four layer scores), mainly on monthly budget (+10.2), stack compatibility (+7.5), team size (+6.4). On-prem Kubernetes (k3s / RKE2 / OpenShift) is stronger on score limit (scores stop at 0 and 100) (+6.5).
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +18.9
