@@ -422,7 +422,11 @@
     }
   ],
   "assumptions": [
-    "project.description is not parsed for a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm)",
+    "project.description sets no field in a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm); a fixed keyword list adds the 'Read from project.description' notes, which change no pick",
+    "Read from project.description ('UPI'): use a payment gateway that takes UPI collections, UPI AutoPay mandates for repeat debits such as EMIs, and payouts to users' accounts through its payout API (Razorpay and Cashfree offer all three)",
+    "Read from project.description ('KYC'): identity documents are sensitive personal data: keep them in the private object store with server-side encryption, open them only through short-lived signed URLs, log every access, and keep them as long as the regulator requires (RBI's KYC Master Direction: at least five years after the relationship ends)",
+    "Read from project.description ('double-entry'): write each money movement as balanced debit and credit rows in one database transaction, append-only (a correction is a new reversing entry, never an edit), and derive balances from the rows",
+    "Read from project.description ('credit scoring'): version the scoring model and store which version scored each application with its inputs, so every decision can be explained and replayed later",
     "Sized for scale.users_12_months: 300,000 users, about 60,000 active on a day (20% daily-to-monthly ratio); scale.users_at_launch (10,000) is the starting point",
     "rbi_localisation: RBI's 2018 directive on storage of payment system data requires payment data to be stored only in India, so every store must have an Indian region",
     "iso27001: only hosts and managed services (backend-as-a-service, managed-only databases) that publish ISO/IEC 27001 certification are kept",

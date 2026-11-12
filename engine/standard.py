@@ -27,6 +27,54 @@ COMPLIANCE = ("gdpr", "dpdp", "hipaa", "pci_dss", "rbi_localisation", "soc2", "i
 PRIORITY_KEYS = ("cost", "time_to_market", "scalability", "performance", "maintainability", "security")
 SECTIONS = ("project", "scale", "team", "budget", "timeline", "infrastructure", "requirements")
 
+# Words in project.description that carry a build duty the structured fields cannot express. Each adds one note to
+# assumptions, quoting the words it matched; none sets a field, so the description still cannot move the stack.
+DESCRIPTION_NOTES = [(re.compile(rx, re.I), note) for rx, note in (
+    (r"\bupi\b", "use a payment gateway that takes UPI collections, UPI AutoPay mandates for repeat debits such as "
+     "EMIs, and payouts to users' accounts through its payout API (Razorpay and Cashfree offer all three)"),
+    (r"\b(?:e-?)?kyc\b", "identity documents are sensitive personal data: keep them in the private object store with "
+     "server-side encryption, open them only through short-lived signed URLs, log every access, and keep them as "
+     "long as the regulator requires (RBI's KYC Master Direction: at least five years after the relationship ends)"),
+    (r"double[- ]entry|\bledgers?\b", "write each money movement as balanced debit and credit rows in one database "
+     "transaction, append-only (a correction is a new reversing entry, never an edit), and derive balances from "
+     "the rows"),
+    (r"credit[- ]scor\w*|risk[- ]scor\w*", "version the scoring model and store which version scored each "
+     "application with its inputs, so every decision can be explained and replayed later"),
+    (r"\bgps\b|geo-?tagged|\blatitude\b|\blongitude\b|geolocat\w*", "store latitude and longitude with each "
+     "record, and add a spatial index (PostGIS on PostgreSQL, or the database's own geo type) once you query by "
+     "distance or area"),
+    (r"\b[23]g\b(?!\s+of\b)|intermittent|patchy|low[- ]bandwidth|poor (?:network|connectivity|signal)|weak (?:network|signal)",
+     "compress photos and other uploads on the device, send changes in small batches, and make uploads resumable "
+     "(for example with the tus protocol) so a dropped connection does not restart them"),
+    (r"low[- ]end|\b[1-3] ?gb (?:of )?ram\b|entry[- ]level (?:phones|devices)|budget (?:phones|devices)",
+     "test on the slowest target device, keep the app bundle and memory use small (screens loaded on demand, "
+     "virtualised lists), and resize images before they are shown"),
+    (r"per[- ]seat|seat[- ]based|per[- ]user (?:pricing|billing|plans?)", "bill through the payment provider's "
+     "subscriptions with the seat count as the quantity, updated when an organisation adds or removes members"),
+    (r"\bchat(?:s|ting)?\b", "store messages in the database ordered per conversation, deliver them over the "
+     "realtime connection, and send a push notification when the recipient is offline"),
+    (r"\bmarkdown\b", "keep the posts as Markdown files in the repository and build the pages from them at deploy "
+     "time; a CMS is needed only when people who do not use git write the content"),
+    (r"\bbookings?\b|\bappointments?\b|\breservations?\b|\btime ?slots?\b", "stop double booking in the database: "
+     "a unique constraint or a row lock on the slot inside one transaction, with a short hold while payment "
+     "completes"),
+    (r"\binventory\b|\bstock levels?\b", "take stock in the same transaction as the order (a conditional update "
+     "that fails at zero), so two buyers cannot both get the last item"),
+    (r"\baudit (?:trail|log)s?\b", "write audit rows append-only, with who, what, when and the old and new values, in "
+     "the same transaction as the change they record"),
+    (r"\binvoices?\b|\bgst\b", "number invoices in one consecutive series per financial year and never change an "
+     "issued one; a correction is a credit note (for GST invoices in India, CGST rule 46 requires both)"),
+    (r"multi-?lingual|several languages|multiple languages|regional languages|\bi18n\b|\btranslations?\b",
+     "keep every user-facing string in translation files from the first screen, store text as UTF-8, and check "
+     "layouts with the longest language's strings"),
+)]
+
+
+def description_notes(text: str) -> list[str]:
+    """The notes the description's words call for, each quoting the words that matched."""
+    return [f"Read from project.description ('{m.group(0)}'): {note}"
+            for rx, note in DESCRIPTION_NOTES for m in [rx.search(text or "")] if m]
+
 # (path, kind, required, default, allowed values). Kinds: text, enum, enums (list of enum), texts (list of text),
 # int0 (integer >= 0), int1 (integer >= 1), num0 (number >= 0), bool, latency (integer > 0 or null).
 # A required field's default is used only when the field is missing and the rest of the file is valid.
@@ -457,9 +505,11 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
     put("app_type", app, "project.type")
     put("project_name", (f["project.name"] or "Unnamed project")[:120], "project.name")
     if f["project.description"]:
-        notes.append("project.description is not parsed for a scenario file: every choice comes from the structured "
+        notes.append("project.description sets no field in a scenario file: every choice comes from the structured "
                      "fields, so wording cannot move the stack (in the app, the description reader only suggests "
-                     "fields for you to confirm)")
+                     "fields for you to confirm); a fixed keyword list adds the 'Read from project.description' "
+                     "notes, which change no pick")
+        notes += description_notes(f["project.description"])
     put("platforms", list(platforms), "project.platforms")
 
     auth = f["requirements.auth"]

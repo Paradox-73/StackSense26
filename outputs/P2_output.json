@@ -402,7 +402,8 @@
   ],
   "assumptions": [
     "project.type 'marketplace': a two-sided marketplace (listings, bookings, payouts) is scored like e-commerce",
-    "project.description is not parsed for a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm)",
+    "project.description sets no field in a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm); a fixed keyword list adds the 'Read from project.description' notes, which change no pick",
+    "Read from project.description ('chat'): store messages in the database ordered per conversation, deliver them over the realtime connection, and send a push notification when the recipient is offline",
     "Sized for scale.users_12_months: 30,000 users, about 6,000 active on a day (20% daily-to-monthly ratio); scale.users_at_launch (2,000) is the starting point",
     "Priorities rated 4 or 5 raise their criteria's weights, strongest first: time_to_market (5), cost (4)",
     "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",

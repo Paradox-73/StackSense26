@@ -2,7 +2,7 @@
   "scenario_id": "P6",
   "engine_version": "1.0.0",
   "status": "ok_with_warnings",
-  "summary": "A modular monolith build: React Native on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $35-120 a month. It keeps data in India under DPDP, builds on the team's Python, keeps working offline, and ships as one deployable that a team of 2 can build in 10 weeks.",
+  "summary": "A modular monolith build: React Native on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $84-169 a month. It keeps data in India under DPDP, builds on the team's Python, keeps working offline, and ships as one deployable that a team of 2 can build in 10 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -318,8 +318,8 @@
     ]
   },
   "estimated_monthly_cost_usd": {
-    "min": 35,
-    "max": 120,
+    "min": 84,
+    "max": 169,
     "assumptions": [
       "Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
       "Scale tier: Small (50-500 users online at once)",
@@ -329,14 +329,15 @@
       "Background jobs: Redis / Valkey: $5-36 (Small (50-500 users online at once) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 200 users online at once (60% of the way up the tier, log scale))",
       "Object storage: $1-2 (~97 GB of uploaded files (the stated total less the database's ~3 GB) at $0.015-0.025/GB-month (https://developers.cloudflare.com/r2/pricing/ and https://aws.amazon.com/s3/pricing/))",
       "Media delivery: $1-5 (~60 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)",
-      "Phone login (SMS OTP): $1-3 (~600 SMS a month (one login every ~20 days per active user) at $0.002-0.005 each)"
+      "Phone login (SMS OTP): $1-3 (~600 SMS a month (one login every ~20 days per active user) at $0.002-0.005 each)",
+      "Offline sync: $49-49 (PowerSync Cloud Pro plan, from $49/month (https://www.powersync.com/pricing); the Free plan pauses an idle instance, so a production app starts here; data beyond the plan's allowance is billed per GB)"
     ]
   },
   "warnings": [
     {
       "code": "BUDGET_RANGE_OVER",
       "severity": "warning",
-      "message": "Budget below the top of the estimate. $35-$120/month against $100/month: the top (~3x today's load) is over, most of the rise in DigitalOcean and Redis / Valkey. Raise the budget before the load grows.",
+      "message": "Budget below the top of the estimate. $84-$169/month against $100/month: the top (~3x today's load) and the middle are over, most of the rise in DigitalOcean and Redis / Valkey. Raise the budget before the load grows.",
       "fields": [
         "budget.monthly_infra_usd",
         "scale.users_12_months"
@@ -345,7 +346,10 @@
   ],
   "assumptions": [
     "project.type 'other' with only phone platforms is scored as a mobile-first app",
-    "project.description is not parsed for a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm)",
+    "project.description sets no field in a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm); a fixed keyword list adds the 'Read from project.description' notes, which change no pick",
+    "Read from project.description ('GPS'): store latitude and longitude with each record, and add a spatial index (PostGIS on PostgreSQL, or the database's own geo type) once you query by distance or area",
+    "Read from project.description ('intermittent'): compress photos and other uploads on the device, send changes in small batches, and make uploads resumable (for example with the tus protocol) so a dropped connection does not restart them",
+    "Read from project.description ('low-end'): test on the slowest target device, keep the app bundle and memory use small (screens loaded on demand, virtualised lists), and resize images before they are shown",
     "Sized for scale.users_12_months: 2,000 users, about 400 active on a day (20% daily-to-monthly ratio); scale.users_at_launch (300) is the starting point",
     "requirements.p95_latency_ms is null: no latency target, so the engine plans for its 300 ms default",
     "Priorities rated 4 or 5 raise their criteria's weights, strongest first: cost (5), time_to_market (4), maintainability (4)",

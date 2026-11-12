@@ -262,7 +262,7 @@
     }
   ],
   "assumptions": [
-    "project.description is not parsed for a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm)",
+    "project.description sets no field in a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm); a fixed keyword list adds the 'Read from project.description' notes, which change no pick",
     "Sized for scale.users_12_months: 1,500 users, about 300 active on a day (20% daily-to-monthly ratio); scale.users_at_launch (1,200) is the starting point",
     "iso27001: only hosts and managed services (backend-as-a-service, managed-only databases) that publish ISO/IEC 27001 certification are kept",
     "Priorities rated 4 or 5 raise their criteria's weights, strongest first: time_to_market (5), maintainability (5), security (4)",

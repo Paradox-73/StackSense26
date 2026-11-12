@@ -184,7 +184,8 @@
   },
   "warnings": [],
   "assumptions": [
-    "project.description is not parsed for a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm)",
+    "project.description sets no field in a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm); a fixed keyword list adds the 'Read from project.description' notes, which change no pick",
+    "Read from project.description ('Markdown'): keep the posts as Markdown files in the repository and build the pages from them at deploy time; a CMS is needed only when people who do not use git write the content",
     "No sign-in and a read-heavy workload: visitors only read, so pre-built static pages are allowed",
     "Sized for scale.users_12_months: 3,000 users, about 600 active on a day (20% daily-to-monthly ratio); scale.users_at_launch (200) is the starting point",
     "requirements.p95_latency_ms is null: no latency target, so the engine plans for its 300 ms default",

@@ -469,10 +469,23 @@ def test_a_relaxed_preference_is_named_in_assumptions():
 
 def test_a_long_description_is_accepted_and_moves_nothing(outputs):
     """Table 3.1 sets no maximum length for project.description (the request body limit bounds the size), and the
-    description is never parsed for a scenario file."""
+    description sets no field of a scenario file."""
     out = run(edit("P2", project={"description": "Customers book electricians and plumbers. " * 500}))
     assert out["status"] == outputs["P2"]["status"] and not out["validation_errors"]
     assert core(out) == core(outputs["P2"])
+
+
+def test_description_keywords_add_notes_that_quote_them_and_change_no_pick(outputs):
+    notes = lambda out: [a for a in out["assumptions"] if a.startswith("Read from project.description")]  # noqa: E731
+    p4, p6 = notes(outputs["P4"]), notes(outputs["P6"])
+    assert [n.split("'")[1] for n in p4] == ["UPI", "KYC", "double-entry", "credit scoring"], p4
+    assert [n.split("'")[1] for n in p6] == ["GPS", "intermittent", "low-end"], p6
+    for name in ("P2", "P4", "P6"):
+        blank = run(edit(name, project={"description": ""}))
+        assert not notes(blank) and core(blank) == core(outputs[name]), name
+        assert blank["estimated_monthly_cost_usd"] == outputs[name]["estimated_monthly_cost_usd"], name
+    unrelated = run(edit("P2", project={"description": "An online bookstore with a book club and stockists"}))
+    assert not notes(unrelated), notes(unrelated)
 
 
 @pytest.mark.parametrize("cloud,host", [("aws", "AWS S3 + CloudFront"), ("gcp", "Firebase Hosting"),
