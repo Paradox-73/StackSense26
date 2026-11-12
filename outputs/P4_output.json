@@ -451,10 +451,7 @@
     "iso27001: only hosts and managed services (backend-as-a-service, managed-only databases) that publish ISO/IEC 27001 certification are kept",
     "Priorities rated 4 or 5 raise their criteria's weights, strongest first: security (5), scalability (4), maintainability (4)",
     "Priorities rated 1 or 2 (cost) keep their criteria at the baseline weight",
-    "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",
-    "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
-    "Architecture preference: Not provided; using default 'auto'.",
-    "Vendor lock-in tolerance: Not provided; using default 'medium'.",
+    "Questionnaire answers the scenario schema has no field for took their defaults: data_shapes 'relational', consistency 'strong', architecture 'auto', lock_in_tolerance 'medium' (an extensions block can set them)",
     "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Set infrastructure.data_residency to india if a sector rule (e.g. RBI) applies.",
     "Stored data: The stated 500 GB counts uploaded files too. The database is sized for ~411 GB of rows (0.5 MB per daily user a month for this app type, at ~64,782 daily users, launch plus 12 months), and the other ~89 GB of files is priced as object storage on the stack's cloud."
   ],

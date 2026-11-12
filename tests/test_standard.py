@@ -1085,3 +1085,13 @@ def test_a_scenario_file_can_carry_questionnaire_answers_in_an_extensions_block(
     india = edit("P2")
     india["extensions"] = {"regions": ["europe"]}  # residency india already fixes the region
     assert core(run(india)) == core(outputs["P2"])
+
+
+def test_questionnaire_defaults_are_one_assumption_line_that_names_the_extensions_block(outputs):
+    lines = [a for a in outputs["P2"]["assumptions"] if "took their defaults" in a]
+    assert len(lines) == 1 and "data_shapes 'relational'" in lines[0] and "extensions block" in lines[0], lines
+    assert not [a for a in outputs["P2"]["assumptions"] if "Not provided; using default" in a]
+    doc = edit("P2")
+    doc["extensions"] = {"architecture": "monolith"}
+    out = run(doc)
+    assert "architecture 'auto'" not in " ".join(out["assumptions"]) and out["status"] != "invalid_input"

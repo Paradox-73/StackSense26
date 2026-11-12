@@ -188,11 +188,9 @@
     "team.languages not in the knowledge base: css; no candidate is written in it, so they match no option",
     "Priorities rated 4 or 5 raise their criteria's weights, strongest first: cost (5), time_to_market (4)",
     "Priorities rated 1 or 2 (scalability, security) keep their criteria at the baseline weight",
+    "Questionnaire answers the scenario schema has no field for took their defaults: consistency 'strong', architecture 'auto', lock_in_tolerance 'medium' (an extensions block can set them)",
     "What kinds of data do you store? (pick the main kind first): Not provided; using the default for this app type, 'document' (pages and posts are documents).",
-    "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
     "Where are your users?: Not provided: no region is favoured when hosts are scored.",
-    "Architecture preference: Not provided; using default 'auto'.",
-    "Vendor lock-in tolerance: Not provided; using default 'medium'.",
     "requirements.full_text_search is false, so no search service is recommended, although projects of this type usually add one"
   ],
   "validation_errors": []

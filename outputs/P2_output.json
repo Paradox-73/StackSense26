@@ -418,10 +418,7 @@
     "Read from project.description ('chat'): store messages in the database ordered per conversation, deliver them over the realtime connection, and send a push notification when the recipient is offline",
     "Sized for scale.users_12_months: 30,000 users, about 6,000 active on a day (20% daily-to-monthly ratio); scale.users_at_launch (2,000) is the starting point",
     "Priorities rated 4 or 5 raise their criteria's weights, strongest first: time_to_market (5), cost (4)",
-    "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",
-    "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
-    "Architecture preference: Not provided; using default 'auto'.",
-    "Vendor lock-in tolerance: Not provided; using default 'medium'.",
+    "Questionnaire answers the scenario schema has no field for took their defaults: data_shapes 'relational', consistency 'strong', architecture 'auto', lock_in_tolerance 'medium' (an extensions block can set them)",
     "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Set infrastructure.data_residency to india if a sector rule (e.g. RBI) applies.",
     "Stored data: The stated 50 GB counts uploaded files too. The database is sized for ~34 GB of rows (0.5 MB per daily user a month for this app type, at ~5,335 daily users, launch plus 12 months), and the other ~16 GB of files is priced as object storage on the stack's cloud."
   ],

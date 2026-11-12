@@ -148,7 +148,7 @@ TOP_LEVEL = set(SECTIONS) | {"scenario_id", "compliance", "priorities", "extensi
 # standard schema has no field for. Each is checked against its question in data/questions.json and then used as
 # that answer; a key not listed here is an UNKNOWN_FIELD notice, as elsewhere.
 EXTENSION_KEYS = ("data_shapes", "consistency", "regions", "lock_in_tolerance", "cacheable_share", "background_work",
-                  "peak_rps", "data_growth_gb_month", "tenancy")
+                  "peak_rps", "data_growth_gb_month", "tenancy", "architecture")
 EXTENSION_PATHS = tuple(f"extensions.{k}" for k in EXTENSION_KEYS)
 
 APP_TYPE = {"content_site": "content_site", "web_app": "saas", "saas_b2b": "saas", "ecommerce": "ecommerce",
@@ -1299,15 +1299,23 @@ def _warnings(result: dict, origin: dict) -> list[dict]:
 
 
 def _assumptions(result: dict) -> list[str]:
-    out = []
+    out, defaults = [], []
     for a in result.get("assumptions", []):
         if a.get("field") == "latency_target_ms":
             continue  # to_answers already states the latency default in the standard field's words
-        label = a.get("label") or a.get("field", "")
         reason = a.get("reason", "")
+        m = re.fullmatch(r"Not provided; using default '(.*)'\.", reason)
+        if m and a.get("field"):
+            # A questionnaire answer the schema has no field for: one line lists them all, in field names
+            defaults.append(f"{a['field']} '{m.group(1)}'")
+            continue
+        label = a.get("label") or a.get("field", "")
         for app_words, file_words in FORM_WORDS:
             reason = reason.replace(app_words, file_words)
         out.append(f"{label}: {reason}".strip())
+    if defaults:
+        out.insert(0, "Questionnaire answers the scenario schema has no field for took their defaults: "
+                   + ", ".join(defaults) + " (an extensions block can set them)")
     return out
 
 

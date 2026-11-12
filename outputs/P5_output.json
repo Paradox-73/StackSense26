@@ -270,10 +270,7 @@
     "Existing identity provider Microsoft Entra ID: sign-in reuses it through OpenID Connect or SAML instead of a new user store",
     "Existing database 'On-prem SQL Server 2019': Microsoft SQL Server is weighed with a bonus for keeping it; if it stays the pick, move its data to the recommended offering with the vendor's migration tool, or reach it over a private link (site-to-site VPN) while it stays where it is",
     "Existing system 'Microsoft 365': integrated through Microsoft Graph API (mail, calendar and Teams notifications, files); it stays the system of record for its own data",
-    "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",
-    "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
-    "Architecture preference: Not provided; using default 'auto'.",
-    "Vendor lock-in tolerance: Not provided; using default 'medium'.",
+    "Questionnaire answers the scenario schema has no field for took their defaults: data_shapes 'relational', consistency 'strong', architecture 'auto', lock_in_tolerance 'medium' (an extensions block can set them)",
     "Stored data: The stated 20 GB counts uploaded files too. The database is sized for ~3.40 GB of rows (0.5 MB per daily user a month for this app type, at ~533 daily users, launch plus 12 months), and the other ~17 GB of files is priced as object storage on the stack's cloud."
   ],
   "validation_errors": []
