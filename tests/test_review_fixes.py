@@ -289,3 +289,11 @@ def test_ruled_out_options_are_listed_only_for_the_users_own_hard_constraints():
     for out in (p1, p2, run(_doc("P5"))):
         for layer in ("frontend", "backend", "database", "hosting"):
             assert alts(out, layer), layer  # statement 4: at least one alternative per core layer
+
+
+def test_every_supporting_service_of_the_public_scenarios_names_two_alternatives_except_a_reused_system():
+    for name in ("P1", "P2", "P3", "P4", "P5", "P6"):
+        for s in run(_doc(name))["stack"]["supporting"]:
+            if "(existing)" in s["choice"]:
+                continue  # a system the project already runs: the alternative is a second one beside it
+            assert len(s["alternatives"]) >= 2 and all(a["why_not"] for a in s["alternatives"]), (name, s["choice"])

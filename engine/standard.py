@@ -1210,7 +1210,9 @@ def _ci_cd(f: dict) -> dict:
                             "to operate.")
     return {"layer": "ci_cd", "choice": choice, "justification": why,
             "driven_by": ["infrastructure.deployment_model", "team.size"],
-            "alternatives": [{"choice": alt, "why_not": "Equivalent pipelines; one more tool to learn for no gain here"}],
+            "alternatives": [{"choice": alt, "why_not": "Equivalent pipelines; one more tool to learn for no gain here"},
+                             {"choice": "Deploying by hand from a developer's machine", "why_not": "No test gate, and "
+                              "each release depends on one person's setup"}],
             "tradeoffs": ["Pipeline minutes are metered on hosted runners"] if deploy not in ("on_premise", "air_gapped")
             else ["You operate the CI server and its runners"],
             "source": "https://docs.github.com/actions" if deploy not in ("on_premise", "air_gapped")

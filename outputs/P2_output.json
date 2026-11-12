@@ -132,6 +132,10 @@
         ],
         "alternatives": [
           {
+            "choice": "Server-Sent Events (a one-way stream)",
+            "why_not": "Server to client only; chat, presence and live edits need messages both ways"
+          },
+          {
             "choice": "Polling the API every few seconds",
             "why_not": "Every client asks again and again, which multiplies requests and still shows changes late"
           }
@@ -150,6 +154,10 @@
           "scale.workload"
         ],
         "alternatives": [
+          {
+            "choice": "Cron jobs on the server",
+            "why_not": "Fixed schedules only: no retries, no priorities and nothing started by a user's action"
+          },
           {
             "choice": "Doing the work inside the web request",
             "why_not": "Slow emails, uploads and API calls would hold the request open and fail with it"
@@ -201,6 +209,10 @@
           {
             "choice": "Files in database columns",
             "why_not": "They bloat backups and the database disk, which costs several times more per GB than object storage"
+          },
+          {
+            "choice": "Public links to the object store",
+            "why_not": "No resizing or edge caching, and private files would be reachable by anyone with the link"
           },
           {
             "choice": "Serving files through the app server",
@@ -295,6 +307,10 @@
         ],
         "alternatives": [
           {
+            "choice": "SMS for every alert",
+            "why_not": "Paid per message, with no rich content or in-app action"
+          },
+          {
             "choice": "Polling for new messages",
             "why_not": "It drains batteries and still misses users who are not in the app"
           }
@@ -313,6 +329,10 @@
           "infrastructure.data_residency"
         ],
         "alternatives": [
+          {
+            "choice": "Uptime checks only",
+            "why_not": "They show the app is down, not why"
+          },
           {
             "choice": "Logs only",
             "why_not": "Without traces and metrics there is no way to see which call is slow or failing"
@@ -335,6 +355,10 @@
           {
             "choice": "GitLab CI/CD",
             "why_not": "Equivalent pipelines; one more tool to learn for no gain here"
+          },
+          {
+            "choice": "Deploying by hand from a developer's machine",
+            "why_not": "No test gate, and each release depends on one person's setup"
           }
         ],
         "tradeoffs": [

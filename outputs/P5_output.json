@@ -136,6 +136,10 @@
         ],
         "alternatives": [
           {
+            "choice": "Cron jobs on the server",
+            "why_not": "Fixed schedules only: no retries, no priorities and nothing started by a user's action"
+          },
+          {
             "choice": "Doing the work inside the web request",
             "why_not": "Slow emails, uploads and API calls would hold the request open and fail with it"
           }
@@ -154,6 +158,10 @@
           "infrastructure.data_residency"
         ],
         "alternatives": [
+          {
+            "choice": "Files on the app server's disk",
+            "why_not": "Lost when an instance is replaced, and not shared between instances"
+          },
           {
             "choice": "Files in database columns",
             "why_not": "They bloat backups and the database disk, which costs several times more per GB than object storage"
@@ -193,6 +201,10 @@
         ],
         "alternatives": [
           {
+            "choice": "Uptime checks only",
+            "why_not": "They show the app is down, not why"
+          },
+          {
             "choice": "Logs only",
             "why_not": "Without traces and metrics there is no way to see which call is slow or failing"
           }
@@ -214,6 +226,10 @@
           {
             "choice": "GitLab CI/CD",
             "why_not": "Equivalent pipelines; one more tool to learn for no gain here"
+          },
+          {
+            "choice": "Deploying by hand from a developer's machine",
+            "why_not": "No test gate, and each release depends on one person's setup"
           }
         ],
         "tradeoffs": [

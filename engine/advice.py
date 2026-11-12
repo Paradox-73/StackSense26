@@ -1369,6 +1369,51 @@ SECONDARY_NOTES = ([("Querying that shape on the primary database", "It models t
                    ["A second store to keep in sync with the system of record"])
 
 
+# A second, different approach per supporting role, beside the do-it-in-the-app alternative of SERVICE_NOTES.
+SECOND_APPROACH = {
+    "Cache": ("A CDN or HTTP cache in front of the API", "It caches whole public responses only, not sessions, counters "
+              "or per-user data"),
+    "Realtime": ("Server-Sent Events (a one-way stream)", "Server to client only; chat, presence and live edits need "
+                 "messages both ways"),
+    "Collaboration sync": ("Locking the document while one person edits", "Only one person can edit at a time, which "
+                           "is not multi-user editing"),
+    "Background jobs": ("Cron jobs on the server", "Fixed schedules only: no retries, no priorities and nothing started "
+                        "by a user's action"),
+    "Ingestion buffer": ("Batching events in each app instance before writing", "Events held in memory are lost when an "
+                         "instance crashes before its batch is written"),
+    "Vector search": ("Keyword search only, without embeddings", "It misses matches worded differently, which retrieval "
+                      "for a language model depends on"),
+    "Analytics": ("A weekly spreadsheet export", "Manual, and the numbers are stale between exports"),
+    "Static frontend": ("A separate VM running nginx", "A server to patch and scale for files a static host serves "
+                        "for little or nothing"),
+    "CDN": ("Serving files straight from object storage", "No edge cache, so distant users wait longer and every "
+            "download is billed as storage egress"),
+    "Media delivery": ("Public links to the object store", "No resizing or edge caching, and private files would be "
+                       "reachable by anyone with the link"),
+    "Object storage": ("Files on the app server's disk", "Lost when an instance is replaced, and not shared between "
+                       "instances"),
+    "Enterprise SSO": ("Each customer's SAML or OIDC login written in the app", "Every integration to build, test and "
+                       "keep working yourself"),
+    "Offline sync": ("Online only, with a retry queue for failed requests", "The app stops working without signal, "
+                     "which the offline requirement rules out"),
+    "Push notifications": ("SMS for every alert", "Paid per message, with no rich content or in-app action"),
+    "Notifications": ("Email only", "Slower to notice and easy to miss for time-sensitive events"),
+    "Model serving": ("A nightly batch job that scores everything", "Results are up to a day old, so a request that "
+                      "needs a fresh answer cannot use them"),
+    "Video on demand": ("An embedded public video platform", "No control over access, ads or branding, so not for "
+                        "private or paid video"),
+    "Live video": ("Pre-recorded video only", "It loses the live interaction the product needs"),
+    "Maps & live location": ("Static map images", "No live movement: every refresh is a new image"),
+    "GPU workers": ("CPU-only inference", "Fine for small models, too slow for the model sizes this work needs"),
+    "Code sandbox": ("Plain containers without extra isolation", "Containers share the host kernel; untrusted code "
+                     "needs gVisor, Firecracker or a separate VM"),
+    "Hybrid split": ("Everything on-premises", "It gives up the cloud's elastic capacity for the parts allowed to run "
+                     "there"),
+    "Observability": ("Uptime checks only", "They show the app is down, not why"),
+    "Audit & security": ("A yearly manual review", "Problems surface months late, and nothing alerts in between"),
+}
+
+
 def service_notes(s: dict, compliance=()) -> tuple[list[tuple[str, str]], list[str]]:
     """(alternatives, trade-offs) of one supporting service, with the product alternatives its choice implies."""
     alts, trade = SECONDARY_NOTES if s["role"].startswith("Secondary store") else SERVICE_NOTES.get(s["role"], ([], []))
@@ -1418,6 +1463,9 @@ def service_notes(s: dict, compliance=()) -> tuple[list[tuple[str, str]], list[s
         extra.append(("Ceph Object Gateway on your own servers", "A storage cluster to run yourself"))
     elif s["role"] == "Search" and not s.get("system") and "Meilisearch" not in name:  # the database's own index
         extra.append(("Meilisearch", "A second system to run before the data needs it"))
+    second = SECOND_APPROACH.get(s["role"])
+    if second and len(extra + alts) < 2 and second[0].split(" (")[0] not in name:
+        extra.append(second)
     return extra + alts, trade
 
 

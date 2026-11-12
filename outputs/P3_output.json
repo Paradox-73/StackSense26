@@ -126,6 +126,10 @@
         ],
         "alternatives": [
           {
+            "choice": "A CDN or HTTP cache in front of the API",
+            "why_not": "It caches whole public responses only, not sessions, counters or per-user data"
+          },
+          {
             "choice": "The database's own buffer cache only",
             "why_not": "It holds hot rows only until the working set outgrows the database's memory, and every read still costs a database round trip"
           }
@@ -144,6 +148,10 @@
           "scale.peak_concurrent_users"
         ],
         "alternatives": [
+          {
+            "choice": "Server-Sent Events (a one-way stream)",
+            "why_not": "Server to client only; chat, presence and live edits need messages both ways"
+          },
           {
             "choice": "Polling the API every few seconds",
             "why_not": "Every client asks again and again, which multiplies requests and still shows changes late"
@@ -164,6 +172,10 @@
         ],
         "alternatives": [
           {
+            "choice": "Locking the document while one person edits",
+            "why_not": "Only one person can edit at a time, which is not multi-user editing"
+          },
+          {
             "choice": "Operational transformation (ShareDB)",
             "why_not": "A central server must order every edit, and offline edits merge less cleanly than with CRDTs"
           }
@@ -183,6 +195,10 @@
         ],
         "alternatives": [
           {
+            "choice": "Cron jobs on the server",
+            "why_not": "Fixed schedules only: no retries, no priorities and nothing started by a user's action"
+          },
+          {
             "choice": "Doing the work inside the web request",
             "why_not": "Slow emails, uploads and API calls would hold the request open and fail with it"
           }
@@ -200,6 +216,10 @@
           "requirements.file_media_storage"
         ],
         "alternatives": [
+          {
+            "choice": "Files on the app server's disk",
+            "why_not": "Lost when an instance is replaced, and not shared between instances"
+          },
           {
             "choice": "Files in database columns",
             "why_not": "They bloat backups and the database disk, which costs several times more per GB than object storage"
@@ -219,6 +239,10 @@
           "scale.users_12_months"
         ],
         "alternatives": [
+          {
+            "choice": "Public links to the object store",
+            "why_not": "No resizing or edge caching, and private files would be reachable by anyone with the link"
+          },
           {
             "choice": "Serving files through the app server",
             "why_not": "Each download holds an app connection and pays the app host's egress price"
@@ -283,6 +307,10 @@
         ],
         "alternatives": [
           {
+            "choice": "Uptime checks only",
+            "why_not": "They show the app is down, not why"
+          },
+          {
             "choice": "Logs only",
             "why_not": "Without traces and metrics there is no way to see which call is slow or failing"
           }
@@ -304,6 +332,10 @@
           {
             "choice": "GitLab CI/CD",
             "why_not": "Equivalent pipelines; one more tool to learn for no gain here"
+          },
+          {
+            "choice": "Deploying by hand from a developer's machine",
+            "why_not": "No test gate, and each release depends on one person's setup"
           }
         ],
         "tradeoffs": [

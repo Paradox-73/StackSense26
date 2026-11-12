@@ -130,6 +130,10 @@
         ],
         "alternatives": [
           {
+            "choice": "Uptime checks only",
+            "why_not": "They show the app is down, not why"
+          },
+          {
             "choice": "Logs only",
             "why_not": "Without traces and metrics there is no way to see which call is slow or failing"
           }
@@ -151,6 +155,10 @@
           {
             "choice": "GitLab CI/CD",
             "why_not": "Equivalent pipelines; one more tool to learn for no gain here"
+          },
+          {
+            "choice": "Deploying by hand from a developer's machine",
+            "why_not": "No test gate, and each release depends on one person's setup"
           }
         ],
         "tradeoffs": [
