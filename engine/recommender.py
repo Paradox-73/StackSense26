@@ -39,6 +39,7 @@ from .profile import (
 from .scoring import (
     EXISTING_SYSTEM_BONUS,
     KEPT_DATABASES,
+    PLACED_WINDOW,
     build_weights,
     hard_constraints,
     net_cost,
@@ -612,6 +613,25 @@ def _picks(core: dict) -> dict[str, str]:
     return {l: c["id"] for l, c in core["combos"][0]["picks"].items()}
 
 
+def _range_over_warning(p: dict, d: dict, cost: dict) -> dict:
+    """BUDGET_RANGE_OVER: the low end of the estimate fits the budget but its top does not, so the budget holds only
+    while the load stays near today's. Names the lines that grow most between the two ends."""
+    lo, hi, budget = cost["total_low"], cost["total_high"], d["budget_usd"]
+    middle = (lo + hi) / 2
+    part = (f"its middle ({_money(middle, p)}) is above it too" if middle > budget else
+            f"its middle ({_money(middle, p)}) still fits")
+    growth = sorted((x for x in cost["lines"] if x["high"] > x["low"]), key=lambda x: x["low"] - x["high"])[:2]
+    drivers = "; ".join(f"{x['component']} ({_money(x['low'], p).removesuffix('/month')}-"
+                        f"{_money(x['high'], p)})" for x in growth)
+    detail = (f"The estimate is {_money(lo, p).removesuffix('/month')}-{_money(hi, p)} against a budget of "
+              f"{_money(budget, p)}: the low end fits, the top end does not, and {part}. The top end is the price at "
+              f"~{10 ** PLACED_WINDOW:.0f}x today's load in the {d['tier_label']} tier; the lines that grow most: {drivers}.")
+    res = ("Plan for the low end and watch those lines; raise the budget before the load grows, or lower the "
+           "availability target or scale inputs if they were set high.")
+    return _warn("BUDGET_RANGE_OVER", "warning", "Budget below the top of the estimate", detail, res,
+                 ["budget_monthly", "dau"])
+
+
 def _money(usd: float, p: dict) -> str:
     if p["currency"] == "INR":
         return f"₹{usd * INR_PER_USD:,.0f}/month"
@@ -814,9 +834,10 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
                             f"{_money(cost['total_low'], p)} (see Cost). Only free plans fit a zero budget, and free plans "
                             "carry no uptime guarantee (no SLA); many pause or throttle idle projects.")
             wn["resolution"] = "Budget for the paid plans in the estimate to get a written SLA, or treat the target as a goal."
-    min_cost, _ = min_feasible_cost(p, d, core["scored"]["hosting"], core["scored"]["database"])
+    min_cost, cheapest_pair = min_feasible_cost(p, d, core["scored"]["hosting"], core["scored"]["database"])
     if cost["total_low"] > d["budget_usd"]:
-        sev = "critical" if min_cost > d["budget_usd"] else "warning"
+        # Even the low end of the estimate breaks the budget: critical, as the budget is broken by the stack shown.
+        sev = "critical"
         detail = (f"Estimated minimum spend {_money(cost['total_low'], p)} exceeds your budget of {_money(d['budget_usd'], p)}"
                   f" at {d['tier_label']} scale.")
         if d["data_estimated"] and d["data_tier"] == d["db_tier"]:
@@ -832,16 +853,20 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
                 res = (f"No feasible combination fits: the stack shown starts at {_money(cost['total_low'], p)}, below the "
                        f"cheapest compliant separate hosting + database ({_money(min_cost, p)}), and is still above the budget. ")
             else:
-                res = (f"No feasible combination fits: the cheapest compliant hosting + database alone costs about "
-                       f"{_money(min_cost, p)}. The stack shown starts at {_money(cost['total_low'], p)}, "
+                res = (f"No feasible combination fits: the cheapest compliant hosting + database alone ({cheapest_pair}) "
+                       f"costs about {_money(min_cost, p)} before usage terms. The stack shown starts at {_money(cost['total_low'], p)}, "
                        f"{_money(pair, p)} of it for its hosting and database"
-                       + (", which scored higher on your other priorities than the cheapest pair" if pair > min_cost + 0.5
-                          else "") + ". ")
+                       + (f". Neither fits the budget, so the stack that scored higher on your other priorities is kept; "
+                          f"the cheapest pair would save about {_money(pair - min_cost, p)} and still be "
+                          f"{_money(min_cost - d['budget_usd'], p)} over" if pair > min_cost + 0.5 else "") + ". ")
             res += "Cost was weighted up. Raise the budget or reduce scale/compliance scope."
         else:
-            res = "A cheaper stack exists but scored lower on your other priorities; see the 'Budget cut' scenario under 'What would change'."
+            res = (f"A cheaper stack exists but scored lower on your other priorities: hosting + database from about "
+                   f"{_money(min_cost, p)} ({cheapest_pair}); see the 'Budget cut' scenario under 'What would change'.")
         core["warnings"].append(_warn("BUDGET_INFEASIBLE" if min_cost > d["budget_usd"] else "BUDGET_STRETCH",
                                       sev, "Budget below estimated cost", detail, res, ["budget_monthly", "dau"]))
+    elif cost["total_high"] > d["budget_usd"]:
+        core["warnings"].append(_range_over_warning(p, d, cost))
 
     core["warnings"] += _scale_warnings(p, d, stack_items, core["warnings"])
     if not baas_hosts_everything(d, stack_items):  # else the host serves only an optional landing page

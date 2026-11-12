@@ -2,13 +2,18 @@
 placed_cost): the low end stays the band's floor (the bill the budget guard checks), and the top end is the price
 half a tier above the project's place, so at the tier's bottom it sits near the floor, it rises smoothly with users
 and it does not jump at a tier edge. Every floor the band carries (entry plans, HIPAA/SSO/SOC 2 minimums) still holds.
-The budget guard's bill (usage=False) keeps whole bands, the same at every user count of a tier."""
+The budget guard's bill (usage=False) keeps whole bands, the same at every user count of a tier. The budget status and
+the BUDGET_* warnings follow the displayed estimate."""
+import glob
+
 import pytest
 
+from engine import recommend
 from engine.advice import estimate_cost
-from engine.kb import load_kb
+from engine.kb import load_kb, load_presets
 from engine.profile import CONCURRENT_THRESHOLDS, DAU_THRESHOLDS, TIER_NAMES, derive, normalize
 from engine.scoring import placed_cost, scale_place, tier_cost
+from engine.standard import run_text
 
 KB = load_kb()["index"]
 PLAIN = normalize({"app_type": "saas", "dau": 1000})[0]  # no compliance, SSO or static site: the bands as listed
@@ -126,3 +131,33 @@ def test_bottom_of_large_tier_quotes_the_floor_and_says_where():
     host = next(x for x in estimate_cost(p, d, STACK, [])["lines"] if x["component"].startswith("Hosting"))
     assert host["low"] == tier_cost(KB["digitalocean"], 3, p)[0]
     assert "5,000 users online at once" in host["basis"] and "bottom of the tier" in host["basis"]
+
+
+def _budget_codes(warnings):
+    return {w["code"]: w["severity"] for w in warnings if w["code"].startswith("BUDGET_") and w["code"] != "BUDGET_OVERSIZED"}
+
+
+@pytest.mark.parametrize("preset", [x["id"] for x in load_presets()])
+def test_budget_status_and_warnings_follow_the_displayed_estimate(preset):
+    r = recommend(next(x for x in load_presets() if x["id"] == preset)["input"], with_counterfactuals=False)
+    if not r["feasible"]:
+        return
+    c, codes = r["cost"], _budget_codes(r["warnings"])
+    if c["total_low"] > c["budget_usd"]:
+        assert c["status"] == "over" and set(codes) & {"BUDGET_INFEASIBLE", "BUDGET_STRETCH"}
+        assert "critical" in codes.values()
+    elif c["total_high"] > c["budget_usd"]:
+        assert c["status"] == "stretch" and codes == {"BUDGET_RANGE_OVER": "warning"}
+    else:
+        assert c["status"] == "within" and not codes
+
+
+@pytest.mark.parametrize("path", sorted(glob.glob("scenarios/public/*.json") + glob.glob("scenarios/edge/*.json")))
+def test_no_scenario_goes_over_budget_silently(path):
+    out = run_text(open(path, encoding="utf-8").read(), capped=False)
+    if out["status"] in ("invalid_input", "infeasible"):
+        return
+    cost = out["estimated_monthly_cost_usd"]
+    check = next(x for x in cost["assumptions"] if x.startswith("Budget check: $"))  # the budget used (or its default)
+    if cost["max"] > float(check.split("$")[1].split("/")[0].replace(",", "")):
+        assert _budget_codes(out["warnings"]) and out["status"] == "ok_with_warnings", out["warnings"]
