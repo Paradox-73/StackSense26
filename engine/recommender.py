@@ -59,6 +59,7 @@ from .stack import (
     choose,
     combo_ids,
     combo_score,
+    decided_text,
     layer_alternatives,
     matching_rules,
     search,
@@ -740,6 +741,12 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
         # their text now describes the split instead of functions-only hosting.
         best = dict(best, rules=[dict(r, note=split_note(stack_items, api_host, r["id"])) if r["id"] in SPLIT_RULES else r
                                  for r in best["rules"]])
+    services, deferred, ops = apply_ops_budget(p, supporting_services(
+        p, d, dict(stack_items, api_host=api_host["item"]) if api_host else stack_items, core["scored"]["database"]))
+    cost = estimate_cost(p, d, dict(stack_items, api_host=api_host["item"]) if api_host else stack_items, services)
+    if best.get("tie_break") and cost["total_low"] > d["budget_usd"]:
+        # The budget rules compare the bands' floors; the estimate shown is still over: the texts must not say "fits".
+        best = dict(best, tie_break=dict(best["tie_break"], shown_over=cost["total_low"]))
     layers_out = {}
     for layer in LAYERS:
         pick = best["picks"][layer]
@@ -820,9 +827,6 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
                          "why": why + (f"; it shares skills/types with {stack_items['frontend']['name']}." if shares else "."),
                          "ranking": [{"name": x["name"], "score": x["score"]} for x in scored]}
 
-    services, deferred, ops = apply_ops_budget(p, supporting_services(
-        p, d, dict(stack_items, api_host=api_host["item"]) if api_host else stack_items, core["scored"]["database"]))
-    cost = estimate_cost(p, d, dict(stack_items, api_host=api_host["item"]) if api_host else stack_items, services)
     arch = architecture(p, d, stack_items)
     arch["how_parts_fit"] = how_parts_fit(p, d, stack_items, services, api_host)
 
@@ -985,12 +989,14 @@ def _tie_break_out(best: dict, p: dict, d: dict) -> dict | None:
         changed = g.get("changed") or []
         kept = ("keeps its backend and database" if not {"backend", "database"} & set(changed) else
                 "changes the " + " and ".join(changed))
+        fits = (f"fits the budget at the bands' floors (about {_money(g['cost'], p)}), but the estimate for your "
+                f"scale still starts at {_money(tb['shown_over'], p)}, over the budget" if tb.get("shown_over") else
+                f"fits the budget (about {_money(g['cost'], p)})")
         return dict(tb, text=(
             f"The stack that would otherwise be chosen ({over}, {g['over_score']:.1f}) has a minimum of about "
-            f"{_money(g['over_cost'], p)}, above your budget of {_money(d['budget_usd'], p)}; this stack {kept}, "
-            f"scores {points(g['over_score'] - best['score'])} lower and fits the budget "
-            f"(about {_money(g['cost'], p)}), so it was chosen (a stack that fits is preferred when it is within "
-            f"{BUDGET_GUARD_POINTS:g} points)."))
+            f"{_money(g['over_cost'], p)} at the price bands' floors, above your budget of {_money(d['budget_usd'], p)}; "
+            f"this stack {kept}, scores {points(g['over_score'] - best['score'])} lower and {fits}, so it was chosen "
+            f"(a stack that fits is preferred when it is within {BUDGET_GUARD_POINTS:g} points)."))
     if tb.get("avoided_return"):
         back = ", ".join(f"{name} ({layer})" for layer, name in tb["avoided_return"])
         return dict(tb, text=(
@@ -1007,7 +1013,7 @@ def _tie_break_out(best: dict, p: dict, d: dict) -> dict | None:
     text = (f"The highest-scoring stack ({top}, {tb['top_score']:.1f}) is only {points(tb['margin'])} ahead, "
             f"inside the {TIE_MARGIN:g}-point tie margin, so StackSense treats it as a tie")
     if tb.get("decided_by"):
-        text += f" and chose this stack on {tb['decided_by']}."
+        text += f" and chose this stack on {decided_text(tb)}."
     else:
         text += f" and chose this stack on {TIE_ORDER_TEXT}."
     return dict(tb, text=text)

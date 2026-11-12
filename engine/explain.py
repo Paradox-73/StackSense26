@@ -5,7 +5,7 @@ from collections import defaultdict
 
 from .kb import CRITERION_LABELS, relevant_lines
 from .scoring import INPUT_LABELS, Weights, shape_models, write_scale
-from .stack import TIE_MARGIN, TIE_ORDER_TEXT, tie_reason
+from .stack import TIE_MARGIN, TIE_ORDER_TEXT, decided_text, tie_reason
 
 # How the paragraphs' closing sentence defines "stack points" (data/explain_templates.json); said once per result.
 STACK_POINTS_DEF = " (points of the overall stack score, the average of the four layer scores)"
@@ -159,6 +159,9 @@ def stack_rule(best: dict | None) -> str:
     """The rule that chose the stack over a higher-scoring one, in words."""
     tb = (best or {}).get("tie_break") or {}
     if tb.get("budget_guard"):
+        if tb.get("shown_over"):
+            return ("the budget rule (a stack whose minimum bill at the price bands' floors fits your budget is preferred "
+                    "when it scores only a few points lower; the estimate for your scale is still over the budget)")
         return "the budget rule (a stack whose minimum bill fits your budget is preferred when it scores only a few points lower)"
     if tb.get("avoided_return"):
         return ("the growth-path rule (the stack does not switch back to a technology the recommendation at a smaller "
@@ -166,7 +169,7 @@ def stack_rule(best: dict | None) -> str:
     if tb.get("kept_on_growth_path"):
         return "the growth-path rule (a pick the recommendation at a larger scale comes back to is held)"
     if tb.get("decided_by"):
-        return f"the tie-break on {tb['decided_by']}"
+        return f"the tie-break on {decided_text(tb)}"
     return TIE_ORDER_TEXT
 
 

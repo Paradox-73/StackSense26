@@ -5,6 +5,7 @@ and it does not jump at a tier edge. Every floor the band carries (entry plans, 
 The budget guard's bill (usage=False) keeps whole bands, the same at every user count of a tier. The budget status and
 the BUDGET_* warnings follow the displayed estimate."""
 import glob
+import json
 
 import pytest
 
@@ -161,3 +162,29 @@ def test_no_scenario_goes_over_budget_silently(path):
     check = next(x for x in cost["assumptions"] if x.startswith("Budget check: $"))  # the budget used (or its default)
     if cost["max"] > float(check.split("$")[1].split("/")[0].replace(",", "")):
         assert _budget_codes(out["warnings"]) and out["status"] == "ok_with_warnings", out["warnings"]
+
+
+def _p2(**change):
+    doc = json.load(open("scenarios/public/P2.json", encoding="utf-8"))
+    for path, value in change.items():
+        section, key = path.split("__")
+        doc[section][key] = value
+    return run_text(json.dumps(doc), capped=False)
+
+
+UNQUALIFIED_FIT = ("minimum bill that fits your budget", "fits the budget (about")
+
+
+@pytest.mark.parametrize("change", [{}, {"budget__monthly_infra_usd": 165.0}, {"priorities__performance": 4},
+                                    {"budget__monthly_infra_usd": 300}])
+def test_budget_rule_says_fits_only_when_the_estimate_fits(change):
+    """P2 with its budget raised 10% picked Cloud Run "on a minimum bill that fits your budget" while the estimate
+    shown was over $165: the budget rules compare the bands' floors, so the words must follow the estimate shown."""
+    out = _p2(**change)
+    budget = json.load(open("scenarios/public/P2.json", encoding="utf-8"))["budget"]["monthly_infra_usd"]
+    budget = change.get("budget__monthly_infra_usd", budget)
+    text = json.dumps(out["stack"]) + json.dumps(out["warnings"])
+    if out["estimated_monthly_cost_usd"]["min"] > budget:
+        assert not any(x in text for x in UNQUALIFIED_FIT), [x for x in UNQUALIFIED_FIT if x in text]
+    if out["estimated_monthly_cost_usd"]["max"] > budget:
+        assert _budget_codes(out["warnings"]) and out["status"] == "ok_with_warnings"

@@ -443,6 +443,16 @@ def combo_ids(combo: dict) -> tuple:
     return tuple(combo["picks"][l]["id"] for l in LAYERS)
 
 
+FITS_BUDGET = "a minimum bill that fits your budget"
+# The tie-break's bill is the bands' floors; when the estimate shown is over the budget, it must not say "fits".
+FLOOR_BILL = "a lower minimum bill at the price bands' floors (the estimate for your scale is still over your budget)"
+
+
+def decided_text(tb: dict) -> str:
+    """The tie-break preference that decided, in words true of the estimate shown (tie_break 'shown_over')."""
+    return FLOOR_BILL if tb.get("decided_by") == FITS_BUDGET and tb.get("shown_over") else tb["decided_by"]
+
+
 def _decided_by(winner: dict, top: dict, left: dict | None = None, fit=None) -> str | None:
     if _returns(winner, left) < _returns(top, left):
         return "not switching back to a technology the stack had already moved away from at a smaller scale"
@@ -452,7 +462,7 @@ def _decided_by(winner: dict, top: dict, left: dict | None = None, fit=None) -> 
         if mw + uw < mt + ut:
             if mw < mt:
                 return f"meeting more of your stated requirements ({mw} vs {mt} layers short of one)"
-            return "a minimum bill that fits your budget"
+            return FITS_BUDGET
     return tie_reason(winner, top)
 
 
