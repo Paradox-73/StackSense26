@@ -59,7 +59,10 @@ def check_schema(out: dict) -> None:
     if out["status"] == "invalid_input":
         assert out["stack"] is None and out["validation_errors"]
         return
-    assert not out["validation_errors"]
+    # A valid result lists only missing required fields, each defaulted and warned about (section 4 and section 6).
+    missing = {w["fields"][0] for w in out["warnings"] if w["code"] == "MISSING_REQUIRED_FIELD"}
+    assert {e["field"] for e in out["validation_errors"]} == missing, (out["validation_errors"], missing)
+    assert all("documented default" in e["message"] for e in out["validation_errors"])
     if out["status"] == "infeasible":
         assert out["stack"] is None and any(w["severity"] == "critical" for w in out["warnings"])
         return
