@@ -279,10 +279,11 @@
       {
         "layer": "auth",
         "choice": "Clerk",
-        "justification": "Social sign-in (Google, Apple, GitHub) needs OAuth 2.0 and OpenID Connect flows, account linking and token refresh, which a maintained sign-in product handles. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Social sign-in (Google, Apple, GitHub) needs OAuth 2.0 and OpenID Connect flows, account linking and token refresh, which a maintained sign-in product handles. Clerk is a US company, so under GDPR sign its data processing agreement with Standard Contractual Clauses (GDPR Chapter V). Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.auth",
-          "scale.users_12_months"
+          "scale.users_12_months",
+          "compliance"
         ],
         "alternatives": [
           {

@@ -1090,7 +1090,11 @@ def _component(layer: str, sl: dict, origin: dict, f: dict, result: dict) -> dic
     ruled = _paths([c for x in sl.get("excluded", []) for c in x.get("constraints", [])], origin)
     driven_by = list(dict.fromkeys(_paths([c["input"] for c in scored], origin)[:DRIVERS_SCORED]
                                    + ruled[:DRIVERS_RULED])) or ["project.type"]
-    alternatives = [{"choice": w["name"], "why_not": w["text"]} for w in sl.get("why_not", [])][:3]
+    # Weighed alternatives that trail by more than FAR_BEHIND points are not contenders (ECS for a static blog); the
+    # closest one always stays, so every layer keeps an alternative.
+    near = [w for w in sl.get("why_not", []) if w.get("gap") is None or w["gap"] <= FAR_BEHIND]
+    near = near or sl.get("why_not", [])[:1]
+    alternatives = [{"choice": w["name"], "why_not": w["text"]} for w in near][:3]
     companion = result["companion"]["name"] if layer == "frontend" and result.get("companion") else None
     alternatives = [x for x in alternatives if x["choice"] != companion]
     taken = {pick["name"], companion} | {x["choice"] for x in alternatives}
@@ -1115,6 +1119,7 @@ def _component(layer: str, sl: dict, origin: dict, f: dict, result: dict) -> dic
             "tradeoffs": list(dict.fromkeys(ex.get("tradeoffs", []) + ex.get("risks", [])))}
 
 
+FAR_BEHIND = 15.0  # points of the 0-100 stack score
 HARD_RULE_WORDS = re.compile(r"region|residency|HIPAA|BAA|PCI|ISO 27001|SOC 2|the cloud you require|air-gapped|\bIndia\b|"
                              r"\bEU\b|existing", re.I)
 
@@ -1204,6 +1209,13 @@ def _supporting(result: dict, f: dict) -> list[dict]:
             why = AUTH_WHY[f["requirements.auth"]] + (f" {s['name'].split(': ', 1)[1][0].upper()}"
                                                       f"{s['name'].split(': ', 1)[1][1:]}." if ": " in s["name"] else "")
             fields = fields + ["scale.users_12_months"]
+            if "gdpr" in f["compliance"] and s["name"].startswith("Clerk"):
+                why += (" Clerk is a US company, so under GDPR sign its data processing agreement with Standard "
+                        "Contractual Clauses (GDPR Chapter V).")
+                fields = fields + ["compliance"]
+        if f["infrastructure.data_residency"] != "none" and "infrastructure.data_residency" not in fields and re.search(
+                r"region|residency|\bIndia\b|\bEU\b", s["name"] + " " + s["why"]):
+            fields = fields + ["infrastructure.data_residency"]  # the residency rule shaped this service too
         layer = s.get("layer") or layer
         alts = [{"choice": c, "why_not": w} for c, w in alts if c.split(" (")[0] not in s["name"]]
         entry = {"layer": layer, "choice": s["name"], "justification": why, "driven_by": fields,

@@ -22,7 +22,7 @@
         },
         {
           "choice": "Server-rendered HTML + HTMX",
-          "why_not": "Swapping it in lowers the stack score by 12.0 points. Astro is stronger on performance / latency (5.0 vs 4.0), structure for large teams (3.0 vs 2.0); Server-rendered HTML + HTMX is stronger on learning curve (5.0 vs 4.0), team skill match (4.5 vs 4.0). A stack compatibility rule costs it 13.0 points, more than the whole gap, while on this layer's own criteria it is 1.0 points ahead: HTMX needs a server that renders HTML; BaaS/function backends return JSON, and a static site runs no server code at all."
+          "why_not": "Swapping it in lowers the stack score by 12.0 points. Astro is stronger on performance / latency (5.0 vs 4.0); Server-rendered HTML + HTMX is stronger on learning curve (5.0 vs 4.0), team skill match (4.5 vs 4.0). A stack compatibility rule costs it 13.0 points, more than the whole gap, while on this layer's own criteria it is 1.0 points ahead: HTMX needs a server that renders HTML; BaaS/function backends return JSON, and a static site runs no server code at all."
         },
         {
           "choice": "Next.js (React)",
@@ -50,11 +50,7 @@
         },
         {
           "choice": "Node.js + Express",
-          "why_not": "Swapping it in lowers the stack score by 7.2 points. No server code (static site) is stronger on low ops burden (5.0 vs 4.0), performance / latency (5.0 vs 3.0); Node.js + Express is stronger on realtime fit (4.0 vs 1.0). 3.5 of the 7.2 points come from a stack compatibility rule: This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets."
-        },
-        {
-          "choice": "Python + Django",
-          "why_not": "Swapping it in lowers the stack score by 41.5 points. No server code (static site) is stronger on team skill match (4.5 vs 1.5), low ops burden (5.0 vs 4.0); Python + Django is stronger on structure for large teams (4.0 vs 3.0), realtime fit (2.0 vs 1.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn. 33.5 of the 41.5 points come from a stack compatibility rule: Netlify Functions run TypeScript and JavaScript; Go runs only in the deprecated Lambda-compatible mode, which accepts no deploys after 1 July 2027, and no other language runs there, so this API cannot run on Netlify. Host it on a container or PaaS service."
+          "why_not": "Swapping it in lowers the stack score by 7.2 points. No server code (static site) is stronger on low ops burden (5.0 vs 4.0), performance / latency (5.0 vs 3.0). 3.5 of the 7.2 points come from a stack compatibility rule: This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets."
         }
       ],
       "tradeoffs": [
@@ -75,15 +71,15 @@
       "alternatives": [
         {
           "choice": "Cloud Firestore",
-          "why_not": "Swapping it in lowers the stack score by 8.8 points. No database (content files in git) is stronger on team skill match (4.5 vs 3.5), performance / latency (5.0 vs 4.0); Cloud Firestore is stronger on data-model fit (5.0 vs 4.0), realtime fit (5.0 vs 1.0). 8.0 of the 8.8 points come from a stack compatibility rule: With no server code, nothing can query a database at request time; a static site reads content files at build time."
+          "why_not": "Swapping it in lowers the stack score by 8.8 points. No database (content files in git) is stronger on team skill match (4.5 vs 3.5), performance / latency (5.0 vs 4.0); Cloud Firestore is stronger on data-model fit (5.0 vs 4.0). 8.0 of the 8.8 points come from a stack compatibility rule: With no server code, nothing can query a database at request time; a static site reads content files at build time."
         },
         {
           "choice": "PostgreSQL",
-          "why_not": "Swapping it in lowers the stack score by 12.6 points. No database (content files in git) is stronger on team skill match (4.5 vs 1.5), cost at your scale (5.0 vs 4.1); PostgreSQL is stronger on realtime fit (3.0 vs 1.0); PostgreSQL takes a penalty: No free option at your scale (from ~$5/month). 5.5 of the 12.6 points come from a stack compatibility rule: With no server code, nothing can query a database at request time; a static site reads content files at build time."
+          "why_not": "Swapping it in lowers the stack score by 12.6 points. No database (content files in git) is stronger on team skill match (4.5 vs 1.5), cost at your scale (5.0 vs 4.1); PostgreSQL takes a penalty: No free option at your scale (from ~$5/month). 5.5 of the 12.6 points come from a stack compatibility rule: With no server code, nothing can query a database at request time; a static site reads content files at build time."
         },
         {
           "choice": "MySQL",
-          "why_not": "Swapping it in lowers the stack score by 14.3 points. No database (content files in git) is stronger on team skill match (4.5 vs 1.5), low ops burden (5.0 vs 4.0); MySQL is stronger on realtime fit (2.0 vs 1.0); MySQL takes a penalty: Only 3/5 fit for your primary 'document' data. 5.5 of the 14.3 points come from a stack compatibility rule: With no server code, nothing can query a database at request time; a static site reads content files at build time."
+          "why_not": "Swapping it in lowers the stack score by 14.3 points. No database (content files in git) is stronger on team skill match (4.5 vs 1.5), low ops burden (5.0 vs 4.0); MySQL takes a penalty: Only 3/5 fit for your primary 'document' data. 5.5 of the 14.3 points come from a stack compatibility rule: With no server code, nothing can query a database at request time; a static site reads content files at build time."
         }
       ],
       "tradeoffs": [
@@ -104,15 +100,15 @@
       "alternatives": [
         {
           "choice": "Cloudflare Pages + Workers",
-          "why_not": "Swapping it in lowers the stack score by 1.1 points. Netlify is stronger on learning curve (5.0 vs 4.0); Cloudflare Pages + Workers is stronger on realtime fit (3.0 vs 1.0)."
+          "why_not": "Swapping it in lowers the stack score by 1.1 points. Netlify is stronger on learning curve (5.0 vs 4.0)."
         },
         {
           "choice": "Vercel",
-          "why_not": "Swapping it in lowers the stack score by 8.4 points. Netlify is stronger on cost at your scale (5.0 vs 2.9); Vercel is stronger on realtime fit (2.0 vs 1.0); Vercel takes a penalty: No free option at your scale (from ~$20/month)."
+          "why_not": "Swapping it in lowers the stack score by 8.4 points. Netlify is stronger on cost at your scale (5.0 vs 2.9); Vercel takes a penalty: No free option at your scale (from ~$20/month)."
         },
         {
-          "choice": "AWS ECS on Fargate",
-          "why_not": "Swapping it in lowers the stack score by 23.3 points. Netlify is stronger on cost at your scale (5.0 vs 1.8), low ops burden (5.0 vs 3.0); AWS ECS on Fargate is stronger on ecosystem maturity (5.0 vs 4.0), realtime fit (4.0 vs 1.0); AWS ECS on Fargate takes a penalty: Usually needs a team of 2+ to operate. 3.5 of the 23.3 points come from a stack compatibility rule: Pre-built pages need only a static file host and its CDN; serving them from containers, functions or a server means building and patching a web-server image and paying for instances to hand out files."
+          "choice": "Render",
+          "why_not": "Swapping it in lowers the stack score by 9.7 points. Netlify is stronger on cost at your scale (5.0 vs 3.0), team skill match (3.5 vs 1.5); Render is stronger on portability (low lock-in) (4.0 vs 3.0); Render takes a penalty: No free option at your scale (from ~$7/month). 1.5 of the 9.7 points come from a stack compatibility rule: Official adapters/presets deploy this framework to the CDN + functions platform with no server to manage."
         }
       ],
       "tradeoffs": [

@@ -1596,7 +1596,8 @@
         "Broad compliance portfolio"
       ],
       "weaknesses": [
-        "Portal/config complexity; pricing tiers are confusing"
+        "Portal/config complexity; pricing tiers are confusing",
+        "The Basic tier scales out to three instances and has no autoscale; rules-based autoscale needs Standard or higher"
       ],
       "sources": [
         "https://learn.microsoft.com/azure/app-service/overview",
@@ -1699,6 +1700,7 @@
       ],
       "weaknesses": [
         "Fewer managed services than hyperscalers",
+        "One region per country in most places (BLR1 is its only Indian region), so a second-region standby for disaster recovery means a second provider",
         {"text": "Its HIPAA BAA does not cover App Platform or Managed Databases (only Droplets, Kubernetes and other listed products)", "when": {"compliance_any": ["hipaa"]}},
         {"text": "DigitalOcean lists static sites in BLR (Bangalore) as having limited availability, through the Cloudflare CDN only", "when": {"india": true, "stack_any": ["no_custom_backend"]}}
       ],

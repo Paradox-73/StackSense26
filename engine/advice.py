@@ -726,6 +726,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             why += (" Push services are not covered by a BAA: put no health information in the notification "
                     "text (e.g. 'You have a new message') and show the content only after the user signs in.")
         expo = stack["frontend"].get("id") == "react_native"  # Expo's push service exists only for Expo apps
+        ios = "ios" in p["platforms"]  # Apple's push service (APNs) carries only an iOS app's notifications
         if residency(env):
             # Expo hosts its push service in Google Cloud's US region (docs.expo.dev); Firebase may process data wherever
             # Google has facilities unless a feature offers a location choice, and FCM offers none (firebase.google.com/support/privacy).
@@ -734,10 +735,11 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
                     "facilities, so send only an ID and let the app fetch the content from your servers in the region.")
         required = CLOUD_NAMES.get(p["cloud_preference"]) if p.get("cloud_required") else None
         if required:
-            why += (f" {'Expo, ' if expo else ''}Firebase Cloud Messaging and Apple's push service run outside "
+            apple = " and Apple's push service" if ios else ""
+            why += (f" {'Expo, ' if expo else ''}Firebase Cloud Messaging{apple} run outside "
                     f"{required}: your servers and data stay on {required}, and only the notification passes through them.")
-        add("Push notifications", "Expo push notifications (FCM and APNs underneath)" if expo else
-            "Firebase Cloud Messaging (+ APNs)", why,
+        add("Push notifications", (f"Expo push notifications (FCM{' and APNs' if ios else ''} underneath)") if expo else
+            "Firebase Cloud Messaging" + (" (+ APNs)" if ios else ""), why,
             "https://docs.expo.dev/push-notifications/overview/" if expo else "https://firebase.google.com/docs/cloud-messaging")
 
     if d.get("gpu") and host.get("gpu_runs_on"):  # the host's GPUs are a sibling product of the one that runs the app

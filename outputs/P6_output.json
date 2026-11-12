@@ -39,11 +39,11 @@
       "alternatives": [
         {
           "choice": "Python + FastAPI",
-          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.5 points lower; either is defensible. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + FastAPI is stronger on performance / latency (4.0 vs 3.0), realtime fit (3.0 vs 2.0)."
+          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.5 points lower; either is defensible. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + FastAPI is stronger on performance / latency (4.0 vs 3.0)."
         },
         {
           "choice": "Node.js + Express",
-          "why_not": "Swapping it in lowers the stack score by 2.7 points. Python + Django is stronger on development speed (5.0 vs 4.0), structure for large teams (4.0 vs 1.0); Node.js + Express is stronger on hiring pool (5.0 vs 4.0), realtime fit (4.0 vs 2.0)."
+          "why_not": "Swapping it in lowers the stack score by 2.7 points. Python + Django is stronger on development speed (5.0 vs 4.0), structure for large teams (4.0 vs 1.0); Node.js + Express is stronger on hiring pool (5.0 vs 4.0)."
         },
         {
           "choice": "Java/Kotlin + Spring Boot",
@@ -69,7 +69,7 @@
       "alternatives": [
         {
           "choice": "MySQL",
-          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores the same (less than 0.05 points apart); either is defensible. PostgreSQL is stronger on realtime fit (3.0 vs 2.0)."
+          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores the same (less than 0.05 points apart); either is defensible."
         },
         {
           "choice": "MongoDB",
@@ -96,11 +96,11 @@
       "alternatives": [
         {
           "choice": "Google Cloud Run",
-          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.6 points lower; either is defensible. DigitalOcean (App Platform + Managed DBs) is stronger on realtime fit (4.0 vs 3.0); Google Cloud Run is stronger on performance / latency (4.0 vs 3.0), scalability (5.0 vs 4.0)."
+          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.6 points lower; either is defensible. Google Cloud Run is stronger on performance / latency (4.0 vs 3.0), scalability (5.0 vs 4.0)."
         },
         {
           "choice": "Vercel",
-          "why_not": "Swapping it in lowers the stack score by 7.6 points. DigitalOcean (App Platform + Managed DBs) is stronger on portability (low lock-in) (4.0 vs 3.0), realtime fit (4.0 vs 2.0); Vercel is stronger on learning curve (5.0 vs 4.0), performance / latency (5.0 vs 3.0). A stack compatibility rule costs it 9.0 points, more than the whole gap, while on this layer's own criteria it is 1.4 points ahead: Frontend platforms run code only as short-lived functions; this framework expects a long-running server. Host the API on a container/PaaS service instead."
+          "why_not": "Swapping it in lowers the stack score by 7.6 points. DigitalOcean (App Platform + Managed DBs) is stronger on portability (low lock-in) (4.0 vs 3.0); Vercel is stronger on learning curve (5.0 vs 4.0), performance / latency (5.0 vs 3.0). A stack compatibility rule costs it 9.0 points, more than the whole gap, while on this layer's own criteria it is 1.4 points ahead: Frontend platforms run code only as short-lived functions; this framework expects a long-running server. Host the API on a container/PaaS service instead."
         },
         {
           "choice": "AWS ECS on Fargate",
@@ -112,7 +112,8 @@
         }
       ],
       "tradeoffs": [
-        "Fewer managed services than hyperscalers"
+        "Fewer managed services than hyperscalers",
+        "One region per country in most places (BLR1 is its only Indian region), so a second-region standby for disaster recovery means a second provider"
       ]
     },
     "supporting": [
@@ -225,7 +226,8 @@
         "choice": "PowerSync Cloud in its India region (ap-south-1): a local SQLite copy on the device kept in sync with Postgres",
         "justification": "Offline use needs a local copy of the data and conflict handling when the device reconnects; the primary database does not provide that by itself. Sized for the 2,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
-          "requirements.offline_support"
+          "requirements.offline_support",
+          "infrastructure.data_residency"
         ],
         "alternatives": [
           {
@@ -244,10 +246,11 @@
       },
       {
         "layer": "other",
-        "choice": "Expo push notifications (FCM and APNs underneath)",
+        "choice": "Expo push notifications (FCM underneath)",
         "justification": "Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Expo's push service runs in Google Cloud's US region, and Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region. Sized for the 2,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
-          "project.platforms"
+          "project.platforms",
+          "infrastructure.data_residency"
         ],
         "alternatives": [
           {

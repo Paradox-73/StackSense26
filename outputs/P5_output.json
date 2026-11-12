@@ -122,7 +122,8 @@
         }
       ],
       "tradeoffs": [
-        "Portal/config complexity; pricing tiers are confusing"
+        "Portal/config complexity; pricing tiers are confusing",
+        "The Basic tier scales out to three instances and has no autoscale; rules-based autoscale needs Standard or higher"
       ]
     },
     "supporting": [

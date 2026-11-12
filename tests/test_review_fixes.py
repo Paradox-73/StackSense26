@@ -309,3 +309,18 @@ def test_the_sign_in_justification_names_what_the_chosen_method_needs():
     assert auth("P3", requirements={"auth": "email_password"})["justification"].startswith("Password sign-in needs")
     assert "Amazon Cognito would cost about $4,350" in auth("P4")["justification"]
     assert "scale.users_12_months" in auth("P3")["driven_by"]
+
+
+def test_round_three_review_points_hold():
+    p1, p2, p3, p6 = (run(_doc(n)) for n in ("P1", "P2", "P3", "P6"))
+    push = lambda out: next(s["choice"] for s in out["stack"]["supporting"] if "Messaging" in s["choice"] or "push" in s["choice"])  # noqa: E731
+    assert push(p2) == "Firebase Cloud Messaging" and "APNs" not in push(p6)  # Android only: no Apple push service
+    assert "(+ APNs)" in push(run(_doc("P4")))  # P4 targets iOS
+    hosts = [a["choice"] for a in p1["stack"]["hosting"]["alternatives"]]
+    assert "AWS ECS on Fargate" not in hosts and hosts, hosts  # 23 points behind a static blog: not a contender
+    assert not [a for a in p1["stack"]["hosting"]["alternatives"] if "realtime fit" in a["why_not"]]  # weight 0.2 here
+    auth = next(s for s in p3["stack"]["supporting"] if s["layer"] == "auth")
+    assert "Clerk is a US company" in auth["justification"] and "compliance" in auth["driven_by"]
+    sync = next(s for s in p6["stack"]["supporting"] if "PowerSync" in s["choice"])
+    assert "infrastructure.data_residency" in sync["driven_by"]
+    assert len(p2["stack"]["hosting"]["tradeoffs"]) >= 2

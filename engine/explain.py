@@ -211,12 +211,16 @@ CHOOSE_IF = {"cost": "a lower bill", "scalability": "headroom to scale", "ease":
              "region_fit": "region coverage", "compliance_maturity": "audit and compliance depth"}
 
 
+COMPARE_MIN_WEIGHT = 0.5  # a criterion weighted below this barely moves the score, so it is no reason
+
+
 def _crit_diffs(pick: dict, other: dict) -> list[tuple[float, str, float, float]]:
-    """(weighted difference, criterion, pick score, other score) for weighted criteria, largest first. A criterion
-    whose scores print the same at one decimal is left out: "stronger on cost (4.2 vs 4.2)" says nothing."""
+    """(weighted difference, criterion, pick score, other score) for criteria that carry weight in this project, largest
+    first. A criterion weighted under COMPARE_MIN_WEIGHT (realtime for a static blog) is left out, and so is one whose
+    scores print the same at one decimal: "stronger on cost (4.2 vs 4.2)" says nothing."""
     ob = {b["criterion"]: b["score"] for b in other["breakdown"]}
     out = [(b["weight"] * (b["score"] - ob.get(b["criterion"], b["score"])), b["criterion"], b["score"],
-            ob.get(b["criterion"], b["score"])) for b in pick["breakdown"] if b["weight"] > 0]
+            ob.get(b["criterion"], b["score"])) for b in pick["breakdown"] if b["weight"] >= COMPARE_MIN_WEIGHT]
     return sorted((x for x in out if f"{x[2]:.1f}" != f"{x[3]:.1f}"), reverse=True)
 
 

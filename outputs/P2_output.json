@@ -44,11 +44,11 @@
       "alternatives": [
         {
           "choice": "Python + FastAPI",
-          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.1 points lower; either is defensible. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), performance / latency (4.0 vs 3.0)."
+          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.1 points lower; either is defensible. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0); Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), performance / latency (4.0 vs 3.0)."
         },
         {
           "choice": "Node.js + Express",
-          "why_not": "Swapping it in lowers the stack score by 1.4 points. Python + Django is stronger on development speed (5.0 vs 4.0), structure for large teams (4.0 vs 1.0); Node.js + Express is stronger on realtime fit (4.0 vs 2.0), team skill match (5.0 vs 4.5)."
+          "why_not": "Swapping it in lowers the stack score by 1.4 points. Python + Django is stronger on development speed (5.0 vs 4.0); Node.js + Express is stronger on realtime fit (4.0 vs 2.0), team skill match (5.0 vs 4.5)."
         },
         {
           "choice": "Java/Kotlin + Spring Boot",
@@ -118,7 +118,8 @@
         }
       ],
       "tradeoffs": [
-        "Fewer managed services than hyperscalers"
+        "Fewer managed services than hyperscalers",
+        "One region per country in most places (BLR1 is its only Indian region), so a second-region standby for disaster recovery means a second provider"
       ]
     },
     "supporting": [
@@ -254,7 +255,8 @@
         "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads. Sized for the 30,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.payments",
-          "compliance"
+          "compliance",
+          "infrastructure.data_residency"
         ],
         "alternatives": [
           {
@@ -301,10 +303,11 @@
       },
       {
         "layer": "other",
-        "choice": "Firebase Cloud Messaging (+ APNs)",
+        "choice": "Firebase Cloud Messaging",
         "justification": "Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region. Sized for the 30,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
-          "project.platforms"
+          "project.platforms",
+          "infrastructure.data_residency"
         ],
         "alternatives": [
           {

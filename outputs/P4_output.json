@@ -79,7 +79,7 @@
       "alternatives": [
         {
           "choice": "MySQL",
-          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.1 points lower; either is defensible. PostgreSQL is stronger on realtime fit (3.0 vs 2.0)."
+          "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.1 points lower; either is defensible."
         },
         {
           "choice": "MongoDB",
@@ -205,7 +205,8 @@
         "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.payments",
-          "compliance"
+          "compliance",
+          "infrastructure.data_residency"
         ],
         "alternatives": [
           {
@@ -278,7 +279,8 @@
         "choice": "Firebase Cloud Messaging (+ APNs)",
         "justification": "Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region. Firebase Cloud Messaging and Apple's push service run outside AWS: your servers and data stay on AWS, and only the notification passes through them. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
-          "project.platforms"
+          "project.platforms",
+          "infrastructure.data_residency"
         ],
         "alternatives": [
           {
