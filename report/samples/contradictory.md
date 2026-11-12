@@ -380,6 +380,10 @@ About ₹8,544,000-₹18,474,240 per month. Budget status: **over**. Planning es
 - https://aiven.io/pricing/postgresql
 - https://supabase.com/docs/guides/platform/compute-and-disk
 - https://neon.com/pricing
+- https://neon.com/docs/introduction/regions
+- https://supabase.com/docs/guides/platform/regions
+- https://vercel.com/docs/marketplace-storage
+- https://neon.com/docs/security/compliance
 - https://learn.microsoft.com/azure/app-service/overview
 - https://learn.microsoft.com/azure/container-apps/overview
 - https://learn.microsoft.com/azure/compliance/offerings/offering-hipaa-us

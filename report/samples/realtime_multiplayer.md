@@ -60,7 +60,7 @@ React SPA (Vite) is the frontend for a Realtime chat / collaboration / multiplay
 - No server to operate for the UI
 
 **Trade-offs**
-- Client-side rendering hurts SEO and first paint on slow phones
+- Client-side rendering: the first screen waits for the JavaScript bundle to download and run
 - Routing, data fetching and state are your own architecture decisions
 
 **Versus runner-up:** React SPA (Vite) beats Next.js (React) by 1.4 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on seo need (+2.0), lock-in tolerance (+0.6), team size (+0.1). Next.js (React) is stronger on latency target (+0.7), general quality (baseline weights) (+0.3). Close call: either is defensible.
@@ -301,7 +301,7 @@ Runs here: React SPA (static files), the Go API as long-running processes. The d
 
 - **Cache**: Redis/Valkey (Upstash Redis on Fly): Read-heavy traffic, a tight latency target or hot key-value data: keep hot reads and sessions in memory in front of a durable primary database.
 - **Realtime**: Redis pub/sub for cross-instance fan-out (Upstash Redis on Fly): With several app instances, a message published on one must reach sockets on all others.
-- **Collaboration sync**: Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus or y-websocket as the sync server: Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke.
+- **Collaboration sync**: Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus as the sync server (a Node.js service beside the Go API): Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke. Hocuspocus runs on Node.js, so it is a second runtime to deploy and monitor beside Go; the Go API keeps sign-in and permissions and Hocuspocus calls it to check each connection.
 - **Ingestion buffer**: Redpanda/Kafka or NATS JetStream: A durable log absorbs write bursts and keeps device ingestion separate from database writes, and lets you replay messages.
 - **Authentication**: Auth0: Do not hand-roll password storage, MFA or SSO.
 - **Observability**: OpenTelemetry instrumentation -> Grafana Cloud: Traces, metrics and error tracking from day one; required to defend an availability target.

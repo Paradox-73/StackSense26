@@ -55,7 +55,7 @@ React SPA (Vite) is the frontend for a Prototype / student / hackathon project w
 - No server to operate for the UI
 
 **Trade-offs**
-- Client-side rendering hurts SEO and first paint on slow phones
+- Client-side rendering: the first screen waits for the JavaScript bundle to download and run
 - Routing, data fetching and state are your own architecture decisions
 
 **Versus runner-up:** React SPA (Vite) beats Next.js (React) by 1.2 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on seo need (+2.0), team size (+0.8). Next.js (React) is stronger on time to mvp (+0.6), application type (+0.3). Close call: either is defensible.

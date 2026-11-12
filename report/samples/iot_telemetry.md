@@ -59,7 +59,7 @@ React SPA (Vite) is the frontend for an IoT / telemetry ingestion project with a
 
 **Trade-offs**
 - Team skill match is only 1.5/5 (weight 2.5).
-- Client-side rendering hurts SEO and first paint on slow phones
+- Client-side rendering: the first screen waits for the JavaScript bundle to download and run
 - Routing, data fetching and state are your own architecture decisions
 
 **Risks**
@@ -305,7 +305,7 @@ Runs here: the Go API as long-running processes. React SPA is built to static fi
 
 ## Supporting services
 
-- **Realtime**: WebSockets in the Go app (coder/websocket or gorilla/websocket): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
+- **Realtime**: WebSockets in the Go app (coder/websocket): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
 - **Ingestion buffer**: Amazon Kinesis Data Streams (MQTT via AWS IoT Core): A durable log absorbs write bursts and keeps device ingestion separate from database writes, and lets you replay messages.
 - **Static frontend**: Amazon S3 + CloudFront: React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Go instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.
 - **Authentication**: Amazon Cognito: Do not hand-roll password storage, MFA or SSO.

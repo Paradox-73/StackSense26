@@ -359,6 +359,10 @@ About ₹35,232-₹474,144 per month. Budget status: **stretch**. Planning estim
 - https://aiven.io/pricing/postgresql
 - https://supabase.com/docs/guides/platform/compute-and-disk
 - https://neon.com/pricing
+- https://neon.com/docs/introduction/regions
+- https://supabase.com/docs/guides/platform/regions
+- https://vercel.com/docs/marketplace-storage
+- https://neon.com/docs/security/compliance
 - https://cloud.google.com/run/docs
 - https://cloud.google.com/run/pricing
 - https://cloud.google.com/run/docs/triggering/websockets

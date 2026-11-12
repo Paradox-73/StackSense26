@@ -179,7 +179,7 @@ Open-source relational database with ACID transactions, JSONB, full-text search 
 
 Your data is mainly relational and reaches about 14 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹1,440-₹3,168 a month, against a total budget of ₹2,000 a month. MySQL is within 0.5 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
 
-Suggested offering: Neon / Supabase Postgres connected through Hyperdrive
+Suggested offering: Supabase Postgres connected through Hyperdrive
 
 **Why**
 - Data-model fit: 4.7/5 vs 3.9 average for this layer.
@@ -382,6 +382,10 @@ About ₹1,440-₹4,128 per month. Budget status: **stretch**. Planning estimate
 - https://aiven.io/pricing/postgresql
 - https://supabase.com/docs/guides/platform/compute-and-disk
 - https://neon.com/pricing
+- https://neon.com/docs/introduction/regions
+- https://supabase.com/docs/guides/platform/regions
+- https://vercel.com/docs/marketplace-storage
+- https://neon.com/docs/security/compliance
 - https://developers.cloudflare.com/pages/
 - https://developers.cloudflare.com/workers/platform/pricing/
 - https://developers.cloudflare.com/durable-objects/

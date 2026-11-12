@@ -317,7 +317,7 @@ Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The data
 - **Payments**: Razorpay with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.
 - **Object storage**: Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN): Media and documents belong in object storage, not the database.
 - **Authentication**: Amazon Cognito in the Mumbai region (ap-south-1): Do not hand-roll password storage, MFA or SSO.
-- **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS.
+- **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 
 ## Estimated monthly cost
@@ -333,6 +333,8 @@ About ₹355,200-₹1,767,744 per month. Budget status: **stretch**. Planning es
 
 ## What would change the recommendation
 
+- **Budget cut to ₹300,000/month (x0.2)**: hosting: AWS EKS (Kubernetes) -> AWS ECS on Fargate
+  - Why hosting changes: Cost at your scale moved the gap 0.2 points toward AWS ECS on Fargate (AWS ECS on Fargate 4.4/5 vs AWS EKS (Kubernetes) 4.3/5, was 4.9 vs 4.8); on its own AWS EKS (Kubernetes) still scores 0.0 higher, so AWS ECS on Fargate wins as part of the whole stack (the other layers changed, and the stack-level compatibility rules or tie-break favour it).
 - **A solo developer**: hosting: AWS EKS (Kubernetes) -> AWS ECS on Fargate
   - Why hosting changes: AWS EKS (Kubernetes) now takes a penalty (Usually needs a team of 4+ to operate), moving the gap 12.0 points toward AWS ECS on Fargate; low ops burden moved the gap 6.0 points toward AWS ECS on Fargate (AWS ECS on Fargate 3.0/5 vs AWS EKS (Kubernetes) 1.0/5, weight 1.0 -> 3.5).
 - **Must run on-premises**: hosting: AWS EKS (Kubernetes) -> On-prem Kubernetes (k3s / RKE2 / OpenShift)
@@ -364,6 +366,10 @@ About ₹355,200-₹1,767,744 per month. Budget status: **stretch**. Planning es
 - https://aiven.io/pricing/postgresql
 - https://supabase.com/docs/guides/platform/compute-and-disk
 - https://neon.com/pricing
+- https://neon.com/docs/introduction/regions
+- https://supabase.com/docs/guides/platform/regions
+- https://vercel.com/docs/marketplace-storage
+- https://neon.com/docs/security/compliance
 - https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
 - https://aws.amazon.com/eks/pricing/
 - https://aws.amazon.com/eks/sla/

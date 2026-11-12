@@ -96,6 +96,10 @@ Every URL cited by the knowledge base, compatibility rules, questionnaire and gl
 - database: PostgreSQL: https://aiven.io/pricing/postgresql
 - database: PostgreSQL: https://supabase.com/docs/guides/platform/compute-and-disk
 - database: PostgreSQL: https://neon.com/pricing
+- database: PostgreSQL: https://neon.com/docs/introduction/regions
+- database: PostgreSQL: https://supabase.com/docs/guides/platform/regions
+- database: PostgreSQL: https://vercel.com/docs/marketplace-storage
+- database: PostgreSQL: https://neon.com/docs/security/compliance
 - database: MySQL: https://dev.mysql.com/doc/
 - database: MySQL: https://vitess.io/docs/
 - database: MySQL: https://planetscale.com/docs

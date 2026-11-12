@@ -190,12 +190,33 @@ def test_budget_rule_says_fits_only_when_the_estimate_fits(change):
         assert _budget_codes(out["warnings"]) and out["status"] == "ok_with_warnings"
 
 
+# A HIPAA telehealth app for EU clinics (the review's brief H07) at $720 a month: Render scores 3.9 points higher
+# but starts above the budget, so the budget rule keeps Fly.io.
+H07 = {"scenario_id": "H07", "project": {"name": "H07", "type": "healthtech", "platforms": ["web"],
+                                         "description": "Telehealth video consults for EU clinics"},
+       "scale": {"traffic_pattern": "steady", "workload": "balanced", "users_at_launch": 1000, "users_12_months": 10000,
+                 "peak_concurrent_users": 200, "data_volume_gb_12_months": 10},
+       "team": {"has_devops": False, "size": 3, "experience": "intermediate", "languages": ["typescript", "python"]},
+       "budget": {"monthly_infra_usd": 720}, "timeline": {"mvp_weeks": 8},
+       "infrastructure": {"cloud_preference": "none", "deployment_model": "managed_cloud", "data_residency": "eu"},
+       "requirements": {"realtime": True, "file_media_storage": True, "auth": "email_password", "availability": "99.9"},
+       "compliance": ["gdpr", "hipaa"]}
+
+
 def test_a_pick_kept_by_the_budget_rule_does_not_lead_the_stack_it_replaced():
-    """P2 with performance 4 moves to AWS Lambda for the budget although the DigitalOcean stack scores 3.4 points
-    higher: the hosting text said Lambda "leads the runner-up, DigitalOcean, by 3.4 stack points"."""
+    """The hosting text of a pick the budget rule kept said it "leads the runner-up" by the points it trails by."""
+    out = run_text(json.dumps(H07), capped=False)
+    host = out["stack"]["hosting"]
+    assert host["choice"].startswith("Fly.io"), host["choice"]
+    assert "leads the runner-up" not in host["justification"], host["justification"]
+    assert "Render would give a stack" in host["justification"] and "chosen by the budget rule" in host["justification"]
+
+
+def test_budget_rules_never_move_p2_to_a_stack_still_over_its_budget():
+    """P2 moved to Cloud Run at $165-179 (its floors fit, the estimate with SMS and media did not) and back to
+    DigitalOcean at $180; with performance 4 its Django or FastAPI server moved onto Lambda functions."""
+    for budget in (150, 165, 175, 180, 190):
+        out = _p2(budget__monthly_infra_usd=budget)
+        assert out["stack"]["hosting"]["choice"].startswith("DigitalOcean"), (budget, out["stack"]["hosting"]["choice"])
     out = _p2(priorities__performance=4)
-    text = out["stack"]["hosting"]["justification"]
-    if not out["stack"]["hosting"]["choice"].startswith("AWS Lambda"):
-        pytest.skip("the budget rule no longer moves this stack")
-    assert "leads the runner-up" not in text, text
-    assert "would give a stack" in text and "chosen by the budget rule" in text, text
+    assert not out["stack"]["hosting"]["choice"].startswith("AWS Lambda"), out["stack"]["hosting"]["choice"]

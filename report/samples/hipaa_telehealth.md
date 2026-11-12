@@ -55,7 +55,7 @@ React SPA (Vite) is the frontend for a Healthcare / telehealth project with abou
 - No server to operate for the UI
 
 **Trade-offs**
-- Client-side rendering hurts SEO and first paint on slow phones
+- Client-side rendering: the first screen waits for the JavaScript bundle to download and run
 - Routing, data fetching and state are your own architecture decisions
 
 **Versus runner-up:** React SPA (Vite) beats Next.js (React) by 1.6 stack points (points on the 0-100 stack score, the average of the four layer scores), mainly on seo need (+2.0), team size (+0.2). Next.js (React) is stronger on general quality (baseline weights) (+0.4), latency target (+0.2).
@@ -365,6 +365,10 @@ About ₹35,520-₹143,616 per month. Budget status: **within**. Planning estima
 - https://aiven.io/pricing/postgresql
 - https://supabase.com/docs/guides/platform/compute-and-disk
 - https://neon.com/pricing
+- https://neon.com/docs/introduction/regions
+- https://supabase.com/docs/guides/platform/regions
+- https://vercel.com/docs/marketplace-storage
+- https://neon.com/docs/security/compliance
 - https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html
 - https://aws.amazon.com/fargate/pricing/
 - https://aws.amazon.com/compliance/hipaa-eligible-services-reference/

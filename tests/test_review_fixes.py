@@ -224,7 +224,9 @@ def _info(out: dict) -> dict:
 
 def test_compliance_duties_and_delivery_risks_are_info_warnings_once():
     p4 = run(_doc("P4"))  # PCI DSS with hosted checkout, RBI localisation
-    assert p4["status"] == "ok" and {"PCI_SCOPE", "RBI_COPIES_IN_INDIA"} <= set(_info(p4)), p4["warnings"]
+    assert {"PCI_SCOPE", "RBI_COPIES_IN_INDIA"} <= set(_info(p4)), p4["warnings"]
+    # Info warnings leave the status alone: only a warning or critical one makes it ok_with_warnings.
+    assert (p4["status"] == "ok") == all(w["severity"] == "info" for w in p4["warnings"]), p4["warnings"]
     assert "SAQ A" in _info(p4)["PCI_SCOPE"]["message"] and "backups" in _info(p4)["RBI_COPIES_IN_INDIA"]["message"]
     hipaa = run(_with("P3", project={"type": "healthtech", "platforms": ["web"]}, compliance=["hipaa"]))
     assert "HIPAA_BAA_NEEDED" in _info(hipaa)

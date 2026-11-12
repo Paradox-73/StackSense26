@@ -379,6 +379,10 @@ About ₹2,352,000-₹10,333,248 per month. Budget status: **stretch**. Planning
 - https://aiven.io/pricing/postgresql
 - https://supabase.com/docs/guides/platform/compute-and-disk
 - https://neon.com/pricing
+- https://neon.com/docs/introduction/regions
+- https://supabase.com/docs/guides/platform/regions
+- https://vercel.com/docs/marketplace-storage
+- https://neon.com/docs/security/compliance
 - https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
 - https://aws.amazon.com/eks/pricing/
 - https://aws.amazon.com/eks/sla/

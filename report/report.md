@@ -455,14 +455,14 @@ Safety (new in 2023) is not scored: the four layers are infrastructure, and no o
 <!-- BEGIN validation -->
 | What is checked | Tests |
 |---|---|
-| Scoring, constraints and cost | 468 |
+| Scoring, constraints and cost | 470 |
 | Explanations match the engine | 130 |
-| Inputs, edge cases and warnings | 277 |
+| Inputs, edge cases and warnings | 292 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 192 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 92 |
-| **All** | **1244** |
+| **All** | **1261** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.

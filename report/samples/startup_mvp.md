@@ -237,7 +237,7 @@ Suggested offering: Included with Supabase (BaaS on Postgres)
 
 Edge platform: static hosting with unmetered bandwidth, Workers (V8 isolates) at 300+ locations, Durable Objects for stateful/WebSocket workloads.
 
-Cloudflare Pages + Workers hosts the stack for users in North America and Europe at a 99.9% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~4.3 requests/s at peak without servers to manage. Its share of the estimated bill is $0-$2 a month, against a total budget of $50 a month. It leads the runner-up, Vercel, by 1.8 stack points.
+Cloudflare Pages + Workers hosts the stack for users in North America and Europe at a 99.9% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~4.3 requests/s at peak without servers to manage. Its share of the estimated bill is $0-$2 a month, against a total budget of $50 a month. Vercel would give a stack 1.8 stack points higher, but Cloudflare Pages + Workers stays as part of the stack chosen by the budget rule (a stack whose minimum bill fits your budget is preferred when it scores only a few points lower).
 
 Runs here: Next.js (server rendering + static files). Supabase runs the API, auth and database as its own managed service.
 
@@ -377,6 +377,10 @@ About ₹2,496-₹2,688 per month. Budget status: **within**. Planning estimate 
 - https://aiven.io/pricing/postgresql
 - https://supabase.com/docs/guides/platform/compute-and-disk
 - https://neon.com/pricing
+- https://neon.com/docs/introduction/regions
+- https://supabase.com/docs/guides/platform/regions
+- https://vercel.com/docs/marketplace-storage
+- https://neon.com/docs/security/compliance
 - https://developers.cloudflare.com/pages/
 - https://developers.cloudflare.com/workers/platform/pricing/
 - https://developers.cloudflare.com/durable-objects/
