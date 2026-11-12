@@ -399,7 +399,7 @@
     {
       "code": "BUDGET_RANGE_OVER",
       "severity": "warning",
-      "message": "Budget below the top of the estimate. The estimate is $1,962-$6,967/month against a budget of $6,000/month: the low end fits, the top end does not, and its middle ($4,464/month) still fits. The top end is the price at ~3x today's load in the Large (5,000-50,000 users online at once) tier; the lines that grow most: Hosting: AWS ECS on Fargate ($800-$2,904/month); Database: PostgreSQL ($800-$2,502/month). Plan for the low end and watch those lines; raise the budget before the load grows, or lower the availability target or scale inputs if they were set high.",
+      "message": "Budget below the top of the estimate. $1,962-$6,967/month against $6,000/month: the top (~3x today's load) is over, most of the rise in AWS ECS on Fargate and PostgreSQL. Raise the budget before the load grows.",
       "fields": [
         "budget.monthly_infra_usd",
         "scale.users_12_months"

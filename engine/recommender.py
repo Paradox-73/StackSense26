@@ -619,16 +619,12 @@ def _range_over_warning(p: dict, d: dict, cost: dict) -> dict:
     while the load stays near today's. Names the lines that grow most between the two ends."""
     lo, hi, budget = cost["total_low"], cost["total_high"], d["budget_usd"]
     middle = (lo + hi) / 2
-    part = (f"its middle ({_money(middle, p)}) is above it too" if middle > budget else
-            f"its middle ({_money(middle, p)}) still fits")
     growth = sorted((x for x in cost["lines"] if x["high"] > x["low"]), key=lambda x: x["low"] - x["high"])[:2]
-    drivers = "; ".join(f"{x['component']} ({_money(x['low'], p).removesuffix('/month')}-"
-                        f"{_money(x['high'], p)})" for x in growth)
-    detail = (f"The estimate is {_money(lo, p).removesuffix('/month')}-{_money(hi, p)} against a budget of "
-              f"{_money(budget, p)}: the low end fits, the top end does not, and {part}. The top end is the price at "
-              f"~{10 ** PLACED_WINDOW:.0f}x today's load in the {d['tier_label']} tier; the lines that grow most: {drivers}.")
-    res = ("Plan for the low end and watch those lines; raise the budget before the load grows, or lower the "
-           "availability target or scale inputs if they were set high.")
+    drivers = " and ".join(x["component"].split(": ", 1)[-1].split(" (")[0] for x in growth)
+    detail = (f"{_money(lo, p).removesuffix('/month')}-{_money(hi, p)} against {_money(budget, p)}: the top (~"
+              f"{10 ** PLACED_WINDOW:.0f}x today's load){' and the middle are' if middle > budget else ' is'} over, "
+              f"most of the rise in {drivers}.")
+    res = "Raise the budget before the load grows."
     return _warn("BUDGET_RANGE_OVER", "warning", "Budget below the top of the estimate", detail, res,
                  ["budget_monthly", "dau"])
 

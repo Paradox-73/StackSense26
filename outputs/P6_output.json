@@ -337,7 +337,7 @@
     {
       "code": "BUDGET_RANGE_OVER",
       "severity": "warning",
-      "message": "Budget below the top of the estimate. The estimate is $35-$120/month against a budget of $100/month: the low end fits, the top end does not, and its middle ($78/month) still fits. The top end is the price at ~3x today's load in the Small (50-500 users online at once) tier; the lines that grow most: Hosting: DigitalOcean (App Platform + Managed DBs) ($12-$59/month); Background jobs: Redis / Valkey ($5-$36/month). Plan for the low end and watch those lines; raise the budget before the load grows, or lower the availability target or scale inputs if they were set high.",
+      "message": "Budget below the top of the estimate. $35-$120/month against $100/month: the top (~3x today's load) is over, most of the rise in DigitalOcean and Redis / Valkey. Raise the budget before the load grows.",
       "fields": [
         "budget.monthly_infra_usd",
         "scale.users_12_months"

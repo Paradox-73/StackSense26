@@ -360,7 +360,7 @@
     {
       "code": "BUDGET_RANGE_OVER",
       "severity": "warning",
-      "message": "Budget below the top of the estimate. The estimate is $1,190-$2,792/month against a budget of $1,500/month: the low end fits, the top end does not, and its middle ($1,991/month) is above it too. The top end is the price at ~3x today's load in the Large (5,000-50,000 users online at once) tier; the lines that grow most: Database: PostgreSQL ($600-$1,244/month); Hosting: Fly.io ($375-$845/month). Plan for the low end and watch those lines; raise the budget before the load grows, or lower the availability target or scale inputs if they were set high.",
+      "message": "Budget below the top of the estimate. $1,190-$2,792/month against $1,500/month: the top (~3x today's load) and the middle are over, most of the rise in PostgreSQL and Fly.io. Raise the budget before the load grows.",
       "fields": [
         "budget.monthly_infra_usd",
         "scale.users_12_months"
