@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Content / blog / marketing (SEO)' project at Small (1k-10k daily users) scale (~2.2 peak req/s) built by 3 engineer(s) in 4 weeks, StackSense recommends Next.js (React) + Serverless functions (Node/Python FaaS) + PostgreSQL + Cloudflare Pages + Workers (architecture: Serverless, event-driven). Estimated infrastructure cost: ₹1,440-₹5,280/month (stretch budget). The highest-scoring stack (Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Vercel, 85.7) is only 0.8 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on a minimum bill that fits your budget.
+For a 'Content / blog / marketing (SEO)' project at Small (1k-10k daily users) scale (~2.2 peak req/s) built by 3 engineer(s) in 4 weeks, StackSense recommends Next.js (React) + Serverless functions (Node/Python FaaS) + PostgreSQL + Cloudflare Pages + Workers (architecture: Serverless, event-driven). Estimated infrastructure cost: ₹1,440-₹4,128/month (stretch budget). The highest-scoring stack (Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Vercel, 85.7) is only 0.8 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on a minimum bill that fits your budget.
 
 ## Recommended stack
 
@@ -38,6 +38,7 @@ Availability approach: The platform runs the functions across zones, with no ins
 
 ## Warnings and how they were resolved
 
+- **[WARNING] Budget below the top of the estimate**: ₹1,440-₹4,128/month against ₹2,000/month: the top (~3x today's load) and the middle are over, most of the rise in PostgreSQL and Cloudflare Pages + Workers. *Resolution:* Raise the budget before the load grows.
 - **[INFO] Cloudflare Pages + Workers publishes no uptime SLA**: Your 99% target rests on the app alone: Cloudflare Pages + Workers commits to no uptime figure and owes no credit when it is down. *Resolution:* Alert on an external uptime check and keep a fallback ready (a second region or provider); pick a host with a published SLA if the target is contractual.
 
 ## Per-layer reasoning
@@ -176,7 +177,7 @@ Serverless functions (Node/Python FaaS) serves the API at about 2.2 requests/s a
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 14 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹1,440-₹4,800 a month, against a total budget of ₹2,000 a month. MySQL is within 0.5 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
+Your data is mainly relational and reaches about 14 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹1,440-₹3,168 a month, against a total budget of ₹2,000 a month. MySQL is within 0.5 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
 
 Suggested offering: Neon / Supabase Postgres connected through Hyperdrive
 
@@ -246,7 +247,7 @@ Suggested offering: Neon / Supabase Postgres connected through Hyperdrive
 
 Edge platform: static hosting with unmetered bandwidth, Workers (V8 isolates) at 300+ locations, Durable Objects for stateful/WebSocket workloads.
 
-Cloudflare Pages + Workers hosts the stack for users in India at a 99% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~2.2 requests/s at peak without servers to manage. Its share of the estimated bill is ₹0-₹480 a month, against a total budget of ₹2,000 a month. Vercel is within 0.7 stack points, inside the tie margin (stacks this close count as tied); Cloudflare Pages + Workers stays as part of the stack chosen by the tie-break on a minimum bill that fits your budget.
+Cloudflare Pages + Workers hosts the stack for users in India at a 99% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~2.2 requests/s at peak without servers to manage. Its share of the estimated bill is ₹0-₹960 a month, against a total budget of ₹2,000 a month. Vercel is within 0.7 stack points, inside the tie margin (stacks this close count as tied); Cloudflare Pages + Workers stays as part of the stack chosen by the tie-break on a minimum bill that fits your budget.
 
 Runs here: Next.js (server rendering + static files), the serverless functions. The database runs as a separate managed service (see Database).
 
@@ -331,11 +332,11 @@ Runs here: Next.js (server rendering + static files), the serverless functions. 
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: Cloudflare Pages + Workers | 0 | 5 | Small (1k-10k daily users) price band |
-| Database: PostgreSQL | 15 | 50 | Small (10-100 GB of data) database tier (~14 GB in 12 months) |
-| **Total** | **15** | **55** | |
+| Hosting: Cloudflare Pages + Workers | 0 | 10 | Small (1k-10k daily users) price band, from the band's floor up to its price at ~3x the load, for 8,000 daily users (90% of the way up the tier, log scale) |
+| Database: PostgreSQL | 15 | 33 | Small (10-100 GB of data) database tier (~14 GB in 12 months), from the band's floor up to its price at ~3x the load, for ~14 GB of data (15% of the way up the tier, log scale) |
+| **Total** | **15** | **43** | |
 
-About ₹1,440-₹5,280 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹1,440-₹4,128 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

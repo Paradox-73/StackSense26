@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Healthcare / telehealth' project at Hyperscale (>10M daily users) scale (~34,722 peak req/s) built by 1 engineer(s) in 2 weeks, StackSense recommends Next.js (React) + Node.js + Express + PostgreSQL + Azure App Service (architecture: Modular monolith). Estimated infrastructure cost: ₹8,544,000-₹31,680,000/month (over budget). 2 critical issue(s) need attention: HIPAA on a free-tier budget; Budget below estimated cost.
+For a 'Healthcare / telehealth' project at Hyperscale (>10M daily users) scale (~34,722 peak req/s) built by 1 engineer(s) in 2 weeks, StackSense recommends Next.js (React) + Node.js + Express + PostgreSQL + Azure App Service (architecture: Modular monolith). Estimated infrastructure cost: ₹8,544,000-₹18,474,240/month (over budget). 2 critical issue(s) need attention: HIPAA on a free-tier budget; Budget below estimated cost.
 
 ## Recommended stack
 
@@ -46,7 +46,7 @@ Availability approach: Multi-AZ everywhere + multi-region failover drills, 24x7 
 - **[WARNING] Compliance on a very short timeline**: BAAs, risk assessments, audit logging and access reviews typically take longer than a few weeks. *Resolution:* Recommending managed, pre-certified services to shorten the path.
 - **[WARNING] 20 ms target across regions**: Light in fibre needs roughly 70+ ms for an intercontinental round trip; a single origin cannot meet this globally. *Resolution:* Favouring edge/multi-region platforms; treat the target as per-region latency.
 - **[WARNING] Very large scale with a tiny team**: Hyperscale (>10M daily users) traffic is usually run by dedicated platform engineers. *Resolution:* Strongly favouring managed/serverless services with low ops burden.
-- **[CRITICAL] Budget below estimated cost**: Estimated minimum spend ₹8,544,000/month exceeds your budget of ₹0/month at Hyperscale (>10M daily users) scale. *Resolution:* No feasible combination fits: the cheapest compliant hosting + database alone costs about ₹2,400,000/month. The stack shown starts at ₹8,544,000/month, ₹7,776,000/month of it for its hosting and database, which scored higher on your other priorities than the cheapest pair. Cost was weighted up. Raise the budget or reduce scale/compliance scope.
+- **[CRITICAL] Budget below estimated cost**: Estimated minimum spend ₹8,544,000/month exceeds your budget of ₹0/month at Hyperscale (>10M daily users) scale. *Resolution:* No feasible combination fits: the cheapest compliant hosting + database alone (AWS ECS on Fargate with PostgreSQL) costs about ₹7,200,000/month before usage terms. The stack shown starts at ₹8,544,000/month, ₹7,776,000/month of it for its hosting and database. Neither fits the budget, so the stack that scored higher on your other priorities is kept; the cheapest pair would save about ₹576,000/month and still be ₹7,200,000/month over. Cost was weighted up. Raise the budget or reduce scale/compliance scope.
 - **[WARNING] 11 TB on one PostgreSQL primary**: PostgreSQL writes through one primary server; at ~11,000 GB within 12 months, backups, restores, index builds and vacuum take hours, and managed instances stop at 64 TiB (Amazon RDS: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html). *Resolution:* Plan sharding before you need it: pick a shard key (tenant or customer id), then use Citus for PostgreSQL (https://docs.citusdata.com/en/stable/get_started/what_is_citus.html) or Vitess for MySQL (https://vitess.io/docs/overview/), or a distributed SQL database (CockroachDB, YugabyteDB, Spanner; not scored by StackSense). Move old rows to cheaper storage if they are rarely read.
 
 ## Per-layer reasoning
@@ -247,7 +247,7 @@ Suggested offering: Azure Database for PostgreSQL Flexible Server
 
 Microsoft's managed web hosting and serverless containers, integrated with Entra ID and Azure SQL/Postgres.
 
-Azure App Service hosts the stack for users in North America and India at a 99.99% availability target. It runs the Node.js + Express API as long-running processes with WebSockets, sized for ~34,722 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is ₹3,456,000-₹20,160,000 a month, against a total budget of ₹0 a month. It leads the runner-up, AWS ECS on Fargate, by 2.4 stack points.
+Azure App Service hosts the stack for users in North America and India at a 99.99% availability target. It runs the Node.js + Express API as long-running processes with WebSockets, sized for ~34,722 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is ₹3,456,000-₹8,347,008 a month, against a total budget of ₹0 a month. It leads the runner-up, AWS ECS on Fargate, by 2.4 stack points.
 
 Runs here: Next.js (server rendering + static files), the Node.js + Express API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -341,12 +341,12 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: Azure App Service | 36,000 | 210,000 | Hyperscale (>10M daily users) price band; x3 for 99.99% availability (redundant instances) |
-| Database: PostgreSQL | 45,000 | 90,000 | Hyperscale (>10M daily users) database tier (~11,000 GB in 12 months); upper end for ~11,000 GB of data: the band's top is priced for the largest data of the tier; x3 for 99.99% availability (standby/replicas) |
-| Cache: Redis / Valkey | 8,000 | 30,000 | Hyperscale (>10M daily users) price band (the app's scale) |
-| **Total** | **89,000** | **330,000** | |
+| Hosting: Azure App Service | 36,000 | 86,948 | Hyperscale (>10M daily users) price band, from the band's floor up to its price at ~3x the load, for 10,000,000 daily users (the bottom of the tier); x3 for 99.99% availability (redundant instances) |
+| Database: PostgreSQL | 45,000 | 90,000 | Hyperscale (>10M daily users) database tier (~11,000 GB in 12 months), from the band's floor up to its price at ~3x the load, for 34,722 req/s at peak (the bottom of the tier: that measure alone is below it); x3 for 99.99% availability (standby/replicas) |
+| Cache: Redis / Valkey | 8,000 | 15,492 | Hyperscale (>10M daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 10,000,000 daily users (the bottom of the tier) |
+| **Total** | **89,000** | **192,440** | |
 
-About ₹8,544,000-₹31,680,000 per month. Budget status: **over**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹8,544,000-₹18,474,240 per month. Budget status: **over**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

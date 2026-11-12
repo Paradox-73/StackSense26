@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'B2B / B2C SaaS' project at Hobby (<1k daily users) scale (~4.3 peak req/s) built by 2 engineer(s) in 8 weeks, StackSense recommends Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Cloudflare Pages + Workers (architecture: BaaS-first (managed backend + thin server-side functions)). Estimated infrastructure cost: $26/month (within budget). The stack that would otherwise be chosen (Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Vercel, 86.8) has a minimum of about $66/month, above your budget of $50/month; this stack keeps its backend and database, scores 1.8 stack points lower and fits the budget (about $26/month), so it was chosen (a stack that fits is preferred when it is within 5 points).
+For a 'B2B / B2C SaaS' project at Hobby (<1k daily users) scale (~4.3 peak req/s) built by 2 engineer(s) in 8 weeks, StackSense recommends Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Cloudflare Pages + Workers (architecture: BaaS-first (managed backend + thin server-side functions)). Estimated infrastructure cost: $26-$28/month (within budget). The stack that would otherwise be chosen (Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Vercel, 86.8) has a minimum of about $66/month at the price bands' floors, above your budget of $50/month; this stack keeps its backend and database, scores 1.8 stack points lower and fits the budget (about $26/month), so it was chosen (a stack that fits is preferred when it is within 5 points).
 
 ## Recommended stack
 
@@ -237,7 +237,7 @@ Suggested offering: Included with Supabase (BaaS on Postgres)
 
 Edge platform: static hosting with unmetered bandwidth, Workers (V8 isolates) at 300+ locations, Durable Objects for stateful/WebSocket workloads.
 
-Cloudflare Pages + Workers hosts the stack for users in North America and Europe at a 99.9% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~4.3 requests/s at peak without servers to manage. Its share of the estimated bill is $0 a month, against a total budget of $50 a month. It leads the runner-up, Vercel, by 1.8 stack points.
+Cloudflare Pages + Workers hosts the stack for users in North America and Europe at a 99.9% availability target. It serves the pages from a global CDN and runs server code as functions, which covers ~4.3 requests/s at peak without servers to manage. Its share of the estimated bill is $0-$2 a month, against a total budget of $50 a month. It leads the runner-up, Vercel, by 1.8 stack points.
 
 Runs here: Next.js (server rendering + static files). Supabase runs the API, auth and database as its own managed service.
 
@@ -315,11 +315,11 @@ Runs here: Next.js (server rendering + static files). Supabase runs the API, aut
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: Cloudflare Pages + Workers | 0 | 0 | Hobby (<1k daily users) price band |
-| Backend: Supabase (BaaS on Postgres) (includes its database) | 26 | 26 | plan sized for the larger of traffic (Hobby (<1k daily users)) and ~14 GB of data in 12 months; disk beyond the plan's allowance billed per GB |
-| **Total** | **26** | **26** | |
+| Hosting: Cloudflare Pages + Workers | 0 | 2 | Hobby (<1k daily users) price band, from the band's floor up to its price at ~3x the load, for 4 req/s at peak (93% of the way up the tier, log scale) |
+| Backend: Supabase (BaaS on Postgres) (includes its database) | 26 | 26 | plan sized for the larger of traffic (Hobby (<1k daily users)) and ~14 GB of data in 12 months, from the band's floor up to its price at ~3x the load, for ~14 GB of data (15% of the way up the tier, log scale); disk beyond the plan's allowance billed per GB |
+| **Total** | **26** | **28** | |
 
-About ₹2,496-₹2,496 per month. Budget status: **within**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹2,496-₹2,688 per month. Budget status: **within**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For an 'Internal tool / admin panel' project at Hobby (<1k daily users) scale (~1.7 peak req/s) built by 1 engineer(s) in 3 weeks, StackSense recommends Server-rendered HTML + HTMX + Python + Django + SQLite (+ Litestream backups) + On-prem VMs + Docker Compose (architecture: Modular monolith). Estimated infrastructure cost: ₹0-₹14,400/month (stretch budget).
+For an 'Internal tool / admin panel' project at Hobby (<1k daily users) scale (~1.7 peak req/s) built by 1 engineer(s) in 3 weeks, StackSense recommends Server-rendered HTML + HTMX + Python + Django + SQLite (+ Litestream backups) + On-prem VMs + Docker Compose (architecture: Modular monolith). Estimated infrastructure cost: ₹0-₹14,688/month (stretch budget).
 
 ## Recommended stack
 
@@ -35,6 +35,10 @@ Availability approach: Single server + nightly backups copied off the machine
 - Scale tier: Hobby (<1k daily users) (peak ~1.7 req/s, derived); database tier: Hobby (<1k daily users) (~3.4 GB in 12 months)
 - Budget: ~$0/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Defaults used (2): What do users do? = read, sign_in, post; Special workloads = none
+
+## Warnings and how they were resolved
+
+- **[WARNING] Budget below the top of the estimate**: ₹0-₹14,688/month against ₹0/month: the top (~3x today's load) and the middle are over, most of the rise in On-prem VMs + Docker Compose. *Resolution:* Raise the budget before the load grows.
 
 ## Per-layer reasoning
 
@@ -236,7 +240,7 @@ Suggested offering: SQLite file on local disk with Litestream backups
 
 Your own servers or private data centre running containers with Compose/systemd and a reverse proxy.
 
-On-prem VMs + Docker Compose hosts the stack for users in India at a 99% availability target. It runs the Python + Django API as long-running processes, sized for ~1.7 requests/s at peak. Its share of the estimated bill is ₹0-₹14,400 a month, against a total budget of ₹0 a month. It leads the runner-up, On-prem Kubernetes (k3s / RKE2 / OpenShift), by 23.5 stack points.
+On-prem VMs + Docker Compose hosts the stack for users in India at a 99% availability target. It runs the Python + Django API as long-running processes, sized for ~1.7 requests/s at peak. Its share of the estimated bill is ₹0-₹14,688 a month, against a total budget of ₹0 a month. It leads the runner-up, On-prem Kubernetes (k3s / RKE2 / OpenShift), by 23.5 stack points.
 
 Runs here: Server-rendered HTML + HTMX (server rendering + static files), the Python + Django API as long-running processes. The database is SQLite, an embedded single-file database: one file on this host's disk that the Python + Django process opens directly, with no separate database server (copy the file to object storage for backups).
 
@@ -328,11 +332,11 @@ Runs here: Server-rendered HTML + HTMX (server rendering + static files), the Py
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: On-prem VMs + Docker Compose | 0 | 150 | Hobby (<1k daily users) price band |
-| Database: SQLite (+ Litestream backups) | 0 | 0 | Hobby (<1k daily users) database tier (~3 GB in 12 months) |
-| **Total** | **0** | **150** | |
+| Hosting: On-prem VMs + Docker Compose | 0 | 153 | Hobby (<1k daily users) price band, from the band's floor up to its price at ~3x the load, for 2 req/s at peak (53% of the way up the tier, log scale) |
+| Database: SQLite (+ Litestream backups) | 0 | 0 | Hobby (<1k daily users) database tier (~3 GB in 12 months), from the band's floor up to its price at ~3x the load, for ~3 GB of data (53% of the way up the tier, log scale) |
+| **Total** | **0** | **153** | |
 
-About ₹0-₹14,400 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹0-₹14,688 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

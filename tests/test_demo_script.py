@@ -142,8 +142,8 @@ def test_typed_description_opening_is_what_the_page_shows():
     r = recommend(answers, with_counterfactuals=False)
     assert [_short(r["stack"][layer]["pick"]["name"]) for layer in LAYERS] == ["React SPA", "Node.js + Express", "PostgreSQL", "Cloudflare Pages + Workers"]
     assert r["cost"]["status"] == "over" and r["profile"]["budget_monthly"] == 5000
-    assert (round(r["cost"]["total_low_inr"]), round(r["cost"]["total_high_inr"])) == (5280, 40800)
-    assert "₹5,280–₹40,800" in SCRIPT and "over budget · ₹5,000" in SCRIPT
+    assert (round(r["cost"]["total_low_inr"]), round(r["cost"]["total_high_inr"])) == (5280, 44256)
+    assert "₹5,280–₹44,256" in SCRIPT and "over budget · ₹5,000" in SCRIPT
     row, say = _row_at(5)
     assert all(w in say for w in ("Six answers", "React", "Express", "PostgreSQL", "Cloudflare", "going over the 5,000 rupee budget", "no quote"))
     assert "Fill from description" in row and "Describe your project" in _row_at(0)[0]
@@ -290,7 +290,7 @@ def test_growth_path_beat_shows_what_the_engine_returns():
     assert [name(c, "hosting") for c in cols] == ["Netlify", "Cloudflare Pages + Workers", "Cloudflare Pages + Workers"]
     first = next(m for m, i in zip(mult, range(5)) if i > 0 and name(i, "hosting") != name(0, "hosting"))
     assert base * first == 200_000, "the switch is first seen at 10x, shown as about 200k users"
-    assert all(r["cost"]["total_high"] == 0 for r in runs)
+    assert all(runs[c]["cost"]["total_high"] == 0 for c in cols)  # the columns the panel shows
     row, say = _row_at(116)
     assert "&panel=growth" in row and "#preset=content_site" in row and 'h.get("panel")' in APP_JS
     assert "Stays: Next.js, No server code, No database. Changes: Hosting → Cloudflare Pages + Workers at about 200k users." in row

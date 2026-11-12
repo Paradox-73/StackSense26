@@ -291,10 +291,10 @@ Runs here: Next.js as pre-built static pages. No server code and no database: co
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: Netlify | 0 | 0 | free static plan: pre-built files only |
+| Hosting: Netlify | 0 | 0 | static-site plan (pre-built files only) price band, from the band's floor up to its price at ~3x the load, for 20,000 daily users (30% of the way up the tier, log scale) |
 | **Total** | **0** | **0** | |
 
-About ₹0-₹0 per month. Budget status: **within**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹0-₹0 per month. Budget status: **within**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

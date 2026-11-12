@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Social network / UGC feed' project at Large (100k-1M daily users) scale (~1,389 peak req/s) built by 3 engineer(s) in 10 weeks, StackSense recommends React Native (Expo) + Firebase (BaaS on Google Cloud) + Cloud Firestore + Provided by Firebase (architecture: BaaS-first (managed backend + thin server-side functions)). Estimated infrastructure cost: ₹58,848-₹360,192/month (stretch budget).
+For a 'Social network / UGC feed' project at Large (100k-1M daily users) scale (~1,389 peak req/s) built by 3 engineer(s) in 10 weeks, StackSense recommends React Native (Expo) + Firebase (BaaS on Google Cloud) + Cloud Firestore + Provided by Firebase (architecture: BaaS-first (managed backend + thin server-side functions)). Estimated infrastructure cost: ₹58,848-₹321,024/month (stretch budget).
 
 ## Recommended stack
 
@@ -36,6 +36,10 @@ Availability approach: Firebase runs the backend on a paid plan; turn on point-i
 - Budget: ~$833/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Assumption: compliance = dpdp: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies.
 - Defaults used (1): Special workloads = none
+
+## Warnings and how they were resolved
+
+- **[WARNING] Budget below the top of the estimate**: ₹58,848-₹321,024/month against ₹80,000/month: the top (~3x today's load) and the middle are over, most of the rise in Firebase and Neo4j. *Resolution:* Raise the budget before the load grows.
 
 ## Per-layer reasoning
 
@@ -112,7 +116,7 @@ React Native (Expo) is the app for a Social network / UGC feed project with abou
 
 Google's mobile/web BaaS: Firestore, Auth, Cloud Functions, FCM push, Crashlytics, Remote Config.
 
-Firebase (BaaS on Google Cloud) serves the API at about 1,389 requests/s at peak (Large (100k-1M daily users)) for a team of 3. As a hosted backend it supplies sign-in, the database API and file storage, so a team of 3 only needs to write the business rules in the 10 weeks available. Realtime is core, and it scores 5.0/5 on realtime fit. Its share of the estimated bill is ₹46,368-₹292,992 a month, against a total budget of ₹80,000 a month. It leads the runner-up, Node.js + Express, by 11.5 stack points.
+Firebase (BaaS on Google Cloud) serves the API at about 1,389 requests/s at peak (Large (100k-1M daily users)) for a team of 3. As a hosted backend it supplies sign-in, the database API and file storage, so a team of 3 only needs to write the business rules in the 10 weeks available. Realtime is core, and it scores 5.0/5 on realtime fit. Its share of the estimated bill is ₹46,368-₹257,952 a month, against a total budget of ₹80,000 a month. It leads the runner-up, Node.js + Express, by 11.5 stack points.
 
 **Why**
 - Realtime fit: 5.0/5 vs 3.5 average for this layer - weighted up because: Realtime is core to the product; Feeds and notifications.
@@ -241,7 +245,7 @@ Suggested offering: Included with Firebase (BaaS on Google Cloud)
 
 Firebase hosts the backend; the app itself ships through the app stores.
 
-With about 100,000 daily users on iOS and Android, nothing of yours needs separate hosting: Firebase runs the backend and the app stores ship the app. If you add a web landing page, Firebase Hosting can serve it; it is optional. The backend's estimated bill, ₹46,368-₹292,992 a month against a total budget of ₹80,000 a month, covers what would otherwise be hosting.
+With about 100,000 daily users on iOS and Android, nothing of yours needs separate hosting: Firebase runs the backend and the app stores ship the app. If you add a web landing page, Firebase Hosting can serve it; it is optional. The backend's estimated bill, ₹46,368-₹257,952 a month against a total budget of ₹80,000 a month, covers what would otherwise be hosting.
 
 **Why**
 - Nothing of yours needs hosting: the app ships through the App Store and Google Play, and Firebase runs the API, auth, database and file storage. Firebase Hosting (free tier) is optional, for a landing page or web admin.
@@ -307,11 +311,11 @@ A team of 3 is kept to 2 extra system(s) to operate. Our estimate: a team of 1-2
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Backend: Firebase (BaaS on Google Cloud) (includes its database) | 483 | 3,052 | plan sized for the larger of traffic (Large (100k-1M daily users)) and ~290 GB of data in 12 months; per-read/write pricing at your request volume; disk beyond the plan's allowance billed per GB |
-| Secondary store (graph): Neo4j | 130 | 700 | Medium (100 GB-1 TB of data) price band (the app's scale) |
-| **Total** | **613** | **3,752** | |
+| Backend: Firebase (BaaS on Google Cloud) (includes its database) | 483 | 2,687 | plan sized for the larger of traffic (Large (100k-1M daily users)) and ~290 GB of data in 12 months, from the band's floor up to its price at ~3x the load, for 1,389 req/s at peak (44% of the way up the tier, log scale); per-read/write pricing at your request volume; disk beyond the plan's allowance billed per GB |
+| Secondary store (graph): Neo4j | 130 | 657 | Medium (100 GB-1 TB of data) price band (the app's scale), from the band's floor up to its price at ~3x the load, for ~290 GB of data (46% of the way up the tier, log scale) |
+| **Total** | **613** | **3,344** | |
 
-About ₹58,848-₹360,192 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹58,848-₹321,024 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

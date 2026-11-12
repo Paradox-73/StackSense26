@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~6,944 peak req/s) built by 20 engineer(s) in 30 weeks, StackSense recommends Next.js (React) + Node.js + NestJS + PostgreSQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹2,352,000-₹12,000,000/month (stretch budget). The highest-scoring stack (Next.js (React) + Go (net/http, chi or Gin) + PostgreSQL + AWS ECS on Fargate, 89.0) is only 0.4 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on lower vendor lock-in (6 vs 7, summed lock-in).
+For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~6,944 peak req/s) built by 20 engineer(s) in 30 weeks, StackSense recommends Next.js (React) + Node.js + NestJS + PostgreSQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹2,352,000-₹10,333,248/month (stretch budget). The highest-scoring stack (Next.js (React) + Go (net/http, chi or Gin) + PostgreSQL + AWS ECS on Fargate, 89.0) is only 0.4 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on lower vendor lock-in (6 vs 7, summed lock-in).
 
 ## Recommended stack
 
@@ -36,6 +36,10 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 - Scale tier: Very large (1M-10M daily users) (peak ~6,944 req/s, derived); database tier: Very large (1M-10M daily users) (~2,800 GB in 12 months)
 - Budget: ~$41,667/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Assumption: compliance = dpdp: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies.
+
+## Warnings and how they were resolved
+
+- **[WARNING] Budget below the top of the estimate**: ₹2,352,000-₹10,333,248/month against ₹4,000,000/month: the top (~3x today's load) and the middle are over, most of the rise in Maps & live location and Media delivery. *Resolution:* Raise the budget before the load grows.
 
 ## Per-layer reasoning
 
@@ -167,7 +171,7 @@ Node.js + NestJS serves the API at about 6,944 requests/s at peak (Very large (1
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 2,800 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹576,000-₹1,152,000 a month, against a total budget of ₹4,000,000 a month. It leads the runner-up, MySQL, by 2.0 stack points.
+Your data is mainly relational and reaches about 2,800 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹576,000-₹1,449,312 a month, against a total budget of ₹4,000,000 a month. It leads the runner-up, MySQL, by 2.0 stack points.
 
 Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
@@ -233,7 +237,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 Managed Kubernetes control plane on AWS.
 
-AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Node.js + NestJS API as long-running processes with WebSockets, sized for ~6,944 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is ₹480,000-₹2,304,000 a month, against a total budget of ₹4,000,000 a month. AWS ECS on Fargate is within less than 0.05 stack points, inside the tie margin (stacks this close count as tied); the tie went to AWS EKS (Kubernetes) on lower vendor lock-in (6 vs 7, summed lock-in).
+AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Node.js + NestJS API as long-running processes with WebSockets, sized for ~6,944 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is ₹480,000-₹1,315,392 a month, against a total budget of ₹4,000,000 a month. AWS ECS on Fargate is within less than 0.05 stack points, inside the tie margin (stacks this close count as tied); the tie went to AWS EKS (Kubernetes) on lower vendor lock-in (6 vs 7, summed lock-in).
 
 Runs here: Next.js (server rendering + static files), the Node.js + NestJS API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -326,16 +330,16 @@ Runs here: Next.js (server rendering + static files), the Node.js + NestJS API a
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: AWS EKS (Kubernetes) | 5,000 | 24,000 | Very large (1M-10M daily users) price band; x2 for 99.95% availability (redundant instances) |
-| Database: PostgreSQL | 6,000 | 12,000 | Very large (1M-10M daily users) database tier (~2,800 GB in 12 months); upper end for ~2,800 GB of data: the band's top is priced for the largest data of the tier; x2 for 99.95% availability (standby/replicas) |
-| Realtime: Redis / Valkey | 1,500 | 8,000 | Very large (1M-10M daily users) price band (the app's scale) |
-| Analytics: ClickHouse | 3,000 | 15,000 | Very large (1M-10M daily users) price band (the app's scale); a copy of data that PostgreSQL also stores (fed by a continuous copy of changes), so that data is paid for in both stores |
+| Hosting: AWS EKS (Kubernetes) | 5,000 | 13,702 | Very large (1M-10M daily users) price band, from the band's floor up to its price at ~3x the load, for 6,944 req/s at peak (14% of the way up the tier, log scale); x2 for 99.95% availability (redundant instances) |
+| Database: PostgreSQL | 6,000 | 15,097 | Very large (1M-10M daily users) database tier (~2,800 GB in 12 months), from the band's floor up to its price at ~3x the load, for 6,944 req/s at peak (14% of the way up the tier, log scale); upper end for ~2,800 GB of data: the band's top is priced for the largest data of the tier; x2 for 99.95% availability (standby/replicas) |
+| Realtime: Redis / Valkey | 1,500 | 4,399 | Very large (1M-10M daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 6,944 req/s at peak (14% of the way up the tier, log scale) |
+| Analytics: ClickHouse | 3,000 | 8,440 | Very large (1M-10M daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 6,944 req/s at peak (14% of the way up the tier, log scale); a copy of data that PostgreSQL also stores (fed by a continuous copy of changes), so that data is paid for in both stores |
 | Media delivery | 1,500 | 13,500 | ~150,000 GB served a month (5 MB per active user a day) at $0.01-0.09/GB |
 | Maps & live location | 4,500 | 45,000 | ~9.0M map loads a month (0.3 per active user a day) at $0.0005-0.005 each |
 | Phone login (SMS OTP) | 3,000 | 7,500 | ~1,500,000 SMS a month (one login every ~20 days per active user) at $0.002-0.005 each |
-| **Total** | **24,500** | **125,000** | |
+| **Total** | **24,500** | **107,638** | |
 
-About ₹2,352,000-₹12,000,000 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹2,352,000-₹10,333,248 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

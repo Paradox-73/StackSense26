@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Healthcare / telehealth' project at Medium (10k-100k daily users) scale (~69 peak req/s) built by 5 engineer(s) in 20 weeks, StackSense recommends React SPA (Vite) + Python + Django + PostgreSQL + AWS ECS on Fargate (architecture: Modular monolith). Estimated infrastructure cost: $370-$1,815/month (within budget).
+For a 'Healthcare / telehealth' project at Medium (10k-100k daily users) scale (~69 peak req/s) built by 5 engineer(s) in 20 weeks, StackSense recommends React SPA (Vite) + Python + Django + PostgreSQL + AWS ECS on Fargate (architecture: Modular monolith). Estimated infrastructure cost: $370-$1,496/month (within budget).
 
 ## Recommended stack
 
@@ -167,7 +167,7 @@ Python + Django serves the API at about 69 requests/s at peak (Medium (10k-100k 
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 280 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $100-$800 a month, against a total budget of $3,000 a month. MySQL is within 0.8 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
+Your data is mainly relational and reaches about 280 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $100-$717 a month, against a total budget of $3,000 a month. MySQL is within 0.8 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.
 
 Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
@@ -233,7 +233,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 Serverless containers on AWS: no nodes to manage, integrates with ALB, RDS, IAM, CloudWatch.
 
-AWS ECS on Fargate hosts the stack for users in North America at a 99.95% availability target. It runs the Python + Django API as long-running processes with WebSockets, sized for ~69 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is $240-$800 a month, against a total budget of $3,000 a month. It leads the runner-up, Azure App Service, by 3.0 stack points.
+AWS ECS on Fargate hosts the stack for users in North America at a 99.95% availability target. It runs the Python + Django API as long-running processes with WebSockets, sized for ~69 requests/s at peak. Under HIPAA it can sign a Business Associate Agreement. Its share of the estimated bill is $240-$630 a month, against a total budget of $3,000 a month. It leads the runner-up, Azure App Service, by 3.0 stack points.
 
 Runs here: the Python + Django API as long-running processes. React SPA is built to static files that are served from Amazon S3 + CloudFront, not from these instances (see Supporting services). The database runs as a separate managed service (see Database).
 
@@ -320,13 +320,13 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: AWS ECS on Fargate | 240 | 800 | Medium (10k-100k daily users) price band; x2 for 99.95% availability (redundant instances) |
-| Database: PostgreSQL | 100 | 800 | Medium (100 GB-1 TB of data) database tier (~280 GB in 12 months); priced as Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless): HIPAA needs a plan whose vendor signs a BAA, which no free or entry plan of this database does; x2 for 99.95% availability (standby/replicas) |
-| Background jobs: Redis / Valkey | 30 | 200 | Medium (10k-100k daily users) price band (the app's scale) |
-| Static frontend: AWS S3 + CloudFront (static) | 0 | 15 | Medium (10k-100k daily users) price band (the app's scale) |
-| **Total** | **370** | **1,815** | |
+| Hosting: AWS ECS on Fargate | 240 | 630 | Medium (10k-100k daily users) price band, from the band's floor up to its price at ~3x the load, for 20,000 daily users (30% of the way up the tier, log scale); x2 for 99.95% availability (redundant instances) |
+| Database: PostgreSQL | 100 | 717 | Medium (100 GB-1 TB of data) database tier (~280 GB in 12 months), from the band's floor up to its price at ~3x the load, for ~280 GB of data (45% of the way up the tier, log scale); priced as Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless): HIPAA needs a plan whose vendor signs a BAA, which no free or entry plan of this database does; x2 for 99.95% availability (standby/replicas) |
+| Background jobs: Redis / Valkey | 30 | 137 | Medium (10k-100k daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 20,000 daily users (30% of the way up the tier, log scale) |
+| Static frontend: AWS S3 + CloudFront (static) | 0 | 12 | Medium (10k-100k daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 20,000 daily users (30% of the way up the tier, log scale) |
+| **Total** | **370** | **1,496** | |
 
-About ₹35,520-₹174,240 per month. Budget status: **within**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹35,520-₹143,616 per month. Budget status: **within**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

@@ -457,9 +457,17 @@
       },
       {
         "when": {
-          "tie": false
+          "tie": false,
+          "behind": false
         },
         "text": "It leads the runner-up, {runner}, by {margin} (points of the overall stack score, the average of the four layer scores)."
+      },
+      {
+        "when": {
+          "tie": false,
+          "behind": true
+        },
+        "text": "{runner} would give a stack {margin} higher, but {kept}."
       },
       {
         "when": {

@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For an 'IoT / telemetry ingestion' project at Large (500-5,000 req/s at peak) scale (~4,000 peak req/s) built by 6 engineer(s) in 16 weeks, StackSense recommends React SPA (Vite) + Go (net/http, chi or Gin) + TimescaleDB (Postgres) + AWS ECS on Fargate (architecture: Modular monolith). Estimated infrastructure cost: $1,365-$7,700/month (stretch budget).
+For an 'IoT / telemetry ingestion' project at Large (500-5,000 req/s at peak) scale (~4,000 peak req/s) built by 6 engineer(s) in 16 weeks, StackSense recommends React SPA (Vite) + Go (net/http, chi or Gin) + TimescaleDB (Postgres) + AWS ECS on Fargate (architecture: Modular monolith). Estimated infrastructure cost: $1,365-$14,731/month (stretch budget).
 
 ## Recommended stack
 
@@ -35,6 +35,10 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 - Scale tier: Large (500-5,000 req/s at peak) (peak ~4,000 req/s, provided); database tier: Large (1-10 TB of data) (~5,600 GB in 12 months)
 - Budget: ~$4,000/month
 - Defaults used (2): What do users do? = read, sign_in, post; Special workloads = none
+
+## Warnings and how they were resolved
+
+- **[WARNING] Budget below the top of the estimate**: $1,365-$14,731/month against $4,000/month: the top (~3x today's load) and the middle are over, most of the rise in TimescaleDB and AWS ECS on Fargate. *Resolution:* Raise the budget before the load grows.
 
 ## Per-layer reasoning
 
@@ -169,7 +173,7 @@ Go (net/http, chi or Gin) serves the API at about 4,000 requests/s at peak (Larg
 
 Postgres extension adding hypertables, compression and continuous aggregates for time-series.
 
-Your data is mainly time-series and reaches about 5,600 GB within 12 months; TimescaleDB (Postgres) fits time-series data 5/5. The workload is write-heavy, and its write scaling scores 4/5. Its share of the estimated bill is $750-$4,500 a month, against a total budget of $4,000 a month. It leads the runner-up, PostgreSQL, by 4.2 stack points.
+Your data is mainly time-series and reaches about 5,600 GB within 12 months; TimescaleDB (Postgres) fits time-series data 5/5. The workload is write-heavy, and its write scaling scores 4/5. Its share of the estimated bill is $750-$8,609 a month, against a total budget of $4,000 a month. It leads the runner-up, PostgreSQL, by 4.2 stack points.
 
 Suggested offering: Timescale Cloud (Tiger Data) on AWS
 
@@ -237,7 +241,7 @@ Suggested offering: Timescale Cloud (Tiger Data) on AWS
 
 Serverless containers on AWS: no nodes to manage, integrates with ALB, RDS, IAM, CloudWatch.
 
-AWS ECS on Fargate hosts the stack for users in Europe at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~4,000 requests/s at peak. Its share of the estimated bill is $600-$3,000 a month, against a total budget of $4,000 a month. It leads the runner-up, Fly.io, by 3.1 stack points.
+AWS ECS on Fargate hosts the stack for users in Europe at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~4,000 requests/s at peak. Its share of the estimated bill is $600-$5,739 a month, against a total budget of $4,000 a month. It leads the runner-up, Fly.io, by 3.1 stack points.
 
 Runs here: the Go API as long-running processes. React SPA is built to static files that are served from Amazon S3 + CloudFront, not from these instances (see Supporting services). The database runs as a separate managed service (see Database).
 
@@ -311,12 +315,12 @@ Runs here: the Go API as long-running processes. React SPA is built to static fi
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: AWS ECS on Fargate | 600 | 3,000 | Large (500-5,000 req/s at peak) price band; x1.5 for 99.9% availability (redundant instances) |
-| Database: TimescaleDB (Postgres) | 750 | 4,500 | Large (1-10 TB of data) database tier (~5,600 GB in 12 months); x1.5 for 99.9% availability (standby/replicas) |
-| Static frontend: AWS S3 + CloudFront (static) | 15 | 200 | Large (500-5,000 req/s at peak) price band (the app's scale) |
-| **Total** | **1,365** | **7,700** | |
+| Hosting: AWS ECS on Fargate | 600 | 5,739 | Large (500-5,000 req/s at peak) price band, from the band's floor up to its price at ~3x the load, for 4,000 req/s at peak (90% of the way up the tier, log scale); x1.5 for 99.9% availability (redundant instances) |
+| Database: TimescaleDB (Postgres) | 750 | 8,609 | Large (1-10 TB of data) database tier (~5,600 GB in 12 months), from the band's floor up to its price at ~3x the load, for 4,000 req/s at peak (90% of the way up the tier, log scale); x1.5 for 99.9% availability (standby/replicas) |
+| Static frontend: AWS S3 + CloudFront (static) | 15 | 383 | Large (500-5,000 req/s at peak) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 4,000 req/s at peak (90% of the way up the tier, log scale) |
+| **Total** | **1,365** | **14,731** | |
 
-About ₹131,040-₹739,200 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹131,040-₹1,414,176 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

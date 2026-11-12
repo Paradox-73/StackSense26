@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Fintech / payments / ledger' project at Large (100k-1M daily users) scale (~2,315 peak req/s) built by 12 engineer(s) in 24 weeks, StackSense recommends Native iOS + Android (Swift / Kotlin) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes) (architecture: Modular monolith). Estimated infrastructure cost: ₹355,200-₹1,416,000/month (within budget). The highest-scoring stack (Native iOS + Android (Swift / Kotlin) + Java/Kotlin + Spring Boot + PostgreSQL + AWS ECS on Fargate, 92.4) is only less than 0.05 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on lower vendor lock-in (5 vs 6, summed lock-in).
+For a 'Fintech / payments / ledger' project at Large (100k-1M daily users) scale (~2,315 peak req/s) built by 12 engineer(s) in 24 weeks, StackSense recommends Native iOS + Android (Swift / Kotlin) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes) (architecture: Modular monolith). Estimated infrastructure cost: ₹355,200-₹1,767,744/month (stretch budget). The highest-scoring stack (Native iOS + Android (Swift / Kotlin) + Java/Kotlin + Spring Boot + PostgreSQL + AWS ECS on Fargate, 92.4) is only less than 0.05 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on lower vendor lock-in (5 vs 6, summed lock-in).
 
 ## Recommended stack
 
@@ -35,6 +35,10 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 - Scale tier: Large (100k-1M daily users) (peak ~2,315 req/s, derived); database tier: Large (1-10 TB of data) (~1,460 GB in 12 months)
 - Budget: ~$15,625/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Assumption: compliance = dpdp: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies.
+
+## Warnings and how they were resolved
+
+- **[WARNING] Budget below the top of the estimate**: ₹355,200-₹1,767,744/month against ₹1,500,000/month: the top (~3x today's load) is over, most of the rise in PostgreSQL and AWS EKS. *Resolution:* Raise the budget before the load grows.
 
 ## Per-layer reasoning
 
@@ -168,7 +172,7 @@ Java/Kotlin + Spring Boot serves the API at about 2,315 requests/s at peak (Larg
 
 Open-source relational database with ACID transactions, JSONB, full-text search and extensions (PostGIS, pgvector, TimescaleDB).
 
-Your data is mainly relational and reaches about 1,460 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹576,000 a month, against a total budget of ₹1,500,000 a month. MySQL is within 0.7 stack points, inside the tie margin (stacks this close count as tied); the tie went to PostgreSQL on adjacent team skills (19.5 vs 19, summed skill fit).
+Your data is mainly relational and reaches about 1,460 GB within 12 months; PostgreSQL fits relational data 5/5. You need strong consistency, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹751,872 a month, against a total budget of ₹1,500,000 a month. MySQL is within 0.7 stack points, inside the tie margin (stacks this close count as tied); the tie went to PostgreSQL on adjacent team skills (19.5 vs 19, summed skill fit).
 
 Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
@@ -234,7 +238,7 @@ Suggested offering: Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)
 
 Managed Kubernetes control plane on AWS.
 
-AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes with WebSockets, sized for ~2,315 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is ₹134,400-₹480,000 a month, against a total budget of ₹1,500,000 a month. AWS ECS on Fargate is within less than 0.05 stack points, inside the tie margin (stacks this close count as tied); the tie went to AWS EKS (Kubernetes) on lower vendor lock-in (5 vs 6, summed lock-in).
+AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes with WebSockets, sized for ~2,315 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is ₹134,400-₹655,872 a month, against a total budget of ₹1,500,000 a month. AWS ECS on Fargate is within less than 0.05 stack points, inside the tie margin (stacks this close count as tied); the tie went to AWS EKS (Kubernetes) on lower vendor lock-in (5 vs 6, summed lock-in).
 
 Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -320,12 +324,12 @@ Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The data
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: AWS EKS (Kubernetes) | 1,400 | 5,000 | Large (100k-1M daily users) price band; x2 for 99.95% availability (redundant instances) |
-| Database: PostgreSQL | 800 | 6,000 | Large (1-10 TB of data) database tier (~1,460 GB in 12 months); x2 for 99.95% availability (standby/replicas) |
+| Hosting: AWS EKS (Kubernetes) | 1,400 | 6,832 | Large (100k-1M daily users) price band, from the band's floor up to its price at ~3x the load, for 500,000 daily users (70% of the way up the tier, log scale); x2 for 99.95% availability (redundant instances) |
+| Database: PostgreSQL | 800 | 7,832 | Large (1-10 TB of data) database tier (~1,460 GB in 12 months), from the band's floor up to its price at ~3x the load, for 2,315 req/s at peak (67% of the way up the tier, log scale); x2 for 99.95% availability (standby/replicas) |
 | Phone login (SMS OTP) | 1,500 | 3,750 | ~750,000 SMS a month (one login every ~20 days per active user) at $0.002-0.005 each |
-| **Total** | **3,700** | **14,750** | |
+| **Total** | **3,700** | **18,414** | |
 
-About ₹355,200-₹1,416,000 per month. Budget status: **within**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹355,200-₹1,767,744 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

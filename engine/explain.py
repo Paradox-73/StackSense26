@@ -215,7 +215,7 @@ def kept_text(layer: str, a: str, alt_cand: dict, margin: float, best: dict | No
         return (f"{a}'s stack is kept because it is also the pick at larger scale: otherwise a growing team "
                 "would have to migrate away and back")
     reason = None
-    if best is not None:
+    if best is not None and margin > -TIE_MARGIN:  # past the tie margin no tie preference decided it
         other = {"picks": dict(best["picks"], **{layer: alt_cand}), "no_skills": best.get("no_skills"),
                  "no_fe_skills": best.get("no_fe_skills"), "lock_in_ok": best.get("lock_in_ok"),
                  "cloud_skills": best.get("cloud_skills", ())}
@@ -446,7 +446,8 @@ def _ctx(layer: str, s: dict, items: dict, p: dict, d: dict, cost: dict, provide
         "cost": _money_txt(line["low"], line["high"], p) if line else None,
         "budget": _money_txt(d["budget_usd"], d["budget_usd"], p),
         "runner": vs["runner_up"] if vs else None, "margin": points(vs["margin"]) if vs else None,
-        "tie": bool(vs and vs["tie"]), "kind": kind, "provided": provided,
+        "tie": bool(vs and vs["tie"]), "behind": bool(vs and not vs["tie"] and vs["margin"] < 0), "kind": kind,
+        "provided": provided,
         "kept": _lower_first(vs["kept"]) if vs and vs.get("kept") else None,
         "assumed": 1 if "consistency" in d.get("defaulted", ()) else 0, "static": 1 if kind == "static" else 0,
         "phones": " and ".join(PHONE_NAMES[x] for x in phones) or None, "both_phones": 1 if len(phones) == 2 else 0,
@@ -478,7 +479,7 @@ def _applies(t: dict, c: dict, stack: set, p: dict) -> bool:
         if k in ("kind", "seo", "consistency", "read_write"):
             if c[k] not in v:
                 return False
-        elif k in ("provided", "tie", "functions", "services", "assumed", "static", "both_phones", "one", "api"):
+        elif k in ("provided", "tie", "behind", "functions", "services", "assumed", "static", "both_phones", "one", "api"):
             if c[k] != v:
                 return False
         elif k in LINE_CONDITIONS:

@@ -307,11 +307,11 @@ Runs here: React SPA (static files). Firebase runs the API, auth and database as
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: Vercel | 0 | 0 | Hobby (<1k daily users) price band |
-| Backend: Firebase (BaaS on Google Cloud) (includes its database) | 0 | 0 | plan sized for the larger of traffic (Hobby (<1k daily users)) and ~2 GB of data in 12 months; per-read/write pricing at your request volume; disk beyond the plan's allowance billed per GB |
+| Hosting: Vercel | 0 | 0 | Hobby (<1k daily users) price band, from the band's floor up to its price at ~3x the load, for 0 req/s at peak (the bottom of the tier) |
+| Backend: Firebase (BaaS on Google Cloud) (includes its database) | 0 | 0 | plan sized for the larger of traffic (Hobby (<1k daily users)) and ~2 GB of data in 12 months, from the band's floor up to its price at ~3x the load, for ~2 GB of data (23% of the way up the tier, log scale); per-read/write pricing at your request volume; disk beyond the plan's allowance billed per GB |
 | **Total** | **0** | **0** | |
 
-About ₹0-₹0 per month. Budget status: **within**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹0-₹0 per month. Budget status: **within**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

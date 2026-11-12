@@ -188,3 +188,14 @@ def test_budget_rule_says_fits_only_when_the_estimate_fits(change):
         assert not any(x in text for x in UNQUALIFIED_FIT), [x for x in UNQUALIFIED_FIT if x in text]
     if out["estimated_monthly_cost_usd"]["max"] > budget:
         assert _budget_codes(out["warnings"]) and out["status"] == "ok_with_warnings"
+
+
+def test_a_pick_kept_by_the_budget_rule_does_not_lead_the_stack_it_replaced():
+    """P2 with performance 4 moves to AWS Lambda for the budget although the DigitalOcean stack scores 3.4 points
+    higher: the hosting text said Lambda "leads the runner-up, DigitalOcean, by 3.4 stack points"."""
+    out = _p2(priorities__performance=4)
+    text = out["stack"]["hosting"]["justification"]
+    if not out["stack"]["hosting"]["choice"].startswith("AWS Lambda"):
+        pytest.skip("the budget rule no longer moves this stack")
+    assert "leads the runner-up" not in text, text
+    assert "would give a stack" in text and "chosen by the budget rule" in text, text

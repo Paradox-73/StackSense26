@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~25,000 peak req/s) built by 25 engineer(s) in 26 weeks, StackSense recommends Next.js (React) + Java/Kotlin + Spring Boot + MySQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹1,036,800-₹5,472,000/month (stretch budget). The highest-scoring stack (Next.js (React) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes), 93.9) is only 0.3 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on adjacent team skills (19.5 vs 19, summed skill fit).
+For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~25,000 peak req/s) built by 25 engineer(s) in 26 weeks, StackSense recommends Next.js (React) + Java/Kotlin + Spring Boot + MySQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹1,036,800-₹7,491,264/month (stretch budget). The highest-scoring stack (Next.js (React) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes), 93.9) is only 0.3 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on adjacent team skills (19.5 vs 19, summed skill fit).
 
 ## Recommended stack
 
@@ -37,6 +37,10 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 - Budget: ~$26,042/month (INR converted at a fixed planning rate of 96 INR = 1 USD (an assumption; check the FBIL reference rate for today's value).)
 - Assumption: compliance = dpdp: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Add 'Data must stay in India' if a sector rule (e.g. RBI) applies.
 - Defaults used (2): What do users do? = read, sign_in, post; Special workloads = none
+
+## Warnings and how they were resolved
+
+- **[WARNING] Budget below the top of the estimate**: ₹1,036,800-₹7,491,264/month against ₹2,500,000/month: the top (~3x today's load) and the middle are over, most of the rise in AWS EKS and ClickHouse. *Resolution:* Raise the budget before the load grows.
 
 ## Per-layer reasoning
 
@@ -167,7 +171,7 @@ Java/Kotlin + Spring Boot serves the API at about 25,000 requests/s at peak (Ver
 
 Widely deployed relational database; horizontally shardable with Vitess.
 
-Your data is mainly relational and reaches about 1,520 GB within 12 months; MySQL fits relational data 5/5. You need strong consistency, and MySQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹576,000 a month, against a total budget of ₹2,500,000 a month. PostgreSQL is within 0.3 stack points, inside the tie margin (stacks this close count as tied); the tie went to MySQL on adjacent team skills (19.5 vs 19, summed skill fit).
+Your data is mainly relational and reaches about 1,520 GB within 12 months; MySQL fits relational data 5/5. You need strong consistency, and MySQL gives it: a read after a write always sees that write. Its share of the estimated bill is ₹76,800-₹793,440 a month, against a total budget of ₹2,500,000 a month. PostgreSQL is within 0.3 stack points, inside the tie margin (stacks this close count as tied); the tie went to MySQL on adjacent team skills (19.5 vs 19, summed skill fit).
 
 Suggested offering: Amazon RDS / Aurora MySQL
 
@@ -234,7 +238,7 @@ Suggested offering: Amazon RDS / Aurora MySQL
 
 Managed Kubernetes control plane on AWS.
 
-AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes with WebSockets, sized for ~25,000 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is ₹480,000-₹2,304,000 a month, against a total budget of ₹2,500,000 a month. It leads the runner-up, AWS ECS on Fargate, by 1.5 stack points.
+AWS EKS (Kubernetes) hosts the stack for users in India at a 99.95% availability target. It runs the Java/Kotlin + Spring Boot API as long-running processes with WebSockets, sized for ~25,000 requests/s at peak. For PCI DSS it is a validated service provider, so card-handling infrastructure can sit on it. Its share of the estimated bill is ₹480,000-₹3,272,448 a month, against a total budget of ₹2,500,000 a month. It leads the runner-up, AWS ECS on Fargate, by 1.5 stack points.
 
 Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring Boot API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -333,14 +337,14 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: AWS EKS (Kubernetes) | 5,000 | 24,000 | Very large (1M-10M daily users) price band; x2 for 99.95% availability (redundant instances) |
-| Database: MySQL | 800 | 6,000 | Large (1-10 TB of data) database tier (~1,520 GB in 12 months); x2 for 99.95% availability (standby/replicas) |
-| Cache: Redis / Valkey | 1,500 | 8,000 | Very large (1M-10M daily users) price band (the app's scale) |
-| Secondary store (document): MongoDB | 500 | 4,000 | Large (1-10 TB of data) price band (the app's scale) |
-| Analytics: ClickHouse | 3,000 | 15,000 | Very large (1M-10M daily users) price band (the app's scale); a copy of data that MySQL also stores (fed by a continuous copy of changes), so that data is paid for in both stores |
-| **Total** | **10,800** | **57,000** | |
+| Hosting: AWS EKS (Kubernetes) | 5,000 | 34,088 | Very large (1M-10M daily users) price band, from the band's floor up to its price at ~3x the load, for 25,000 req/s at peak (70% of the way up the tier, log scale); x2 for 99.95% availability (redundant instances) |
+| Database: MySQL | 800 | 8,265 | Large (1-10 TB of data) database tier (~1,520 GB in 12 months), from the band's floor up to its price at ~3x the load, for 25,000 req/s at peak (70% of the way up the tier, log scale); x2 for 99.95% availability (standby/replicas) |
+| Cache: Redis / Valkey | 1,500 | 10,407 | Very large (1M-10M daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 25,000 req/s at peak (70% of the way up the tier, log scale) |
+| Secondary store (document): MongoDB | 500 | 5,510 | Large (1-10 TB of data) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 25,000 req/s at peak (70% of the way up the tier, log scale) |
+| Analytics: ClickHouse | 3,000 | 19,764 | Very large (1M-10M daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 25,000 req/s at peak (70% of the way up the tier, log scale); a copy of data that MySQL also stores (fed by a continuous copy of changes), so that data is paid for in both stores |
+| **Total** | **10,800** | **78,034** | |
 
-About ₹1,036,800-₹5,472,000 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹1,036,800-₹7,491,264 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Realtime chat / collaboration / multiplayer' project at Large (100k-1M daily users) scale (~3,472 peak req/s) built by 4 engineer(s) in 16 weeks, StackSense recommends React SPA (Vite) + Go (net/http, chi or Gin) + MongoDB + Fly.io (architecture: Modular monolith). Estimated infrastructure cost: $1,325-$4,800/month (stretch budget).
+For a 'Realtime chat / collaboration / multiplayer' project at Large (100k-1M daily users) scale (~3,472 peak req/s) built by 4 engineer(s) in 16 weeks, StackSense recommends React SPA (Vite) + Go (net/http, chi or Gin) + MongoDB + Fly.io (architecture: Modular monolith). Estimated infrastructure cost: $1,325-$14,409/month (stretch budget).
 
 ## Recommended stack
 
@@ -38,6 +38,7 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 
 ## Warnings and how they were resolved
 
+- **[WARNING] Budget below the top of the estimate**: $1,325-$14,409/month against $2,000/month: the top (~3x today's load) and the middle are over, most of the rise in MongoDB and Fly.io. *Resolution:* Raise the budget before the load grows.
 - **[WARNING] 50 ms target for users worldwide**: The stack as shown runs its API and MongoDB in one region. A round trip between continents alone takes ~85 ms (US East - West Europe) to ~170-225 ms (Southeast Asia - Europe or US East), measured between cloud regions (https://learn.microsoft.com/en-us/azure/networking/azure-network-latency), so users far from that region miss a 50 ms target before any work is done. *Resolution:* Deploy the API in a region per continent with read replicas (or a multi-region database for writes), cache reads at the edge (CDN or edge functions), or treat the target as per-region.
 - **[INFO] Fly.io publishes no uptime SLA**: Your 99.9% target rests on the app alone: Fly.io commits to no uptime figure and owes no credit when it is down. *Resolution:* Alert on an external uptime check and keep a fallback ready (a second region or provider); pick a host with a published SLA if the target is contractual.
 
@@ -170,7 +171,7 @@ Go (net/http, chi or Gin) serves the API at about 3,472 requests/s at peak (Larg
 
 Document database with flexible schemas, multi-document transactions, change streams and built-in sharding.
 
-Your data is mainly key-value and reaches about 170 GB within 12 months; MongoDB fits key-value data 4/5. The workload is write-heavy, and its write scaling scores 4/5. Realtime is core, and it can push changes to clients (realtime fit 4.0/5). Its share of the estimated bill is $750-$1,500 a month, against a total budget of $2,000 a month.
+Your data is mainly key-value and reaches about 170 GB within 12 months; MongoDB fits key-value data 4/5. The workload is write-heavy, and its write scaling scores 4/5. Realtime is core, and it can push changes to clients (realtime fit 4.0/5). Its share of the estimated bill is $750-$8,633 a month, against a total budget of $2,000 a month.
 
 Suggested offering: MongoDB Atlas (runs on AWS, GCP or Azure in the same region as your compute)
 
@@ -230,7 +231,7 @@ Suggested offering: MongoDB Atlas (runs on AWS, GCP or Azure in the same region 
 
 Runs Docker images as Firecracker micro-VMs close to users in many regions, with Anycast networking.
 
-Fly.io hosts the stack for users worldwide at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~3,472 requests/s at peak. Its share of the estimated bill is $375-$1,800 a month, against a total budget of $2,000 a month. It leads the runner-up, AWS ECS on Fargate, by 4.2 stack points.
+Fly.io hosts the stack for users worldwide at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~3,472 requests/s at peak. Its share of the estimated bill is $375-$3,119 a month, against a total budget of $2,000 a month. It leads the runner-up, AWS ECS on Fargate, by 4.2 stack points.
 
 Runs here: React SPA (static files), the Go API as long-running processes. The database runs as a separate managed service (see Database).
 
@@ -309,12 +310,12 @@ Runs here: React SPA (static files), the Go API as long-running processes. The d
 
 | Component | Low (USD) | High (USD) | Basis |
 |---|---|---|---|
-| Hosting: Fly.io | 375 | 1,800 | Large (100k-1M daily users) price band; x1.5 for 99.9% availability (redundant instances) |
-| Database: MongoDB | 750 | 1,500 | Large (100k-1M daily users) database tier (~170 GB in 12 months); upper end for ~170 GB of data: the band's top is priced for the largest data of the tier; x1.5 for 99.9% availability (standby/replicas) |
-| Cache: Redis / Valkey | 200 | 1,500 | Large (100k-1M daily users) price band (the app's scale) |
-| **Total** | **1,325** | **4,800** | |
+| Hosting: Fly.io | 375 | 3,119 | Large (100k-1M daily users) price band, from the band's floor up to its price at ~3x the load, for 3,472 req/s at peak (84% of the way up the tier, log scale); x1.5 for 99.9% availability (redundant instances) |
+| Database: MongoDB | 750 | 8,633 | Large (100k-1M daily users) database tier (~170 GB in 12 months), from the band's floor up to its price at ~3x the load, for 3,472 req/s at peak (84% of the way up the tier, log scale); upper end for ~170 GB of data: the band's top is priced for the largest data of the tier; x1.5 for 99.9% availability (standby/replicas) |
+| Cache: Redis / Valkey | 200 | 2,657 | Large (100k-1M daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 3,472 req/s at peak (84% of the way up the tier, log scale) |
+| **Total** | **1,325** | **14,409** | |
 
-About ₹127,200-₹460,800 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹127,200-₹1,383,264 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

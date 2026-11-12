@@ -132,7 +132,7 @@ Every score therefore splits into the points each answer added. `driven_by` list
 | `compliance` | Never relaxed. HIPAA needs a BAA from the host, a backend-as-a-service and a managed-only database; PCI DSS a host attestation; SOC 2 and ISO 27001 a published report or certificate. GDPR adds a data-processing note; DPDP adds duties, not a region filter. |
 | `deployment_model` | `self_hosted_cloud_vm` keeps what runs on a plain VM (self-managed database, Keycloak, Grafana); `on_premise` removes public-cloud services and flags payments, SMS and push as outside services (`ONPREM_EXTERNAL`, critical); `air_gapped` keeps self-hostable components and moves payments, SMS and push outside or replaces them. |
 | explicit `cloud_preference` | `aws`, `gcp` or `azure` keeps only that cloud; `none` removes all three. |
-| budget, timeline, priorities | Soft: weights and penalties. A minimum bill over the budget raises `BUDGET_STRETCH`, or `BUDGET_INFEASIBLE` (critical) when nothing fits. |
+| budget, timeline, priorities | Soft: weights and penalties. An estimate's top over the budget raises `BUDGET_RANGE_OVER`; its low end over it, a critical `BUDGET_STRETCH` or `BUDGET_INFEASIBLE`. |
 
 Preference constraints such as lock-in are relaxed only if a layer would otherwise be empty (`RELAXED_CONSTRAINT`); if the hard constraints empty a layer, the status is `infeasible`. Clashing hard constraints raise a critical warning naming the one that gives way: `CLOUD_VS_DEPLOYMENT` keeps the deployment model, and `RESIDENCY_CONFLICT` keeps both residency rules, so only providers with both regions remain.
 
@@ -162,63 +162,63 @@ A solo beginner with $0, two weeks and critical SEO publishes pages nobody signs
 
 ### 6.2 P2 FixIt Now: home-services marketplace in India (in depth)
 
-![P2 FixIt Now: Next.js, Django, PostgreSQL and DigitalOcean, $207 to $851 a month, with a budget warning](screenshots/s-P2.png)
+![P2 FixIt Now: Next.js, Django, PostgreSQL and DigitalOcean, $207 to $623 a month, with a critical budget warning](screenshots/s-P2.png)
 
 Three intermediate engineers (JavaScript, TypeScript, Python) with nobody on operations have 8 weeks and $150 a month for a marketplace with India residency, critical SEO, chat, phone sign-in, uploads, payments and search, sized at about 6,000 daily users and 12 requests per second at peak.
 
-- **Hosting.** Residency removes Netlify, Render, Railway, Fly.io and Hetzner (no Indian region) and Cloudflare (Enterprise add-on needed) before scoring. DigitalOcean App Platform in BLR1 (Bangalore) leads Google Cloud Run by 1.0 stack point on cost at this scale (3.9 against 3.5) and realtime fit (4.0 against 3.0), and runs Django as long-running processes for the chat WebSockets. `driven_by` lists the answers that added the most points (`team.size`, `team.languages`, `priorities.time_to_market`, `priorities.cost`), then the constraint fields that ruled rivals out (`compliance`, `infrastructure.data_residency`, and `requirements.auth`, since signed-in users rule out a static host).
-- **Frontend.** Critical SEO needs finished HTML. Next.js (SEO 5/5, in the team's languages) leads Nuxt by 2.3 points, and a React SPA loses 5.5 with a client-side rendering penalty. React Native (Expo) is the Android companion, because a mobile toolkit cannot be primary when web is a target.
-- **Backend.** Django matches the team and runs one process for the WebSockets (Channels), jobs and connection pools. FastAPI is 0.1 behind, inside the tie margin, and the output says either is defensible; Spring Boot loses 10.5 because nobody knows Java. Trade-offs: realtime fit 2/5, a sync-first ORM.
-- **Database.** The unstated data shape and consistency default to relational and strong, as `assumptions` notes. PostgreSQL (fit 5/5) on DigitalOcean Managed PostgreSQL costs $75 to $150 for about 34 GB with a standby; MySQL ties (0.3), MongoDB loses 6.4, and eventually consistent stores and single-node SQLite are ruled out.
-- **Supporting services.** Celery with a Valkey broker; PostgreSQL full-text search, since 34 GB fits its own index; DigitalOcean Spaces in Bangalore, a private bucket with short-lived signed URLs and no public CDN; MSG91 with the DLT-registered templates Indian operators require; Razorpay hosted checkout, keeping card data off the servers (PCI DSS SAQ A). A team of three runs at most two extra systems; this stack adds Valkey, and sign-in uses Django's built-in authentication with the users in India.
-- **Cost.** $207 to $851 a month. The floor (hosting $75 with redundancy for 99.9%, database $75, Valkey $30, media $9, SMS $18) exceeds the $150 budget, so the output carries `BUDGET_STRETCH` and `ok_with_warnings`, stating that a cheaper stack scored lower on the stated priorities.
+- **Hosting.** Residency removes Netlify, Render, Railway, Fly.io and Hetzner (no Indian region) and Cloudflare (Enterprise add-on needed) before scoring. DigitalOcean App Platform in BLR1 (Bangalore) leads Google Cloud Run by 1.0 stack point on cost at this scale (3.9 against 3.5) and realtime fit (4.0 against 3.0), and runs Django as long-running processes for the chat WebSockets. `driven_by` lists the answers that added the most points, then the constraint fields that ruled rivals out.
+- **Frontend.** Critical SEO needs finished HTML. Next.js (SEO 5/5, in the team's languages) leads Nuxt by 2.3 points, and a React SPA loses 5.5 with a client-side rendering penalty.
+- **Backend.** Django matches the team and runs one process for the WebSockets (Channels), jobs and connection pools. FastAPI is 0.1 behind, inside the tie margin, and the output says either is defensible; Spring Boot loses 10.5 because nobody knows Java.
+- **Database.** The unstated data shape and consistency default to relational and strong, as `assumptions` notes. PostgreSQL (fit 5/5) on DigitalOcean Managed PostgreSQL costs $75 to $150 for about 34 GB with a standby; MySQL ties (0.3).
+- **Supporting services.** Celery with a Valkey broker; PostgreSQL full-text search, since 34 GB fits its own index; DigitalOcean Spaces in Bangalore, a private bucket with short-lived signed URLs and no public CDN; MSG91 with the DLT-registered templates Indian operators require; Razorpay hosted checkout, keeping card data off the servers (PCI DSS SAQ A). Sign-in uses Django's built-in authentication, with the users in India.
+- **Cost.** $207 to $623 a month. The floor (hosting $75 with redundancy for 99.9%, database $75, Valkey $30, media $9, SMS $18) exceeds the $150 budget, so the output carries a critical `BUDGET_STRETCH` and `ok_with_warnings`, naming the cheaper hosting and database that scored lower.
 
 ### 6.3 P3 BoardRoom: realtime collaborative whiteboard
 
-![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io, $1,190 to $4,635 a month, with a no-SLA info warning](screenshots/s-P3.png)
+![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io, $1,190 to $2,792 a month, with a budget warning and a no-SLA info warning](screenshots/s-P3.png)
 
-Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1. PostgreSQL leads Microsoft SQL Server by 2.1; MySQL takes a penalty because tenants share one database and its privileges stop at table and column level. Supporting services add Yjs shared documents (CRDTs), Upstash Redis for the cache and pub/sub across instances, River jobs in PostgreSQL, Cloudflare R2 storage, Stripe hosted checkout and Auth0 sign-in. Fly.io publishes no SLA, so the output carries an info warning `NO_PUBLISHED_SLA`.
+Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1. PostgreSQL leads Microsoft SQL Server by 2.1; Supporting services add Yjs shared documents (CRDTs), Upstash Redis for the cache and pub/sub across instances, River jobs in PostgreSQL, Cloudflare R2 storage, Stripe hosted checkout and Auth0 sign-in. Fly.io publishes no SLA, so the output carries an info warning `NO_PUBLISHED_SLA`.
 
 ### 6.4 P4 QuickCredit: digital lending in India (in depth)
 
-![P4 QuickCredit: React SPA, Spring Boot, PostgreSQL and AWS ECS on Fargate, $1,962 to $7,242 a month](screenshots/s-P4.png)
+![P4 QuickCredit: React SPA, Spring Boot, PostgreSQL and AWS ECS on Fargate, $1,962 to $6,967 a month, with a budget warning](screenshots/s-P4.png)
 
 P4 is the most constrained scenario: AWS required, RBI localisation, PCI DSS, ISO 27001 and 99.95%, for eight seniors (Java, Kotlin, TypeScript) who can run infrastructure, sized at about 60,000 daily users and 833 requests per second at peak.
 
-- **Hosting.** The explicit AWS removes Vercel, Netlify, Cloudflare, Render, Railway, Fly.io and Cloud Run before scoring, and S3 with CloudFront is static-only with a 99.9% SLA. ECS on Fargate leads Lambda by 2.9 stack points on performance and portability; its justification quotes the PCI DSS service-provider attestation, and the region is ap-south-1 (Mumbai). Trade-offs: AWS networking and IAM to learn, a load balancer and NAT gateway billed while idle, no AWS skill listed.
-- **Backend.** Spring Boot matches the team and scores 5/5 on scalability, maturity and structure, which the load, the 99.95% target and the scalability and maintainability priorities weight up; Go is 3.0 behind on skill match. Supabase (not on AWS, no ISO 27001) and Firebase (not on AWS) are ruled out.
-- **Database.** A double-entry ledger needs ACID, so eventually consistent stores are out; Firestore is off AWS and SQLite has no failover. PostgreSQL on Amazon RDS or Aurora in Mumbai costs $800 to $1,600 for about 411 GB with a standby; MySQL ties (0.1).
-- **Frontend.** Behind a login SEO does not matter, so a React SPA ships as static files on S3 and CloudFront; Angular ties (0.8) and Next.js loses 1.2 for adding a Node.js server. Native iOS and Android apps (Swift, Kotlin) score best among mobile toolkits.
+- **Hosting.** The explicit AWS removes Vercel, Netlify, Cloudflare, Render, Railway, Fly.io and Cloud Run before scoring, and S3 with CloudFront is static-only with a 99.9% SLA. ECS on Fargate leads Lambda by 2.9 stack points on performance and portability; its justification quotes the PCI DSS service-provider attestation, and the region is ap-south-1 (Mumbai).
+- **Backend.** Spring Boot matches the team and scores 5/5 on scalability, maturity and structure, which the load, the 99.95% target and the scalability and maintainability priorities weight up; Go is 3.0 behind on skill match.
+- **Database.** A double-entry ledger needs ACID, so eventually consistent stores are out; Firestore is off AWS and SQLite has no failover. PostgreSQL on Amazon RDS or Aurora in Mumbai costs $800 to $2,502 for about 411 GB with a standby; MySQL ties (0.1).
+- **Frontend.** Behind a login SEO does not matter, so a React SPA ships as static files on S3 and CloudFront; Angular ties (0.8) and Next.js loses 1.2 for adding a Node.js server.
 - **Supporting services.** The credit-scoring model on an Amazon SageMaker endpoint in Mumbai ($75 to $180, CPU); Cognito in Mumbai with MSG91 for SMS; Razorpay hosted checkout; SQS for jobs; uploads in a private S3 bucket with short-lived signed URLs; KMS, audit logging, least-privilege IAM and a WAF for PCI DSS.
-- **Cost.** $1,962 to $7,242 against $6,000, with hosting and the database doubled for 99.95%; the floor fits the budget, so the status is `ok` and the budget check reads "stretch".
+- **Cost.** $1,962 to $6,967 against $6,000, with hosting and the database doubled for 99.95%; the floor fits the budget but the top does not, so the budget check reads "stretch" and the output carries `BUDGET_RANGE_OVER` and `ok_with_warnings`.
 
 ### 6.5 P5 PeopleDesk: internal HR tool
 
-![P5 PeopleDesk: HTMX, ASP.NET Core, Microsoft SQL Server and Azure App Service, $30 to $172 a month, with an extended-support info warning](screenshots/s-P5.png)
+![P5 PeopleDesk: HTMX, ASP.NET Core, Microsoft SQL Server and Azure App Service, $30 to $259 a month, with an extended-support info warning](screenshots/s-P5.png)
 
-Two C# developers build a tool for 1,200 employees on Azure in India under ISO 27001, for $300 a month. Azure rules out every other host, and Supabase also lacks ISO 27001. ASP.NET Core leads Laravel by 3.7 points on the team's C# and a 2.0-point rule for Microsoft's tooling on Azure. HTMX leads a React SPA by 1.4. Existing systems are reused: sign-in through Microsoft Entra ID over OpenID Connect, SQL Server kept as Azure SQL Database, Microsoft 365 through the Graph API; an info warning notes that SQL Server 2019 security updates end on 8 January 2030.
+Two C# developers build a tool for 1,200 employees on Azure in India under ISO 27001, for $300 a month. Azure rules out every other host, and Supabase also lacks ISO 27001. ASP.NET Core leads Laravel by 3.7 points on the team's C# and a 2.0-point rule for Microsoft's tooling on Azure. Existing systems are reused: sign-in through Microsoft Entra ID over OpenID Connect, SQL Server kept as Azure SQL Database, Microsoft 365 through the Graph API; an info warning notes that SQL Server 2019 security updates end on 8 January 2030.
 
 ### 6.6 P6 KhetSurvey: offline-first crop survey app
 
-![P6 KhetSurvey: React Native, Django, PostgreSQL and DigitalOcean, $35 to $105 a month](screenshots/s-P6.png)
+![P6 KhetSurvey: React Native, Django, PostgreSQL and DigitalOcean, $35 to $120 a month, with a budget warning](screenshots/s-P6.png)
 
-Two developers (JavaScript, Python) build an Android-only survey app that must work offline, in India, for $100 a month; type `other` on phones only is scored as a mobile-first app. React Native (Expo) leads Flutter by 3.5 points on skills, and PowerSync keeps a local SQLite copy in sync with PostgreSQL. Django and DigitalOcean in Bangalore win ties (0.5 and 0.6 points), and of about 100 GB in a year, the photos (about 97 GB) go to DigitalOcean Spaces and the survey records (about 3 GB) to PostgreSQL. The description's 2 GB phones and 2G/3G links are not read from the file; the offline flag carries that need.
+Two developers (JavaScript, Python) build an Android-only survey app that must work offline, in India, for $100 a month; type `other` on phones only is scored as a mobile-first app. React Native (Expo) leads Flutter by 3.5 points on skills, and PowerSync keeps a local SQLite copy in sync with PostgreSQL. Django and DigitalOcean in Bangalore win ties (0.5 and 0.6 points), and of about 100 GB in a year, the photos (about 97 GB) go to DigitalOcean Spaces and the survey records (about 3 GB) to PostgreSQL.
 
 ## 7. Edge-case handling
 
 The nine files in `scenarios/edge/` cover the nine categories of the statement's section 6; the screenshots after the table show each result, cut to the handling.
 
-| Category and file | How it is detected | What the engine does | Screenshot |
-|---|---|---|---|
-| Missing fields (E1: only name, type and platforms) | `validate()` collects absent required paths | Documented defaults, seven `MISSING_REQUIRED_FIELD` warnings, every default in `assumptions`; `ok_with_warnings` | E1 |
-| Invalid values (E2: P2 with seven broken fields) | Type, range and enum checks per field | `invalid_input`, `stack` null, seven field-level `validation_errors` (unknown type and platform, −5 users, a string count, `magic_link`, a numeric availability, a priority of 7) | E2 |
-| Contradictions (E3: five million users, $0, 99.99% from one beginner, three platforms in three weeks) | `engine/conflicts.py` compares fields; the cost model compares the cheapest compliant bill with the budget | Critical `BEGINNER_HIGH_AVAILABILITY`, `MANY_PLATFORMS_SHORT_TIMELINE` and `BUDGET_INFEASIBLE`; a reduced-scope stack, each relaxed goal in `assumptions`, its $9,200 floor stated | E3 |
-| Over-engineering trap (E4: results page for two million readers, no sign-in) | No sign-in and a read-heavy workload allow static options | Astro, no backend or database, Netlify, $20 to $200; no Kubernetes or microservices | E4 |
-| Regulatory constraints (E5: HIPAA, GDPR, PCI DSS, EU residency) | Compliance flags and regions per entry, checked before scoring | Cloud Run in Frankfurt with Cloud SQL; Firebase (no BAA), Vercel and Netlify (no SLA for 99.95%) out; sign-in under the Google Cloud BAA, hosted checkout, KMS, audit logs and a WAF | E5 |
-| Existing systems (E6: Okta, SQL Server 2014, SAP ECC) | Free text matched to databases, identity providers, business systems and end-of-life products | Okta reused over OpenID Connect, SQL Server kept as Azure SQL, SAP integrated through OData; `EOL_EXISTING_SYSTEM` for SQL Server 2014 and Windows Server 2012 | E6 |
-| Restricted deployment (E7: P2 with no internet) | `air_gapped` keeps self-hostable options; `AIR_GAPPED_EXTERNAL` finds outside dependencies | On-premises VMs, self-managed PostgreSQL, Ceph Object Gateway, nginx instead of a CDN, Keycloak, GitLab CI; payments, SMS and push moved outside or replaced (critical) | E7 |
-| Skill mismatch (E8: P2 with a PHP-only team) | Skill match is weighted; an unknown server language takes a penalty | Laravel, HTMX and MySQL; Laravel leads FastAPI by 6.4 points on skill match, and its trade-offs note that high throughput needs Octane | E8 |
-| Deprecated technology (E9: AngularJS 1.5, CentOS 7, Python 2.7, PHP 7.2) | An end-of-life table citing the vendor or endoflife.date | Four `EOL_EXISTING_SYSTEM` warnings with sources; each system integrated through its API | E9 |
+| Category and file | How it is detected | What the engine does |
+|---|---|---|
+| Missing fields (E1: only name, type and platforms) | `validate()` collects absent required paths | Documented defaults, seven `MISSING_REQUIRED_FIELD` warnings, every default in `assumptions`; `ok_with_warnings` |
+| Invalid values (E2: P2 with seven broken fields) | Type, range and enum checks per field | `invalid_input`, `stack` null, seven field-level `validation_errors` (unknown type and platform, −5 users, a string count, `magic_link`, a numeric availability, a priority of 7) |
+| Contradictions (E3: five million users, $0, 99.99% from one beginner, three platforms in three weeks) | `engine/conflicts.py` compares fields; the cost model compares the cheapest compliant bill with the budget | Critical `BEGINNER_HIGH_AVAILABILITY`, `MANY_PLATFORMS_SHORT_TIMELINE` and `BUDGET_INFEASIBLE`; a reduced-scope stack, each relaxed goal in `assumptions`, its $9,200 floor stated |
+| Over-engineering trap (E4: results page for two million readers, no sign-in) | No sign-in and a read-heavy workload allow static options | Astro, no backend or database, Netlify, $20 to $379; no Kubernetes or microservices |
+| Regulatory constraints (E5: HIPAA, GDPR, PCI DSS, EU residency) | Compliance flags and regions per entry, checked before scoring | Cloud Run in Frankfurt with Cloud SQL; Firebase (no BAA), Vercel and Netlify (no SLA for 99.95%) out; sign-in under the Google Cloud BAA, hosted checkout, KMS, audit logs and a WAF |
+| Existing systems (E6: Okta, SQL Server 2014, SAP ECC) | Free text matched to databases, identity providers, business systems and end-of-life products | Okta reused over OpenID Connect, SQL Server kept as Azure SQL, SAP integrated through OData; `EOL_EXISTING_SYSTEM` for SQL Server 2014 and Windows Server 2012 |
+| Restricted deployment (E7: P2 with no internet) | `air_gapped` keeps self-hostable options; `AIR_GAPPED_EXTERNAL` finds outside dependencies | On-premises VMs, self-managed PostgreSQL, Ceph Object Gateway, nginx instead of a CDN, Keycloak, GitLab CI; payments, SMS and push moved outside or replaced (critical) |
+| Skill mismatch (E8: P2 with a PHP-only team) | Skill match is weighted; an unknown server language takes a penalty | Laravel, HTMX and MySQL; Laravel leads FastAPI by 6.4 points on skill match, and its trade-offs note that high throughput needs Octane |
+| Deprecated technology (E9: AngularJS 1.5, CentOS 7, Python 2.7, PHP 7.2) | An end-of-life table citing the vendor or endoflife.date | Four `EOL_EXISTING_SYSTEM` warnings with sources; each system integrated through its API |
 
 ![E1 Missing fields: a stack from the documented defaults, and the first two of seven MISSING_REQUIRED_FIELD warnings](screenshots/e-E1.png)
 
@@ -244,7 +244,7 @@ Appendix F has the tables behind 8.1 to 8.3.
 
 ### 8.1 Tests
 
-The 1189 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1244 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -309,7 +309,7 @@ The top five options per layer give 625 stacks. The 65 compatibility rules add s
 
 ### A.5 Supporting services and cost lines
 
-Supporting services follow the stack and the hard inputs: nothing cloud-only on-premises, nothing outside the residency region, nothing without a BAA under HIPAA. My estimate of how many extra systems a team can run beside its app and database is one for one or two people, two for three to five and four for six to twelve; the rest are listed with the trigger for adding them, and compliance and security services are never deferred. Each cost line states its basis: the price band for the scale tier, a multiplier for capacity the team runs itself (1.5 at 99.9%, 2 at 99.95%, 3 at 99.99%, for a stated target only), a database bill of at least its storage, add-ons at the app's own tier, and usage for model inference, video, maps, SMS and media delivery.
+Supporting services follow the stack and the hard inputs: nothing cloud-only on-premises, nothing outside the residency region, nothing without a BAA under HIPAA. My estimate of how many extra systems a team can run beside its app and database is one for one or two people, two for three to five and four for six to twelve; the rest are listed with the trigger for adding them, and compliance and security services are never deferred. Each cost line states its basis: the price band for the scale tier, read from its floor up to its price at three times the project's load in the tier, a multiplier for capacity the team runs itself (1.5 at 99.9%, 2 at 99.95%, 3 at 99.99%, for a stated target only), a database bill of at least its storage, add-ons at the app's own tier, and usage for model inference, video, maps, SMS and media delivery.
 
 </div>
 
@@ -368,14 +368,14 @@ The guided questionnaire runs the same engine on its own answers. Two screenshot
 <!-- BEGIN gallery -->
 ![Startup SaaS MVP](screenshots/gallery/startup_mvp.png)
 
-**Startup SaaS MVP.** Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Cloudflare Pages + Workers, about $26 a month.
+**Startup SaaS MVP.** Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Cloudflare Pages + Workers, about $26–$28 a month.
 Why it fits: backend, low ops burden: 5.0/5 vs 4.2 average for this layer; hosting, low ops burden: 5.0/5 vs 4.0 average for this layer.
 <!-- END gallery -->
 
 <!-- BEGIN gallery_more -->
 ![HIPAA telehealth platform](screenshots/gallery/hipaa_telehealth.png)
 
-**HIPAA telehealth platform.** React SPA (Vite) + Python + Django + PostgreSQL + AWS ECS on Fargate, about $370–$1,815 a month.
+**HIPAA telehealth platform.** React SPA (Vite) + Python + Django + PostgreSQL + AWS ECS on Fargate, about $370–$1,496 a month.
 Why it fits: backend, ecosystem maturity: 5.0/5 vs 4.4 average for this layer; hosting, realtime fit: 4.0/5 vs 3.4 average for this layer.
 <!-- END gallery_more -->
 
@@ -388,7 +388,7 @@ Why it fits: backend, ecosystem maturity: 5.0/5 vs 4.4 average for this layer; h
 | Backend | Supabase (BaaS on Postgres) | **Node.js + Express** |
 | Database | PostgreSQL | PostgreSQL |
 | Hosting | Cloudflare Pages + Workers | **Google Cloud Run** |
-| Est. cost / month | $26 | $22–$85 |
+| Est. cost / month | $26–$28 | $22–$82 |
 
 - Backend: Supabase (BaaS on Postgres) now takes a penalty (Minimum ~$584/month is 11.7x the whole budget), moving the gap 17.8 points toward Node.js + Express; cost at your scale moved the gap 11.1 points toward Node.js + Express (Node.js + Express 5.0/5 vs Supabase (BaaS on Postgres) 1.5/5, was 5.0 vs 4.8).
 - Hosting: Cloudflare Pages + Workers is now ruled out: No HIPAA Business Associate Agreement available.
@@ -403,7 +403,7 @@ Why it fits: backend, ecosystem maturity: 5.0/5 vs 4.4 average for this layer; h
 | Backend | Go (net/http, chi or Gin) | Go (net/http, chi or Gin) |
 | Database | TimescaleDB (Postgres) | TimescaleDB (Postgres) |
 | Hosting | AWS ECS on Fargate | AWS ECS on Fargate |
-| Est. cost / month | $1,365–$7,700 | $38,500–$140,000 |
+| Est. cost / month | $1,365–$14,731 | $38,500–$157,328 |
 
 
 **Internal tool, own servers vs cloud** (preset `internal_tool`; changed answer: `deployment`: on_prem → cloud)
@@ -414,7 +414,7 @@ Why it fits: backend, ecosystem maturity: 5.0/5 vs 4.4 average for this layer; h
 | Backend | Python + Django | Python + Django |
 | Database | SQLite (+ Litestream backups) | SQLite (+ Litestream backups) |
 | Hosting | On-prem VMs + Docker Compose | **Render** |
-| Est. cost / month | $0–$150 | $7 |
+| Est. cost / month | $0–$153 | $7 |
 
 - Hosting: On-prem VMs + Docker Compose is now ruled out: On-premises option; you chose public cloud.
 <!-- END pairs_more -->
@@ -455,14 +455,14 @@ Safety (new in 2023) is not scored: the four layers are infrastructure, and no o
 <!-- BEGIN validation -->
 | What is checked | Tests |
 |---|---|
-| Scoring, constraints and cost | 414 |
+| Scoring, constraints and cost | 468 |
 | Explanations match the engine | 130 |
-| Inputs, edge cases and warnings | 276 |
+| Inputs, edge cases and warnings | 277 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 192 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 92 |
-| **All** | **1189** |
+| **All** | **1244** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.
