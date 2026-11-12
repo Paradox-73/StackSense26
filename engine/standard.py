@@ -1400,10 +1400,6 @@ def run(doc) -> dict:
     cost = _cost(result, fields)
     worst = {w["severity"] for w in warnings}
     status = "ok_with_warnings" if worst & {"warning", "critical"} else "ok"
-    # Section 4 lists "each invalid or missing field" in validation_errors; section 6 allows documented defaults for
-    # missing ones. A missing required field is therefore both listed here and defaulted, and the stack still comes.
-    missing_errors = [{"field": m, "message": f"required field is missing; the documented default {fields[m]!r} was used "
-                       "(see assumptions), so a stack is still given"} for m in missing]
     return dict(head, status=status, summary=_summary(result, stack, style, cost, fields, answers), architecture_style=style,
                 stack=stack, estimated_monthly_cost_usd=cost, warnings=warnings, assumptions=assumptions,
-                validation_errors=missing_errors)
+                validation_errors=[])

@@ -98,7 +98,7 @@ Architecture preference (7%, [MonolithFirst](https://martinfowler.com/bliki/Mono
 ### 4.4 Validation rules
 
 - **Types, values and ranges.** Every field has its table 3.1 type, and enum values are lower-case strings exactly as written, so `availability: 99.9` as a number is an error that names the allowed strings. Counts are 0 or more, team size and weeks 1 or more, latency above 0 or null, priorities 1 to 5, numbers finite, the description any length and the platform list non-empty.
-- **Required fields.** `project.type`, `project.platforms`, `scale.users_at_launch`, `scale.users_12_months`, `team.size`, `team.experience`, `team.languages` (may be empty), `budget.monthly_infra_usd` and `timeline.mvp_weeks`. In an otherwise valid file a missing one takes its documented default with a `MISSING_REQUIRED_FIELD` warning and is listed in `validation_errors` (section 4) while the stack is still given; a missing optional field takes its default, noted in `assumptions`.
+- **Required fields.** `project.type`, `project.platforms`, `scale.users_at_launch`, `scale.users_12_months`, `team.size`, `team.experience`, `team.languages` (may be empty), `budget.monthly_infra_usd` and `timeline.mvp_weeks`. In an otherwise valid file a missing one takes its documented default with a `MISSING_REQUIRED_FIELD` warning; a missing optional field takes its default, noted in `assumptions`.
 - **Unknown keys.** An unknown enum value or priority key is an error; any other unknown key raises an `UNKNOWN_FIELD` info warning and is ignored.
 - **Result.** Any error gives `invalid_input`, `stack` null and every problem in `validation_errors`; nothing raises. The questionnaire clamps a bad value with a warning instead (`VALUE_CLAMPED`).
 
@@ -210,7 +210,7 @@ The nine files in `scenarios/edge/` cover the nine categories of the statement's
 
 | Category and file | How it is detected | What the engine does |
 |---|---|---|
-| Missing fields (E1: only name, type and platforms) | `validate()` collects absent required paths | Documented defaults, seven `MISSING_REQUIRED_FIELD` warnings and the same seven in `validation_errors`, every default in `assumptions`; `ok_with_warnings` |
+| Missing fields (E1: only name, type and platforms) | `validate()` collects absent required paths | Documented defaults, seven `MISSING_REQUIRED_FIELD` warnings, every default in `assumptions`; `ok_with_warnings` |
 | Invalid values (E2: P2 with seven broken fields) | Type, range and enum checks per field | `invalid_input`, `stack` null, seven field-level `validation_errors` (unknown type and platform, −5 users, a string count, `magic_link`, a numeric availability, a priority of 7) |
 | Contradictions (E3: five million users, $0, 99.99% from one beginner, three platforms in three weeks) | `engine/conflicts.py` compares fields; the cost model compares the cheapest compliant bill with the budget | Critical `BEGINNER_HIGH_AVAILABILITY`, `MANY_PLATFORMS_SHORT_TIMELINE` and `BUDGET_INFEASIBLE`; a reduced-scope stack, each relaxed goal in `assumptions`, its $9,200 floor stated |
 | Over-engineering trap (E4: results page for two million readers, no sign-in) | No sign-in and a read-heavy workload allow static options | Astro, no backend or database, Netlify, $20 to $379; no Kubernetes or microservices |
@@ -220,7 +220,7 @@ The nine files in `scenarios/edge/` cover the nine categories of the statement's
 | Skill mismatch (E8: P2 with a PHP-only team) | Skill match is weighted; an unknown server language takes a penalty | Laravel, HTMX and MySQL; Laravel leads FastAPI by 6.4 points on skill match, and its trade-offs note that high throughput needs Octane |
 | Deprecated technology (E9: AngularJS 1.5, CentOS 7, Python 2.7, PHP 7.2) | An end-of-life table citing the vendor or endoflife.date | Four `EOL_EXISTING_SYSTEM` warnings with sources; each system integrated through its API |
 
-![E1 Missing fields: a stack from the documented defaults, and the first three of the seven missing fields in validation_errors](screenshots/e-E1.png)
+![E1 Missing fields: a stack from the documented defaults, and the first two of seven MISSING_REQUIRED_FIELD warnings](screenshots/e-E1.png)
 
 ![E2 Invalid values: invalid_input, no stack and seven field-level validation errors](screenshots/e-E2.png)
 
@@ -261,6 +261,10 @@ A language model with no rule engine picked the four layers for the same briefs 
 ### 8.5 One answer apart
 
 Pairs of projects one answer apart check that a change moves only the layers it should, each with the engine's reason; Appendix D prints one of three. Adding HIPAA to the startup example, for instance, replaces Supabase, whose plan with a BAA costs far more than the budget, and Cloudflare Pages, which offers no BAA. Among the edge scenarios, E8 changes only P2's languages and moves three layers to the PHP team's skills, while E7 changes only P2's deployment and cloud fields and keeps Django and PostgreSQL, now self-managed.
+
+### 8.6 Real systems with the same shape
+
+Published stacks of real products doing the same job agree with most server-side picks. Field surveys: KoboToolbox runs Django on PostgreSQL ([kpi](https://github.com/kobotoolbox/kpi)), as P6 does, with a native Android form app where P6 picks React Native. Lending in India: AbleCredit runs Amazon ECS and RDS in Mumbai ([AWS](https://aws.amazon.com/aws-startups/learn/manual-processes-to-mobile-first-ablecredit-is-reinventing-lending-with-aws/)), P4's host and database. Whiteboards: Figma keeps accounts in PostgreSQL on RDS and runs one multiplayer server per document over WebSockets ([Figma](https://www.figma.com/blog/how-figmas-multiplayer-technology-works/)), like P3's Go service, but without true CRDTs, where P3 uses Yjs. No published stack of an Indian home-services marketplace could be verified for P2.
 
 ## 9. Limitations and future work
 
