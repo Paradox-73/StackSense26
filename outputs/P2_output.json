@@ -103,7 +103,6 @@
         }
       ],
       "tradeoffs": [
-        "Team skill match is only 1.5/5 (weight 3.5).",
         "Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless",
         "Connection-per-process model needs PgBouncer/RDS Proxy under serverless"
       ]

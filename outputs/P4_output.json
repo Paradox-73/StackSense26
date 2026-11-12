@@ -103,7 +103,6 @@
         }
       ],
       "tradeoffs": [
-        "Team skill match is only 1.5/5 (weight 2.5).",
         "Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless",
         "Connection-per-process model needs PgBouncer/RDS Proxy under serverless"
       ]
@@ -139,7 +138,6 @@
         }
       ],
       "tradeoffs": [
-        "Team skill match is only 1.5/5 (weight 2.5).",
         "AWS networking/IAM learning curve",
         "ALB + NAT gateway base costs even when idle"
       ]

@@ -72,8 +72,13 @@ def explain_pick(layer: str, pick: dict, layer_scored: list[dict], w: Weights, r
         why.append(skill_line)
 
     tradeoffs = []
+    # A low score is a trade-off only where it bites: a database or host is not learnt like a language, and the
+    # offline copy of a database is the sync service's job (supporting_services adds one whenever offline is asked).
+    moot = {"skill_fit"} if layer in ("database", "hosting") else set()
+    if layer == "database" and (p or {}).get("offline"):
+        moot.add("offline")
     for b in pick["breakdown"]:
-        if b["score"] <= 2.5 and b["weight"] >= 0.8:
+        if b["score"] <= 2.5 and b["weight"] >= 0.8 and b["criterion"] not in moot:
             tradeoffs.append(f"{b['label']} is only {b['score']:.1f}/5 (weight {b['weight']:.1f}).")
     tradeoffs += relevant_lines(pick["item"].get("weaknesses", []), stack_ids, p)[:2]
 

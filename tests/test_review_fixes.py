@@ -258,3 +258,14 @@ def test_no_card_scope_note_when_store_billing_takes_the_payments():
     pay = [s["choice"] for s in out["stack"]["supporting"] if s["layer"] == "payments"]
     assert pay and "Google Play Billing" in pay[0] and "hosted checkout" not in pay[0], pay
     assert "PCI_SCOPE" not in _info(out), out["warnings"]
+
+
+def test_score_trade_offs_skip_what_another_part_of_the_stack_handles():
+    for name in ("P2", "P3", "P4", "P6"):
+        out = run(_doc(name))
+        for layer in ("database", "hosting"):
+            lines = out["stack"][layer]["tradeoffs"]
+            assert not [t for t in lines if t.startswith("Team skill match")], (name, layer, lines)
+    p6 = run(_doc("P6"))["stack"]["database"]["tradeoffs"]  # offline is the sync service's job
+    assert not [t for t in p6 if t.startswith("Offline support")], p6
+    assert any("Realtime fit is only" in t for t in run(_doc("P2"))["stack"]["backend"]["tradeoffs"])  # still said
