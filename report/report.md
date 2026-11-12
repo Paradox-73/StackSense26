@@ -269,9 +269,9 @@ Pairs of projects one answer apart check that a change moves only the layers it 
 - Niche options (CockroachDB, Oracle Database, Rust web frameworks such as Axum, desktop toolkits other than an Electron shell) are not scored; an existing Oracle database is acknowledged but cannot be the pick.
 - Existing systems are matched by patterns: an unknown product only gets "integrated through its API", and one missing from the end-of-life table gets no warning.
 - Daily users are 20% of the 12-month users for every project type; only the three highest priorities change weights; costs exclude egress spikes, support plans and most third-party fees.
-- The random-project test covers the questionnaire path; the explicit-cloud and air-gapped rules have unit tests but no random-input property yet, and most supporting services list no alternative.
+- The random-project test covers the questionnaire path; the explicit-cloud and air-gapped rules have unit tests but no random-input property yet, and most supporting services list one alternative, not several.
 
-Next: an architect review of the answer key and the public outputs, scheduled re-reads of vendor price pages, a random-input property for every hard constraint through the scenario adapter, and alternatives for supporting services.
+Next: an architect review of the answer key and the public outputs, scheduled re-reads of vendor price pages, a random-input property for every hard constraint through the scenario adapter, and a second alternative for each supporting service.
 
 ## 10. References and third-party tools
 
