@@ -946,15 +946,26 @@ def _quote(layer: str, f: dict) -> str:
     return f" Sized for the {f['scale.users_12_months']:,.0f} users expected at 12 months (scale.users_12_months)."
 
 
+def _left_out(s: dict, f: dict) -> bool:
+    """A service the scenario rules out although the engine would add it."""
+    if s["role"] == "Collaboration sync" and f["project.type"] == "gaming":
+        return True  # a game server owns the state; merging documents (CRDTs) is for co-editing tools
+    return s["role"] == "Search" and not f["requirements.full_text_search"]  # the scenario says it needs none
+
+
+def _deferred(result: dict, f: dict) -> list[str]:
+    """Services the operations budget keeps out of the first release, as assumptions with their trigger: they are
+    not part of the recommended stack, so stack.supporting does not list them."""
+    return [f"Deferred: {s['role']} ({s['name']}) is left out of the first release, because the team's operations "
+            f"budget allows no more systems to run; add it {s['trigger']}." for s in result.get("deferred_services", [])
+            if not _left_out(s, f)]
+
+
 def _supporting(result: dict, f: dict) -> list[dict]:
     out = []
-    services = [(s, False) for s in result.get("supporting_services", [])] + \
-               [(s, True) for s in result.get("deferred_services", [])]
-    for s, deferred in services:
-        if s["role"] == "Collaboration sync" and f["project.type"] == "gaming":
-            continue  # a game server owns the state; merging documents (CRDTs) is for co-editing tools
-        if s["role"] == "Search" and not f["requirements.full_text_search"]:
-            continue  # the engine adds search for shops and content sites; the scenario says it needs none
+    for s in result.get("supporting_services", []):
+        if _left_out(s, f):
+            continue
         layer = SERVICE_LAYER.get(s["role"], "other")
         fields = OTHER_FIELDS.get(s["role"]) or SERVICE_FIELDS[layer]
         if f["infrastructure.data_residency"] != "none" and layer in ("storage", "auth", "cache", "observability", "ml"):
@@ -964,8 +975,8 @@ def _supporting(result: dict, f: dict) -> list[dict]:
         if s.get("system"):
             tradeoffs.append(f"One more system to run: {s['system']}")
         if s.get("trigger"):
-            tradeoffs.append(f"Add it {s['trigger']}" if deferred else f"Can wait until {s['trigger']}")
-        why = s["why"] + (" Deferred: the team's operations budget keeps it out of the first release." if deferred else "")
+            tradeoffs.append(f"Can wait until {s['trigger']}")
+        why = s["why"]
         layer = s.get("layer") or layer
         alts = [{"choice": c, "why_not": w} for c, w in alts if c.split(" (")[0] not in s["name"]]
         entry = {"layer": layer, "choice": s["name"], "justification": why, "driven_by": fields,
@@ -1194,6 +1205,7 @@ def run(doc) -> dict:
         assumptions.append("requirements.full_text_search is false, so no search service is recommended, although "
                            "projects of this type usually add one")
     result = _store_billing(_reuse_services(result, fields), fields)
+    assumptions += _deferred(result, fields)
     stack = {l: _component(l, result["stack"][l], origin, fields, result) for l in LAYERS}
     stack["supporting"] = _supporting(result, fields)
     style = _style(result)

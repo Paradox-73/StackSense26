@@ -996,3 +996,32 @@ def test_of_two_existing_brokers_one_carries_the_queue_and_the_other_is_kept():
     assert queues == ["Apache Kafka (existing)"], queues
     notes = [a for a in out["assumptions"] if a.startswith("Existing message system")]
     assert len(notes) == 2 and any("IBM MQ is kept as it is" in a and "go through Apache Kafka" in a for a in notes), notes
+
+
+# A two-person beginner team's festival-sale shop: its operations budget defers the analytics store.
+SMALL_TEAM_SHOP = {
+    "scenario_id": "small_team_shop",
+    "project": {"name": "Saree store", "type": "ecommerce", "description": "Handloom saree store with festival sales",
+                "platforms": ["web"]},
+    "scale": {"traffic_pattern": "seasonal", "workload": "read_heavy", "users_at_launch": 20000,
+              "users_12_months": 500000, "peak_concurrent_users": 8000, "data_volume_gb_12_months": 10},
+    "team": {"has_devops": False, "size": 2, "experience": "beginner", "languages": ["javascript", "typescript"]},
+    "budget": {"monthly_infra_usd": 150}, "timeline": {"mvp_weeks": 6},
+    "infrastructure": {"cloud_preference": "any", "deployment_model": "managed_cloud", "data_residency": "india",
+                       "existing_systems": []},
+    "requirements": {"realtime": False, "offline_support": False, "full_text_search": True, "file_media_storage": True,
+                     "payments": True, "auth": "phone_otp", "multi_tenant": False, "ml_features": "none",
+                     "seo_critical": True, "availability": "99.9", "p95_latency_ms": None},
+    "compliance": ["dpdp", "pci_dss"],
+    "priorities": {"cost": 5, "time_to_market": 5, "scalability": 3, "performance": 3, "maintainability": 2,
+                   "security": 3},
+}
+
+
+def test_deferred_services_are_assumptions_not_part_of_the_stack():
+    out = run(SMALL_TEAM_SHOP)
+    deferred = [a for a in out["assumptions"] if a.startswith("Deferred: ")]
+    assert deferred and all(" add it when " in a for a in deferred), deferred
+    names = [a.split(" (", 1)[1].split(") is left out")[0] for a in deferred]
+    choices = [s["choice"] for s in out["stack"]["supporting"]]
+    assert not set(names) & set(choices) and "Deferred" not in json.dumps(out["stack"]["supporting"]), (names, choices)
