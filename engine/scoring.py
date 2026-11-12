@@ -516,6 +516,9 @@ def view_layer_fit(skills: frozenset) -> float:
     return min(VIEW_LAYER_SKILL_FIT, max(_own_skill_fit(b, set(skills)) for b in known))
 
 
+NATIVE_RELATED = {"swift": {"kotlin"}, "kotlin": {"swift", "java"}}
+
+
 def _own_skill_fit(item: dict, skills: set) -> float:
     hits = skills & set(item.get("skills", []))
     if len(hits) >= 2:
@@ -1010,6 +1013,15 @@ def raw_scores(layer: str, item: dict, p: dict, d: dict, cost_scores: dict) -> d
                 s[c] = min(s[c], cap)
             if layer == "hosting":
                 s[c] = cloud_skill_fit(item, d["skills"], s[c])
+            langs = item.get("platform_languages")
+            if langs and d["skills"]:
+                # Native apps are one codebase per phone platform, each in its own language: the team's fit is the
+                # average over the languages this project needs. Swift and Kotlin are close siblings (and Kotlin
+                # runs on the JVM), so knowing one is a related skill for the other.
+                need = [langs[pl] for pl in ("ios", "android") if pl in p["platforms"]]
+                if need:
+                    s[c] = sum(_own_skill_fit({"skills": [x], "related_skills": sorted(NATIVE_RELATED[x])}, d["skills"])
+                               for x in need) / len(need)
         elif c == "ops" and self_hosted_baas(item, p):
             s[c] = SELF_HOSTED_BAAS_OPS
         elif c == "portability":
@@ -1241,10 +1253,15 @@ def adjustments(layer: str, item: dict, p: dict, d: dict, best_fit: tuple | None
         # that lists neither platform language learns two languages for native against one for a cross-platform
         # toolkit: the second is a new language like an unfamiliar backend's.
         new = sorted({langs[pl] for pl in ("ios", "android") if pl in p["platforms"]} - d["skills"])
-        if len(new) >= 2:
-            a(-UNFAMILIAR_BACKEND_PENALTY * (len(new) - 1), "team_skills",
+        # A cross-platform toolkit needs no new language when the team already writes one (TypeScript for React
+        # Native, Dart for Flutter), else one.
+        cross = 0 if any(d["skills"] & set(fe.get("skills", [])) for fe in load_kb()["frontend"]
+                         if fe.get("kind") == "mobile" and not fe.get("platform_languages")) else 1
+        if len(new) > cross:
+            a(-UNFAMILIAR_BACKEND_PENALTY * (len(new) - cross), "team_skills",
               f"{langs['why']}: nobody on the team listed {' or '.join(n.capitalize() for n in new)}, so it learns "
-              f"{len(new)} new languages where a cross-platform toolkit needs one")
+              f"{len(new)} new language{'s' if len(new) > 1 else ''} where a cross-platform toolkit needs "
+              f"{'none' if cross == 0 else 'one'}")
 
     if (
         layer == "frontend"

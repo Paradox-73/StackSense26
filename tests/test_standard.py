@@ -490,12 +490,15 @@ def test_description_keywords_add_notes_that_quote_them_and_change_no_pick(outpu
 
 def test_a_native_app_in_an_unlisted_language_is_a_warning(outputs):
     code = "MOBILE_LANGUAGE_NOT_LISTED"
-    p4 = [w for w in outputs["P4"]["warnings"] if w["code"] == code]  # Java, Kotlin, TypeScript team; native iOS app
-    assert len(p4) == 1 and "Swift" in p4[0]["message"] and "React Native (Expo)" in p4[0]["message"], p4
-    assert p4[0]["severity"] == "warning" and "team.languages" in p4[0]["fields"]
-    swift = run(edit("P4", team={"languages": ["java", "kotlin", "typescript", "swift"]}))
+    kotlin = run(edit("P4", team={"languages": ["java", "kotlin"]}))  # no TypeScript or Dart: native still leads
+    hit = [w for w in kotlin["warnings"] if w["code"] == code]
+    assert "Native iOS + Android" in kotlin["stack"]["frontend"]["choice"], kotlin["stack"]["frontend"]["choice"]
+    assert len(hit) == 1 and "Swift" in hit[0]["message"] and hit[0]["severity"] == "warning", hit
+    swift = run(edit("P4", team={"languages": ["java", "kotlin", "swift"]}))
     assert not [w for w in swift["warnings"] if w["code"] == code]
-    for name in ("P2", "P6"):  # React Native apps
+    # P4's team writes TypeScript, so React Native carries both phones in a language it knows and no warning is due.
+    assert "React Native (Expo)" in outputs["P4"]["stack"]["frontend"]["choice"]
+    for name in ("P2", "P4", "P6"):
         assert not [w for w in outputs[name]["warnings"] if w["code"] == code], name
 
 
