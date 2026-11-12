@@ -27,10 +27,6 @@
         {
           "choice": "Next.js (React)",
           "why_not": "Swapping it in lowers the stack score by 2.7 points. Astro is stronger on low ops burden (5.0 vs 4.0), learning curve (4.0 vs 3.0); Next.js (React) is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0). 1.5 of the 2.7 points come from a stack compatibility rule: Official adapters/presets deploy this framework to the CDN + functions platform with no server to manage."
-        },
-        {
-          "choice": "React Native (Expo)",
-          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
         }
       ],
       "tradeoffs": [
@@ -88,10 +84,6 @@
         {
           "choice": "MySQL",
           "why_not": "Swapping it in lowers the stack score by 14.3 points. No database (content files in git) is stronger on team skill match (4.5 vs 1.5), low ops burden (5.0 vs 4.0); MySQL is stronger on realtime fit (2.0 vs 1.0); MySQL takes a penalty: Only 3/5 fit for your primary 'document' data. 5.5 of the 14.3 points come from a stack compatibility rule: With no server code, nothing can query a database at request time; a static site reads content files at build time."
-        },
-        {
-          "choice": "Redis / Valkey",
-          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data; In-memory store: with the default append-only-file setting (fsync every second) a crash loses up to the last second of writes, and snapshots alone lose minutes; it holds key-value data but not tables of records: your document data needs a durable general-purpose primary store, with Redis / Valkey beside it as a supporting store"
         }
       ],
       "tradeoffs": [
@@ -121,10 +113,6 @@
         {
           "choice": "AWS ECS on Fargate",
           "why_not": "Swapping it in lowers the stack score by 23.3 points. Netlify is stronger on cost at your scale (5.0 vs 1.8), low ops burden (5.0 vs 3.0); AWS ECS on Fargate is stronger on ecosystem maturity (5.0 vs 4.0), realtime fit (4.0 vs 1.0); AWS ECS on Fargate takes a penalty: Usually needs a team of 2+ to operate. 3.5 of the 23.3 points come from a stack compatibility rule: Pre-built pages need only a static file host and its CDN; serving them from containers, functions or a server means building and patching a web-server image and paying for instances to hand out files."
-        },
-        {
-          "choice": "On-prem VMs + Docker Compose",
-          "why_not": "Ruled out: On-premises option; you chose public cloud"
         }
       ],
       "tradeoffs": [

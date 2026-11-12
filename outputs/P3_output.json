@@ -19,18 +19,6 @@
         {
           "choice": "Next.js (React)",
           "why_not": "Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.7 points lower; either is defensible. React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), learning curve (4.0 vs 3.0); Next.js (React) is stronger on performance / latency (4.0 vs 3.0), development speed (5.0 vs 4.0); Next.js (React) takes a penalty: No search visibility needed: server rendering adds a Node.js server for pages that React SPA (Vite) serves as static files."
-        },
-        {
-          "choice": "React Native (Expo)",
-          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
-        },
-        {
-          "choice": "Flutter",
-          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
-        },
-        {
-          "choice": "Native iOS + Android (Swift / Kotlin)",
-          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
         }
       ],
       "tradeoffs": [
@@ -61,10 +49,6 @@
         {
           "choice": "Python + Django",
           "why_not": "Swapping it in lowers the stack score by 11.0 points. Go (net/http, chi or Gin) is stronger on realtime fit (4.0 vs 2.0), performance / latency (5.0 vs 3.0); Python + Django is stronger on development speed (5.0 vs 3.0), ecosystem maturity (5.0 vs 4.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn. 1.0 of the 11.0 points come from a stack compatibility rule: Tiny static binaries give near-instant cold starts on scale-to-zero platforms."
-        },
-        {
-          "choice": "No server code (static site)",
-          "why_not": "Ruled out: Only for read-only sites; your users sign in, post or pay"
         }
       ],
       "tradeoffs": [
@@ -92,14 +76,6 @@
         {
           "choice": "MySQL",
           "why_not": "Swapping it in lowers the stack score by 3.2 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0); MySQL takes a penalty: Customers share one database and in MySQL privileges stop at table and column level, so the tenant filter lives in every application query."
-        },
-        {
-          "choice": "MongoDB",
-          "why_not": "Ruled out for your answers: Write-heavy load at Large (5,000-50,000 users online at once) on a store that fits 'relational' data 2/5 with write scaling 4/5."
-        },
-        {
-          "choice": "Amazon DynamoDB",
-          "why_not": "Ruled out: Write-heavy load at Large (5,000-50,000 users online at once) on a store that fits 'relational' data 1/5 with write scaling 5/5"
         }
       ],
       "tradeoffs": [
@@ -131,10 +107,6 @@
         {
           "choice": "AWS ECS on Fargate",
           "why_not": "Swapping it in lowers the stack score by 4.7 points. Fly.io is stronger on realtime fit (5.0 vs 4.0), team skill match (3.5 vs 1.5); AWS ECS on Fargate is stronger on scalability (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0). 2.0 of the 4.7 points come from a stack compatibility rule: Anycast + multi-region VMs keep websocket round-trips short for global users."
-        },
-        {
-          "choice": "AWS S3 + CloudFront (static)",
-          "why_not": "Ruled out: Only for read-only sites; your users sign in, post or pay"
         }
       ],
       "tradeoffs": [

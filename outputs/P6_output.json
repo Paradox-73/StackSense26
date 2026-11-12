@@ -19,18 +19,6 @@
         {
           "choice": "Flutter",
           "why_not": "Swapping it in lowers the stack score by 3.5 points. React Native (Expo) is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 3.0); Flutter is stronger on performance / latency (4.0 vs 3.0)."
-        },
-        {
-          "choice": "Next.js (React)",
-          "why_not": "Ruled out: Web-only framework; you target iOS/Android only"
-        },
-        {
-          "choice": "React SPA (Vite)",
-          "why_not": "Ruled out: Web-only framework; you target iOS/Android only"
-        },
-        {
-          "choice": "Nuxt (Vue)",
-          "why_not": "Ruled out: Web-only framework; you target iOS/Android only"
         }
       ],
       "tradeoffs": [
@@ -60,10 +48,6 @@
         {
           "choice": "Java/Kotlin + Spring Boot",
           "why_not": "Swapping it in lowers the stack score by 10.7 points. Python + Django is stronger on team skill match (4.5 vs 1.5), learning curve (5.0 vs 2.0); Java/Kotlin + Spring Boot is stronger on performance / latency (4.0 vs 3.0), scalability (5.0 vs 4.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn. 1.0 of the 10.7 points come from a stack compatibility rule: Git-push deploys with managed database add-ons are the shortest path to production for a monolith."
-        },
-        {
-          "choice": "No server code (static site)",
-          "why_not": "Ruled out: Only for read-only sites; your users sign in, post or pay"
         }
       ],
       "tradeoffs": [
@@ -90,14 +74,6 @@
         {
           "choice": "MongoDB",
           "why_not": "Swapping it in lowers the stack score by 4.8 points. PostgreSQL is stronger on data-model fit (4.4 vs 2.6), consistency fit (5.0 vs 3.5); MongoDB is stronger on team skill match (3.5 vs 1.5), offline support (2.0 vs 1.0); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data."
-        },
-        {
-          "choice": "Redis / Valkey",
-          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data; In-memory store: with the default append-only-file setting (fsync every second) a crash loses up to the last second of writes, and snapshots alone lose minutes; it holds key-value data but not tables of records: your relational data needs a durable general-purpose primary store, with Redis / Valkey beside it as a supporting store"
-        },
-        {
-          "choice": "Apache Cassandra / ScyllaDB",
-          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data"
         }
       ],
       "tradeoffs": [

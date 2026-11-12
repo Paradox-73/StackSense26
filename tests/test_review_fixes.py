@@ -278,3 +278,14 @@ def test_gdpr_and_dpdp_duties_are_info_warnings_that_leave_the_status_alone():
     assert p2["DPDP_DUTIES"]["severity"] == "info" and "Data Protection Board" in p2["DPDP_DUTIES"]["message"]
     assert "DPDP_DUTIES" not in p3 and "GDPR_DUTIES" not in p2
     assert run(_doc("P5"))["status"] == "ok"  # P5 lists iso27001 only: no duty warning, status untouched
+
+
+def test_ruled_out_options_are_listed_only_for_the_users_own_hard_constraints():
+    alts = lambda out, layer: [(a["choice"], a["why_not"]) for a in out["stack"][layer]["alternatives"]]  # noqa: E731
+    p1, p2 = run(_doc("P1")), run(_doc("P2"))
+    assert not [a for a in alts(p1, "frontend") if a[1].startswith("Ruled out")]  # "Mobile toolkit" is padding here
+    assert not [a for a in alts(p2, "database") if a[0].startswith("Redis")]
+    assert ("Netlify", "Ruled out: No India region; data must stay in India") in alts(p2, "hosting")
+    for out in (p1, p2, run(_doc("P5"))):
+        for layer in ("frontend", "backend", "database", "hosting"):
+            assert alts(out, layer), layer  # statement 4: at least one alternative per core layer

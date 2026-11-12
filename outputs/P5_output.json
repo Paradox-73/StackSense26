@@ -23,14 +23,6 @@
         {
           "choice": "Next.js (React)",
           "why_not": "Swapping it in lowers the stack score by 3.2 points. Server-rendered HTML + HTMX is stronger on learning curve (5.0 vs 3.0), low ops burden (5.0 vs 4.0); Next.js (React) is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Next.js (React) takes a penalty: No search visibility needed: server rendering adds a Node.js server for pages that React SPA (Vite) serves as static files. 1.3 of the 3.2 points come from a stack compatibility rule: The backend renders HTML fragments directly: one codebase, no API layer or SPA build."
-        },
-        {
-          "choice": "React Native (Expo)",
-          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
-        },
-        {
-          "choice": "Flutter",
-          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
         }
       ],
       "tradeoffs": [
@@ -127,14 +119,6 @@
         {
           "choice": "AWS ECS on Fargate",
           "why_not": "Ruled out for your answers: Not on Azure, the cloud you require."
-        },
-        {
-          "choice": "Render",
-          "why_not": "Ruled out for your answers: Not on Azure, the cloud you require."
-        },
-        {
-          "choice": "Netlify",
-          "why_not": "Ruled out: Not on Azure, the cloud you require; No India region; data must stay in India"
         }
       ],
       "tradeoffs": [

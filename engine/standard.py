@@ -1055,12 +1055,24 @@ def _component(layer: str, sl: dict, origin: dict, f: dict, result: dict) -> dic
             break
         if x["name"] not in taken:
             alternatives.append({"choice": x["name"], "why_not": "Ruled out: " + "; ".join(x["reasons"][:2])})
+    # An option a rule removed is worth listing when the rule is one of the user's own hard constraints (a region, a
+    # compliance regime, the required cloud); a generic one ("Mobile toolkit; web is a target") is padding once scored
+    # alternatives exist.
+    weighed = [x for x in alternatives if not x["why_not"].startswith("Ruled out")]
+    ruled = [x for x in alternatives if x["why_not"].startswith("Ruled out")]
+    if weighed:
+        ruled = [x for x in ruled if HARD_RULE_WORDS.search(x["why_not"])][:1]
+    alternatives = weighed + ruled[:2]
     if not alternatives:
         alternatives = [{"choice": r["name"], "why_not": f"Scores {r['score']:.1f} against the pick's {pick['score']:.1f}"}
                         for r in sl.get("ranking", []) if r["name"] != pick["name"]][:1]
     return {"choice": choice, "justification": (ex.get("paragraph") or " ".join(ex.get("why", []))) + extra,
             "driven_by": driven_by, "alternatives": alternatives,
             "tradeoffs": list(dict.fromkeys(ex.get("tradeoffs", []) + ex.get("risks", [])))}
+
+
+HARD_RULE_WORDS = re.compile(r"region|residency|HIPAA|BAA|PCI|ISO 27001|SOC 2|the cloud you require|air-gapped|\bIndia\b|"
+                             r"\bEU\b|existing", re.I)
 
 
 def _native_language_gap(*ids, f: dict) -> str:

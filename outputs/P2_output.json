@@ -23,14 +23,6 @@
         {
           "choice": "React SPA (Vite)",
           "why_not": "Swapping it in lowers the stack score by 5.5 points. Next.js (React) is stronger on SEO (5.0 vs 2.0), development speed (5.0 vs 4.0); React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), learning curve (4.0 vs 3.0); React SPA (Vite) takes a penalty: Client-side rendering is a liability when organic search is the business."
-        },
-        {
-          "choice": "Flutter",
-          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
-        },
-        {
-          "choice": "Native iOS + Android (Swift / Kotlin)",
-          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
         }
       ],
       "tradeoffs": [
@@ -61,10 +53,6 @@
         {
           "choice": "Java/Kotlin + Spring Boot",
           "why_not": "Swapping it in lowers the stack score by 10.5 points. Python + Django is stronger on team skill match (4.5 vs 1.5), development speed (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on scalability (5.0 vs 4.0), realtime fit (3.0 vs 2.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn."
-        },
-        {
-          "choice": "No server code (static site)",
-          "why_not": "Ruled out: Only for read-only sites; your users sign in, post or pay"
         }
       ],
       "tradeoffs": [
@@ -92,14 +80,6 @@
         {
           "choice": "MongoDB",
           "why_not": "Swapping it in lowers the stack score by 6.4 points. PostgreSQL is stronger on data-model fit (5.0 vs 2.0), cost at your scale (4.2 vs 3.2); MongoDB is stronger on team skill match (4.0 vs 1.5), scalability (5.0 vs 4.0); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data."
-        },
-        {
-          "choice": "Redis / Valkey",
-          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data; In-memory store: ~34 GB within 12 months cannot sensibly live in RAM as the system of record (use it as a cache)"
-        },
-        {
-          "choice": "Apache Cassandra / ScyllaDB",
-          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data"
         }
       ],
       "tradeoffs": [

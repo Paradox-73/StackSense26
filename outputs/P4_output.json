@@ -23,14 +23,6 @@
         {
           "choice": "Next.js (React)",
           "why_not": "Swapping it in lowers the stack score by 1.2 points. React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), portability (low lock-in) (5.0 vs 4.0); Next.js (React) is stronger on performance / latency (4.0 vs 3.0), development speed (5.0 vs 4.0); Next.js (React) takes a penalty: No search visibility needed: server rendering adds a Node.js server for pages that React SPA (Vite) serves as static files."
-        },
-        {
-          "choice": "React Native (Expo)",
-          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
-        },
-        {
-          "choice": "Flutter",
-          "why_not": "Ruled out: Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)"
         }
       ],
       "tradeoffs": [
@@ -92,14 +84,6 @@
         {
           "choice": "MongoDB",
           "why_not": "Swapping it in lowers the stack score by 6.8 points. PostgreSQL is stronger on data-model fit (5.0 vs 2.0), consistency fit (5.0 vs 3.5); MongoDB is stronger on team skill match (3.5 vs 1.5), scalability (5.0 vs 4.0); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data."
-        },
-        {
-          "choice": "Redis / Valkey",
-          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data; In-memory store: ~411 GB within 12 months cannot sensibly live in RAM as the system of record (use it as a cache)"
-        },
-        {
-          "choice": "Apache Cassandra / ScyllaDB",
-          "why_not": "Ruled out: Eventually consistent; cannot be the system of record for ACID data"
         }
       ],
       "tradeoffs": [
@@ -127,14 +111,6 @@
         {
           "choice": "Vercel",
           "why_not": "Ruled out for your answers: Not on AWS, the cloud you require."
-        },
-        {
-          "choice": "Render",
-          "why_not": "Ruled out for your answers: Not on AWS, the cloud you require."
-        },
-        {
-          "choice": "Netlify",
-          "why_not": "Ruled out: Not on AWS, the cloud you require; No India region; data must stay in India"
         }
       ],
       "tradeoffs": [
