@@ -71,6 +71,7 @@ FORBIDDEN_NAMES = ["cl" + "aude", "plan" + ".md", "planning", ".venv", ".git/", 
 # The first line of report section 11, the AI assistance declaration (statement 5.1, FAQ and template), must name the
 # coding assistant; only this exact opening, at the start of a line of report/report.md, is exempt from the check.
 DECLARATION = "- Cl" + "aude Code (Anth" + "ropic), an AI coding assistant: "
+NO_PDF = "the folder needs exactly one Report_<FullName>.pdf (run python tools/build_report.py first)"
 NO_EMAIL = ("report/cover.json has no Unstop registered email, so the report's title page says it is still to be added: "
             "fill it in, then rebuild the PDF (python tools/build_report.py) and this folder")
 
@@ -178,7 +179,7 @@ def check(dest: Path) -> list[str]:
                 bad.append(f"{folder}/{out.name} is not what the engine returns for {f.name} now")
     pdfs = list(dest.glob("Report_*.pdf"))
     if [p.name for p in pdfs] != [f"Report_{dest.name[len('StackSense26_'):]}.pdf"] or pdfs[0].read_bytes()[:4] != b"%PDF":
-        bad.append("the folder needs exactly one Report_<FullName>.pdf (run python tools/build_report.py first)")
+        bad.append(NO_PDF)
     if source.is_dir() and _size(source) >= MAX_BYTES:
         bad.append(f"source/ is {_size(source) / 1e6:.1f} MB, over the 25 MB limit")
     if _size(dest) >= MAX_FOLDER_BYTES:

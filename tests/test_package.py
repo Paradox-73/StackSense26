@@ -13,6 +13,10 @@ sys.path.insert(0, str(ROOT / "tools"))
 import package_submission as ps  # noqa: E402
 
 
+# The report PDF ships beside source/, not in it: in a copy of source/ it is absent, and so is that problem's cause.
+EXPECTED = {ps.NO_EMAIL} | (set() if ps.REPORT_PDF.exists() else {ps.NO_PDF})
+
+
 @pytest.fixture(scope="module")
 def built(tmp_path_factory):
     return ps.build(tmp_path_factory.mktemp("dist"))
@@ -21,10 +25,12 @@ def built(tmp_path_factory):
 def test_folder_has_the_section_9_3_layout_and_passes_its_checks(built):
     dest, problems = built
     email = json.loads((ROOT / "report" / "cover.json").read_text(encoding="utf-8"))["email"]
-    assert problems == ([] if email.strip() else [ps.NO_EMAIL])  # the owner adds the email before submitting
+    # The owner adds the email before submitting.
+    assert [p for p in problems if p not in EXPECTED - {ps.NO_EMAIL}] == ([] if email.strip() else [ps.NO_EMAIL])
     full = "_".join(json.loads((ROOT / "report" / "cover.json").read_text(encoding="utf-8"))["author"].split())
     assert dest.name == f"StackSense26_{full}"
-    assert sorted(p.name for p in dest.iterdir()) == ["Report_" + full + ".pdf", "outputs", "source"]
+    pdf = ["Report_" + full + ".pdf"] if ps.REPORT_PDF.exists() else []
+    assert sorted(p.name for p in dest.iterdir()) == pdf + ["outputs", "source"]
     assert (dest / "source" / "README.md").is_file() and (dest / "source" / ".env.example").is_file()
     assert sorted(p.name for p in (dest / "outputs").iterdir()) == [f"P{i}_output.json" for i in range(1, 7)]
     names = [p.relative_to(dest).as_posix() for p in dest.rglob("*") if p.is_file()]
@@ -40,7 +46,7 @@ def test_an_output_that_is_not_the_engines_is_caught(built, tmp_path):
     doc = json.loads(out.read_text(encoding="utf-8"))
     doc["stack"]["database"]["choice"] = "A database typed in by hand"
     out.write_text(json.dumps(doc), encoding="utf-8")
-    assert [p for p in ps.check(dest) if p != ps.NO_EMAIL] == ["outputs/P3_output.json is not what the engine returns for P3.json now"]
+    assert [p for p in ps.check(dest) if p not in EXPECTED] == ["outputs/P3_output.json is not what the engine returns for P3.json now"]
 
 
 def test_an_output_file_for_no_public_scenario_is_caught(built, tmp_path):
@@ -51,7 +57,7 @@ def test_an_output_file_for_no_public_scenario_is_caught(built, tmp_path):
     shutil.copytree(built[0], dest)
     for folder in ("outputs", "source/outputs"):
         (dest / folder / "E1_output.json").write_text('{"status": "ok"}', encoding="utf-8")
-    assert [p for p in ps.check(dest) if p != ps.NO_EMAIL] == [
+    assert [p for p in ps.check(dest) if p not in EXPECTED] == [
         "outputs/E1_output.json is not the output of a public scenario",
         "source/outputs/E1_output.json is not the output of a public scenario"]
 

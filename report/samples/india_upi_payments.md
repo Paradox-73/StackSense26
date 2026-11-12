@@ -333,8 +333,6 @@ About ₹355,200-₹1,767,744 per month. Budget status: **stretch**. Planning es
 
 ## What would change the recommendation
 
-- **Budget cut to ₹300,000/month (x0.2)**: hosting: AWS EKS (Kubernetes) -> AWS ECS on Fargate
-  - Why hosting changes: Cost at your scale moved the gap 0.2 points toward AWS ECS on Fargate (AWS ECS on Fargate 4.4/5 vs AWS EKS (Kubernetes) 4.3/5, was 4.9 vs 4.8); on its own AWS EKS (Kubernetes) still scores 0.0 higher, so AWS ECS on Fargate wins as part of the whole stack (the other layers changed, and the stack-level compatibility rules or tie-break favour it).
 - **A solo developer**: hosting: AWS EKS (Kubernetes) -> AWS ECS on Fargate
   - Why hosting changes: AWS EKS (Kubernetes) now takes a penalty (Usually needs a team of 4+ to operate), moving the gap 12.0 points toward AWS ECS on Fargate; low ops burden moved the gap 6.0 points toward AWS ECS on Fargate (AWS ECS on Fargate 3.0/5 vs AWS EKS (Kubernetes) 1.0/5, weight 1.0 -> 3.5).
 - **Must run on-premises**: hosting: AWS EKS (Kubernetes) -> On-prem Kubernetes (k3s / RKE2 / OpenShift)
