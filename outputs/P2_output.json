@@ -2,7 +2,7 @@
   "scenario_id": "P2",
   "engine_version": "1.0.0",
   "status": "ok_with_warnings",
-  "summary": "A modular monolith build: Next.js on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $192-524 a month. It keeps data in India under DPDP, builds on the team's Python, pushes live updates, and ships as one deployable that a team of 3 can build in 8 weeks.",
+  "summary": "A modular monolith build: Next.js on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $139-418 a month. It keeps data in India under DPDP, builds on the team's Python, pushes live updates, and ships as one deployable that a team of 3 can build in 8 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -63,7 +63,7 @@
     },
     "database": {
       "choice": "PostgreSQL: DigitalOcean Managed PostgreSQL",
-      "justification": "Your data is mainly relational and reaches about 34 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $75-$150 a month, against a total budget of $150 a month. MySQL is within 0.3 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.",
+      "justification": "Your data is mainly relational and reaches about 34 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. Its share of the estimated bill is $47-$122 a month, against a total budget of $150 a month. MySQL is within 0.3 stack points, inside the tie margin (stacks this close count as tied); PostgreSQL has the higher stack score.",
       "driven_by": [
         "priorities.time_to_market",
         "priorities.cost",
@@ -89,7 +89,7 @@
     },
     "hosting": {
       "choice": "DigitalOcean (App Platform + Managed DBs), region BLR1 (Bangalore)",
-      "justification": "DigitalOcean (App Platform + Managed DBs) hosts the stack for users in India at a 99.9% availability target. It runs the Python + Django API as long-running processes with WebSockets, sized for ~12 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is $75-$233 a month, against a total budget of $150 a month. It leads the runner-up, Google Cloud Run, by 1.0 stack points.",
+      "justification": "DigitalOcean (App Platform + Managed DBs) hosts the stack for users in India at a 99.9% availability target. It runs the Python + Django API as long-running processes with WebSockets, sized for ~12 requests/s at peak. It has a region in India, so data can stay in the country. Its share of the estimated bill is $50-$155 a month, against a total budget of $150 a month. It leads the runner-up, Google Cloud Run, by 1.0 stack points.",
       "driven_by": [
         "team.size",
         "team.languages",
@@ -369,14 +369,14 @@
     ]
   },
   "estimated_monthly_cost_usd": {
-    "min": 192,
-    "max": 524,
+    "min": 139,
+    "max": 418,
     "assumptions": [
       "Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
       "Scale tier: Medium (500-5,000 users online at once)",
-      "Budget check: $150/month stated, status 'over'",
-      "Hosting: DigitalOcean (App Platform + Managed DBs): $75-233 (Medium (500-5,000 users online at once) price band, from the band's floor up to its price at ~3x the load, for 800 users online at once (20% of the way up the tier, log scale); x1.5 for 99.9% availability (redundant instances))",
-      "Database: PostgreSQL: $75-150 (Medium (500-5,000 users online at once) database tier (~34 GB in 12 months), from the band's floor up to its price at ~3x the load, for ~34 GB of data (the bottom of the tier: that measure alone is below it); upper end for ~34 GB of data: the band's top is priced for the largest data of the tier; priced as DigitalOcean Managed PostgreSQL; x1.5 for 99.9% availability (standby/replicas))",
+      "Budget check: $150/month stated, status 'stretch'",
+      "Hosting: DigitalOcean (App Platform + Managed DBs): $50-155 (Medium (500-5,000 users online at once) price band, from the band's floor up to its price at ~3x the load, for 800 users online at once (20% of the way up the tier, log scale); one instance carries DigitalOcean's 99.95% SLA, which meets the 99.9% target, so no second instance is priced)",
+      "Database: PostgreSQL: $47-122 (Medium (500-5,000 users online at once) database tier (~34 GB in 12 months), from the band's floor up to its price at ~3x the load, for ~34 GB of data (the bottom of the tier: that measure alone is below it); from $31.29 on DigitalOcean Managed PostgreSQL (2 GiB RAM, 1 vCPU): one node with 2 GiB RAM and 1 vCPU, 30 GiB of disk included, then $0.215 per GiB a month up to 60 GiB; a standby node is priced on top; upper end for ~34 GB of data: the band's top is priced for the largest data of the tier; x1.5 for 99.9% availability (standby/replicas))",
       "Background jobs: Redis / Valkey: $15-15 (Medium (500-5,000 users online at once) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 800 users online at once (20% of the way up the tier, log scale))",
       "Object storage: $0-0 (~16 GB of uploaded files (the stated total less the database's ~34 GB) at $0.015-0.025/GB-month (https://developers.cloudflare.com/r2/pricing/ and https://aws.amazon.com/s3/pricing/))",
       "Media delivery: $9-81 (~900 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)",
@@ -385,9 +385,9 @@
   },
   "warnings": [
     {
-      "code": "BUDGET_STRETCH",
-      "severity": "critical",
-      "message": "Budget below estimated cost. Estimated minimum spend $192/month exceeds your budget of $150/month at Medium (500-5,000 users online at once) scale. The same stack fits at 99% availability: with one app instance and no database standby it starts at about $142/month, within the budget; that relaxes the 99.9% target (requirements.availability). Otherwise raise the budget.",
+      "code": "BUDGET_RANGE_OVER",
+      "severity": "warning",
+      "message": "Budget below the top of the estimate. $139-$418/month against $150/month: the top (~3x today's load) and the middle are over, most of the rise in DigitalOcean and PostgreSQL. Raise the budget before the load grows.",
       "fields": [
         "budget.monthly_infra_usd",
         "scale.users_12_months"
@@ -422,8 +422,7 @@
     "Architecture preference: Not provided; using default 'auto'.",
     "Vendor lock-in tolerance: Not provided; using default 'medium'.",
     "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Set infrastructure.data_residency to india if a sector rule (e.g. RBI) applies.",
-    "Stored data: The stated 50 GB counts uploaded files too. The database is sized for ~34 GB of rows (0.5 MB per daily user a month for this app type, at ~5,335 daily users, launch plus 12 months), and the other ~16 GB of files is priced as object storage on the stack's cloud.",
-    "Relaxed or flagged (BUDGET_STRETCH): Budget below estimated cost. Estimated minimum spend $192/month exceeds your budget of $150/month at Medium (500-5,000 users online at once) scale. The same stack fits at 99% availability: with one app instance and no database standby it starts at about $142/month, within the budget; that relaxes the 99.9% target (requirements.availability). Otherwise raise the budget."
+    "Stored data: The stated 50 GB counts uploaded files too. The database is sized for ~34 GB of rows (0.5 MB per daily user a month for this app type, at ~5,335 daily users, launch plus 12 months), and the other ~16 GB of files is priced as object storage on the stack's cloud."
   ],
   "validation_errors": []
 }

@@ -378,7 +378,9 @@ def tier_cost(item: dict, tier: int, p: dict, d: dict | None = None) -> tuple[fl
             if lo > 0:
                 # The project is on a paid plan: the band's top is the dearest vendor plan that still holds
                 # it, not the tier's generic top (sized for the largest data and traffic of the tier).
-                hi = min(hi, max(plan_price(x, d) for x in entry_plans_holding(item, tier, d)))
+                capped = [plan_price(x, d) for x in entry_plans_holding(item, tier, d) if not x.get("floor_only")]
+                if capped:  # a floor_only plan (a small node at a larger tier) lowers the floor but caps nothing
+                    hi = min(hi, max(capped))
         elif lo == 0 and tier + 1 < len(bands):
             lo = bands[tier + 1][0]
         hi = max(hi, lo)

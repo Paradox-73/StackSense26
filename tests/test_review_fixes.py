@@ -203,8 +203,9 @@ def test_second_runtimes_language_gaps_and_outside_services_are_stated():
     p3 = run(_doc("P3"))  # Go backend, live whiteboard
     sync = next(s for s in p3["stack"]["supporting"] if "Yjs" in s["choice"])
     assert "Node.js service beside the Go API" in sync["choice"] and " or " not in sync["choice"], sync["choice"]
-    p4 = run(_doc("P4"))  # native apps, team lists Java, Kotlin and TypeScript; AWS required; RBI localisation
-    assert "does not list Swift" in p4["stack"]["frontend"]["justification"], p4["stack"]["frontend"]["justification"]
+    native = run(_with("P4", team={"languages": ["java", "kotlin"]}))  # native apps for a team with no Swift
+    assert "does not list Swift" in native["stack"]["frontend"]["justification"], native["stack"]["frontend"]["justification"]
+    p4 = run(_doc("P4"))  # AWS required; RBI localisation
     push = next(s for s in p4["stack"]["supporting"] if "Firebase Cloud Messaging" in s["choice"])
     assert "run outside AWS" in push["justification"] and "leaves your residency region" in push["justification"]
     sms = next(s for s in p4["stack"]["supporting"] if s["choice"].startswith("MSG91"))

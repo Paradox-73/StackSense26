@@ -229,11 +229,11 @@ def _p2_at(budget: float) -> dict:
 
 
 def test_an_over_budget_stack_offers_the_same_stack_without_redundancy_when_that_fits():
-    out = _p2_at(150)  # 99.9% stated: two app instances and a database standby put the floor over $150
+    out = _p2_at(130)  # 99.9% stated: the database standby puts the floor over $130
     warn = next(w for w in out["warnings"] if w["code"] == "BUDGET_STRETCH")
     assert "The same stack fits at 99% availability" in warn["message"], warn["message"]
     single = float(warn["message"].split("starts at about $")[1].split("/month")[0].replace(",", ""))
-    assert single <= 150 < out["estimated_monthly_cost_usd"]["min"], (single, out["estimated_monthly_cost_usd"])
+    assert single <= 130 < out["estimated_monthly_cost_usd"]["min"], (single, out["estimated_monthly_cost_usd"])
     tight = _p2_at(100)  # below even the single-instance floor: the cheaper-stack advice stays
     msg = next(w["message"] for w in tight["warnings"] if w["code"].startswith("BUDGET"))
     assert "same stack fits" not in msg and "cheaper stack" in msg, msg

@@ -1697,6 +1697,17 @@ def _database_where(stack: dict, disk: str) -> str:
 # databases) include their redundancy in the price.
 AVAILABILITY_MULT = {99.0: 1.0, 99.9: 1.5, 99.95: 2.0, 99.99: 3.0}
 INSTANCE_HOSTS = ("containers", "kubernetes", "paas", "vps", "onprem")
+# The SLA one instance carries on its own, from each host's SLA page (data/kb/hosting.json "sla" scope): where it meets
+# the target, a second instance buys nothing for availability, so the redundancy multiplier is not priced.
+SINGLE_INSTANCE_SLA = {"digitalocean": 99.95, "azure_apps": 99.95, "hetzner": 99.9, "gcp_compute": 99.9,
+                       "aws_ec2": 99.5, "azure_vm": 99.5}
+
+
+def _covered_by_sla(host: dict, d: dict) -> str | None:
+    """The basis text when one instance's own SLA meets the availability target, else None."""
+    sla = SINGLE_INSTANCE_SLA.get(host.get("id"), 0)
+    return (f"one instance carries {host['name'].split(' (')[0]}'s {sla:g}% SLA, which meets the {d['availability']:g}% "
+            "target, so no second instance is priced") if sla >= d["availability"] else None
 REQUEST_BILLED = ("gcp_cloud_run",)  # scales per request across zones by default
 # Model serving: about one model call per active user a day of ~1,500 tokens, priced from a small
 # hosted model to a mid-size one (published per-million-token prices, mid 2026).
@@ -1866,6 +1877,8 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
         if host.get("kind") in INSTANCE_HOSTS and host["id"] not in REQUEST_BILLED and mult > 1:
             if one:
                 basis.append(SINGLE_INSTANCE_BASIS)
+            elif _covered_by_sla(host, d):
+                basis.append(_covered_by_sla(host, d))
             else:
                 lo, hi = lo * mult, hi * mult
                 basis.append(f"x{mult:g} for {d['availability']:g}% availability (redundant instances)")
@@ -1922,7 +1935,8 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
         elif dbx.get("entry_plans") and dbt <= max(x["max_tier"] for x in dbx["entry_plans"]):
             basis.append(f"too much data or traffic for the free and entry plans of {offer} "
                          f"(the largest holds {max(x['max_data_gb'] for x in dbx['entry_plans']):g} GB)")
-        if not ep and not db.get("usage") and d["data_tier"] < dbt:
+        sized = ep and not ep.get("floor_only")  # a floor_only plan sets the floor, not the size of the top
+        if not sized and not db.get("usage") and d["data_tier"] < dbt:
             # Traffic set the tier, not the data: the band's top is priced for the tier's largest data, so with a
             # small dataset the top is the instance the traffic needs (up to twice the floor) plus that data's band.
             bands = db.get("cost_usd", [[0, 0]] * 6)
@@ -1933,7 +1947,7 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
                 hi = top
                 basis.append(f"upper end for ~{d['data_12mo_gb']:,.0f} GB of data: the band's top is priced for the "
                              "largest data of the tier")
-        if not ep and plans and dbt <= max(x["max_tier"] for x in plans) and not (
+        if not sized and plans and dbt <= max(x["max_tier"] for x in plans) and not (
                 dbx.get("entry_plans") and dbt <= max(x["max_tier"] for x in dbx["entry_plans"])):
             # Entry plans exist, but none is the offering on this host (or none signs a BAA): price the
             # host's own managed service from the band instead of quoting another vendor's plan.
