@@ -11,7 +11,7 @@ The model sees only the brief text and the list of technologies the knowledge ba
 technology id per layer. Picks are scored with the same rule as tools/bench.py (top-1 = the key's best pick,
 acceptable = any pick at least 2 of 3 labeller personas accept). The file is written after every brief and briefs already
 in it are skipped, so an interrupted or rate-limited run continues where it stopped. Answers are also saved in
-data/llm_cache/, so a repeated run costs no requests. Needs STACKSENSE_LLM_API_KEY or OPENROUTER_API_KEY (see README).
+benchmark/llm_baseline_cache/, so a repeated run costs no requests. Needs STACKSENSE_LLM_API_KEY or OPENROUTER_API_KEY (see README).
 
 Agreement with the key is not the only measure. Each saved stack is also graded by the rule engine (offline, with
 baseline_grading.grade_stack): hard requirements the stack breaks, minimum monthly cost against the engine's,
@@ -24,6 +24,7 @@ import argparse
 import json
 import os
 import sys
+from pathlib import Path
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -37,6 +38,9 @@ from baseline_grading import (SYSTEM_PROMPT, allowed_options, build_messages, en
 
 OUT_PATH = os.path.join(ROOT, "benchmark", "llm_baseline.json")
 REPEAT_PATH = os.path.join(ROOT, "benchmark", "llm_baseline_repeat.json")
+# This experiment asks the model for a stack, which the engine never does, so its saved answers live here and not in
+# data/llm_cache/ (the engine's own description reader and summary).
+CACHE_DIR = os.path.join(ROOT, "benchmark", "llm_baseline_cache")
 
 
 def score_picks(brief: dict, picks: dict[str, str | None]) -> dict:
@@ -262,6 +266,7 @@ def main() -> int:
     ap.add_argument("--grade", action="store_true", help="grade the saved stacks with the rule engine and save; no requests")
     ap.add_argument("--repeat", action="store_true", help="ask the same briefs again, cache bypassed (resumable)")
     args = ap.parse_args()
+    llm.CACHE_DIR = Path(CACHE_DIR)
     if not bench.verify_hash():
         print("ANSWER KEY HASH MISMATCH: tests/benchmark/answer_key.json changed", file=sys.stderr)
         return 2
