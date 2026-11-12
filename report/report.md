@@ -114,7 +114,7 @@ Quick mode asks seven questions; Refine opens all 42. "Describe your project" fi
 
 ### 5.1 How technologies are represented
 
-`data/kb/*.json` holds 70 technologies: 17 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region (Appendix D prints such facts for the public scenarios' hosts). 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 379 URLs, and no end-of-life product is in the knowledge base.
+`data/kb/*.json` holds 70 technologies: 17 frontends, 14 backends, 15 databases and 24 hosting platforms. Each entry has 1-to-5 scores on twelve criteria anchored to the rubric in Appendix C, cost bands for six scale tiers, compliance flags (HIPAA BAA with its minimum price, PCI DSS, SOC 2, ISO 27001, GDPR terms), regions, the published SLA, what it can run (long-lived processes, WebSockets, containers, GPUs), whether it is self-hostable, a scale ceiling, a minimum team, lock-in, and strengths and weaknesses with official sources; databases add the consistency model, the fit per data shape and the managed offering per cloud. The AWS ECS on Fargate entry, for example, records a HIPAA BAA, a PCI DSS Level 1 attestation, ISO 27001, a 99.99% multi-zone SLA and an Indian region (Appendix D prints such facts for the public scenarios' hosts). 65 compatibility rules adjust whole stacks, such as Next.js with Vercel or WebSockets on Netlify. `report/sources.md` lists 383 URLs, and no end-of-life product is in the knowledge base.
 
 ### 5.2 Scoring and filtering
 
@@ -206,7 +206,7 @@ Two developers (JavaScript, Python) build an Android-only survey app that must w
 
 ## 7. Edge-case handling
 
-The nine files in `scenarios/edge/` cover the nine categories of the statement's section 6; the screenshots after the table show each result, cut to the handling.
+The nine files in `scenarios/edge/` cover the nine categories of the statement's section 6; the screenshots after the table show seven of the results, cut to the handling (E6 and E9 add only the end-of-life warnings the table lists).
 
 | Category and file | How it is detected | What the engine does |
 |---|---|---|
@@ -230,13 +230,9 @@ The nine files in `scenarios/edge/` cover the nine categories of the statement's
 
 ![E5 Regulatory constraints: Cloud Run in Frankfurt under a HIPAA BAA, with Vercel and Netlify ruled out](screenshots/e-E5.png)
 
-![E6 Existing systems: Microsoft SQL Server kept for the data, and two end-of-life warnings](screenshots/e-E6.png)
-
 ![E7 Restricted deployment: on-premises VMs, and a critical warning for the outside services an air-gapped network cannot reach](screenshots/e-E7.png)
 
 ![E8 Skill mismatch: Laravel leads FastAPI by 6.4 stack points on the PHP team's skills](screenshots/e-E8.png)
-
-![E9 Deprecated technology: four EOL_EXISTING_SYSTEM warnings, each with its source](screenshots/e-E9.png)
 
 ## 8. Validation
 
@@ -244,7 +240,7 @@ Appendix F has the tables behind 8.1 to 8.3.
 
 ### 8.1 Tests
 
-The 1244 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1261 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -260,7 +256,7 @@ A language model with no rule engine picked the four layers for the same briefs 
 
 ### 8.5 One answer apart
 
-Pairs of projects one answer apart check that a change moves only the layers it should, each with the engine's reason; Appendix D has three. Adding HIPAA to the startup example, for instance, replaces Supabase, whose plan with a BAA costs far more than the budget, and Cloudflare Pages, which offers no BAA. Among the edge scenarios, E8 changes only P2's languages and moves three layers to the PHP team's skills, while E7 changes only P2's deployment and cloud fields and keeps Django and PostgreSQL, now self-managed.
+Pairs of projects one answer apart check that a change moves only the layers it should, each with the engine's reason; Appendix D prints one of three. Adding HIPAA to the startup example, for instance, replaces Supabase, whose plan with a BAA costs far more than the budget, and Cloudflare Pages, which offers no BAA. Among the edge scenarios, E8 changes only P2's languages and moves three layers to the PHP team's skills, while E7 changes only P2's deployment and cloud fields and keeps Django and PostgreSQL, now self-managed.
 
 ## 9. Limitations and future work
 
@@ -279,7 +275,7 @@ Next: an architect review of the answer key and the public outputs, scheduled re
 
 **APIs and datasets.** The optional Google Gemini API through its OpenAI-compatible endpoint (free tier, <https://ai.google.dev/gemini-api/docs/openai>); OpenRouter (<https://openrouter.ai/>) can be configured instead, and the client uses only the Python standard library. No dataset is shipped. The Stack Overflow Developer Survey 2025 (<https://survey.stackoverflow.co/2025/technology>) is the hiring-pool proxy, and INR budgets use a fixed planning rate of 96 INR to 1 USD from the FBIL reference rate (<https://www.fbil.org.in/>).
 
-**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 379 URLs is in `report/sources.md`. Appendix G prints the URL of every other source this report cites, from the methods behind the design to the HIPAA, PCI DSS, DPDP and RBI rules it encodes. The repository is <https://github.com/Paradox-73/StackSense26>; its README gives the commands that run the app, the tests and the studies, and rebuild this PDF.
+**Sources.** Every technology, rule, question and glossary entry cites official documentation, pricing or compliance pages; the register of 383 URLs is in `report/sources.md`. Appendix G prints the URL of every other source this report cites, from the methods behind the design to the HIPAA, PCI DSS, DPDP and RBI rules it encodes. The repository is <https://github.com/Paradox-73/StackSense26>; its README gives the commands that run the app, the tests and the studies, and rebuild this PDF.
 
 ## 11. AI assistance declaration
 - Claude Code (Anthropic), an AI coding assistant: used to write code and tests, to gather sources for the knowledge base and to draft documentation.
@@ -301,11 +297,11 @@ An option is removed before scoring when it breaks a compliance rule (HIPAA BAA,
 
 ### A.3 Adjustments and the cost criterion
 
-After the weighted average come adjustments with a stated reason: a minimum price above the layer's budget share costs 6 points per e-fold of overshoot (so 4 times over budget costs less than 40 times over); load near the scale ceiling, a team smaller than the option needs, a server language nobody listed and an in-memory store holding too much data also cost points. Cost at your scale is 5 − 4 × min(1, ln(1 + bill / share) / ln 31), where the share is 60% of the budget for hosting or the backend and 40% for the database: $0 scores 5 and 30 times the share scores 1. It depends only on the option's own bill, so it moves smoothly as users grow.
+After the weighted average come adjustments with a stated reason: a minimum price above the layer's budget share costs 6 points per e-fold of overshoot (so 4 times over budget costs less than 40 times over); load near the scale ceiling, a team smaller than the option needs, a server language nobody listed and an in-memory store holding too much data also cost points. Cost at your scale is 5 − 4 × min(1, ln(1 + bill / share) / ln 31), where the share is 60% of the budget for hosting or the backend and 40% for the database: $0 scores 5 and 30 times the share scores 1.
 
 ### A.4 Stack search, ties and growth
 
-The top five options per layer give 625 stacks. The 65 compatibility rules add synergies (Next.js with Vercel, Supabase with Postgres, DynamoDB with Lambda), caveats (Lambda with Postgres needs RDS Proxy) and conflicts (WebSockets on Netlify or Lambda, DynamoDB off AWS, SQLite on hosts that run several instances). Ties within 1 stack point go to the fewest misses, then the preferred cloud, team skill match, the hiring pool when no skills are listed, the frontend's points from the most important answers and lower lock-in, then the higher score. Every run also works out the answer at all six scale tiers, smallest first, and passes over a stack that returns to a technology a smaller tier already left when one that does not is within 4 points of the top. If the chosen stack's minimum bill is over the budget, the best stack that keeps the same backend and database, fits the budget and scores at most 5 points lower replaces it. When the frontend platform runs server code only as short functions and the load or realtime needs a long-running API, the API gets its own host.
+The top five options per layer give 625 stacks. The 65 compatibility rules add synergies (Next.js with Vercel, Supabase with Postgres, DynamoDB with Lambda), caveats (Lambda with Postgres needs RDS Proxy) and conflicts (WebSockets on Netlify or Lambda, DynamoDB off AWS, SQLite on hosts that run several instances). Ties within 1 stack point go to the fewest misses, then the preferred cloud, team skill match, the hiring pool when no skills are listed, the frontend's points from the most important answers and lower lock-in, then the higher score. Every run also works out the answer at all six scale tiers, smallest first, and passes over a stack that returns to a technology a smaller tier already left when one that does not is within 4 points of the top. If the chosen stack's minimum bill is over the budget, the best stack that keeps the same backend and database (a server stays off functions), fits the budget with its usage terms and scores at most 5 points lower replaces it. When the frontend platform runs server code only as short functions and the load or realtime needs a long-running API, the API gets its own host.
 
 ### A.5 Supporting services and cost lines
 
@@ -338,14 +334,14 @@ Every technology score is an integer from 1 (poor) to 5 (excellent) for that cri
 
 </div>
 
-Scores of 2 and 4 sit between the anchors. The rubric is a reading guide: the sources for each technology are in `report/sources.md`, and the rules and weights that combine the scores are in the knowledge base and `engine/scoring.py`.
+Scores of 2 and 4 sit between the anchors; each technology's sources are in `report/sources.md`.
 
 ## Appendix D. Knowledge-base evidence and more samples
 
 <div class="appx">
 
 <!-- BEGIN evidence -->
-The table prints the knowledge-base facts for the hosting options that the six public scenarios pick or rank second, and for their two database picks; `tools/build_assets.py` generates it from `data/kb/`. SLA is the highest uptime that the vendor's SLA page commits to. India and EU mark a region that meets a data-residency rule. A price in the BAA column is the least a month at which the vendor signs one. Ops is the operations-burden score from Appendix C, where 5 means the least work. Cost is the monthly band at the scale tier Medium (10k-100k daily users or 50-500 req/s at peak), for the app alone on a host and for the managed service on a database. A managed database takes the SLA, regions and attestations of the host's service, so those cells read host. The source column gives the vendor's compliance and SLA pages, or the database's documentation; `report/sources.md` lists every other source.
+The table prints the knowledge-base facts for the hosting options that the six public scenarios pick or rank second, and for their two database picks; `tools/build_assets.py` generates it from `data/kb/`. SLA is the highest uptime that the vendor's SLA page commits to. India and EU mark a region that meets a data-residency rule. A price in the BAA column is the least a month at which the vendor signs one. Ops is the operations-burden score from Appendix C, where 5 means the least work. Cost is the monthly band at the scale tier Medium (10k-100k daily users or 50-500 req/s at peak), for the app alone on a host and for the managed service on a database. A managed database takes the SLA, regions and attestations of the host's service, so those cells read host.
 
 | Option | SLA | India | EU | HIPAA BAA | PCI DSS | ISO 27001 | Ops | Cost a month | Source |
 |---|---|---|---|---|---|---|---|---|---|
@@ -363,7 +359,7 @@ The table prints the knowledge-base facts for the hosting options that the six p
 
 </div>
 
-The guided questionnaire runs the same engine on its own answers. Two screenshots of its result page and three one-answer-apart pairs follow, with changed layers in bold and the engine's reason.
+The guided questionnaire runs the same engine on its own answers. One screenshot of its result page and one of the three one-answer-apart pairs in `report/pairs.md` follow, with changed layers in bold and the engine's reason.
 
 <!-- BEGIN gallery -->
 ![Startup SaaS MVP](screenshots/gallery/startup_mvp.png)
@@ -371,13 +367,6 @@ The guided questionnaire runs the same engine on its own answers. Two screenshot
 **Startup SaaS MVP.** Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Cloudflare Pages + Workers, about $26–$28 a month.
 Why it fits: backend, low ops burden: 5.0/5 vs 4.2 average for this layer; hosting, low ops burden: 5.0/5 vs 4.0 average for this layer.
 <!-- END gallery -->
-
-<!-- BEGIN gallery_more -->
-![HIPAA telehealth platform](screenshots/gallery/hipaa_telehealth.png)
-
-**HIPAA telehealth platform.** React SPA (Vite) + Python + Django + PostgreSQL + AWS ECS on Fargate, about $370–$1,496 a month.
-Why it fits: backend, ecosystem maturity: 5.0/5 vs 4.4 average for this layer; hosting, realtime fit: 4.0/5 vs 3.4 average for this layer.
-<!-- END gallery_more -->
 
 <!-- BEGIN pairs -->
 **Startup SaaS MVP, then add HIPAA** (preset `startup_mvp`; changed answer: `compliance`: gdpr → gdpr, hipaa)
@@ -393,31 +382,6 @@ Why it fits: backend, ecosystem maturity: 5.0/5 vs 4.4 average for this layer; h
 - Backend: Supabase (BaaS on Postgres) now takes a penalty (Minimum ~$584/month is 11.7x the whole budget), moving the gap 17.8 points toward Node.js + Express; cost at your scale moved the gap 11.1 points toward Node.js + Express (Node.js + Express 5.0/5 vs Supabase (BaaS on Postgres) 1.5/5, was 5.0 vs 4.8).
 - Hosting: Cloudflare Pages + Workers is now ruled out: No HIPAA Business Associate Agreement available.
 <!-- END pairs -->
-
-<!-- BEGIN pairs_more -->
-**IoT telemetry, 40,000 devices vs 5 million** (preset `iot_telemetry`; changed answer: `dau`: 40,000 → 5,000,000)
-
-| Layer | Before | After |
-|---|---|---|
-| Frontend | React SPA (Vite) | React SPA (Vite) |
-| Backend | Go (net/http, chi or Gin) | Go (net/http, chi or Gin) |
-| Database | TimescaleDB (Postgres) | TimescaleDB (Postgres) |
-| Hosting | AWS ECS on Fargate | AWS ECS on Fargate |
-| Est. cost / month | $1,365–$14,731 | $38,500–$157,328 |
-
-
-**Internal tool, own servers vs cloud** (preset `internal_tool`; changed answer: `deployment`: on_prem → cloud)
-
-| Layer | Before | After |
-|---|---|---|
-| Frontend | Server-rendered HTML + HTMX | Server-rendered HTML + HTMX |
-| Backend | Python + Django | Python + Django |
-| Database | SQLite (+ Litestream backups) | SQLite (+ Litestream backups) |
-| Hosting | On-prem VMs + Docker Compose | **Render** |
-| Est. cost / month | $0–$153 | $7 |
-
-- Hosting: On-prem VMs + Docker Compose is now ruled out: On-premises option; you chose public cloud.
-<!-- END pairs_more -->
 
 ## Appendix E. Input research in detail
 
@@ -438,7 +402,7 @@ Why it fits: backend, ecosystem maturity: 5.0/5 vs 4.4 average for this layer; h
 | Functional fit | Functional suitability | (none) | application type, what users do, special workloads, background work, machine learning, tenancy, data shape, realtime, SEO, offline | data-model fit, realtime, SEO, interactivity, offline |
 | User experience | Interaction capability | (none) | latency target, realtime, offline, client platforms | performance, interactivity, realtime, offline, platform filter |
 
-Safety (new in 2023) is not scored: the four layers are infrastructure, and no option changes whether the product can harm people or property. Health data is covered under Security.
+Safety (new in 2023) is not scored: no infrastructure option changes whether the product can harm people; health data falls under Security.
 
 **ATAM in this engine.** The Architecture Tradeoff Analysis Method's utility tree is the set of criterion weights; its scenarios are the six public scenarios, the nine edge scenarios, the 14 presets and the 40 benchmark briefs; its sensitivity points are what "Not sure" and the question-influence study find; and its trade-off points are the contradiction warnings and the compatibility rules that cost points on one layer to gain on another.
 
@@ -483,7 +447,7 @@ Safety (new in 2023) is not scored: the four layers are infrastructure, and no o
 Before the general rule fixes made on the 30 tuning briefs, the held-out briefs scored 60% (24/40) top-1 and 80% (32/40) acceptable. The picks outside the acceptable set are listed by `python tools/bench.py --briefs`.
 <!-- END bench -->
 
-Top-1 is scored on 158 of the 160 layer picks, because the personas have no majority for the backend and hosting of brief A05. A language model wrote the key, so it may favour the LLM-only baseline below; no human architect has checked it.
+Top-1 is scored on 158 of the 160 layer picks, because the personas have no majority for the backend and hosting of brief A05.
 
 ### F.3 LLM-only baseline
 
@@ -493,7 +457,7 @@ Top-1 is scored on 158 of the 160 layer picks, because the personas have no majo
 
 ## Appendix G. Sources and their URLs
 
-Section 10 prints the URLs of the libraries, fonts, APIs and datasets, and `report/sources.md` lists the 379 URLs behind the knowledge base, rules, questions and glossary. This appendix prints the URL of every other source: first the main references, then each source that sections 1 to 9 link to, with the section that first cites it.
+Section 10 prints the URLs of the libraries, fonts, APIs and datasets, and `report/sources.md` lists the 383 URLs behind the knowledge base, rules, questions and glossary. This appendix prints the URL of every other source: first the main references, then each source that sections 1 to 9 link to, with the section that first cites it.
 
 <div class="appx refs">
 

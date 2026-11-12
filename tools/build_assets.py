@@ -44,8 +44,7 @@ def evidence_block() -> str:
            "is the least a month at which the vendor signs one. Ops is the operations-burden score from Appendix C, where 5 means "
            f"the least work. Cost is the monthly band at the scale tier {TIER_LABELS[2]}, for the app alone on a host and for the "
            "managed service on a database. A managed database takes the SLA, regions and attestations of the host's service, so "
-           "those cells read host. The source column gives the vendor's compliance and SLA pages, or the database's documentation; "
-           "`report/sources.md` lists every other source.", "",
+           "those cells read host.", "",
            "| Option | SLA | India | EU | HIPAA BAA | PCI DSS | ISO 27001 | Ops | Cost a month | Source |",
            "|---|---|---|---|---|---|---|---|---|---|"]
     for layer, kid in EVIDENCE_ROWS:
@@ -228,8 +227,7 @@ def build() -> dict[Path, str]:
     files[ROOT / "report" / "validation.md"] = vfull
     kg, kp = build_pairs.KEY_GALLERY, build_pairs.KEY_PAIRS
     for name, body in (("validation", vtable), ("evidence", evidence_block()),
-                       ("gallery", build_pairs.gallery_markdown(0, kg).rstrip()), ("gallery_more", build_pairs.gallery_markdown(kg).rstrip()),
-                       ("pairs", build_pairs.pairs_markdown(0, kp).rstrip()), ("pairs_more", build_pairs.pairs_markdown(kp).rstrip()),
+                       ("gallery", build_pairs.gallery_markdown(0, kg).rstrip()), ("pairs", build_pairs.pairs_markdown(0, kp).rstrip()),
                        ("bench", bench_block())):
         text = replace_block(text, name, body)
     files[rp] = text.replace("\n", nl)

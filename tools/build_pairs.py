@@ -27,8 +27,8 @@ PAIRS = [
 ]
 
 GALLERY = ["startup_mvp", "hipaa_telehealth"]  # the two sample screenshots of tools/capture_screenshots.py
-KEY_GALLERY = 1  # report.md blocks: the first sample is block gallery, the rest gallery_more
-KEY_PAIRS = 1    # report.md blocks: the first pair is block pairs, the rest pairs_more
+KEY_GALLERY = 1  # report.md blocks: the report prints the first sample (block gallery)
+KEY_PAIRS = 1    # report.md blocks: the report prints the first pair (block pairs); report/pairs.md has all
 
 
 def _preset(pid: str) -> dict:

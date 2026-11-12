@@ -367,7 +367,9 @@ def _llm_baseline() -> str:
     lines += ["", "Model chain: " + (models or "not recorded") + "."]
     if graded:
         lb, ec = m["llm_breaks"], m["engine_check"]
-        cases = "; ".join(f"{c['id']} {c['layer']} = {c['pick']} ({c['reasons'][0].rstrip('.')})" for c in lb["cases"])
+        # The first clause of each reason names the rule; the full reasons are in benchmark/llm_baseline.json.
+        cases = "; ".join(f"{c['id']} {c['layer']} = {c['pick']} ({re.split(r'[:;(]', c['reasons'][0])[0].strip().rstrip('.')})"
+                          for c in lb["cases"])
         lines += ["", f"The model's stacks that break a hard requirement: {cases}." if cases else "No model stack broke a hard requirement.",
                   "",
                   f"{_agreement_sentence(rates, bench.pct)} "
