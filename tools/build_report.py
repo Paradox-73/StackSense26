@@ -163,7 +163,7 @@ CLAIMS = [
     ("presets", [r"(\d+) (?:presets|ready-made scenarios|built-in examples)"]),
     ("glossary_terms", [r"(\d+) glossary terms", r"\((\d+) terms\)"]),
     ("source_urls", [r"(\d+) cited URLs", r"register of (\d+) URLs", r"(\d+) URLs"]),
-    ("tests", [r"(\d+) (?:pytest )?tests\b(?! with| in)", r"`(\d+) passed in"]),
+    ("tests", [r"(\d+) (?:pytest )?tests\b(?! with| in)", r"`(\d+) passed in", r"badge/tests-(\d+)"]),
     ("warning_codes", [r"(\d+) (?:distinct )?warning codes"]),
     ("conflict_warning_codes", [r"(\d+) (?:cross-field|contradiction) checks"]),
     ("scenario_fixtures", [r"(\d+) scenario fixtures"]),

@@ -59,6 +59,7 @@ from .stack import (
     choose,
     combo_ids,
     combo_score,
+    FITS_BUDGET,
     decided_text,
     layer_alternatives,
     matching_rules,
@@ -338,10 +339,16 @@ def _core(raw: dict, kb: dict | None = None, light: bool = False) -> dict:
     combos = search(layer_scored, kb["rules"], p, d, window=WALK_WINDOW if light else None)
     _, lefts, holds, forbids, nowide = _growth_path(kb, p, d, layer_scored)
     k = own_step(p, d)
-    shown = _shown_fits(p, d, layer_scored["database"])
-    best = _budget_guard(p, d, combos, choose(combos, lefts[k], holds[k], shown, forbids[k]),
-                         layer_scored["database"], lefts[k],
-                         wide=None if k in nowide else _wider(kb, p, d, layer_scored), hold=holds[k], shown=shown)
+    best = _budget_guard(p, d, combos, choose(combos, lefts[k], holds[k], _fits(p, d, layer_scored["database"]),
+                                              forbids[k]), layer_scored["database"], lefts[k],
+                         wide=None if k in nowide else _wider(kb, p, d, layer_scored), hold=holds[k])
+    tb = best.get("tie_break") or {}
+    by_budget = tb.get("budget_guard") or tb.get("decided_by") == FITS_BUDGET
+    if by_budget and not _shown_fits(p, d, layer_scored["database"])(best):
+        # The budget rules compare the bands' floors. A stack they moved to that is still over the budget once the usage
+        # terms are added gains nothing (P2: DigitalOcean at $150, Cloud Run at $165-179, DigitalOcean again from
+        # $180, all over until $192), so the stack is chosen without them.
+        best = choose(combos, lefts[k], holds[k], None, forbids[k])
     best = _pair_with_mobile(best, combos, kb, p, d, w)
     combos[:] = [c for c in combos if c is not best]
     combos.insert(0, best)
@@ -456,13 +463,9 @@ def _fits(p: dict, d: dict, db_scored: list[dict], memo: dict | None = None):
 
 
 def _shown_fits(p: dict, d: dict, db_scored: list[dict]):
-    """Predicate for the answers' own scale: the bands' floors fit the budget and so does the low end of the
-    estimate shown, with its usage terms (SMS, media, tokens). Without the second test a budget preference could
-    move the pick to a stack that is still over the budget once those terms are added, and back again when the
-    budget rises (P2: DigitalOcean at $150, Cloud Run at $165-179, DigitalOcean from $180, all over until $207)."""
+    """Predicate for the answers' own scale: the low end of the estimate shown, with its usage terms (SMS, media,
+    tokens), fits the budget."""
     def ok(c):
-        if _stack_cost(p, d, c, db_scored) > d["budget_usd"]:
-            return False
         items = {l: c["picks"][l]["item"] for l in LAYERS}
         kept, _, _ = apply_ops_budget(p, supporting_services(p, d, items, db_scored))
         return estimate_cost(p, d, items, kept)["total_low"] <= d["budget_usd"]
@@ -521,14 +524,13 @@ def _to_functions(best: dict, c: dict) -> bool:
 
 
 def _budget_guard(p: dict, d: dict, combos: list[dict], best: dict, db_scored: list[dict], left: dict | None = None,
-                  memo: dict | None = None, wide=None, hold: dict | None = None, shown=None) -> dict:
+                  memo: dict | None = None, wide=None, hold: dict | None = None) -> dict:
     """If the chosen stack's estimated minimum bill is over the budget, take the best stack that keeps
     its backend and database, scores at most BUDGET_GUARD_POINTS lower and fits the budget (usually a
     cheaper host). When nothing with the same backend and database fits, the search is widened to the
     cheapest options of every layer (`wide`) and the best fitting stack of those, again within
     BUDGET_GUARD_POINTS, is taken even if it changes the backend or database. A swap that keeps the backend may not
-    move a server onto functions (_to_functions). `shown` (the answers' own scale) also asks the replacement's
-    estimate with usage terms to fit."""
+    move a server onto functions (_to_functions)."""
     budget = d["budget_usd"]
     over = _stack_cost(p, d, best, db_scored, memo)
     if over <= budget:
@@ -546,8 +548,7 @@ def _budget_guard(p: dict, d: dict, combos: list[dict], best: dict, db_scored: l
                      and ((c["picks"]["backend"]["id"], c["picks"]["database"]["id"]) == core) == same_core
                      and not (same_core and _to_functions(best, c))
                      and (not hold or _holds(c, hold)) and (ok is None or ok(c))
-                     for cost in [_stack_cost(p, d, c, db_scored, memo)] if cost <= budget
-                     and (shown is None or shown(c))), None)
+                     for cost in [_stack_cost(p, d, c, db_scored, memo)] if cost <= budget), None)
     pick = find(combos, True)
     if pick is None and wide is not None:
         skills = set(d["skills"])
