@@ -164,7 +164,7 @@ Node.js + Express serves the API at about 34,722 requests/s at peak (Hyperscale 
 
 **Why not the others?**
 - Why not C# + ASP.NET Core? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.6 points lower; either is defensible. Node.js + Express is stronger on learning curve (5.0 vs 3.0), hiring pool (5.0 vs 4.0); C# + ASP.NET Core is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0). A stack compatibility rule costs it 1.5 points, more than the whole gap, while on this layer's own criteria it is 0.9 points ahead: One language across the stack: shared types, shared validation, any developer can work on any layer.
-- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 2.8 points. Node.js + Express is stronger on realtime fit (4.0 vs 2.0), hiring pool (5.0 vs 4.0); Python + Django is stronger on development speed (5.0 vs 4.0), structure for large teams (4.0 vs 1.0). 1.5 of the 2.8 points come from a stack compatibility rule: One language across the stack: shared types, shared validation, any developer can work on any layer.
+- Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 2.8 points. Node.js + Express is stronger on realtime fit (4.0 vs 2.0), hiring pool (5.0 vs 4.0); Python + Django is stronger on development speed (5.0 vs 4.0). 1.5 of the 2.8 points come from a stack compatibility rule: One language across the stack: shared types, shared validation, any developer can work on any layer.
 - Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 2.8 points. Node.js + Express is stronger on learning curve (5.0 vs 2.0), low ops burden (4.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on scalability (5.0 vs 4.0), performance / latency (4.0 vs 3.0). 1.5 of the 2.8 points come from a stack compatibility rule: One language across the stack: shared types, shared validation, any developer can work on any layer.
 
 **Excluded by hard constraints**
@@ -263,6 +263,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + Express API 
 **Trade-offs**
 - Cost at your scale is only 1.0/5 (weight 5.0).
 - Portal/config complexity; pricing tiers are confusing
+- The Basic tier scales out to three instances and has no autoscale; rules-based autoscale needs Standard or higher
 
 **Risks**
 - No free option at your scale (from ~$12,000/month).

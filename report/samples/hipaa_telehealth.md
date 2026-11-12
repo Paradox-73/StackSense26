@@ -123,7 +123,7 @@ Python + Django serves the API at about 69 requests/s at peak (Medium (10k-100k 
 - Realtime needs Django Channels + Redis
 - Sync-first ORM; async support is partial
 
-**Versus runner-up:** Python + Django and Python + FastAPI are within 0.6 points of each other, inside the 1-point tie margin, so they count as tied. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), performance / latency (4.0 vs 3.0). Choose Python + FastAPI instead if live updates matters more to you than a mature ecosystem. Python + Django has the higher stack score. Either is defensible.
+**Versus runner-up:** Python + Django and Python + FastAPI are within 0.6 points of each other, inside the 1-point tie margin, so they count as tied. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0); Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), performance / latency (4.0 vs 3.0). Choose Python + FastAPI instead if live updates matters more to you than a mature ecosystem. Python + Django has the higher stack score. Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +40.0
@@ -155,8 +155,8 @@ Python + Django serves the API at about 69 requests/s at peak (Medium (10k-100k 
 - Node.js + Express (stack 87.5, -1.1): Scores 84.1 on its own; its stack is 1.1 points behind the pick.
 
 **Why not the others?**
-- Why not Python + FastAPI? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.6 points lower; either is defensible. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0), structure for large teams (4.0 vs 2.0); Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), performance / latency (4.0 vs 3.0).
-- Why not Node.js + Express? (popular choice) Swapping it in lowers the stack score by 1.1 points. Python + Django is stronger on development speed (5.0 vs 4.0), structure for large teams (4.0 vs 1.0); Node.js + Express is stronger on realtime fit (4.0 vs 2.0), hiring pool (5.0 vs 4.0).
+- Why not Python + FastAPI? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.6 points lower; either is defensible. Python + Django is stronger on ecosystem maturity (5.0 vs 4.0); Python + FastAPI is stronger on realtime fit (3.0 vs 2.0), performance / latency (4.0 vs 3.0).
+- Why not Node.js + Express? (popular choice) Swapping it in lowers the stack score by 1.1 points. Python + Django is stronger on development speed (5.0 vs 4.0); Node.js + Express is stronger on realtime fit (4.0 vs 2.0), hiring pool (5.0 vs 4.0).
 - Why not Java/Kotlin + Spring Boot? (popular choice) Swapping it in lowers the stack score by 6.4 points. Python + Django is stronger on team skill match (4.5 vs 1.5), development speed (5.0 vs 3.0); Java/Kotlin + Spring Boot is stronger on scalability (5.0 vs 4.0), realtime fit (3.0 vs 2.0); Java/Kotlin + Spring Boot takes a penalty: Nobody on the team listed Java/Kotlin or a closely related skill: a new server language to learn.
 
 **Excluded by hard constraints**

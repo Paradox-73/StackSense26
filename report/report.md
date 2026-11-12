@@ -122,7 +122,7 @@ Quick mode asks seven questions; Refine opens all 42. "Describe your project" fi
 2. **Filter, then score.** Hard constraints remove options (Section 5.3). Each survivor scores Σ(weight × score) / Σ weight on 0 to 100, plus stated adjustments such as 6 points per e-fold of a minimum price over the layer's budget share (Appendix A).
 3. **Stack search.** The top five per layer give 625 stacks, scored (Σ layer scores + Σ rule adjustments) / 4; a stack point is one point of that score.
 
-Every score therefore splits into the points each answer added. `driven_by` lists the four answers that added the most (at least 1 point each), then up to three fields whose hard constraints ruled a rival out. Alternatives come from swapping one layer and re-scoring the whole stack, so each `why_not` states the gap in stack points and its criteria, or the rule that excludes the option. Justifications quote the scenario's numbers, and `tests/test_faithfulness.py` checks every quoted score and figure against the result.
+Every score therefore splits into the points each answer added. `driven_by` lists the four answers that added the most (at least 1 point each), then up to three fields whose hard constraints ruled a rival out. Alternatives come from swapping one layer and re-scoring the whole stack, so each `why_not` states the gap in points (out of 100 on the whole-stack score) and its criteria, or the rule that excludes the option. Justifications quote the scenario's numbers, and `tests/test_faithfulness.py` checks every quoted score and figure against the result.
 
 ### 5.3 Hard and soft constraints
 
@@ -158,7 +158,7 @@ Each screenshot is the top of the result on the running app's Scenario file page
 
 ![P1 DevFolio: a static Astro site on Netlify, no backend or database, $0 a month](screenshots/s-P1.png)
 
-A solo beginner with $0, two weeks and critical SEO publishes pages nobody signs in to, so static options are allowed and the backend and database are "None", each with its reason. Astro (SEO 5/5) leads SvelteKit by 1.1 stack points, and Netlify's free static plan leads Cloudflare Pages by 1.1 and Vercel by 8.4 (no free option at this scale). `assumptions` notes that no search service is added because `full_text_search` is false.
+A solo beginner with $0, two weeks and critical SEO publishes pages nobody signs in to, so static options are allowed and the backend and database are "None", each with its reason. Astro (SEO 5/5) leads SvelteKit by 1.1 points, and Netlify's free static plan leads Cloudflare Pages by 1.1 and Vercel by 8.4 (no free option at this scale). `assumptions` notes that no search service is added because `full_text_search` is false.
 
 ### 6.2 P2 FixIt Now: home-services marketplace in India (in depth)
 
@@ -177,7 +177,7 @@ Three intermediate engineers (JavaScript, TypeScript, Python) with nobody on ope
 
 ![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io in Frankfurt, $1,190 to $2,817 a month, with a budget warning and a no-SLA info warning](screenshots/s-P3.png)
 
-Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1; GDPR with no residency places it in Frankfurt. PostgreSQL leads Microsoft SQL Server by 2.1; Supporting services add Yjs shared documents (CRDTs), Upstash Redis for the cache and pub/sub across instances, River jobs in PostgreSQL, Cloudflare R2 storage, Stripe hosted checkout and Clerk sign-in, free up to 50,000 monthly users (Auth0 would cost $3,500 a month there). Fly.io publishes no SLA, so the output carries an info warning `NO_PUBLISHED_SLA`.
+Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1; GDPR with no residency places it in Frankfurt. PostgreSQL leads Microsoft SQL Server by 2.1; Supporting services add Yjs shared documents (CRDTs), Upstash Redis for the cache and pub/sub across instances, River jobs in PostgreSQL, Cloudflare R2 storage, Stripe hosted checkout and Clerk sign-in, free up to 50,000 monthly users (Auth0 would cost $3,500 a month there). Fly.io publishes no SLA, so the output carries an info warning `NO_PUBLISHED_SLA`.
 
 ### 6.4 P4 QuickCredit: digital lending in India (in depth)
 
@@ -185,7 +185,7 @@ Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurren
 
 P4 is the most constrained scenario: AWS required, RBI localisation, PCI DSS, ISO 27001 and 99.95%, for eight seniors (Java, Kotlin, TypeScript) who can run infrastructure, sized at about 60,000 daily users and 833 requests per second at peak.
 
-- **Hosting.** The explicit AWS removes Vercel, Netlify, Cloudflare, Render, Railway, Fly.io and Cloud Run before scoring, and S3 with CloudFront is static-only with a 99.9% SLA. ECS on Fargate leads Lambda by 2.9 stack points on performance and portability; its justification quotes the PCI DSS service-provider attestation, and the region is ap-south-1 (Mumbai).
+- **Hosting.** The explicit AWS removes Vercel, Netlify, Cloudflare, Render, Railway, Fly.io and Cloud Run before scoring, and S3 with CloudFront is static-only with a 99.9% SLA. ECS on Fargate leads Lambda by 2.9 points on performance and portability; its justification quotes the PCI DSS service-provider attestation, and the region is ap-south-1 (Mumbai).
 - **Backend.** Spring Boot matches the team and scores 5/5 on scalability, maturity and structure, which the load, the 99.95% target and the scalability and maintainability priorities weight up; Go is 3.0 behind on skill match.
 - **Database.** A double-entry ledger needs ACID, so eventually consistent stores are out; Firestore is off AWS and SQLite has no failover. PostgreSQL on Amazon RDS or Aurora in Mumbai costs $800 to $2,502 for about 411 GB with a standby; MySQL ties (0.1).
 - **Frontend.** Behind a login SEO does not matter, so a React SPA ships as static files on S3 and CloudFront; Angular ties (0.8) and Next.js loses 1.2 for adding a Node.js server. The phones get React Native (Expo) in the team's TypeScript: native apps would need Swift, which nobody lists.
@@ -234,7 +234,7 @@ The nine files in `scenarios/edge/` cover the nine categories of the statement's
 
 ![E7 Restricted deployment: the critical warning for the payment, SMS and push services an air-gapped network cannot reach, and what replaces each](screenshots/e-E7.png)
 
-![E8 Skill mismatch: Laravel leads FastAPI by 6.4 stack points on the PHP team's skills](screenshots/e-E8.png)
+![E8 Skill mismatch: Laravel leads FastAPI by 6.4 points on the PHP team's skills](screenshots/e-E8.png)
 
 ![E9 Deprecated technology: the first two of four EOL_EXISTING_SYSTEM warnings, each citing its end-of-life source](screenshots/e-E9.png)
 
@@ -244,7 +244,7 @@ Appendix F has the tables behind 8.1 to 8.3.
 
 ### 8.1 Tests
 
-The 1279 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1280 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -429,12 +429,12 @@ Safety (new in 2023) is not scored: no infrastructure option changes whether the
 |---|---|
 | Scoring, constraints and cost | 476 |
 | Explanations match the engine | 130 |
-| Inputs, edge cases and warnings | 303 |
+| Inputs, edge cases and warnings | 304 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 192 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 93 |
-| **All** | **1279** |
+| **All** | **1280** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.

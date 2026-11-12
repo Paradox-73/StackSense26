@@ -97,7 +97,7 @@ Next.js (React) is the frontend for a Content / blog / marketing (SEO) project w
 
 **Why not the others?**
 - Why not Astro? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.4 points lower; either is defensible. Next.js (React) is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 3.0); Astro is stronger on low ops burden (5.0 vs 4.0), performance / latency (5.0 vs 4.0).
-- Why not React SPA (Vite)? (popular choice) Swapping it in lowers the stack score by 1.8 points. Next.js (React) is stronger on SEO (5.0 vs 2.0), development speed (5.0 vs 4.0); React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0), portability (low lock-in) (5.0 vs 4.0).
+- Why not React SPA (Vite)? (popular choice) Swapping it in lowers the stack score by 1.8 points. Next.js (React) is stronger on SEO (5.0 vs 2.0), development speed (5.0 vs 4.0); React SPA (Vite) is stronger on low ops burden (5.0 vs 4.0).
 
 **Excluded by hard constraints**
 - React Native (Expo): Mobile toolkit; web is a target, so the primary frontend is a web framework (mobile app suggested as companion)
@@ -166,7 +166,7 @@ Serverless functions (Node/Python FaaS) serves the API at about 2.2 requests/s a
 
 **Why not the others?**
 - Why not Supabase (BaaS on Postgres)? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.2 points higher; the tie went to Serverless functions (Node/Python FaaS) on adjacent team skills (16.5 vs 16, summed skill fit); either is defensible. Serverless functions (Node/Python FaaS) is stronger on team skill match (3.5 vs 3.0), cost at your scale (5.0 vs 4.6); Supabase (BaaS on Postgres) is stronger on development speed (5.0 vs 4.0), learning curve (5.0 vs 4.0).
-- Why not Firebase (BaaS on Google Cloud)? (highest score in this layer) Swapping it in lowers the stack score by 12.8 points. Serverless functions (Node/Python FaaS) is stronger on team skill match (3.5 vs 3.0), portability (low lock-in) (3.0 vs 1.0); Firebase (BaaS on Google Cloud) is stronger on development speed (5.0 vs 4.0), learning curve (5.0 vs 4.0). A stack compatibility rule costs it 15.0 points, more than the whole gap, while on this layer's own criteria it is 2.2 points ahead: Firebase is designed around Firestore/Realtime Database; pairing it with another primary DB needs a separate server tier.
+- Why not Firebase (BaaS on Google Cloud)? (highest score in this layer) Swapping it in lowers the stack score by 12.8 points. Serverless functions (Node/Python FaaS) is stronger on team skill match (3.5 vs 3.0); Firebase (BaaS on Google Cloud) is stronger on development speed (5.0 vs 4.0), learning curve (5.0 vs 4.0). A stack compatibility rule costs it 15.0 points, more than the whole gap, while on this layer's own criteria it is 2.2 points ahead: Firebase is designed around Firestore/Realtime Database; pairing it with another primary DB needs a separate server tier.
 - Why not Node.js + Express? (popular choice) Swapping it in lowers the stack score by 1.8 points. Serverless functions (Node/Python FaaS) is stronger on low ops burden (5.0 vs 4.0), scalability (5.0 vs 4.0); Node.js + Express is stronger on team skill match (4.5 vs 3.5), learning curve (5.0 vs 4.0). A stack compatibility rule costs it 3.5 points, more than the whole gap, while on this layer's own criteria it is 1.8 points ahead: This framework can be adapted to serverless functions, but you lose in-memory state, background jobs and WebSockets.
 - Why not Python + Django? (popular choice) Swapping it in lowers the stack score by 11.8 points. Serverless functions (Node/Python FaaS) is stronger on team skill match (3.5 vs 1.5), low ops burden (5.0 vs 4.0); Python + Django is stronger on development speed (5.0 vs 4.0), ecosystem maturity (5.0 vs 4.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn. 8.5 of the 11.8 points come from a stack compatibility rule: Frontend platforms run code only as short-lived functions; this framework expects a long-running server. Host the API on a container/PaaS service instead.
 
@@ -198,7 +198,7 @@ Suggested offering: Supabase Postgres connected through Hyperdrive
 - Minimum ~$15/month uses most of the budget.
 - Serverless functions need a pooled/HTTP driver (Neon serverless driver, Supabase pooler, PlanetScale) to avoid connection exhaustion.
 
-**Versus runner-up:** PostgreSQL and MySQL are within 0.5 points of each other, inside the 1-point tie margin, so they count as tied. PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0). PostgreSQL has the higher stack score. Either is defensible.
+**Versus runner-up:** PostgreSQL and MySQL are within 0.5 points of each other, inside the 1-point tie margin, so they count as tied. PostgreSQL is stronger on data-model fit (4.7 vs 4.3). PostgreSQL has the higher stack score. Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +42.5
@@ -229,8 +229,8 @@ Suggested offering: Supabase Postgres connected through Hyperdrive
 - Microsoft SQL Server (stack 83.3, -1.6): Scores 73.7 on its own; its stack is 1.6 points behind the pick.
 
 **Why not the others?**
-- Why not MySQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.5 points lower; either is defensible. PostgreSQL is stronger on data-model fit (4.7 vs 4.3), realtime fit (3.0 vs 2.0); MySQL takes a penalty: Minimum ~$15/month uses most of the budget.
-- Why not MongoDB? (popular choice) Swapping it in lowers the stack score by 6.7 points. PostgreSQL is stronger on data-model fit (4.7 vs 3.0), consistency fit (5.0 vs 3.5); MongoDB is stronger on scalability (5.0 vs 4.0), realtime fit (4.0 vs 3.0); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data.
+- Why not MySQL? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.5 points lower; either is defensible. PostgreSQL is stronger on data-model fit (4.7 vs 4.3); MySQL takes a penalty: Minimum ~$15/month uses most of the budget.
+- Why not MongoDB? (popular choice) Swapping it in lowers the stack score by 6.7 points. PostgreSQL is stronger on data-model fit (4.7 vs 3.0), consistency fit (5.0 vs 3.5); MongoDB is stronger on scalability (5.0 vs 4.0); MongoDB takes a penalty: Only 2/5 fit for your primary 'relational' data.
 
 **Excluded by hard constraints**
 - Amazon DynamoDB: Poor fit for 'relational' data as the primary store (1/5)
@@ -269,7 +269,7 @@ Runs here: Next.js (server rendering + static files), the serverless functions. 
 - Serverless functions need a pooled/HTTP driver (Neon serverless driver, Supabase pooler, PlanetScale) to avoid connection exhaustion.
 - Next.js runs on Cloudflare through the OpenNext adapter; some features (e.g. certain ISR/image paths) differ from Vercel.
 
-**Versus runner-up:** Cloudflare Pages + Workers and Vercel are within 0.7 points of each other, inside the 1-point tie margin, so they count as tied. Cloudflare Pages + Workers is stronger on cost at your scale (4.8 vs 3.6), realtime fit (3.0 vs 2.0); Vercel is stronger on learning curve (5.0 vs 4.0). Choose Vercel instead if a gentler learning curve matters more to you than a lower bill. Cloudflare Pages + Workers stays as part of the stack chosen by the tie-break on a minimum bill that fits your budget. Either is defensible.
+**Versus runner-up:** Cloudflare Pages + Workers and Vercel are within 0.7 points of each other, inside the 1-point tie margin, so they count as tied. Cloudflare Pages + Workers is stronger on cost at your scale (4.8 vs 3.6); Vercel is stronger on learning curve (5.0 vs 4.0). Choose Vercel instead if a gentler learning curve matters more to you than a lower bill. Cloudflare Pages + Workers stays as part of the stack chosen by the tie-break on a minimum bill that fits your budget. Either is defensible.
 
 **Inputs that drove this score** (points out of 100)
 - General quality (baseline weights): +33.1
@@ -297,9 +297,9 @@ Runs here: Next.js (server rendering + static files), the serverless functions. 
 - Netlify (stack 82.9, -2.0): Scores 75.3 on its own; its stack is 2.0 points behind the pick.
 
 **Why not the others?**
-- Why not Vercel? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.7 points higher; Cloudflare Pages + Workers stays as part of the stack chosen by the tie-break on a minimum bill that fits your budget; either is defensible. Cloudflare Pages + Workers is stronger on cost at your scale (4.8 vs 3.6), realtime fit (3.0 vs 2.0); Vercel is stronger on learning curve (5.0 vs 4.0); Vercel takes a penalty: Minimum ~$20/month uses most of the budget.
-- Why not AWS ECS on Fargate? (popular choice) Swapping it in lowers the stack score by 17.8 points. Cloudflare Pages + Workers is stronger on team skill match (4.0 vs 1.5), cost at your scale (4.8 vs 2.6); AWS ECS on Fargate is stronger on ecosystem maturity (5.0 vs 4.0), realtime fit (4.0 vs 3.0); AWS ECS on Fargate takes a penalty: Minimum ~$50/month is 2.4x the whole budget. 7.0 of the 17.8 points come from a stack compatibility rule: This host has no managed function runtime; you would need Knative/OpenFaaS or to rewrite as a server.
-- Why not Render? (popular choice) Swapping it in lowers the stack score by 13.4 points. Cloudflare Pages + Workers is stronger on team skill match (4.0 vs 1.5), cost at your scale (4.8 vs 3.6); Render is stronger on learning curve (5.0 vs 4.0), portability (low lock-in) (4.0 vs 3.0). 7.0 of the 13.4 points come from a stack compatibility rule: This host has no managed function runtime; you would need Knative/OpenFaaS or to rewrite as a server.
+- Why not Vercel? (runner-up) Within the 1-point tie margin (counted as tied): swapped in, its stack scores 0.7 points higher; Cloudflare Pages + Workers stays as part of the stack chosen by the tie-break on a minimum bill that fits your budget; either is defensible. Cloudflare Pages + Workers is stronger on cost at your scale (4.8 vs 3.6); Vercel is stronger on learning curve (5.0 vs 4.0); Vercel takes a penalty: Minimum ~$20/month uses most of the budget.
+- Why not AWS ECS on Fargate? (popular choice) Swapping it in lowers the stack score by 17.8 points. Cloudflare Pages + Workers is stronger on team skill match (4.0 vs 1.5), cost at your scale (4.8 vs 2.6); AWS ECS on Fargate is stronger on ecosystem maturity (5.0 vs 4.0); AWS ECS on Fargate takes a penalty: Minimum ~$50/month is 2.4x the whole budget. 7.0 of the 17.8 points come from a stack compatibility rule: This host has no managed function runtime; you would need Knative/OpenFaaS or to rewrite as a server.
+- Why not Render? (popular choice) Swapping it in lowers the stack score by 13.4 points. Cloudflare Pages + Workers is stronger on team skill match (4.0 vs 1.5), cost at your scale (4.8 vs 3.6); Render is stronger on learning curve (5.0 vs 4.0). 7.0 of the 13.4 points come from a stack compatibility rule: This host has no managed function runtime; you would need Knative/OpenFaaS or to rewrite as a server.
 
 **Excluded by hard constraints**
 - AWS S3 + CloudFront (static): Only for read-only sites; your users sign in, post or pay
