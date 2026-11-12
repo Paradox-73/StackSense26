@@ -4,7 +4,7 @@
 
 [![Python 3.10-3.13](https://img.shields.io/badge/python-3.10--3.13-3776ab)](https://www.python.org/downloads/)
 [![FastAPI 0.142](https://img.shields.io/badge/FastAPI-0.142-009688)](https://fastapi.tiangolo.com/)
-[![1261 tests](https://img.shields.io/badge/tests-1261-2ea44f)](tests/)
+[![1263 tests](https://img.shields.io/badge/tests-1263-2ea44f)](tests/)
 [![LLM optional](https://img.shields.io/badge/LLM-optional-6f42c1)](#switch-off-the-language-model)
 [![Deterministic](https://img.shields.io/badge/output-deterministic-0969da)](#validation-and-consistency)
 
@@ -218,7 +218,7 @@ Sources:
 
 ## Key results
 
-- **Tests:** 1261 tests, including checks that every warning code is tested and that the numbers in this file match the code (`tests/test_docs.py`).
+- **Tests:** 1263 tests, including checks that every warning code is tested and that the numbers in this file match the code (`tests/test_docs.py`).
 - **Benchmark** (`python tools/bench.py`): 40 project briefs against an answer key written before measurement. Result: 82% top-1 (129 of the 158 layer picks that have a best pick) and 96% acceptable (154 of all 160 layer picks); on the ten briefs held out from tuning, 72% and 95%. A language model playing three architect personas wrote the key, blind to the engine; no human architect checked it.
 - **LLM-only comparison** (`python tools/llm_baseline.py --show`, offline, not part of the engine): LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 82% and 96%, but the model breaks a hard requirement in 7 of the 40 briefs; the engine's picks break none.
 - **Random projects** (`python tools/fuzz.py --n 1000 --growth-n 100`): 1,000 seeded random projects against 15 properties (hard constraints, identical repeats, renaming and reordering, no return to an earlier pick as users grow): 0 violations.

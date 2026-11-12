@@ -21,7 +21,7 @@ The statement judges a stack on its fit to the constraints, on the inputs the en
 - **Sizing.** The stack is sized for `scale.users_12_months`, with daily users at 20% of it; `scale.users_at_launch` is the starting point. Both readings appear in `assumptions`.
 - **Constraints.** Residency, compliance, deployment model and an explicit cloud are hard and remove options before scoring; `cloud_preference` `any` sets no constraint, and `none` rules out AWS, Google Cloud and Azure. Budget, timeline and priorities are soft and traded off with a stated reason.
 - **"None" is a valid choice** for a layer that is not needed, with the reason, as for P1's backend and database.
-- **The description is not parsed from a scenario file,** so wording cannot move the stack; in the app it only suggests fields that the user confirms.
+- **The description sets no field of a scenario file,** so wording cannot move the stack; a fixed keyword list (UPI, KYC, ledger, GPS, 2G/3G, bookings and others) only adds build notes to `assumptions`, and in the app the description only suggests fields that the user confirms.
 - **Infeasible or relaxed.** If no stack meets the hard constraints, the status is `infeasible` with critical warnings; if soft goals conflict, it is `ok_with_warnings` and `assumptions` names each relaxed goal.
 - **Cost** is an order-of-magnitude band with the basis of every line. Carbon footprint, interface design and start-up credits are out of scope (Appendix E).
 
@@ -70,7 +70,7 @@ Every field of table 3.1 is accepted under its exact name; Section 4.4 gives the
 
 | Fields | What they map to and which decisions they affect |
 |---|---|
-| `project`: type, platforms, name, description | The type sets an archetype, which fixes the default data shape, consistency, requests per user and some weights (marketplace scores like e-commerce, gaming like realtime collaboration). Platforms filter the frontend. Phones only rules out web frameworks, web plus phones adds a mobile companion, desktop an Electron shell and api_only "No frontend". The name labels the output; the description is not parsed. |
+| `project`: type, platforms, name, description | The type sets an archetype, which fixes the default data shape, consistency, requests per user and some weights (marketplace scores like e-commerce, gaming like realtime collaboration). Platforms filter the frontend. Phones only rules out web frameworks, web plus phones adds a mobile companion, desktop an Electron shell and api_only "No frontend". The name labels the output; the description sets no field, and 15 keyword rules add notes such as UPI AutoPay for EMIs or resumable uploads on 2G. |
 | `scale`: users_at_launch, users_12_months, peak_concurrent_users, data_volume_gb_12_months, traffic_pattern, workload | Daily users set the scale tier, peak requests per second, price bands and scale ceilings; concurrent users count open connections; data volume sets the database tier and storage cost; the pattern sets the peak factor; read-heavy work lowers the database tier and, with no sign-in, allows a static site. |
 | `team`: size, experience, languages, has_devops | Operations-burden, structure and learning-curve weights; the minimum team per option; how many extra systems the team can run; skill match; on-call and self-hosting warnings. |
 | `budget.monthly_infra_usd`, `timeline.mvp_weeks` | Cost weight and the minimum-bill check; development-speed, learning-curve and skill weights. |
@@ -200,13 +200,13 @@ Two C# developers build a tool for 1,200 employees on Azure in India under ISO 2
 
 ### 6.6 P6 KhetSurvey: offline-first crop survey app
 
-![P6 KhetSurvey: React Native, Django, PostgreSQL and DigitalOcean, $35 to $120 a month, with a budget warning](screenshots/s-P6.png)
+![P6 KhetSurvey: React Native, Django, PostgreSQL and DigitalOcean, $84 to $169 a month with the $49 PowerSync Pro plan, with a budget warning](screenshots/s-P6.png)
 
 Two developers (JavaScript, Python) build an Android-only survey app that must work offline, in India, for $100 a month; type `other` on phones only is scored as a mobile-first app. React Native (Expo) leads Flutter by 3.5 points on skills, and PowerSync keeps a local SQLite copy in sync with PostgreSQL. Django and DigitalOcean in Bangalore win ties (0.5 and 0.6 points), and of about 100 GB in a year, the photos (about 97 GB) go to DigitalOcean Spaces and the survey records (about 3 GB) to PostgreSQL.
 
 ## 7. Edge-case handling
 
-The nine files in `scenarios/edge/` cover the nine categories of the statement's section 6; the screenshots after the table show seven of the results, cut to the handling (E6 and E9 add only the end-of-life warnings the table lists).
+The nine files in `scenarios/edge/` cover the nine categories of the statement's section 6; the screenshots after the table show all nine results, each cut to the part that shows the handling.
 
 | Category and file | How it is detected | What the engine does |
 |---|---|---|
@@ -228,11 +228,15 @@ The nine files in `scenarios/edge/` cover the nine categories of the statement's
 
 ![E4 Over-engineering trap: a static Astro site on Netlify for two million readers](screenshots/e-E4.png)
 
-![E5 Regulatory constraints: Cloud Run in Frankfurt under a HIPAA BAA, with Vercel and Netlify ruled out](screenshots/e-E5.png)
+![E5 Regulatory constraints: Cloud Run in Frankfurt, which can sign a HIPAA BAA, picked on the compliance and residency fields](screenshots/e-E5.png)
 
-![E7 Restricted deployment: on-premises VMs, and a critical warning for the outside services an air-gapped network cannot reach](screenshots/e-E7.png)
+![E6 Existing systems: the existing SQL Server data and Okta sign-in kept, on Azure with the team's .NET](screenshots/e-E6.png)
+
+![E7 Restricted deployment: the critical warning for the payment, SMS and push services an air-gapped network cannot reach, and what replaces each](screenshots/e-E7.png)
 
 ![E8 Skill mismatch: Laravel leads FastAPI by 6.4 stack points on the PHP team's skills](screenshots/e-E8.png)
+
+![E9 Deprecated technology: the first two of four EOL_EXISTING_SYSTEM warnings, each citing its end-of-life source](screenshots/e-E9.png)
 
 ## 8. Validation
 
@@ -240,7 +244,7 @@ Appendix F has the tables behind 8.1 to 8.3.
 
 ### 8.1 Tests
 
-The 1261 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1263 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -421,12 +425,12 @@ Safety (new in 2023) is not scored: no infrastructure option changes whether the
 |---|---|
 | Scoring, constraints and cost | 470 |
 | Explanations match the engine | 130 |
-| Inputs, edge cases and warnings | 292 |
+| Inputs, edge cases and warnings | 294 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 192 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 92 |
-| **All** | **1261** |
+| **All** | **1263** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.

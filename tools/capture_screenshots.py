@@ -135,10 +135,10 @@ LINKS = {n: l for n, l, *_ in SHOTS}
 CARD = ".sc-core > .sc-c:nth-child({})"  # the component cards: 1 frontend, 2 backend, 3 database, 4 hosting
 SCENARIO_SHOTS = [(f"s-P{i}", f"P{i}", None, None) for i in range(1, 7)] + [
     ("e-E1", "E1_missing_fields", None, ".sc-w:nth-child(2)"), ("e-E2", "E2_invalid_values", None, None),
-    ("e-E3", "E3_contradictions", ".sc-w.critical", None), ("e-E4", "E4_static_at_scale", None, None),
-    ("e-E5", "E5_regulatory", CARD.format(4), CARD.format(4) + " ul"), ("e-E6", "E6_existing_systems", None, None),
-    ("e-E7", "E7_air_gapped", None, ".sc-w:nth-child(2)"), ("e-E8", "E8_skill_mismatch", CARD.format(2), CARD.format(2) + " li"),
-    ("e-E9", "E9_deprecated", "h2", None),
+    ("e-E3", "E3_contradictions", ".sc-w.critical", None), ("e-E4", "E4_static_at_scale", None, ".sc-sum"),
+    ("e-E5", "E5_regulatory", CARD.format(4), CARD.format(4) + " p.small"), ("e-E6", "E6_existing_systems", None, ".sc-sum"),
+    ("e-E7", "E7_air_gapped", ".sc-w:nth-child(3)", ".sc-w:nth-child(3)"),
+    ("e-E8", "E8_skill_mismatch", CARD.format(2), CARD.format(2) + " li"), ("e-E9", "E9_deprecated", "h2", ".sc-w:nth-child(2)"),
 ]
 
 
