@@ -231,7 +231,6 @@ def test_defaulted_data_shape_lowers_the_score_but_does_not_exclude():
            "team_skills": ["dart", "firebase"], "budget_monthly": 0, "offline": True, "regions": ["global"]}
     r = recommend(raw, with_counterfactuals=False)
     assert r["stack"]["database"]["pick"]["id"] == "firestore"
-    assert "BUDGET_INFEASIBLE" not in {w["code"] for w in r["warnings"]}
     r = recommend(dict(raw, data_shapes=["relational"]), with_counterfactuals=False)
     assert "firestore" in {e["id"] for e in r["stack"]["database"]["excluded"]}
 

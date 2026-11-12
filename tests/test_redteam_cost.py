@@ -8,7 +8,10 @@ from pathlib import Path
 import pytest
 
 from engine import recommend
+from engine.advice import scale_places
+from engine.kb import load_kb
 from engine.profile import derive, normalize
+from engine.scoring import band_price
 
 CASES = {c["id"]: c["input"] for c in
          json.loads((Path(__file__).parent / "redteam" / "cases.json").read_text(encoding="utf-8"))["cases"]}
@@ -67,12 +70,16 @@ def test_redteam_stated_small_data_prices_the_small_plan():
 @pytest.mark.parametrize("case_id", ["t34_wordpress_shop_like", "t13_iot_fleet"])
 def test_redteam_database_top_follows_small_data(case_id):
     """Traffic set the database tier but the data is far smaller than the tier's: the top of the price band is the
-    instance the traffic needs, not the tier's largest data (t34: 2 GB priced up to $4,500 before)."""
+    instance the traffic needs where the project sits in the tier, not the tier's largest data (t34: 2 GB priced up
+    to $4,500 before)."""
     r = run(case_id)
-    d = r["derived"]
+    p, d = r["profile"], r["derived"]
     line = next(x for x in r["cost"]["lines"] if x["component"].startswith("Database:"))
     if d["data_tier"] < d["db_tier"]:
-        assert line["high"] <= 2.5 * line["low"] and "upper end for" in line["basis"], line
+        db = load_kb()["index"][r["stack"]["database"]["pick"]["id"]]
+        need = band_price(db, d["db_tier"], min(max(scale_places(p, d)["db"][0] - d["db_tier"], 0), 1), p, d)
+        assert line["high"] <= 2.5 * need and "upper end for" in line["basis"], (line, need)
+        assert line["high"] < db["cost_usd"][d["db_tier"]][1], line
 
 
 def test_database_band_is_unchanged_when_data_sets_the_tier():

@@ -397,6 +397,39 @@ def tier_cost(item: dict, tier: int, p: dict, d: dict | None = None) -> tuple[fl
     return lo, hi
 
 
+# Headroom of the displayed estimate's top, in scale tiers: the price half a tier above where the project sits (about
+# 3x its users), for spikes and growth.
+PLACED_WINDOW = 0.5
+
+
+def placed_cost(item: dict, tier: int, at: float, p: dict, d: dict | None = None) -> tuple[float, float]:
+    """Displayed price [low, high] of a scale tier's band at the project's place in the tier. `at` is the tier plus
+    the share of the way through it, on a log scale of the measure that set it (3.0: the bottom of Large). The band
+    is read as a price that runs from its floor at the tier's bottom to its top at the tier's top, rising evenly on a
+    log scale (linearly from a $0 floor) and then on through the next tier's band. The high end is that price
+    PLACED_WINDOW tiers above the project's place, so it rises smoothly with users and does not jump at a tier edge.
+    The low end stays the band's floor: the cheapest setup (or entry plan) that holds the tier, the same floor the
+    budget guard compares, so the budget status never disagrees with the bill the picks were checked against. Not
+    used by scoring: the picks compare whole bands (net_cost)."""
+    return tier_cost(item, tier, p, d)[0], band_price(item, tier, min(max(at - tier, 0.0), 1.0) + PLACED_WINDOW, p, d)
+
+
+def band_price(item: dict, tier: int, s: float, p: dict, d: dict | None = None) -> float:
+    """The band's price `s` tiers into it (0: its floor, 1: its top, past 1: on through the next tier's band), rising
+    evenly on a log scale, or linearly from a $0 floor (see placed_cost)."""
+    lo, hi = tier_cost(item, tier, p, d)
+    if s > 1:
+        nlo, nhi = tier_cost(item, tier + 1, p, d) if tier + 1 < len(TIER_LABELS) else (hi, hi)
+        lo, hi, s = max(hi, nlo), max(hi, nhi), s - 1  # never below the tier's own top
+    return lo * (hi / lo) ** s if lo > 0 else lo + (hi - lo) * s
+
+
+def scale_place(value: float, thresholds: list[float]) -> float:
+    """Place of a value on the scale tiers: the tier plus the share of the way through it, on a log scale. Every
+    thresholds list rises tenfold a tier, so the value at the first threshold is 1.0 and a tenth of it 0.0."""
+    return min(max(1 + math.log10(max(value, 1e-9) / thresholds[0]), 0.0), float(len(thresholds) + 1) - 1e-9)
+
+
 def seat_cost(item: dict, lo: float, p: dict) -> float:
     """Paid plans that bill each deploying team member; the price band's floor covers one seat."""
     if item.get("seat_usd") and lo > 0 and p["team_size"] > 1:
@@ -408,16 +441,21 @@ def seat_cost(item: dict, lo: float, p: dict) -> float:
 WRITE_SHARE = {"read_heavy": 0.1, "balanced": 0.3, "write_heavy": 0.7}
 
 
-def usage_cost(item: dict, tier: int, p: dict, d: dict, per_op: bool = True) -> tuple[float, float]:
+def usage_cost(item: dict, tier: int, p: dict, d: dict, per_op: bool = True,
+               at: float | None = None) -> tuple[float, float]:
     """Price band plus usage terms for usage-billed services (a BaaS or Firestore): the plan is
     sized by the larger of traffic and stored data, disk beyond the plan's allowance is billed per
     GB, and per-operation pricing is estimated from requests a month (high = twice that, for
     fan-out reads). per_op=False leaves out the per-operation term, the only one that follows the
-    exact user count rather than the scale and data tiers."""
+    exact user count rather than the scale and data tiers. With `at` (the project's place on the
+    scale, see placed_cost) the band is read at that place instead of whole."""
+    def band(t: int) -> tuple[float, float]:
+        return tier_cost(item, t, p, d) if at is None else placed_cost(item, t, at, p, d)
+
     u = item.get("usage")
     if not u or self_hosted_baas(item, p):
-        return tier_cost(item, tier, p, d)
-    lo, hi = tier_cost(item, max(tier, d["data_tier"]), p, d)
+        return band(tier)
+    lo, hi = band(max(tier, d["data_tier"]))
     storage = max(0.0, d["data_12mo_gb"] - u.get("storage_included_gb", 0)) * u.get("storage_usd_per_gb", 0)
     ops = 0.0
     if per_op and u.get("doc_write_usd_per_100k"):

@@ -2,14 +2,27 @@
 from __future__ import annotations
 
 from .kb import CLOUD_NAMES, load_kb
-from .profile import TIER_LABELS, TIER_NAMES, USD_PER_INR, typical_users
+from .profile import (
+    CONCURRENT_THRESHOLDS,
+    DATA_GB_THRESHOLDS,
+    DAU_THRESHOLDS,
+    RPS_THRESHOLDS,
+    TIER_LABELS,
+    TIER_NAMES,
+    USD_PER_INR,
+    typical_users,
+)
 from .scoring import (
     DERIVED_SHAPES,
     STATIC_CONTENT_MAX_GB,
     STEADY_TRAFFIC_TIER,
     entry_plan,
     hard_constraints,
+    PLACED_WINDOW,
+    band_price,
+    placed_cost,
     plan_price,
+    scale_place,
     seat_cost,
     self_hosted_baas,
     shape_models,
@@ -1551,16 +1564,53 @@ UNSTATED_AVAILABILITY = ("no redundancy priced: no availability target was given
                          "stating it adds x{m:g} for redundant capacity)")
 
 
+def scale_places(p: dict, d: dict) -> dict[str, tuple[float, str]]:
+    """Where the project sits on the scale tiers, as (tier plus the share of the way through it on a log scale, the
+    measure that puts it there), for the app ("scale"), the stored data ("data") and the database ("db"). The scale
+    place is the furthest of the measures that set the scale tier (profile.derive). The database's is the further of
+    its own loads, the stored data and the requests (peak req/s, one tier lower for read-heavy traffic): users online
+    at once hold connections on the app servers, not database queries, so where they alone raise the database tier
+    its price starts at that tier's floor."""
+    rps = (scale_place(d["peak_rps"], RPS_THRESHOLDS), f"{d['peak_rps']:,.0f} req/s at peak")
+    measures = [(d["peak_rps"], RPS_THRESHOLDS, rps[1])]
+    if not (p["app_type"] == "iot_telemetry" and d["rps_source"] == "provided"):  # devices: the message rate sizes it
+        measures.append((p["dau"], DAU_THRESHOLDS, f"{p['dau']:,} daily users"))
+    if d["peak_concurrent"]:
+        measures.append((d["peak_concurrent"], CONCURRENT_THRESHOLDS, f"{d['peak_concurrent']:,} users online at once"))
+    scale = max(((scale_place(v, t), what) for v, t, what in measures), key=lambda x: x[0])
+    data = (scale_place(d["data_12mo_gb"], DATA_GB_THRESHOLDS), f"~{d['data_12mo_gb']:,.0f} GB of data")
+    queries = (rps[0] - (1 if p["read_write"] == "read_heavy" else 0), rps[1])
+    return {"scale": scale, "data": data, "db": data if data[0] >= queries[0] else queries}
+
+
+def place_text(place: tuple[float, str], tier: int) -> str:
+    """How a line was read from its band: where in the tier the project sits, and the measure that puts it there."""
+    share = min(max(place[0] - tier, 0.0), 1.0)
+    where = ("at the bottom of the tier" + (" (that measure alone is below it)" if place[0] < tier else "")
+             if share == 0 else f"{share:.0%} of the way up the tier (log scale)")
+    return (f"from the band's floor up to its price at ~{10 ** PLACED_WINDOW:.0f}x the load where {place[1]} puts "
+            f"the project ({where})")
+
+
 def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bool = True) -> dict:
-    """Monthly cost lines. usage=False leaves out the usage terms that follow the exact user count
-    (per-operation pricing, media and inference volumes), keeping the price bands of the scale tier and
+    """Monthly cost lines. Each price band is read where the project sits inside its tier (placed_cost).
+    usage=False (the budget guard's bill) leaves out the usage terms that follow the exact user count
+    (per-operation pricing, media and inference volumes) and takes each band whole, from its floor, keeping
     the plan size and disk set by stored data, so the result is the same at every user count of a tier."""
     kb = load_kb()
-    cost_of = usage_cost if usage else (lambda item, t, p_, d_: usage_cost(item, t, p_, d_, per_op=False))
     tier, dbt = d["compute_tier"], d["db_tier"]
+    places = scale_places(p, d) if usage else {}
+    at = places.get("scale", (None,))[0]
+    db_at = places.get("db", (None,))[0]
     lines = []
     mult = _avail(d)
     unstated = AVAILABILITY_MULT.get(d["availability"], 1.0) if mult == 1.0 else 1.0
+
+    def band(item: dict, t: int, x: float | None, d_: dict | None = None) -> tuple[float, float]:
+        return tier_cost(item, t, p, d_) if x is None else placed_cost(item, t, x, p, d_)
+
+    def band_text(label: str, place: str, t: int) -> str:
+        return f"{label} price band" + (f", {place_text(places[place], t)}" if usage else "")
 
     def line(component, lo, hi, basis):
         lines.append({"component": component, "low": float(round(lo)), "high": float(round(hi)), "basis": basis})
@@ -1568,9 +1618,9 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
     host = stack["hosting"]
     one = single_instance(stack)
     if not baas_hosts_everything(d, stack):  # otherwise the optional landing page fits a free tier
-        lo, hi = tier_cost(host, tier, p)
-        basis = [f"free static plan: pre-built files only" if host.get("static_cost_usd") and static_site(p)
-                 else f"{d['tier_label']} price band"]
+        lo, hi = band(host, tier, at)
+        basis = [band_text("Static-site plan (pre-built files only)" if host.get("static_cost_usd") and static_site(p)
+                           else d["tier_label"], "scale", tier)]
         seats = seat_cost(host, lo, p)
         if seats:
             lo, hi = lo + seats, hi + seats
@@ -1601,8 +1651,8 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
             basis.append("pages and server rendering only; the API is priced on its own line")
         line(f"Hosting: {host['name']}", lo, hi, "; ".join(basis))
         if api:
-            lo, hi = tier_cost(api, tier, p)
-            basis = [f"{d['tier_label']} price band"]
+            lo, hi = band(api, tier, at)
+            basis = [band_text(d["tier_label"], "scale", tier)]
             if api["id"] not in REQUEST_BILLED and mult > 1:
                 if one:
                     basis.append(SINGLE_INSTANCE_BASIS)
@@ -1612,10 +1662,13 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
             line(f"API host: {api['name']}", lo, hi, "; ".join(basis))
     be = stack["backend"]
     if be.get("kind") == "baas":
-        lo, hi = cost_of(be, tier, p, d)
+        # A usage-billed plan is sized by the larger of traffic and stored data, so it is read at the further of the two.
+        be_place = (max(places["scale"], places["data"]) if be.get("usage") else places["scale"]) if usage else (None,)
+        lo, hi = usage_cost(be, tier, p, d, per_op=usage, at=be_place[0])
         what = "self-hosted on your servers, no subscription" if self_hosted_baas(be, p) else "includes its database"
         basis = ("runs on your servers; priced under hosting" if self_hosted_baas(be, p) else
                  f"plan sized for the larger of traffic ({d['tier_label']}) and ~{d['data_12mo_gb']:,.0f} GB of data in 12 months"
+                 + (f", {place_text(be_place, max(tier, d['data_tier']) if be.get('usage') else tier)}" if usage else "")
                  + ("; per-read/write pricing at your request volume" if be.get("usage", {}).get("doc_write_usd_per_100k") else "")
                  + ("; disk beyond the plan's allowance billed per GB" if be.get("usage", {}).get("storage_usd_per_gb") else ""))
         line(f"Backend: {be['name']} ({what})", lo, hi, basis)
@@ -1624,8 +1677,9 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
         dbhost = stack.get("api_host") or host  # the database sits next to the API
         offer = database_offering(db, dbhost, p)
         dbx = with_usable_plans(db, offer, p)
-        lo, hi = cost_of(dbx, dbt, p, d)
-        basis = [f"{d['db_tier_label']} database tier (~{d['data_12mo_gb']:,.0f} GB in 12 months)"]
+        lo, hi = usage_cost(dbx, dbt, p, d, per_op=usage, at=db_at)
+        basis = [f"{d['db_tier_label']} database tier (~{d['data_12mo_gb']:,.0f} GB in 12 months)"
+                 + (f", {place_text(places['db'], dbt)}" if usage else "")]
         ep = entry_plan(dbx, dbt, d)
         band_lo = db.get("cost_usd", [[0, 0]] * 6)[dbt][0]
         plans = db.get("entry_plans", []) + db.get("host_plans", [])
@@ -1640,7 +1694,9 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
             # Traffic set the tier, not the data: the band's top is priced for the tier's largest data, so with a
             # small dataset the top is the instance the traffic needs (up to twice the floor) plus that data's band.
             bands = db.get("cost_usd", [[0, 0]] * 6)
-            top = max(lo, min(hi, max(2 * lo, lo + bands[d["data_tier"]][1])))
+            # The traffic's instance: the floor for the guard, the band's price where the project sits on display.
+            need = band_price(dbx, dbt, min(max(db_at - dbt, 0.0), 1.0), p, d) if usage else lo
+            top = max(lo, min(hi, max(2 * need, need + bands[d["data_tier"]][1])))
             if top < hi:
                 hi = top
                 basis.append(f"upper end for ~{d['data_12mo_gb']:,.0f} GB of data: the band's top is priced for the "
@@ -1671,7 +1727,7 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
                          "so backup storage, monitoring and a tested failover are yours to build")
         if self_run_db(db, dbhost, offer):
             # On the team's own servers the managed band, its storage floor and allowance do not apply.
-            lo, hi, basis = self_run_db_cost(p, d, db, dbhost)
+            lo, hi, basis = self_run_db_cost(p, d, db, dbhost, db_at)
         lic = db.get("self_managed_licence") if _env(p, host)["onprem"] else None
         # Run on your own servers, a commercial database needs a licence the managed services include in their
         # price. The free edition fits only a small database with no failover (a 99.9%+ target, the default
@@ -1693,9 +1749,11 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
             if item.get("entry_plans") or item.get("host_plans"):
                 # A store's plans, like the primary's, only where they are the offering on the API's host.
                 item = with_usable_plans(item, database_offering(item, stack.get("api_host") or host, p), p)
-            lo, hi = tier_cost(item, s["cost_tier"], p, d)
-            basis = (f"{d['tier_label'] if s['cost_tier'] == tier else d['db_tier_label'] if s['cost_tier'] == dbt else TIER_LABELS[s['cost_tier']]}"
-                     " price band (the app's scale)")
+            t = s["cost_tier"]
+            place = "scale" if t == tier else "db" if t == dbt else None
+            lo, hi = band(item, t, places[place][0] if usage and place else None, d)
+            basis = (f"{d['tier_label'] if t == tier else d['db_tier_label'] if t == dbt else TIER_LABELS[t]}"
+                     " price band (the app's scale)" + (f", {place_text(places[place], t)}" if usage and place else ""))
             if s["role"] == "Analytics":
                 # The warehouse is fed by change-data-capture from the primary database, which keeps the rows too.
                 basis += (f"; a copy of data that {db['name']} also stores (fed by a continuous copy of changes), "
@@ -1732,7 +1790,8 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
         "currency": "USD", "lines": lines, "total_low": total_lo, "total_high": total_hi,
         "total_low_inr": round(total_lo * inr), "total_high_inr": round(total_hi * inr),
         "budget_usd": budget, "status": status, "tier": d["tier_label"],
-        "note": "Planning estimate from published price bands at your scale tier, with the usage terms listed per line; "
+        "note": "Planning estimate from published price bands at your scale tier, each read where the project sits inside "
+                "its tier, with the usage terms listed per line; "
                 "excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
     }
 
@@ -1747,13 +1806,13 @@ def self_run_db(db: dict, host: dict, offer: str) -> bool:
     return host.get("kind") == "onprem" or (host.get("kind") == "vps" and own)
 
 
-def self_run_db_cost(p: dict, d: dict, db: dict, host: dict) -> tuple[float, float, list[str]]:
+def self_run_db_cost(p: dict, d: dict, db: dict, host: dict, at: float | None = None) -> tuple[float, float, list[str]]:
     """(low, high, basis) of a self-run database: a server of the host sized for the database tier at the host's own
     band, a standby for a stated availability target, and the host's backups where it prices them. On-premises the
     database takes servers of its own, priced at the on-premises server band (a Kubernetes host's band also carries
-    the cluster, which the database shares)."""
+    the cluster, which the database shares). With `at` the band is read at the project's place in the tier."""
     server = load_kb()["index"]["onprem_docker"] if host.get("kind") == "onprem" else host
-    lo, hi = tier_cost(server, d["db_tier"], p)
+    lo, hi = tier_cost(server, d["db_tier"], p) if at is None else placed_cost(server, d["db_tier"], at, p)
     basis = [f"{d['db_tier_label']} database tier (~{d['data_12mo_gb']:,.0f} GB in 12 months) on "
              + ("servers of its own on your premises" if server is not host else f"a {host['name']} server of its own")
              + ", at the host's rates rather than a managed service's"]
@@ -1768,17 +1827,25 @@ def self_run_db_cost(p: dict, d: dict, db: dict, host: dict) -> tuple[float, flo
     return lo, hi, basis
 
 
-def min_feasible_cost(p: dict, d: dict, hosting_feasible: list[dict], db_feasible: list[dict]) -> float:
-    """Cheapest monthly hosting plus database cost among the technologies that pass the hard constraints. On the
-    cheapest host, a database that host runs on its own servers costs that host's server price."""
+def min_feasible_cost(p: dict, d: dict, hosting_feasible: list[dict], db_feasible: list[dict]) -> tuple[float, str]:
+    """(cheapest monthly hosting plus database bill among the technologies that pass the hard constraints, their
+    names). The host is the one with the lowest price-band floor; the databases with the three lowest floors on it are
+    then priced as the budget guard prices a stack (estimate_cost without usage terms: availability, storage floor,
+    self-run servers), and the cheapest is taken."""
     if not hosting_feasible or not db_feasible:
-        return 0.0
-    cheapest = min(hosting_feasible, key=lambda x: tier_cost(x["item"], d["compute_tier"], p)[0])["item"]
-    h = tier_cost(cheapest, d["compute_tier"], p)[0]
-    dbc = min(self_run_db_cost(p, d, x["item"], cheapest)[0]
-              if self_run_db(x["item"], cheapest, database_offering(x["item"], cheapest, p))
-              else tier_cost(x["item"], d["db_tier"], p, d)[0] for x in db_feasible)
-    return h + dbc
+        return 0.0, ""
+    host = min(hosting_feasible, key=lambda x: tier_cost(x["item"], d["compute_tier"], p)[0])["item"]
+
+    def floor(db: dict) -> float:
+        return (self_run_db_cost(p, d, db, host)[0] if self_run_db(db, host, database_offering(db, host, p))
+                else tier_cost(db, d["db_tier"], p, d)[0])
+
+    def bill(db: dict) -> float:
+        stack = {"frontend": {}, "backend": {}, "database": db, "hosting": host}
+        return estimate_cost(p, d, stack, [], usage=False)["total_low"]
+
+    db = min(sorted((x["item"] for x in db_feasible), key=floor)[:3], key=bill)
+    return bill(db), f"{host['name']} with {db['name']}"
 
 
 # How a release changes the stored data, by kind of database. SQL engines have a fixed schema that versioned

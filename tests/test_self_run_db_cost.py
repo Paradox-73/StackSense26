@@ -1,9 +1,10 @@
 """A database the team runs on its own servers (on-premises, or a VPS host with no managed service for it) costs one
-more server of that host at the host's own rates, not a managed service's price band."""
-from engine.advice import estimate_cost
+more server of that host at the host's own rates, not a managed service's price band. Like every band, the server's
+is read where the project sits in the database tier (engine/scoring.py placed_cost)."""
+from engine.advice import estimate_cost, scale_places
 from engine.kb import load_kb
 from engine.profile import derive, normalize
-from engine.scoring import tier_cost
+from engine.scoring import placed_cost
 
 
 def _db_line(host_id: str, db_id: str = "postgres", **answers) -> tuple[dict, dict, dict]:
@@ -18,14 +19,14 @@ def _db_line(host_id: str, db_id: str = "postgres", **answers) -> tuple[dict, di
 
 def test_a_database_on_a_vps_is_priced_as_one_more_server_of_that_host():
     line, p, d = _db_line("hetzner")
-    lo, hi = tier_cost(load_kb()["index"]["hetzner"], d["db_tier"], p)
+    lo, hi = placed_cost(load_kb()["index"]["hetzner"], d["db_tier"], scale_places(p, d)["db"][0], p)
     assert (line["low"], line["high"]) == (round(lo * 1.2), round(hi * 1.2)), line  # + Hetzner's 20% backups
     assert "Hetzner" in line["basis"] and "rds" not in line["basis"].lower(), line["basis"]
 
 
 def test_a_database_on_premises_is_priced_at_the_on_premises_server_band():
     line, p, d = _db_line("onprem_docker", deployment="on_prem")
-    lo, hi = tier_cost(load_kb()["index"]["onprem_docker"], d["db_tier"], p)
+    lo, hi = placed_cost(load_kb()["index"]["onprem_docker"], d["db_tier"], scale_places(p, d)["db"][0], p)
     assert (line["low"], line["high"]) == (round(lo), round(hi)), line
 
 

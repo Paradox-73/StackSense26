@@ -814,7 +814,7 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
                             f"{_money(cost['total_low'], p)} (see Cost). Only free plans fit a zero budget, and free plans "
                             "carry no uptime guarantee (no SLA); many pause or throttle idle projects.")
             wn["resolution"] = "Budget for the paid plans in the estimate to get a written SLA, or treat the target as a goal."
-    min_cost = min_feasible_cost(p, d, core["scored"]["hosting"], core["scored"]["database"])
+    min_cost, _ = min_feasible_cost(p, d, core["scored"]["hosting"], core["scored"]["database"])
     if cost["total_low"] > d["budget_usd"]:
         sev = "critical" if min_cost > d["budget_usd"] else "warning"
         detail = (f"Estimated minimum spend {_money(cost['total_low'], p)} exceeds your budget of {_money(d['budget_usd'], p)}"
