@@ -74,7 +74,12 @@ def portable_offering(item: dict, host: dict, onprem: bool, hybrid: bool, no_hyp
     Azure ruled out, an offering that names one of them gives way to the self-managed setup, and so does a
     third-party offering that lacks an attestation the project needs."""
     offers = item.get("managed_offerings", {})
-    cloud = offers.get("onprem" if onprem else host.get("provider")) or offers.get("any")
+    # A residency or audit rule the default vendor does not meet names one that does (database.json rule_offerings).
+    regional = next((r[host.get("provider")] for rule, r in (item.get("rule_offerings") or {}).items()
+                     if rule in compliance and host.get("provider") in r), None)
+    # Kubernetes on your servers runs a database operator; plain VMs or Docker hosts run the VM setup (Patroni).
+    mine = "onprem_k8s" if host.get("id") == "onprem_k8s" and "onprem_k8s" in offers else "onprem"
+    cloud = (None if onprem else regional) or offers.get(mine if onprem else host.get("provider")) or offers.get("any")
     gaps = [] if onprem else offering_gaps(item, host, compliance)
     if gaps and offers.get("onprem"):
         where = CLOUD_NAMES.get(host.get("provider"), host.get("name", "your host"))
@@ -281,8 +286,31 @@ BUILTIN_SEARCH_DOCS = {"postgres": "https://www.postgresql.org/docs/current/text
 # Job queues a functions-only platform delivers to functions, by hosting provider: (name, source).
 PLATFORM_QUEUES = {"aws": ("Amazon SQS with a Lambda consumer", "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"),
                    "cloudflare": ("Cloudflare Queues (a Worker consumes each batch)", "https://developers.cloudflare.com/queues/"),
-                   "": ("A hosted HTTP queue that calls your functions (e.g. Upstash QStash)",
+                   "": ("Upstash QStash (an HTTP queue that calls your functions with each job)",
                         "https://upstash.com/docs/qstash/overall/getstarted")}
+POWERSYNC_REGIONS_DOCS = "https://docs.powersync.com/configuration/powersync-service/cloud-instances.md"
+POWERSYNC_SELF_HOST_DOCS = "https://docs.powersync.com/self-hosting/getting-started"
+# QStash runs in two regions, EU (the default) and US (upstash.com/docs/qstash/howto/multi-region); under a residency rule
+# it has no region for, the jobs stay in the app's own database and a scheduled function drains them.
+QSTASH_REGIONS = {"eu": "EU", "us": "US"}
+QSTASH_REGIONS_DOCS = "https://upstash.com/docs/qstash/howto/multi-region"
+VERCEL_CRON_DOCS = "https://vercel.com/docs/schedules/cron-jobs/usage-and-pricing"
+
+
+def _platform_queue(prov: str, env: dict, db: dict) -> tuple[str, str]:
+    """The queue a functions-only platform delivers to functions, inside the residency rule."""
+    name, src = PLATFORM_QUEUES.get(prov, PLATFORM_QUEUES[""])
+    if prov in PLATFORM_QUEUES or not residency(env):
+        return name, src
+    region = next((QSTASH_REGIONS[r] for r in ("eu", "us") if env[r]), None)
+    if region and not env["india"]:
+        return f"Upstash QStash in its {region} region (an HTTP queue that calls your functions with each job)", \
+            QSTASH_REGIONS_DOCS
+    cron = "a Vercel cron job (once a minute needs the Pro plan; Hobby runs it once a day)" if prov == "vercel" else \
+        "a scheduled function"
+    return (f"A jobs table in {short_name(db)} in your required region (rows claimed with FOR UPDATE SKIP LOCKED), "
+            f"drained by a function that {cron} calls",
+            VERCEL_CRON_DOCS if prov == "vercel" else QSTASH_REGIONS_DOCS)
 
 
 def _redis_offering(text: str, env: dict) -> str:
@@ -372,10 +400,16 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
                 "Chat and live updates for a part of the product: the app server holds the connections itself; add "
                 "Redis pub/sub only when a second instance must reach the same users.", src)
         if p["app_type"] == "realtime_collab" and p["realtime"] == "core" and be.get("kind") != "baas":
+            # Hocuspocus runs on Node.js (tiptap.dev/docs/hocuspocus); Yjs lists no sync server in other server languages.
+            node = be.get("language") in ("node", "javascript")
             add("Collaboration sync", "Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus "
-                "or y-websocket as the sync server", "Many people editing one document at once need conflict-free "
-                "merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke.",
-                "https://docs.yjs.dev/")
+                "as the sync server" + ("" if node else f" (a Node.js service beside the {short_name(be)} API)"),
+                "Many people editing one document at once need conflict-free "
+                "merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke."
+                + ("" if node else f" Hocuspocus runs on Node.js, so it is a second runtime to deploy and monitor beside "
+                   f"{short_name(be)}; the {short_name(be)} API keeps sign-in and permissions and Hocuspocus calls it to "
+                   "check each connection."),
+                "https://tiptap.dev/docs/hocuspocus/getting-started/overview")
 
     secondary: dict[str, tuple[dict, list[str]]] = {}  # store id -> (candidate, shapes it serves)
     # A specialist store kept out of the primary role only because the project also has records it should not hold
@@ -465,7 +499,7 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         if be.get("kind") == "server" and host.get("kind") in ("faas", "frontend_paas") and not stack.get("api_host"):
             # Functions-only hosting has no always-on process to run a worker or hold a queue connection,
             # so the queue must be one the platform delivers to functions.
-            name, src = PLATFORM_QUEUES.get(prov, PLATFORM_QUEUES[""])
+            name, src = _platform_queue(prov, env, db)
             add("Background jobs", name,
                 f"Send emails, process uploads and call slow APIs outside the request path. {stack['hosting']['name']} "
                 "runs only short request-scoped functions, so a worker-process queue (BullMQ, Celery, Sidekiq) has nowhere "
@@ -646,11 +680,19 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         elif db["id"] in ("postgres", "timescaledb") or be["id"] == "supabase":
             # ElectricSQL's 2024 rewrite syncs Postgres "shapes" over HTTP into the app's own store, with no local SQLite
             # copy (electric.ax/docs/intro), so PowerSync is the one named.
-            sync = (("PowerSync on its Team or Enterprise plan (the plans its pricing page lists with HIPAA compliance), "
-                     "with a signed BAA before any PHI syncs: a local SQLite copy on the device kept in sync with Postgres",
-                     "https://www.powersync.com/pricing") if env["hipaa"] else
-                    ("PowerSync: a local SQLite copy on the device kept in sync with Postgres",
-                     "https://docs.powersync.com/"))
+            # PowerSync Cloud runs in US, EU, JP, AU, BR and IN regions (POWERSYNC_REGIONS_DOCS); on your own servers or
+            # an air-gapped network its Open Edition runs as a Docker service beside the database.
+            region = next((f" in its {r} region ({code})" for r, code, on in
+                           (("India", "ap-south-1", env["india"]), ("EU", "eu-west-1", env["eu"]),
+                            ("US", "us-east-1", env["us"])) if on), "")
+            sync = (("PowerSync Open Edition, self-hosted in Docker beside your Postgres: a local SQLite copy on the "
+                     "device kept in sync with Postgres, with no sync service outside your network",
+                     POWERSYNC_SELF_HOST_DOCS) if env["onprem"] or env["air_gapped"] or env["self_managed"] else
+                    (f"PowerSync Cloud{region} on its Team or Enterprise plan (the plans its pricing page lists with "
+                     "HIPAA compliance), with a signed BAA before any PHI syncs: a local SQLite copy on the device kept "
+                     "in sync with Postgres", "https://www.powersync.com/pricing") if env["hipaa"] else
+                    (f"PowerSync Cloud{region}: a local SQLite copy on the device kept in sync with Postgres",
+                     POWERSYNC_REGIONS_DOCS if region else "https://docs.powersync.com/"))
         else:
             sync = ("Local SQLite on the device plus a sync API with per-record version numbers",
                     "https://www.sqlite.org/whentouse.html")
@@ -671,6 +713,16 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             why += (" Push services are not covered by a BAA: put no health information in the notification "
                     "text (e.g. 'You have a new message') and show the content only after the user signs in.")
         expo = stack["frontend"].get("id") == "react_native"  # Expo's push service exists only for Expo apps
+        if residency(env):
+            # Expo hosts its push service in Google Cloud's US region (docs.expo.dev); Firebase may process data wherever
+            # Google has facilities unless a feature offers a location choice, and FCM offers none (firebase.google.com/support/privacy).
+            why += (" Notification text leaves your residency region: " + ("Expo's push service runs in Google Cloud's US "
+                    "region, and " if expo else "") + "Firebase Cloud Messaging may process messages anywhere Google has "
+                    "facilities, so send only an ID and let the app fetch the content from your servers in the region.")
+        required = CLOUD_NAMES.get(p["cloud_preference"]) if p.get("cloud_required") else None
+        if required:
+            why += (f" {'Expo, ' if expo else ''}Firebase Cloud Messaging and Apple's push service run outside "
+                    f"{required}: your servers and data stay on {required}, and only the notification passes through them.")
         add("Push notifications", "Expo push notifications (FCM and APNs underneath)" if expo else
             "Firebase Cloud Messaging (+ APNs)", why,
             "https://docs.expo.dev/push-notifications/overview/" if expo else "https://firebase.google.com/docs/cloud-messaging")
@@ -691,18 +743,28 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     elif p["app_type"] == "ml_product" or p.get("ml_features", "none") != "none":
         ml = {"gcp": "Vertex AI endpoints", "aws": "Amazon Bedrock", "azure": "Azure AI Foundry"}.get(
             "" if env["hybrid"] or env["self_managed"] else env["cloud"] or "")
+        src = "https://cloud.google.com/vertex-ai/docs"
+        where = " in your Indian region" if env["india"] else " in your EU region" if env["eu"] else \
+            " in your US region" if env["us"] else ""
         if not ml and env["self_managed"]:  # VMs you run: no managed model service
-            ml = "a self-hosted inference server (vLLM or Hugging Face TGI) on GPU VMs you run"
+            ml = "a self-hosted inference server (vLLM) on GPU VMs you run"
         if not ml and env["hybrid"]:
             ml = "a self-hosted inference server (vLLM) packaged as a container, so it runs in both places"
-        if not ml:
-            ml = ("a self-hosted inference server (vLLM or Hugging Face TGI) on your own GPUs" if env["onprem"] else
-                  "a model API under a signed BAA, or self-hosted vLLM on HIPAA-eligible GPUs" if env["hipaa"] else
-                  "self-hosted vLLM on GPUs in your Indian region" if env["india"] else
-                  "self-hosted vLLM on GPUs in your EU region" if env["eu"] else
-                  "a hosted model API or GPU inference provider")
-        add("Model serving", ml, "Keep GPU inference separate from the web tier so each scales on its own metric.",
-            "https://cloud.google.com/vertex-ai/docs")
+        if not ml and (env["onprem"] or env["no_hyperscaler"] or env["hipaa"]):
+            # No cloud model service may hold the data: the model runs on GPUs the team runs (under HIPAA, servers the
+            # host's BAA covers), so it is priced as GPU servers, not tokens.
+            ml = ("a self-hosted inference server (vLLM) on your own GPUs" if env["onprem"] else
+                  f"a self-hosted inference server (vLLM) on GPU servers{where} covered by your host's BAA" if env["hipaa"]
+                  else f"a self-hosted inference server (vLLM) on GPU servers{where}")
+        if not ml:  # any cloud is allowed: a hosted model API that processes prompts inside the residency region
+            ml, src = HOSTED_MODEL_API["india" if env["india"] else "eu" if env["eu"] else "us" if env["us"] else ""]
+        gpu = None
+        if "vLLM" in ml:
+            src = VLLM_DOCS
+            gpu = ((0.0, 0.0, "GPU servers on your premises: the hardware is outside this estimate") if env["onprem"] else
+                   GPU_SERVER_USAGE)
+        add("Model serving", ml, "Keep GPU inference separate from the web tier so each scales on its own metric.", src,
+            usage=gpu, tier_usage=gpu)
 
     if static:
         add("Observability", "An uptime check plus the host's web analytics",
@@ -859,7 +921,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, p
                 "S3 + AWS Elemental MediaConvert + CloudFront under the AWS BAA" if env["hipaa"] else
                 "S3 + AWS Elemental MediaConvert + CloudFront" if env["cloud"] == "aws" else
                 "Transcoder API + Cloud Storage + Cloud CDN" if env["cloud"] == "gcp" else
-                "Cloudflare Stream or Mux (upload, transcoding, adaptive streaming and CDN in one)")
+                "Cloudflare Stream (upload, transcoding, adaptive streaming and CDN in one)")
         mins = dau30 * VIDEO_MIN_PER_USER_DAY
         watched = f"~{mins / 1e6:,.1f}M minutes watched a month ({VIDEO_MIN_PER_USER_DAY} min per active user a day)"
         if name.startswith("Cloudflare Stream"):
@@ -885,7 +947,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, p
             "serving MP4 files from the app server breaks on slow connections and costs far more in egress.",
             src, usage=usage)
     if "live_video" in work:
-        name = ("Self-hosted LiveKit or Jitsi (WebRTC SFU) on your servers, with a TURN relay" if env["onprem"] else
+        name = ("Self-hosted LiveKit (WebRTC SFU) on your servers, with a TURN relay" if env["onprem"] else
                 "Video with a signed BAA: Amazon Chime SDK, Twilio Video or Daily (HIPAA plans)" if env["hipaa"] else
                 "LiveKit, self-hosted in your Indian region" if env["india"] else
                 "LiveKit Cloud")
@@ -918,7 +980,11 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, p
             "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud"
             + ("; Indian operators deliver only DLT-registered templates." if india else ".")
             + (MSG91_RESIDENCY if env["india"] and not env["air_gapped"] else "")
-            + (" A phone number tied to a health service is PHI, so the gateway must sign a BAA." if env["hipaa"] else ""),
+            + (" A phone number tied to a health service is PHI, so the gateway must sign a BAA." if env["hipaa"] else "")
+            + (f" The SMS gateway runs outside {CLOUD_NAMES[p['cloud_preference']]}, which your cloud rule requires for "
+               "the servers and data: only phone numbers and codes pass through it."
+               if p.get("cloud_required") and p["cloud_preference"] in CLOUD_NAMES and not cognito
+               and not env["air_gapped"] else ""),
             "https://wammu.eu/gammu/" if env["air_gapped"] else
             MSG91_AUDIT if india or env["india"] else
             "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html" if cognito else
@@ -926,7 +992,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, p
             usage=(sms * price[0], sms * price[1],
                    f"~{sms:,.0f} SMS a month (one login every ~20 days per active user) at ${price[0]}-{price[1]} each"))
     if "user_code" in work:
-        add("Code sandbox", "Separate worker pool running submissions in gVisor or Firecracker sandboxes (or self-hosted Judge0)",
+        add("Code sandbox", "Separate worker pool running submissions in gVisor sandboxes",
             "User code must never run in the web server's process or network: isolate it with CPU, memory, time and "
             "network limits on machines that hold no secrets.", "https://gvisor.dev/docs/", system="sandbox")
 
@@ -953,6 +1019,10 @@ AWS_HIPAA_DOCS = "https://aws.amazon.com/compliance/hipaa-eligible-services-refe
 AZURE_HIPAA_DOCS = "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-hipaa-us"
 # Object storage a team runs itself; MinIO's repository is archived and no longer maintained (github.com/minio/minio).
 CEPH_RGW_DOCS = "https://docs.ceph.com/en/latest/radosgw/"
+# Wasabi enters into HIPAA BAAs (its HIPAA white paper) and runs EU Central 2 in Frankfurt and US East 1 in N. Virginia,
+# with no Indian region (WASABI_REGIONS); its pages do not say which regions the BAA covers.
+WASABI_HIPAA_DOCS = "https://www.wasabi.com/hipaa-white-paper"
+WASABI_REGIONS = "https://docs.wasabi.com/docs/what-are-the-service-urls-for-wasabi-s-different-storage-regions"
 # Where a HIPAA project's files go on a platform with no hyperscaler, from each host's own HIPAA page: Render has no
 # object store and lists persistent disks as fit for PHI; Fly.io offers a BAA for Tigris; Vercel's BAA lists its CDN,
 # functions and build pipeline, not a file store.
@@ -1018,7 +1088,12 @@ def _object_storage(env: dict, prov: str, private: bool = True) -> tuple[str, st
         # A Render disk holds PHI but keeps its service to one instance and serves no signed URLs, so it is not offered.
         lists = {"render": "; Render's HIPAA page lists no object store",
                  "vercel": "; Vercel's BAA lists its CDN and functions, not a file store"}.get(prov, "")
-        return f"Object storage{where} from a vendor that signs a BAA covering it{lists} (no public CDN for PHI)", src
+        if env["india"]:  # Wasabi lists no Indian region (WASABI_REGIONS), and no other BAA vendor is checked there
+            return (f"Object storage in an Indian region under a signed BAA: no vendor checked here offers both, so "
+                    f"confirm one before any PHI is stored{lists} (no public CDN for PHI)", src)
+        region = "EU Central 2 (Frankfurt, eu-central-2)" if env["eu"] else "US East 1 (N. Virginia, us-east-1)"
+        return (f"Wasabi object storage in {region} under a signed Wasabi BAA, after you confirm the BAA covers that "
+                f"region{lists} (no public CDN for PHI)", WASABI_HIPAA_DOCS)
     if env["india"] and (env["no_hyperscaler"] or prov == "digitalocean"):
         return ("DigitalOcean Spaces in BLR1 (Bangalore)" + lock,
                 "https://docs.digitalocean.com/products/spaces/details/availability/")
@@ -1104,8 +1179,11 @@ def _observability(env: dict) -> str:
         return "self-hosted Grafana + Prometheus + Loki + Tempo on your own VMs"
     if env["cloud"]:
         return {"aws": "CloudWatch + X-Ray", "gcp": "Cloud Monitoring/Trace", "azure": "Azure Monitor Application Insights"}[env["cloud"]]
-    if env["hipaa"]:
-        return "Datadog or New Relic under a signed BAA, or self-hosted Grafana + Prometheus + Loki"
+    if env["hipaa"] and env["india"]:  # no Datadog site is checked to keep data in India
+        return "self-hosted Grafana + Prometheus + Loki on your BAA-covered servers in your Indian region"
+    if env["hipaa"]:  # Datadog signs a BAA (docs.datadoghq.com/data_security/hipaa_compliance/); its page names no site
+        return ("Datadog on its EU site (datadoghq.eu) under a signed BAA, after you confirm the BAA covers that site"
+                if env["eu"] else "Datadog under a signed BAA")
     if env["india"]:
         return ("the host's built-in metrics and logs, kept in your Indian region; self-hosted Grafana + Prometheus + "
                 "Loki there once you outgrow them")
@@ -1301,7 +1379,7 @@ WEBSOCKET_LIBS = {
     "dotnet": ("ASP.NET Core SignalR", "https://learn.microsoft.com/aspnet/core/signalr/introduction"),
     "rails": ("Action Cable", "https://guides.rubyonrails.org/action_cable_overview.html"),
     "laravel": ("Laravel Reverb", "https://laravel.com/docs/reverb"),
-    "go": ("coder/websocket or gorilla/websocket", "https://pkg.go.dev/github.com/coder/websocket"),
+    "go": ("coder/websocket", "https://pkg.go.dev/github.com/coder/websocket"),
     "phoenix": ("Phoenix Channels", "https://hexdocs.pm/phoenix/channels.html"),
 }
 SPA_STATIC_HOME = {
@@ -1511,6 +1589,26 @@ SCORING_SERVING = {
     "static": ("Your own model as a small CPU container service of its own (BentoML, or ONNX Runtime behind a small HTTP "
                "service), in the stack's region: the site runs no server code", "https://docs.bentoml.com/"),
 }
+# A hosted model API whose prompts stay inside a residency region. Azure OpenAI's Standard (regional) deployments process
+# prompts and responses in the deployment's region, and South India and Sweden Central offer gpt-4.1-mini that way
+# (AZURE_OPENAI_REGIONS); Bedrock has a us-east-1 endpoint (docs.aws.amazon.com/general/latest/gr/bedrock.html).
+AZURE_OPENAI_REGIONS = ("https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/"
+                        "models-sold-directly-by-azure-region-availability?pivots=standard")
+HOSTED_MODEL_API = {
+    "india": ("Azure OpenAI, a Standard (regional) deployment of gpt-4.1-mini in South India, which processes prompts "
+              "and responses in that region", AZURE_OPENAI_REGIONS),
+    "eu": ("Azure OpenAI, a Standard (regional) deployment of gpt-4.1-mini in Sweden Central, which processes prompts "
+           "and responses in that region", AZURE_OPENAI_REGIONS),
+    "us": ("Amazon Bedrock in us-east-1 (N. Virginia), called with a model served in that region rather than a "
+           "cross-Region inference profile", "https://docs.aws.amazon.com/general/latest/gr/bedrock.html"),
+    "": ("Amazon Bedrock (a pay-per-token model API)", "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"),
+}
+VLLM_DOCS = "https://docs.vllm.ai/"
+# A self-hosted model is billed by GPU server, not by token: one dedicated server with a 24 GB GPU (Hetzner GEX45,
+# EUR 214 a month) to one with a 96 GB GPU (GEX63, EUR 999), at a planning rate of 1.15 USD per EUR.
+GPU_SERVER_USAGE = (246.0, 1149.0, "one always-on GPU server, from a 24 GB GPU (Hetzner GEX45, EUR 214 a month) for a "
+                    "small model to a 96 GB GPU (GEX63, EUR 999) for a mid-size one, at 1.15 USD per EUR, used as a "
+                    "reference price for that capacity (https://www.hetzner.com/dedicated-rootserver/matrix-gpu/)")
 SCORING_WHY = {
     # onnxruntime-node 1.31.1: unpackedSize 307,626,018 bytes (registry.npmjs.org/onnxruntime-node/1.31.1); function
     # limits: vercel.com/docs/functions/limitations, developers.cloudflare.com/workers/platform/limits/.
@@ -1770,7 +1868,7 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
                  if s["name"] == SCORING_SERVING["aws"][0] else
                  "one or two always-on CPU instances serving the model, priced at Amazon SageMaker's list prices, used "
                  "as a reference for that capacity (SageMaker is not the service here): " + sagemaker)
-        elif s["role"] == "Model serving" and usage and not _env(p, host)["onprem"]:
+        elif s["role"] == "Model serving" and usage and not _env(p, host)["onprem"] and "vLLM" not in s["name"]:
             tokens = p["dau"] * 30 * MODEL_CALLS_PER_USER_DAY * MODEL_TOKENS_PER_CALL
             line("Model serving: inference", tokens / 1e6 * MODEL_USD_PER_M_TOKENS[0], tokens / 1e6 * MODEL_USD_PER_M_TOKENS[1],
                  f"~{MODEL_CALLS_PER_USER_DAY} call/user/day x {MODEL_TOKENS_PER_CALL:,} tokens = ~{tokens / 1e6:,.0f}M tokens/month "

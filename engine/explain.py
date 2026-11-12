@@ -77,9 +77,14 @@ def explain_pick(layer: str, pick: dict, layer_scored: list[dict], w: Weights, r
             tradeoffs.append(f"{b['label']} is only {b['score']:.1f}/5 (weight {b['weight']:.1f}).")
     tradeoffs += relevant_lines(pick["item"].get("weaknesses", []), stack_ids, p)[:2]
 
-    risks = [f"{x['reason'].rstrip('.')}." for x in pick["adjustments"] if x["delta"] < 0]
+    # Someone on the team operates infrastructure: the platform-skills penalty still scores, but the line would contradict it.
+    devops = bool((p or {}).get("has_devops"))
+    risks = [f"{x['reason'].rstrip('.')}." for x in pick["adjustments"] if x["delta"] < 0
+             and not (devops and x["reason"].startswith("Requires platform/DevOps skills"))]
     risks += [f"{r['note']}" for r in mine if r["kind"] in ("caveat", "conflict")]
-    if skills_given and pick["raw"].get("skill_fit", 3) <= 1.5:
+    # A language or framework to learn is a frontend or backend matter; a database, a host or "None" is not learnt that way.
+    if skills_given and layer in ("frontend", "backend") and pick["item"].get("kind") != "none" \
+            and pick["raw"].get("skill_fit", 3) <= 1.5:
         risks.append(f"Nobody on the team listed {pick['name']} or a closely related skill; plan 2-4 weeks to learn it.")
     if pick["item"].get("lock_in", 1) >= 4:
         risks.append("High vendor lock-in: migrating away later means rewriting data access code.")
@@ -426,7 +431,8 @@ def _ctx(layer: str, s: dict, items: dict, p: dict, d: dict, cost: dict, provide
         "peak": _num(d["peak_rps"]) if d["peak_rps"] else "<0.1",
         "team_phrase": "a solo developer" if p["team_size"] == 1 else f"a team of {p['team_size']}",
         "weeks": p["timeline_weeks"],
-        "tier": d["tier_label"].replace("daily users", "devices") if p["app_type"] == "iot_telemetry" else d["tier_label"], "seo_label": opt("seo", p["seo"]).lower(),
+        "tier": d["tier_label"].replace("daily users", "devices") if p["app_type"] == "iot_telemetry" else d["tier_label"], "seo_label": opt("seo", p["seo"]).lower()
+        if "sign_in" in d["user_actions"] else opt("seo", p["seo"]).lower().replace(" (behind login)", ""),
         "seo_s": raw.get("seo"), "inter_s": raw.get("interactivity"), "rt_s": raw.get("realtime"),
         "lang": LANG_LABELS.get(it.get("language", ""), None),
         "hipaa_note": (comp.get("hipaa_note") or "").rstrip(".") or None,

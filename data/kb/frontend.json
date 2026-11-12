@@ -101,7 +101,11 @@
         "No server to operate for the UI"
       ],
       "weaknesses": [
-        "Client-side rendering hurts SEO and first paint on slow phones",
+        {"text": "Client-side rendering hurts SEO and first paint on slow phones",
+         "when": [{"seo": ["important", "critical"]}, {"app_type": ["ecommerce", "content_site", "social_network", "mobile_first"]}]},
+        {"text": "Client-side rendering: the first screen waits for the JavaScript bundle to download and run",
+         "when": {"seo": ["none"], "app_type": ["saas", "realtime_collab", "analytics_dashboard", "ml_product", "iot_telemetry",
+                                                 "fintech", "healthcare", "internal_tool", "prototype"]}},
         "Routing, data fetching and state are your own architecture decisions"
       ],
       "sources": [

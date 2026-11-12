@@ -105,8 +105,7 @@
       "tradeoffs": [
         "Team skill match is only 1.5/5 (weight 3.5).",
         "Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless",
-        "Connection-per-process model needs PgBouncer/RDS Proxy under serverless",
-        "Nobody on the team listed PostgreSQL or a closely related skill; plan 2-4 weeks to learn it."
+        "Connection-per-process model needs PgBouncer/RDS Proxy under serverless"
       ]
     },
     "hosting": {
@@ -311,7 +310,7 @@
       {
         "layer": "other",
         "choice": "Firebase Cloud Messaging (+ APNs)",
-        "justification": "Standard channel for mobile engagement on Android and iOS. Sized for the 30,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region. Sized for the 30,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "project.platforms"
         ],
@@ -389,6 +388,15 @@
       "fields": [
         "budget.monthly_infra_usd",
         "scale.users_12_months"
+      ]
+    },
+    {
+      "code": "PCI_SCOPE",
+      "severity": "info",
+      "message": "Card payments: the hosted checkout collects card numbers on the payment provider's page, so your PCI DSS check is the shortest self-assessment (SAQ A). Putting card fields on your own pages, or storing card numbers, widens the audit.",
+      "fields": [
+        "requirements.payments",
+        "compliance"
       ]
     }
   ],

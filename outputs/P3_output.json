@@ -34,7 +34,7 @@
         }
       ],
       "tradeoffs": [
-        "Client-side rendering hurts SEO and first paint on slow phones",
+        "Client-side rendering: the first screen waits for the JavaScript bundle to download and run",
         "Routing, data fetching and state are your own architecture decisions"
       ]
     },
@@ -105,8 +105,7 @@
       "tradeoffs": [
         "Team skill match is only 1.5/5 (weight 2.5).",
         "Single-writer primary: write scale-out needs sharding (Citus) or Aurora Limitless",
-        "Connection-per-process model needs PgBouncer/RDS Proxy under serverless",
-        "Nobody on the team listed PostgreSQL or a closely related skill; plan 2-4 weeks to learn it."
+        "Connection-per-process model needs PgBouncer/RDS Proxy under serverless"
       ]
     },
     "hosting": {
@@ -186,8 +185,8 @@
       },
       {
         "layer": "other",
-        "choice": "Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus or y-websocket as the sync server",
-        "justification": "Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
+        "choice": "Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus as the sync server (a Node.js service beside the Go API)",
+        "justification": "Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke. Hocuspocus runs on Node.js, so it is a second runtime to deploy and monitor beside Go; the Go API keeps sign-in and permissions and Hocuspocus calls it to check each connection. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "project.type",
           "requirements.realtime"
@@ -201,7 +200,7 @@
         "tradeoffs": [
           "Document snapshots grow with edit history and need compaction"
         ],
-        "source": "https://docs.yjs.dev/"
+        "source": "https://tiptap.dev/docs/hocuspocus/getting-started/overview"
       },
       {
         "layer": "queue",
@@ -372,6 +371,15 @@
       "message": "Fly.io publishes no uptime SLA. Your 99.9% target rests on the app alone: Fly.io commits to no uptime figure and owes no credit when it is down. Alert on an external uptime check and keep a fallback ready (a second region or provider); pick a host with a published SLA if the target is contractual.",
       "fields": [
         "requirements.availability"
+      ]
+    },
+    {
+      "code": "PCI_SCOPE",
+      "severity": "info",
+      "message": "Card payments: the hosted checkout collects card numbers on the payment provider's page, so your PCI DSS check is the shortest self-assessment (SAQ A). Putting card fields on your own pages, or storing card numbers, widens the audit.",
+      "fields": [
+        "requirements.payments",
+        "compliance"
       ]
     }
   ],

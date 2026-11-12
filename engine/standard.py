@@ -159,6 +159,11 @@ EXISTING_PLATFORMS = [
     (r"shopify", "Shopify", "commerce", "https://shopify.dev/docs/api/storefront"),
     (r"magento|adobe commerce", "Adobe Commerce (Magento)", "commerce", "https://developer.adobe.com/commerce/webapi/"),
 ]
+# CI systems a team already runs; the new app's pipelines go there: (pattern, name, source).
+EXISTING_CI = [(r"\bjenkins\b", "Jenkins", "https://www.jenkins.io/doc/book/pipeline/"),
+               (r"\bgitlab\b", "GitLab CI/CD", "https://docs.gitlab.com/ci/"),
+               (r"azure devops|azure pipelines|\bvsts\b|\btfs\b", "Azure Pipelines (Azure DevOps)",
+                "https://learn.microsoft.com/azure/devops/pipelines/get-started/what-is-azure-pipelines")]
 PLATFORM_API = {"WordPress": "the WordPress REST API", "Drupal": "Drupal's core JSON:API module",
                 "Shopify": "the Shopify Storefront API", "Adobe Commerce (Magento)": "Adobe Commerce's REST or GraphQL API"}
 # The engine services an existing platform replaces, by the platform's kind.
@@ -226,6 +231,13 @@ END_OF_LIFE = [  # the source page gives each product's end date
     (r"adobe flash|flash player", "Adobe Flash", "it has reached end of life", "https://www.adobe.com/products/flashplayer/end-of-life.html"),
     (r"mongodb ?([1-5]\.\d|6\.0)\b", "MongoDB {0}", "it has reached end of life", "https://endoflife.date/mongodb"),
     (r"heroku free", "Heroku free plans", "they have been retired", "https://blog.heroku.com/next-chapter"),
+    (r"spring ?boot ?(2)(?:\.\d+)*\b", "Spring Boot {0}.x", "open-source support ended with 2.7.18 on 23 Nov 2023",
+     "https://spring.io/blog/2023/11/23/spring-boot-2-7-18-available-now/"),
+    # Google's own deprecations table records the shutdown; the old IoT Core pages now redirect elsewhere.
+    (r"(?:google )?cloud iot core|google iot core", "Google Cloud IoT Core",
+     "Google shut the service down on 16 Aug 2023", "https://docs.cloud.google.com/eventarc/docs/deprecations"),
+    (r"jquery ?([12])(?:\.\d+)*\b", "jQuery {0}.x", "the 1.x and 2.x branches are no longer supported",
+     "https://jquery.com/support/"),
     # The repository names MinIO's AIStor editions as the alternatives, so a system that says AIStor is not flagged.
     (r"^(?!.*\baistor\b).*\bminio\b", "MinIO", "its open-source repository was archived on 25 Apr 2026 and is no "
      "longer maintained", "https://github.com/minio/minio"),
@@ -407,7 +419,7 @@ def _systems(texts: list[str]) -> tuple[list[str], list[str], list[tuple[str, st
             if re.search(pattern, low) and name not in idps:
                 idps.append(name)
                 hit = True
-        hit = hit or any(re.search(pattern, low) for pattern, *_ in EXISTING_PLATFORMS)
+        hit = hit or any(re.search(pattern, low) for pattern, *_ in EXISTING_PLATFORMS + EXISTING_CI)
         for pattern, product, status, source in END_OF_LIFE:  # one text can name several products
             m = re.search(pattern, low)
             if m:
@@ -663,7 +675,13 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
                          "integrated, not migrated: the new app keeps its own data in the recommended database and reaches "
                          f"{UNSCORED_DATABASES[dbid]} through its client drivers or a change-data-capture feed")
     _platform_notes(f, notes, warns)
+    retired = {e[0] for e in eol}
     for text in other:
+        if text in retired:  # past its vendor's support: its data moves, it is not kept as a record
+            notes.append(f"Existing system '{text}': past its vendor's support (see the EOL_EXISTING_SYSTEM warning), so "
+                         "it is not kept as a system of record; move its data and duties into the new stack before "
+                         "go-live")
+            continue
         how, cloud_only = next(((api, c) for pattern, api, c in INTEGRATIONS if re.search(pattern, text.lower())),
                                (None, False))
         if how is None:
@@ -835,6 +853,47 @@ def _language_warning(result: dict, f: dict, a: dict) -> list[dict]:
                       "release.", ["team.languages"])]
 
 
+RBI_STORAGE = "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244"
+PLATFORMS_INFO_WEEKS = 8  # our planning judgement: 3+ client platforms in 5-8 weeks is tight (4 or fewer is critical)
+
+
+def _compliance_info(result: dict, f: dict, warnings: list[dict]) -> list[dict]:
+    """Duties and risks that otherwise sit only in assumptions or service texts, as plain info warnings; a duty an
+    existing warning already states is not repeated."""
+    have = {w["code"] for w in warnings}
+    comp, out = set(f["compliance"]), []
+    services = " ".join(s["name"] for s in result.get("supporting_services", []))
+    if "hipaa" in comp and "HIPAA_FREE_TIER" not in have:
+        out.append(_std_warn("HIPAA_BAA_NEEDED", "info",
+                             "HIPAA: sign a Business Associate Agreement (BAA) with every vendor that stores or handles "
+                             "health data (host, database, file storage, sign-in, monitoring) before any patient data goes "
+                             "in, and keep health data out of logs and notification text.", ["compliance"]))
+    if "hosted checkout" in services:
+        out.append(_std_warn("PCI_SCOPE", "info",
+                             "Card payments: the hosted checkout collects card numbers on the payment provider's page, so "
+                             "your PCI DSS check is the shortest self-assessment (SAQ A). Putting card fields on your own "
+                             "pages, or storing card numbers, widens the audit.", ["requirements.payments", "compliance"]))
+    if "rbi_localisation" in comp:
+        out.append(_std_warn("RBI_COPIES_IN_INDIA", "info",
+                             "RBI localisation: the entire payment data must be stored only in India, so backups, "
+                             "replicas and logs that hold it must also be in an Indian region; check each destination "
+                             f"before go-live ({RBI_STORAGE}).", ["compliance"]))
+    avail = float(f["requirements.availability"])
+    if avail >= 99.95 and not f["team.has_devops"] and not have & {"SLA_SMALL_TEAM", "BEGINNER_HIGH_AVAILABILITY"}:
+        out.append(_std_warn("ON_CALL_GAP", "info",
+                             f"A {avail:g}% target allows about {(100 - avail) / 100 * 30 * 24 * 60:,.0f} minutes of "
+                             "downtime a month, and team.has_devops is false: someone must be on call to restore service "
+                             "within minutes, or the target will be missed.",
+                             ["requirements.availability", "team.has_devops"]))
+    clients = [x for x in f["project.platforms"] if x != "api_only"]
+    if len(clients) >= 3 and f["timeline.mvp_weeks"] <= PLATFORMS_INFO_WEEKS and "MANY_PLATFORMS_SHORT_TIMELINE" not in have:
+        out.append(_std_warn("PLATFORMS_TIMELINE", "info",
+                             f"{len(clients)} client platforms ({', '.join(clients)}) in {f['timeline.mvp_weeks']:g} weeks: "
+                             "each needs its own build, testing and store or release work, so plan to release one "
+                             "platform first and add the others after.", ["project.platforms", "timeline.mvp_weeks"]))
+    return out
+
+
 def _reused(result: dict, f: dict) -> tuple[str | None, str | None]:
     """The existing database the stack keeps and the existing identity provider sign-in goes through, if any."""
     db = load_kb()["index"].get(result["stack"]["database"]["pick"]["id"], {})
@@ -885,6 +944,8 @@ def _component(layer: str, sl: dict, origin: dict, f: dict, result: dict) -> dic
         name = mobile_name(comp["id"], comp["name"], f["project.platforms"])
         choice += f" + {name} for the {apps} app"
         extra = f" {comp['why'].replace(comp['name'], name)}"
+    if layer == "frontend":
+        extra += _native_language_gap(pick["id"], (result.get("companion") or {}).get("id"), f=f)
     if layer == "database" and sl.get("managed_offering") and choice != "None":
         index = load_kb()["index"]
         host = index.get(((result["stack"]["hosting"].get("api_host") or {}).get("id")
@@ -921,6 +982,22 @@ def _component(layer: str, sl: dict, origin: dict, f: dict, result: dict) -> dic
     return {"choice": choice, "justification": (ex.get("paragraph") or " ".join(ex.get("why", []))) + extra,
             "driven_by": driven_by, "alternatives": alternatives,
             "tradeoffs": list(dict.fromkeys(ex.get("tradeoffs", []) + ex.get("risks", [])))}
+
+
+def _native_language_gap(*ids, f: dict) -> str:
+    """A native phone app in a language team.languages does not list: say so, and name the toolkit that would reuse
+    the team's web language."""
+    if "native_mobile" not in ids:
+        return ""
+    langs = set(f["team.languages"])
+    missing = [lang for plat, lang in (("ios", "swift"), ("android", "kotlin")) if plat in f["project.platforms"]
+               and lang not in langs]
+    if not missing:
+        return ""
+    apps = " and ".join({"swift": "the iOS app (Swift)", "kotlin": "the Android app (Kotlin)"}[m] for m in missing)
+    web = next((n for x, n in (("typescript", "TypeScript"), ("javascript", "JavaScript")) if x in langs), None)
+    return (f" team.languages does not list {' or '.join(m.capitalize() for m in missing)}, so {apps} is a language "
+            "the team must learn" + (f"; React Native (Expo) would reuse the team's {web} instead." if web else "."))
 
 
 ONE_PER_LAYER = ("auth", "cdn", "storage")
@@ -1020,6 +1097,18 @@ def _reuse_identity(idp: str, replaced: list[dict]) -> dict:
 
 def _ci_cd(f: dict) -> dict:
     deploy = f["infrastructure.deployment_model"]
+    text, name, source = next(((t, n, s) for pattern, n, s in EXISTING_CI for t in f["infrastructure.existing_systems"]
+                               if re.search(pattern, t.lower())), (None, None, None))
+    if name:  # the pipeline the team already runs builds the new app too
+        return {"layer": "ci_cd", "choice": f"{name} (existing)",
+                "justification": f"infrastructure.existing_systems lists '{text}': the new app's builds, tests and "
+                                 f"deploys run as new pipelines on {name}, so there is no second CI system to learn, "
+                                 "secure and pay for.",
+                "driven_by": ["infrastructure.existing_systems", "infrastructure.deployment_model", "team.size"],
+                "alternatives": [{"choice": "GitHub Actions", "why_not": f"A second CI system beside {name}, which "
+                                  "already builds the team's other code"}],
+                "tradeoffs": [f"The new pipelines share {name}'s runners and its upgrade schedule"],
+                "source": source}
     if deploy in ("on_premise", "air_gapped"):
         choice, alt, why = ("GitLab CI/CD (self-managed GitLab on your servers)", "Jenkins",
                             "Builds and deploys run inside your network; an air-gapped site needs a runner and an "
@@ -1102,7 +1191,11 @@ def _summary(result: dict, stack: dict, style: str, cost: dict, f: dict, a: dict
     items = {l: load_kb()["index"].get(result["stack"][l]["pick"]["id"], {}) for l in LAYERS}
     reasons = []
     db, idp = _reused(result, f)
-    kept = ([names["database"]] if db else []) + ([f"{idp} sign-in"] if idp else [])
+    # The kept engine's data moves to the offering the database line names, so the summary says where it goes.
+    offering = stack["database"]["choice"].partition(": ")[2].split(" (")[0]
+    moved = (" (on servers you run)" if offering.lower().startswith("self-managed") else f" (moved to {offering})"
+             if offering else "")
+    kept = ([f"{names['database']} data{moved}"] if db else []) + ([f"{idp} sign-in"] if idp else [])
     if kept:
         reasons.append(f"keeps the existing {' and '.join(kept)}")
     cloud, deploy = f["infrastructure.cloud_preference"], f["infrastructure.deployment_model"]
@@ -1186,6 +1279,7 @@ def run(doc) -> dict:
     warnings += extra + _warnings(result, origin)
     if result.get("feasible"):
         warnings += _language_warning(result, fields, answers)
+        warnings += _compliance_info(_store_billing(result, fields), fields, warnings)
     absent = [path for path, _kind, required, *_ in FIELDS if not required and _get(doc, path)[1] is None
               and not (path == "requirements.p95_latency_ms" and _get(doc, path)[0])]
     absent += [f"priorities.{k}" for k in PRIORITY_KEYS if (doc.get("priorities") or {}).get(k) is None]

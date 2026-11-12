@@ -18,8 +18,10 @@ from engine.kb import load_presets
 from tools.profiles import random_input
 
 CLOUD_ONLY = ["Cloudflare R2", "Backblaze", "Grafana Cloud", "Sentry", "SQS", "hosted model API", "Clerk", "Auth0",
-              "Upstash", "MongoDB Atlas", "ClickHouse Cloud", "AuraDB", "Timescale Cloud", "Workers KV", "Turso"]
-NOT_IN_INDIA = ["Clerk", "Auth0", "Cloudflare R2", "Backblaze", "Workers KV", "Sentry"]
+              "Upstash", "MongoDB Atlas", "ClickHouse Cloud", "AuraDB", "Timescale Cloud", "Workers KV", "Turso",
+              "Bedrock", "Azure OpenAI", "Neon", "PowerSync Cloud"]
+# No India region: Neon (neon.com/docs/introduction/regions), QStash (EU and US only), Wasabi (docs.wasabi.com).
+NOT_IN_INDIA = ["Clerk", "Auth0", "Cloudflare R2", "Backblaze", "Workers KV", "Sentry", "Neon", "QStash", "Wasabi"]
 NOT_IN_EU = ["Clerk"]
 HIPAA_NO_BAA_STATED = ["Cloudflare R2", "Upstash", "Clerk", "Grafana Cloud", "Sentry", "Pusher"]
 AUDIT_DIR = Path(__file__).resolve().parent / "scenarios_extra"

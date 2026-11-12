@@ -740,7 +740,9 @@ def test_hipaa_files_with_no_hyperscaler_stay_where_the_hosts_baa_reaches():
             host = out["stack"]["hosting"]["choice"].split(",")[0]
             store = [s for s in out["stack"]["supporting"] if s["layer"] == "storage"]
             assert store and not [s for s in store if "your BAA-covered servers" in s["choice"]], (name, residency, host, store)
-            assert store[0]["source"] == docs[host], (name, residency, host, store[0])
+            # Wasabi signs BAAs and has US and EU regions; elsewhere the host's own HIPAA page is the source.
+            want = "https://www.wasabi.com/hipaa-white-paper" if store[0]["choice"].startswith("Wasabi") else docs[host]
+            assert store[0]["source"] == want, (name, residency, host, store[0])
             seen.add(host)
     assert set(docs) <= seen, seen
 
@@ -862,8 +864,9 @@ def test_an_unscored_database_is_integrated_not_migrated():
 
 def test_systems_with_no_known_interface_say_so():
     out = edited("P5", infrastructure={"existing_systems": ["WhatsApp groups", "Windows 7 office PCs"]})
-    for name in ("WhatsApp groups", "Windows 7 office PCs"):
-        assert any(a.startswith(f"Existing system '{name}': no known integration path") for a in out["assumptions"])
+    assert any(a.startswith("Existing system 'WhatsApp groups': no known integration path") for a in out["assumptions"])
+    # A product past its vendor's support is moved off, not integrated as a system of record.
+    assert any(a.startswith("Existing system 'Windows 7 office PCs': past its vendor's support") for a in out["assumptions"])
     assert not [a for a in out["assumptions"] if "integrated through its API" in a]
 
 

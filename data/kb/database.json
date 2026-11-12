@@ -76,16 +76,30 @@
         "aws": "Amazon RDS / Aurora PostgreSQL (+ RDS Proxy for serverless)",
         "gcp": "Cloud SQL / AlloyDB for PostgreSQL",
         "azure": "Azure Database for PostgreSQL Flexible Server",
-        "vercel": "Neon or Supabase Postgres via Vercel Marketplace",
-        "netlify": "Neon / Supabase Postgres",
+        "vercel": "Supabase Postgres via Vercel Marketplace",
+        "netlify": "Supabase Postgres",
         "render": "Render Postgres",
         "railway": "Railway Postgres",
         "flyio": "Fly Managed Postgres",
         "digitalocean": "DigitalOcean Managed PostgreSQL",
-        "hetzner": "Self-managed Postgres (Docker + automated backups) or a managed provider",
-        "onprem": "Self-managed with Patroni or CloudNativePG operator",
-        "cloudflare": "Neon / Supabase Postgres connected through Hyperdrive"
+        "hetzner": "Self-managed Postgres in Docker with automated backups",
+        "onprem": "Self-managed with Patroni (replication and automated failover on your VMs)",
+        "onprem_k8s": "Self-managed with the CloudNativePG operator on your Kubernetes cluster",
+        "cloudflare": "Supabase Postgres connected through Hyperdrive"
       },
+      "rule_offerings": {
+        "data_residency_india": {
+          "vercel": "Supabase Postgres in ap-south-1 (Mumbai) via Vercel Marketplace",
+          "netlify": "Supabase Postgres in ap-south-1 (Mumbai)",
+          "cloudflare": "Supabase Postgres in ap-south-1 (Mumbai) connected through Hyperdrive"
+        },
+        "iso27001": {
+          "vercel": "Neon Postgres via Vercel Marketplace",
+          "netlify": "Neon Postgres",
+          "cloudflare": "Neon Postgres connected through Hyperdrive"
+        }
+      },
+      "rule_offerings_note": "Supabase runs in ap-south-1, Mumbai (https://supabase.com/docs/guides/platform/regions), is a Vercel Marketplace Postgres provider (https://vercel.com/docs/marketplace-storage) and has a Hyperdrive guide (https://developers.cloudflare.com/hyperdrive/examples/connect-to-postgres/postgres-database-providers/supabase/); Neon has no India region (https://neon.com/docs/introduction/regions) but completed ISO 27001 and SOC 2 audits (https://neon.com/docs/security/compliance), which the knowledge base does not record for Supabase. The first rule listed that the project has wins.",
       "strengths": [
         "Default choice for relational data: constraints, joins, transactions",
         "Extensions cover JSON, search, geo, time-series and vectors",
@@ -104,7 +118,11 @@
         "https://neon.com/docs/introduction/plans",
         "https://aiven.io/pricing/postgresql",
         "https://supabase.com/docs/guides/platform/compute-and-disk",
-        "https://neon.com/pricing"
+        "https://neon.com/pricing",
+        "https://neon.com/docs/introduction/regions",
+        "https://supabase.com/docs/guides/platform/regions",
+        "https://vercel.com/docs/marketplace-storage",
+        "https://neon.com/docs/security/compliance"
       ],
       "entry_plans": [
         {"name": "Supabase Free", "vendor": "Supabase", "usd": 0, "max_tier": 1, "max_data_gb": 0.5,
