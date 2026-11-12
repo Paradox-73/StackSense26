@@ -26,7 +26,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 ### How the parts fit
 
 1. **Request path**: The iOS/Android app, installed from the app stores, sends API calls to the Java/Kotlin + Spring Boot service on AWS EKS (Kubernetes) (~2,315 requests/s at peak), which queries PostgreSQL.
-2. **Sign-in**: Sign-in uses Amazon Cognito in the Mumbai region (ap-south-1); the Java/Kotlin + Spring Boot API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses Spring Security's one-time token login in your API, with one-time codes sent through the SMS gateway and the users in your database in your Indian region: Amazon Cognito would cost about $37,350 a month at ~2,500,000 monthly users; the Java/Kotlin + Spring Boot API checks the session or token on every request.
 3. **Data**: PostgreSQL is the system of record (about 1,460 GB within 12 months); uploaded files go to Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN). Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens. Every store above is placed in the region your residency rule requires.
 4. **Deploy**: CI builds container images and rolls them out on AWS EKS (Kubernetes) (manifests or Helm), one service at a time. App releases go through App Store and Google Play review. Database schema changes run as versioned migrations before the new code serves traffic.
 
@@ -316,7 +316,7 @@ Runs here: the Java/Kotlin + Spring Boot API as long-running processes. The data
 - **Phone login (SMS OTP)**: MSG91, with DLT-registered SMS templates: One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India.
 - **Payments**: Razorpay with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.
 - **Object storage**: Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN): Media and documents belong in object storage, not the database.
-- **Authentication**: Amazon Cognito in the Mumbai region (ap-south-1): Do not hand-roll password storage, MFA or SSO.
+- **Authentication**: Spring Security's one-time token login in your API, with one-time codes sent through the SMS gateway and the users in your database in your Indian region: Amazon Cognito would cost about $37,350 a month at ~2,500,000 monthly users: Do not hand-roll password storage, MFA or SSO.
 - **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 

@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For an 'ML / AI product' project at Medium (10k-100k daily users) scale (~69 peak req/s) built by 4 engineer(s) in 12 weeks, StackSense recommends Next.js (React) + Python + FastAPI + PostgreSQL + Google Cloud Run (architecture: Modular monolith). Estimated infrastructure cost: $367-$4,939/month (stretch budget).
+For an 'ML / AI product' project at Medium (10k-100k daily users) scale (~69 peak req/s) built by 4 engineer(s) in 12 weeks, StackSense recommends Next.js (React) + Python + FastAPI + PostgreSQL + Google Cloud Run (architecture: Modular monolith). Estimated infrastructure cost: $2,392-$6,964/month (over budget). 1 critical issue(s) need attention: Budget below estimated cost.
 
 ## Recommended stack
 
@@ -26,7 +26,7 @@ Availability approach: The platform runs the functions across zones, with no ins
 ### How the parts fit
 
 1. **Request path**: The browser loads Next.js (React) from Google Cloud Run; it sends API calls to the Python + FastAPI service on Google Cloud Run (~69 requests/s at peak), which queries PostgreSQL.
-2. **Sign-in**: Sign-in uses Auth0; the Python + FastAPI API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses Clerk; the Python + FastAPI API checks the session or token on every request.
 3. **Data**: PostgreSQL is the system of record (about 560 GB within 12 months); uploaded files go to Cloud Storage + Cloud CDN.
 4. **Deploy**: CI builds a container image and rolls it out on Google Cloud Run with health checks and zero-downtime restarts. Database schema changes run as versioned migrations before the new code serves traffic.
 
@@ -38,7 +38,7 @@ Availability approach: The platform runs the functions across zones, with no ins
 
 ## Warnings and how they were resolved
 
-- **[WARNING] Budget below the top of the estimate**: $367-$4,939/month against $1,500/month: the top (~3x today's load) and the middle are over, most of the rise in inference and PostgreSQL. *Resolution:* Raise the budget before the load grows.
+- **[CRITICAL] Budget below estimated cost**: Estimated minimum spend $2,392/month exceeds your budget of $1,500/month at Medium (10k-100k daily users) scale. *Resolution:* A cheaper stack exists but scored lower on your other priorities: hosting + database from about $80/month (Cloudflare Pages + Workers with PostgreSQL); see the 'Budget cut' scenario under 'What would change'.
 
 ## Per-layer reasoning
 
@@ -311,7 +311,7 @@ Runs here: Next.js (server rendering + static files), the Python + FastAPI API a
 - **Vector search**: pgvector extension in the primary Postgres: Keeps embeddings next to relational data with transactional consistency; move to a dedicated vector DB only past ~10M+ vectors.
 - **Background jobs**: Celery (Redis/Valkey broker): Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (Memorystore).
 - **Object storage**: Cloud Storage + Cloud CDN: Media and documents belong in object storage, not the database.
-- **Authentication**: Auth0: Do not hand-roll password storage, MFA or SSO.
+- **Authentication**: Clerk: Do not hand-roll password storage, MFA or SSO.
 - **Model serving**: Vertex AI endpoints: Keep GPU inference separate from the web tier so each scales on its own metric.
 - **Observability**: OpenTelemetry instrumentation -> Cloud Monitoring/Trace: Traces, metrics and error tracking from day one; required to defend an availability target.
 
@@ -322,10 +322,11 @@ Runs here: Next.js (server rendering + static files), the Python + FastAPI API a
 | Hosting: Google Cloud Run | 60 | 383 | Medium (10k-100k daily users) price band, from the band's floor up to its price at ~3x the load, for 30,000 daily users (48% of the way up the tier, log scale) |
 | Database: PostgreSQL | 75 | 989 | Medium (100 GB-1 TB of data) database tier (~560 GB in 12 months), from the band's floor up to its price at ~3x the load, for ~560 GB of data (75% of the way up the tier, log scale); priced as Cloud SQL / AlloyDB for PostgreSQL; x1.5 for 99.9% availability (standby/replicas) |
 | Cache: Redis / Valkey | 30 | 192 | Medium (10k-100k daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 30,000 daily users (48% of the way up the tier, log scale) |
+| Authentication | 2,025 | 2,025 | Clerk Pro: $25/month plus $0.02 for each of the ~100,000 monthly users above 50,000 (https://clerk.com/pricing) |
 | Model serving: inference | 202 | 3,375 | ~1 call/user/day x 1,500 tokens = ~1,350M tokens/month at $0.15-2.5 per million |
-| **Total** | **367** | **4,939** | |
+| **Total** | **2,392** | **6,964** | |
 
-About ₹35,232-₹474,144 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹229,632-₹668,544 per month. Budget status: **over**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~25,000 peak req/s) built by 25 engineer(s) in 26 weeks, StackSense recommends Next.js (React) + Java/Kotlin + Spring Boot + MySQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹1,036,800-₹7,491,264/month (stretch budget). The highest-scoring stack (Next.js (React) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes), 93.9) is only 0.3 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on adjacent team skills (19.5 vs 19, summed skill fit).
+For an 'E-commerce / marketplace' project at Very large (1M-10M daily users) scale (~25,000 peak req/s) built by 25 engineer(s) in 26 weeks, StackSense recommends Next.js (React) + Java/Kotlin + Spring Boot + MySQL + AWS EKS (Kubernetes) (architecture: Service-oriented (a few coarse services, one per team)). Estimated infrastructure cost: ₹15,422,400-₹21,876,864/month (over budget). The highest-scoring stack (Next.js (React) + Java/Kotlin + Spring Boot + PostgreSQL + AWS EKS (Kubernetes), 93.9) is only 0.3 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on adjacent team skills (19.5 vs 19, summed skill fit). 1 critical issue(s) need attention: Budget below estimated cost.
 
 ## Recommended stack
 
@@ -40,7 +40,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 
 ## Warnings and how they were resolved
 
-- **[WARNING] Budget below the top of the estimate**: ₹1,036,800-₹7,491,264/month against ₹2,500,000/month: the top (~3x today's load) and the middle are over, most of the rise in AWS EKS and ClickHouse. *Resolution:* Raise the budget before the load grows.
+- **[CRITICAL] Budget below estimated cost**: Estimated minimum spend ₹15,422,400/month exceeds your budget of ₹2,500,000/month at Very large (1M-10M daily users) scale. *Resolution:* A cheaper stack exists but scored lower on your other priorities: hosting + database from about ₹460,800/month (AWS ECS on Fargate with PostgreSQL); see the 'Budget cut' scenario under 'What would change'.
 
 ## Per-layer reasoning
 
@@ -342,9 +342,10 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 | Cache: Redis / Valkey | 1,500 | 10,407 | Very large (1M-10M daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 25,000 req/s at peak (70% of the way up the tier, log scale) |
 | Secondary store (document): MongoDB | 500 | 5,510 | Large (1-10 TB of data) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 25,000 req/s at peak (70% of the way up the tier, log scale) |
 | Analytics: ClickHouse | 3,000 | 19,764 | Very large (1M-10M daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 25,000 req/s at peak (70% of the way up the tier, log scale); a copy of data that MySQL also stores (fed by a continuous copy of changes), so that data is paid for in both stores |
-| **Total** | **10,800** | **78,034** | |
+| Authentication | 149,850 | 149,850 | Amazon Cognito Essentials: 10,000 monthly active users free, then $0.015 each (~10,000,000 here; https://aws.amazon.com/cognito/pricing/) |
+| **Total** | **160,650** | **227,884** | |
 
-About ₹1,036,800-₹7,491,264 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹15,422,400-₹21,876,864 per month. Budget status: **over**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Realtime chat / collaboration / multiplayer' project at Large (100k-1M daily users) scale (~3,472 peak req/s) built by 4 engineer(s) in 16 weeks, StackSense recommends React SPA (Vite) + Go (net/http, chi or Gin) + MongoDB + Fly.io (architecture: Modular monolith). Estimated infrastructure cost: $1,325-$14,409/month (stretch budget).
+For a 'Realtime chat / collaboration / multiplayer' project at Large (100k-1M daily users) scale (~3,472 peak req/s) built by 4 engineer(s) in 16 weeks, StackSense recommends React SPA (Vite) + Go (net/http, chi or Gin) + MongoDB + Fly.io (architecture: Modular monolith). Estimated infrastructure cost: $20,350-$33,434/month (over budget). 1 critical issue(s) need attention: Budget below estimated cost.
 
 ## Recommended stack
 
@@ -26,7 +26,7 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 ### How the parts fit
 
 1. **Request path**: The browser loads React SPA (Vite) from Fly.io; it sends API calls to the Go service on Fly.io (~3,472 requests/s at peak), which queries MongoDB.
-2. **Sign-in**: Sign-in uses Auth0; the Go API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses Clerk; the Go API checks the session or token on every request.
 3. **Data**: MongoDB is the system of record (about 170 GB within 12 months).
 4. **Deploy**: CI builds a container image and rolls it out on Fly.io with health checks and zero-downtime restarts. MongoDB keeps no fixed schema: new code reads both the old and the new document shape during a rollout, and backfills that rewrite old documents run as versioned scripts (indexes and validation rules ship the same way).
 
@@ -38,7 +38,7 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 
 ## Warnings and how they were resolved
 
-- **[WARNING] Budget below the top of the estimate**: $1,325-$14,409/month against $2,000/month: the top (~3x today's load) and the middle are over, most of the rise in MongoDB and Fly.io. *Resolution:* Raise the budget before the load grows.
+- **[CRITICAL] Budget below estimated cost**: Estimated minimum spend $20,350/month exceeds your budget of $2,000/month at Large (100k-1M daily users) scale. *Resolution:* A cheaper stack exists but scored lower on your other priorities: hosting + database from about $275/month (Cloudflare Pages + Workers with Google BigQuery); see the 'Budget cut' scenario under 'What would change'.
 - **[WARNING] 50 ms target for users worldwide**: The stack as shown runs its API and MongoDB in one region. A round trip between continents alone takes ~85 ms (US East - West Europe) to ~170-225 ms (Southeast Asia - Europe or US East), measured between cloud regions (https://learn.microsoft.com/en-us/azure/networking/azure-network-latency), so users far from that region miss a 50 ms target before any work is done. *Resolution:* Deploy the API in a region per continent with read replicas (or a multi-region database for writes), cache reads at the edge (CDN or edge functions), or treat the target as per-region.
 - **[INFO] Fly.io publishes no uptime SLA**: Your 99.9% target rests on the app alone: Fly.io commits to no uptime figure and owes no credit when it is down. *Resolution:* Alert on an external uptime check and keep a fallback ready (a second region or provider); pick a host with a published SLA if the target is contractual.
 
@@ -303,7 +303,7 @@ Runs here: React SPA (static files), the Go API as long-running processes. The d
 - **Realtime**: Redis pub/sub for cross-instance fan-out (Upstash Redis on Fly): With several app instances, a message published on one must reach sockets on all others.
 - **Collaboration sync**: Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus as the sync server (a Node.js service beside the Go API): Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke. Hocuspocus runs on Node.js, so it is a second runtime to deploy and monitor beside Go; the Go API keeps sign-in and permissions and Hocuspocus calls it to check each connection.
 - **Ingestion buffer**: Redpanda/Kafka or NATS JetStream: A durable log absorbs write bursts and keeps device ingestion separate from database writes, and lets you replay messages.
-- **Authentication**: Auth0: Do not hand-roll password storage, MFA or SSO.
+- **Authentication**: Clerk: Do not hand-roll password storage, MFA or SSO.
 - **Observability**: OpenTelemetry instrumentation -> Grafana Cloud: Traces, metrics and error tracking from day one; required to defend an availability target.
 
 ## Estimated monthly cost
@@ -313,9 +313,10 @@ Runs here: React SPA (static files), the Go API as long-running processes. The d
 | Hosting: Fly.io | 375 | 3,119 | Large (100k-1M daily users) price band, from the band's floor up to its price at ~3x the load, for 3,472 req/s at peak (84% of the way up the tier, log scale); x1.5 for 99.9% availability (redundant instances) |
 | Database: MongoDB | 750 | 8,633 | Large (100k-1M daily users) database tier (~170 GB in 12 months), from the band's floor up to its price at ~3x the load, for 3,472 req/s at peak (84% of the way up the tier, log scale); upper end for ~170 GB of data: the band's top is priced for the largest data of the tier; x1.5 for 99.9% availability (standby/replicas) |
 | Cache: Redis / Valkey | 200 | 2,657 | Large (100k-1M daily users) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 3,472 req/s at peak (84% of the way up the tier, log scale) |
-| **Total** | **1,325** | **14,409** | |
+| Authentication | 19,025 | 19,025 | Clerk Pro: $25/month plus $0.02 for each of the ~950,000 monthly users above 50,000 (https://clerk.com/pricing) |
+| **Total** | **20,350** | **33,434** | |
 
-About ₹127,200-₹1,383,264 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹1,953,600-₹3,209,664 per month. Budget status: **over**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

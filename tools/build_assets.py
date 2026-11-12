@@ -90,7 +90,7 @@ def bench_block() -> str:
 
 CATEGORIES = {
     "Scoring, constraints and cost": ["test_engine", "test_deployment_models", "test_data_fit", "test_team_skills", "test_cloud_preference", "test_diversity",
-                                      "test_app_defaults", "test_cost_model", "test_cost_in_tier", "test_static_and_budget", "test_special_workloads",
+                                      "test_app_defaults", "test_cost_model", "test_cost_in_tier", "test_auth_cost", "test_static_and_budget", "test_special_workloads",
                                       "test_split_hosting", "test_services_lint", "test_runs_here", "test_kb_facts", "test_requirements_bind",
                                       "test_hosting_limits", "test_budget_search", "test_skills_ties",
                                       "test_entry_plans", "test_hiring_pool", "test_search_shape", "test_sqlite_traffic",

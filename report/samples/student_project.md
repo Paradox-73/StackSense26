@@ -326,8 +326,7 @@ About ₹0-₹0 per month. Budget status: **within**. Planning estimate from pub
 - **Low tolerance for vendor lock-in**: backend: Firebase (BaaS on Google Cloud) -> Supabase (BaaS on Postgres); database: Cloud Firestore -> PostgreSQL
   - Why backend changes: Firebase (BaaS on Google Cloud) is now ruled out: Proprietary API with the highest lock-in; you asked for low lock-in.
   - Why database changes: Cloud Firestore is now ruled out: Proprietary API with the highest lock-in; you asked for low lock-in.
-- **HIPAA compliance required**: frontend: React SPA (Vite) -> Next.js (React); backend: Firebase (BaaS on Google Cloud) -> Node.js + Express; hosting: Vercel -> Google Cloud Run
-  - Why frontend changes: Low ops burden, where React SPA (Vite) leads (5.0/5 vs 4.0/5), counts for less now (share of the total weight fell; gap 0.1 points toward Next.js (React)); on its own React SPA (Vite) still scores 5.9 higher, so Next.js (React) wins as part of the whole stack (a stack rule now applies: One language across the stack: shared types, shared validation, any developer can work on any layer).
+- **HIPAA compliance required**: backend: Firebase (BaaS on Google Cloud) -> Node.js + Express; hosting: Vercel -> Google Cloud Run
   - Why backend changes: Firebase (BaaS on Google Cloud) is now ruled out: No HIPAA Business Associate Agreement available.
   - Why hosting changes: Vercel now takes a penalty (No free option at your scale (from ~$350/month)), moving the gap 37.3 points toward Google Cloud Run; cost at your scale moved the gap 28.1 points toward Google Cloud Run (Google Cloud Run 4.3/5 vs Vercel 1.0/5, was 4.3 vs 5.0).
 

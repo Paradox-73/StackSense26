@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For a 'Content / blog / marketing (SEO)' project at Small (1k-10k daily users) scale (~2.2 peak req/s) built by 3 engineer(s) in 4 weeks, StackSense recommends Next.js (React) + Serverless functions (Node/Python FaaS) + PostgreSQL + Cloudflare Pages + Workers (architecture: Serverless, event-driven). Estimated infrastructure cost: ₹1,440-₹4,128/month (stretch budget). The highest-scoring stack (Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Vercel, 85.7) is only 0.8 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on a minimum bill that fits your budget.
+For a 'Content / blog / marketing (SEO)' project at Small (1k-10k daily users) scale (~2.2 peak req/s) built by 3 engineer(s) in 4 weeks, StackSense recommends Next.js (React) + Serverless functions (Node/Python FaaS) + PostgreSQL + Cloudflare Pages + Workers (architecture: Serverless, event-driven). Estimated infrastructure cost: ₹1,440-₹6,528/month (stretch budget). The highest-scoring stack (Next.js (React) + Supabase (BaaS on Postgres) + PostgreSQL + Vercel, 85.7) is only 0.8 stack points ahead, inside the 1-point tie margin, so StackSense treats it as a tie and chose this stack on a minimum bill that fits your budget.
 
 ## Recommended stack
 
@@ -26,7 +26,7 @@ Availability approach: The platform runs the functions across zones, with no ins
 ### How the parts fit
 
 1. **Request path**: The browser loads Next.js (React) from Cloudflare Pages + Workers; it sends API calls to functions on Cloudflare Pages + Workers, one invocation per request (~2.2 requests/s at peak).
-2. **Sign-in**: Sign-in uses Auth0; each function checks the token on every request.
+2. **Sign-in**: Sign-in uses Clerk; each function checks the token on every request.
 3. **Data**: PostgreSQL is the system of record (about 14 GB within 12 months); uploaded files go to Cloudflare R2 (+ Cloudflare CDN). Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens.
 4. **Deploy**: A git push builds the app; Cloudflare Pages + Workers deploys it with a preview URL per pull request. Database schema changes run as versioned migrations before the new code serves traffic.
 
@@ -38,7 +38,7 @@ Availability approach: The platform runs the functions across zones, with no ins
 
 ## Warnings and how they were resolved
 
-- **[WARNING] Budget below the top of the estimate**: ₹1,440-₹4,128/month against ₹2,000/month: the top (~3x today's load) and the middle are over, most of the rise in PostgreSQL and Cloudflare Pages + Workers. *Resolution:* Raise the budget before the load grows.
+- **[WARNING] Budget below the top of the estimate**: ₹1,440-₹6,528/month against ₹2,000/month: the top (~3x today's load) and the middle are over, most of the rise in Authentication and PostgreSQL. *Resolution:* Raise the budget before the load grows.
 - **[INFO] Cloudflare Pages + Workers publishes no uptime SLA**: Your 99% target rests on the app alone: Cloudflare Pages + Workers commits to no uptime figure and owes no credit when it is down. *Resolution:* Alert on an external uptime check and keep a fallback ready (a second region or provider); pick a host with a published SLA if the target is contractual.
 
 ## Per-layer reasoning
@@ -325,7 +325,7 @@ Runs here: Next.js (server rendering + static files), the serverless functions. 
 - **Search**: Postgres full-text search: Catalogue/content search with relevance tuning outgrows LIKE queries quickly; the database's own text index starts it, and Meilisearch takes over when facets and typo tolerance matter.
 - **Payments**: Razorpay with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.
 - **Object storage**: Cloudflare R2 (+ Cloudflare CDN): Media and documents belong in object storage, not the database.
-- **Authentication**: Auth0: Do not hand-roll password storage, MFA or SSO.
+- **Authentication**: Clerk: Do not hand-roll password storage, MFA or SSO.
 - **Observability**: OpenTelemetry instrumentation -> Grafana Cloud: Traces, metrics and error tracking from day one; required to defend an availability target.
 
 ## Estimated monthly cost
@@ -334,9 +334,10 @@ Runs here: Next.js (server rendering + static files), the serverless functions. 
 |---|---|---|---|
 | Hosting: Cloudflare Pages + Workers | 0 | 10 | Small (1k-10k daily users) price band, from the band's floor up to its price at ~3x the load, for 8,000 daily users (90% of the way up the tier, log scale) |
 | Database: PostgreSQL | 15 | 33 | Small (10-100 GB of data) database tier (~14 GB in 12 months), from the band's floor up to its price at ~3x the load, for ~14 GB of data (15% of the way up the tier, log scale) |
-| **Total** | **15** | **43** | |
+| Authentication | 0 | 25 | Clerk's free Hobby plan holds up to 50,000 monthly users (~40,000 here); its Pro plan, $25/month, adds production features (https://clerk.com/pricing) |
+| **Total** | **15** | **68** | |
 
-About ₹1,440-₹4,128 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹1,440-₹6,528 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 
@@ -354,7 +355,7 @@ About ₹1,440-₹4,128 per month. Budget status: **stretch**. Planning estimate
 - **HIPAA compliance required**: backend: Serverless functions (Node/Python FaaS) -> Node.js + Express; hosting: Cloudflare Pages + Workers -> AWS Lambda + API Gateway
   - Why backend changes: Low ops burden, where Serverless functions (Node/Python FaaS) leads (5.0/5 vs 4.0/5), counts for less now (share of the total weight fell; gap 0.1 points toward Node.js + Express).
   - Why hosting changes: Cloudflare Pages + Workers is now ruled out: No HIPAA Business Associate Agreement available.
-- **Data must stay in India**: hosting: Cloudflare Pages + Workers -> AWS Lambda + API Gateway
+- **Data must stay in India**: hosting: Cloudflare Pages + Workers -> Vercel
   - Why hosting changes: Cloudflare Pages + Workers is now ruled out: Keeping data and TLS termination inside India or the EU needs the Data Localization Suite, an Enterprise add-on; treated as not meeting a residency rule.
 
 ## Next-best complete stacks

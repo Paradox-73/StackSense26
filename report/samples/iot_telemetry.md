@@ -4,7 +4,7 @@ _Engine v1.0.0. Deterministic: the same inputs always give the same output._
 
 ## Summary
 
-For an 'IoT / telemetry ingestion' project at Large (500-5,000 req/s at peak) scale (~4,000 peak req/s) built by 6 engineer(s) in 16 weeks, StackSense recommends React SPA (Vite) + Go (net/http, chi or Gin) + TimescaleDB (Postgres) + AWS ECS on Fargate (architecture: Modular monolith). Estimated infrastructure cost: $1,365-$14,731/month (stretch budget).
+For an 'IoT / telemetry ingestion' project at Large (500-5,000 req/s at peak) scale (~4,000 peak req/s) built by 6 engineer(s) in 16 weeks, StackSense recommends React SPA (Vite) + Go (net/http, chi or Gin) + TimescaleDB (Postgres) + AWS ECS on Fargate (architecture: Modular monolith). Estimated infrastructure cost: $4,215-$17,581/month (over budget). 1 critical issue(s) need attention: Budget below estimated cost.
 
 ## Recommended stack
 
@@ -38,7 +38,7 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 
 ## Warnings and how they were resolved
 
-- **[WARNING] Budget below the top of the estimate**: $1,365-$14,731/month against $4,000/month: the top (~3x today's load) and the middle are over, most of the rise in TimescaleDB and AWS ECS on Fargate. *Resolution:* Raise the budget before the load grows.
+- **[CRITICAL] Budget below estimated cost**: Estimated minimum spend $4,215/month exceeds your budget of $4,000/month at Large (500-5,000 req/s at peak) scale. *Resolution:* The same stack fits at 99% availability: with one app instance and no database standby it starts at about $3,909/month, within the budget; that relaxes the 99.9% target (requirements.availability). Otherwise raise the budget. 
 
 ## Per-layer reasoning
 
@@ -318,9 +318,10 @@ Runs here: the Go API as long-running processes. React SPA is built to static fi
 | Hosting: AWS ECS on Fargate | 600 | 5,739 | Large (500-5,000 req/s at peak) price band, from the band's floor up to its price at ~3x the load, for 4,000 req/s at peak (90% of the way up the tier, log scale); x1.5 for 99.9% availability (redundant instances) |
 | Database: TimescaleDB (Postgres) | 750 | 8,609 | Large (1-10 TB of data) database tier (~5,600 GB in 12 months), from the band's floor up to its price at ~3x the load, for 4,000 req/s at peak (90% of the way up the tier, log scale); x1.5 for 99.9% availability (standby/replicas) |
 | Static frontend: AWS S3 + CloudFront (static) | 15 | 383 | Large (500-5,000 req/s at peak) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 4,000 req/s at peak (90% of the way up the tier, log scale) |
-| **Total** | **1,365** | **14,731** | |
+| Authentication | 2,850 | 2,850 | Amazon Cognito Essentials: 10,000 monthly active users free, then $0.015 each (~200,000 here; https://aws.amazon.com/cognito/pricing/) |
+| **Total** | **4,215** | **17,581** | |
 
-About ₹131,040-₹1,414,176 per month. Budget status: **stretch**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
+About ₹404,640-₹1,687,776 per month. Budget status: **over**. Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.
 
 ## What would change the recommendation
 

@@ -98,7 +98,7 @@ Architecture preference (7%, [MonolithFirst](https://martinfowler.com/bliki/Mono
 ### 4.4 Validation rules
 
 - **Types, values and ranges.** Every field has its table 3.1 type, and enum values are lower-case strings exactly as written, so `availability: 99.9` as a number is an error that names the allowed strings. Counts are 0 or more, team size and weeks 1 or more, latency above 0 or null, priorities 1 to 5, numbers finite, the description any length and the platform list non-empty.
-- **Required fields.** `project.type`, `project.platforms`, `scale.users_at_launch`, `scale.users_12_months`, `team.size`, `team.experience`, `team.languages` (may be empty), `budget.monthly_infra_usd` and `timeline.mvp_weeks`. In an otherwise valid file a missing one takes its documented default with a `MISSING_REQUIRED_FIELD` warning; a missing optional field takes its default, noted in `assumptions`.
+- **Required fields.** `project.type`, `project.platforms`, `scale.users_at_launch`, `scale.users_12_months`, `team.size`, `team.experience`, `team.languages` (may be empty), `budget.monthly_infra_usd` and `timeline.mvp_weeks`. In an otherwise valid file a missing one takes its documented default with a `MISSING_REQUIRED_FIELD` warning and is listed in `validation_errors` (section 4) while the stack is still given; a missing optional field takes its default, noted in `assumptions`.
 - **Unknown keys.** An unknown enum value or priority key is an error; any other unknown key raises an `UNKNOWN_FIELD` info warning and is ignored.
 - **Result.** Any error gives `invalid_input`, `stack` null and every problem in `validation_errors`; nothing raises. The questionnaire clamps a bad value with a warning instead (`VALUE_CLAMPED`).
 
@@ -162,7 +162,7 @@ A solo beginner with $0, two weeks and critical SEO publishes pages nobody signs
 
 ### 6.2 P2 FixIt Now: home-services marketplace in India (in depth)
 
-![P2 FixIt Now: Next.js, Django, PostgreSQL and DigitalOcean, $207 to $623 a month, with a critical budget warning](screenshots/s-P2.png)
+![P2 FixIt Now: Next.js, Django, PostgreSQL and DigitalOcean, $192 to $524 a month, with a critical budget warning that names the 99% option](screenshots/s-P2.png)
 
 Three intermediate engineers (JavaScript, TypeScript, Python) with nobody on operations have 8 weeks and $150 a month for a marketplace with India residency, critical SEO, chat, phone sign-in, uploads, payments and search, sized at about 6,000 daily users and 12 requests per second at peak.
 
@@ -171,13 +171,13 @@ Three intermediate engineers (JavaScript, TypeScript, Python) with nobody on ope
 - **Backend.** Django matches the team and runs one process for the WebSockets (Channels), jobs and connection pools. FastAPI is 0.1 behind, inside the tie margin, and the output says either is defensible; Spring Boot loses 10.5 because nobody knows Java.
 - **Database.** The unstated data shape and consistency default to relational and strong, as `assumptions` notes. PostgreSQL (fit 5/5) on DigitalOcean Managed PostgreSQL costs $75 to $150 for about 34 GB with a standby; MySQL ties (0.3).
 - **Supporting services.** Celery with a Valkey broker; PostgreSQL full-text search, since 34 GB fits its own index; DigitalOcean Spaces in Bangalore, a private bucket with short-lived signed URLs and no public CDN; MSG91 with the DLT-registered templates Indian operators require; Razorpay hosted checkout, keeping card data off the servers (PCI DSS SAQ A). Sign-in uses Django's built-in authentication, with the users in India.
-- **Cost.** $207 to $623 a month. The floor (hosting $75 with redundancy for 99.9%, database $75, Valkey $30, media $9, SMS $18) exceeds the $150 budget, so the output carries a critical `BUDGET_STRETCH` and `ok_with_warnings`, naming the cheaper hosting and database that scored lower.
+- **Cost.** $192 to $524 a month. The floor (hosting $75 with redundancy for 99.9%, database $75 with a standby, Valkey $15 on DigitalOcean's 1 GiB plan, media $9, SMS $18) exceeds the $150 budget, so the output carries a critical `BUDGET_STRETCH` and `ok_with_warnings`. The warning names the relaxation that fits: the same stack at 99% (one app instance, no standby) starts at about $142.
 
 ### 6.3 P3 BoardRoom: realtime collaborative whiteboard
 
 ![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io in Frankfurt, $1,190 to $2,792 a month, with a budget warning and a no-SLA info warning](screenshots/s-P3.png)
 
-Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1; GDPR with no residency places it in Frankfurt. PostgreSQL leads Microsoft SQL Server by 2.1; Supporting services add Yjs shared documents (CRDTs), Upstash Redis for the cache and pub/sub across instances, River jobs in PostgreSQL, Cloudflare R2 storage, Stripe hosted checkout and Auth0 sign-in. Fly.io publishes no SLA, so the output carries an info warning `NO_PUBLISHED_SLA`.
+Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1; GDPR with no residency places it in Frankfurt. PostgreSQL leads Microsoft SQL Server by 2.1; Supporting services add Yjs shared documents (CRDTs), Upstash Redis for the cache and pub/sub across instances, River jobs in PostgreSQL, Cloudflare R2 storage, Stripe hosted checkout and Clerk sign-in, free up to 50,000 monthly users (Auth0 would cost $3,500 a month there). Fly.io publishes no SLA, so the output carries an info warning `NO_PUBLISHED_SLA`.
 
 ### 6.4 P4 QuickCredit: digital lending in India (in depth)
 
@@ -189,7 +189,7 @@ P4 is the most constrained scenario: AWS required, RBI localisation, PCI DSS, IS
 - **Backend.** Spring Boot matches the team and scores 5/5 on scalability, maturity and structure, which the load, the 99.95% target and the scalability and maintainability priorities weight up; Go is 3.0 behind on skill match.
 - **Database.** A double-entry ledger needs ACID, so eventually consistent stores are out; Firestore is off AWS and SQLite has no failover. PostgreSQL on Amazon RDS or Aurora in Mumbai costs $800 to $2,502 for about 411 GB with a standby; MySQL ties (0.1).
 - **Frontend.** Behind a login SEO does not matter, so a React SPA ships as static files on S3 and CloudFront; Angular ties (0.8) and Next.js loses 1.2 for adding a Node.js server.
-- **Supporting services.** The credit-scoring model on an Amazon SageMaker endpoint in Mumbai ($75 to $180, CPU); Cognito in Mumbai with MSG91 for SMS; Razorpay hosted checkout; SQS for jobs; uploads in a private S3 bucket with short-lived signed URLs; KMS, audit logging, least-privilege IAM and a WAF for PCI DSS.
+- **Supporting services.** The credit-scoring model on an Amazon SageMaker endpoint in Mumbai ($75 to $180, CPU); sign-in by one-time codes in the Spring Boot API with MSG91 for SMS, since Cognito would cost about $4,350 a month at 300,000 monthly users; Razorpay hosted checkout; SQS for jobs; uploads in a private S3 bucket with short-lived signed URLs; KMS, audit logging, least-privilege IAM and a WAF for PCI DSS.
 - **Cost.** $1,962 to $6,967 against $6,000, with hosting and the database doubled for 99.95%; the floor fits the budget but the top does not, so the budget check reads "stretch" and the output carries `BUDGET_RANGE_OVER` and `ok_with_warnings`.
 
 ### 6.5 P5 PeopleDesk: internal HR tool
@@ -210,7 +210,7 @@ The nine files in `scenarios/edge/` cover the nine categories of the statement's
 
 | Category and file | How it is detected | What the engine does |
 |---|---|---|
-| Missing fields (E1: only name, type and platforms) | `validate()` collects absent required paths | Documented defaults, seven `MISSING_REQUIRED_FIELD` warnings, every default in `assumptions`; `ok_with_warnings` |
+| Missing fields (E1: only name, type and platforms) | `validate()` collects absent required paths | Documented defaults, seven `MISSING_REQUIRED_FIELD` warnings and the same seven in `validation_errors`, every default in `assumptions`; `ok_with_warnings` |
 | Invalid values (E2: P2 with seven broken fields) | Type, range and enum checks per field | `invalid_input`, `stack` null, seven field-level `validation_errors` (unknown type and platform, −5 users, a string count, `magic_link`, a numeric availability, a priority of 7) |
 | Contradictions (E3: five million users, $0, 99.99% from one beginner, three platforms in three weeks) | `engine/conflicts.py` compares fields; the cost model compares the cheapest compliant bill with the budget | Critical `BEGINNER_HIGH_AVAILABILITY`, `MANY_PLATFORMS_SHORT_TIMELINE` and `BUDGET_INFEASIBLE`; a reduced-scope stack, each relaxed goal in `assumptions`, its $9,200 floor stated |
 | Over-engineering trap (E4: results page for two million readers, no sign-in) | No sign-in and a read-heavy workload allow static options | Astro, no backend or database, Netlify, $20 to $379; no Kubernetes or microservices |
@@ -220,7 +220,7 @@ The nine files in `scenarios/edge/` cover the nine categories of the statement's
 | Skill mismatch (E8: P2 with a PHP-only team) | Skill match is weighted; an unknown server language takes a penalty | Laravel, HTMX and MySQL; Laravel leads FastAPI by 6.4 points on skill match, and its trade-offs note that high throughput needs Octane |
 | Deprecated technology (E9: AngularJS 1.5, CentOS 7, Python 2.7, PHP 7.2) | An end-of-life table citing the vendor or endoflife.date | Four `EOL_EXISTING_SYSTEM` warnings with sources; each system integrated through its API |
 
-![E1 Missing fields: a stack from the documented defaults, and the first two of seven MISSING_REQUIRED_FIELD warnings](screenshots/e-E1.png)
+![E1 Missing fields: a stack from the documented defaults, and the first three of the seven missing fields in validation_errors](screenshots/e-E1.png)
 
 ![E2 Invalid values: invalid_input, no stack and seven field-level validation errors](screenshots/e-E2.png)
 
@@ -244,7 +244,7 @@ Appendix F has the tables behind 8.1 to 8.3.
 
 ### 8.1 Tests
 
-The 1265 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1274 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -269,9 +269,9 @@ Pairs of projects one answer apart check that a change moves only the layers it 
 - Niche options (CockroachDB, Oracle Database, Rust web frameworks such as Axum, desktop toolkits other than an Electron shell) are not scored; an existing Oracle database is acknowledged but cannot be the pick.
 - Existing systems are matched by patterns: an unknown product only gets "integrated through its API", and one missing from the end-of-life table gets no warning.
 - Daily users are 20% of the 12-month users for every project type; only the three highest priorities change weights; costs exclude egress spikes, support plans and most third-party fees.
-- The random-project test covers the questionnaire path; the explicit-cloud and air-gapped rules have unit tests but no random-input property yet, and most supporting services list one alternative, not several.
+- The random-project test covers the questionnaire path; the explicit-cloud and air-gapped rules have unit tests but no random-input property yet.
 
-Next: an architect review of the answer key and the public outputs, scheduled re-reads of vendor price pages, a random-input property for every hard constraint through the scenario adapter, and a second alternative for each supporting service.
+Next: an architect review of the answer key and the public outputs, scheduled re-reads of vendor price pages, and a random-input property for every hard constraint through the scenario adapter.
 
 ## 10. References and third-party tools
 
@@ -381,7 +381,7 @@ Why it fits: backend, low ops burden: 5.0/5 vs 4.2 average for this layer; hosti
 | Backend | Supabase (BaaS on Postgres) | **Node.js + Express** |
 | Database | PostgreSQL | PostgreSQL |
 | Hosting | Cloudflare Pages + Workers | **Google Cloud Run** |
-| Est. cost / month | $26–$28 | $22–$82 |
+| Est. cost / month | $26–$28 | $27–$82 |
 
 - Backend: Supabase (BaaS on Postgres) now takes a penalty (Minimum ~$584/month is 11.7x the whole budget), moving the gap 17.8 points toward Node.js + Express; cost at your scale moved the gap 11.1 points toward Node.js + Express (Node.js + Express 5.0/5 vs Supabase (BaaS on Postgres) 1.5/5, was 5.0 vs 4.8).
 - Hosting: Cloudflare Pages + Workers is now ruled out: No HIPAA Business Associate Agreement available.
@@ -423,14 +423,14 @@ Safety (new in 2023) is not scored: no infrastructure option changes whether the
 <!-- BEGIN validation -->
 | What is checked | Tests |
 |---|---|
-| Scoring, constraints and cost | 470 |
+| Scoring, constraints and cost | 475 |
 | Explanations match the engine | 130 |
-| Inputs, edge cases and warnings | 296 |
+| Inputs, edge cases and warnings | 300 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 192 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 92 |
-| **All** | **1265** |
+| **All** | **1274** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.

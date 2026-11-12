@@ -8,7 +8,7 @@
 | Backend | Supabase (BaaS on Postgres) | **Node.js + Express** |
 | Database | PostgreSQL | PostgreSQL |
 | Hosting | Cloudflare Pages + Workers | **Google Cloud Run** |
-| Est. cost / month | $26–$28 | $22–$82 |
+| Est. cost / month | $26–$28 | $27–$82 |
 
 - Backend: Supabase (BaaS on Postgres) now takes a penalty (Minimum ~$584/month is 11.7x the whole budget), moving the gap 17.8 points toward Node.js + Express; cost at your scale moved the gap 11.1 points toward Node.js + Express (Node.js + Express 5.0/5 vs Supabase (BaaS on Postgres) 1.5/5, was 5.0 vs 4.8).
 - Hosting: Cloudflare Pages + Workers is now ruled out: No HIPAA Business Associate Agreement available.
@@ -21,7 +21,7 @@
 | Backend | Go (net/http, chi or Gin) | Go (net/http, chi or Gin) |
 | Database | TimescaleDB (Postgres) | TimescaleDB (Postgres) |
 | Hosting | AWS ECS on Fargate | AWS ECS on Fargate |
-| Est. cost / month | $1,365–$14,731 | $38,500–$157,328 |
+| Est. cost / month | $4,215–$17,581 | $413,350–$532,178 |
 
 
 **Internal tool, own servers vs cloud** (preset `internal_tool`; changed answer: `deployment`: on_prem → cloud)
@@ -32,6 +32,6 @@
 | Backend | Python + Django | Python + Django |
 | Database | SQLite (+ Litestream backups) | SQLite (+ Litestream backups) |
 | Hosting | On-prem VMs + Docker Compose | **Render** |
-| Est. cost / month | $0–$153 | $7 |
+| Est. cost / month | $0–$153 | $7–$32 |
 
 - Hosting: On-prem VMs + Docker Compose is now ruled out: On-premises option; you chose public cloud.

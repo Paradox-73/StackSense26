@@ -134,7 +134,7 @@ LINKS = {n: l for n, l, *_ in SHOTS}
 # errors and warnings), which names the four picks and the cost.
 CARD = ".sc-core > .sc-c:nth-child({})"  # the component cards: 1 frontend, 2 backend, 3 database, 4 hosting
 SCENARIO_SHOTS = [(f"s-P{i}", f"P{i}", None, None) for i in range(1, 7)] + [
-    ("e-E1", "E1_missing_fields", None, ".sc-w:nth-child(2)"), ("e-E2", "E2_invalid_values", None, None),
+    ("e-E1", "E1_missing_fields", None, "ul.sc-list li:nth-child(3)"), ("e-E2", "E2_invalid_values", None, None),
     ("e-E3", "E3_contradictions", ".sc-w.critical", None), ("e-E4", "E4_static_at_scale", None, ".sc-sum"),
     ("e-E5", "E5_regulatory", CARD.format(4), CARD.format(4) + " p.small"), ("e-E6", "E6_existing_systems", None, ".sc-sum"),
     ("e-E7", "E7_air_gapped", ".sc-w:nth-child(3)", ".sc-w:nth-child(3)"),
