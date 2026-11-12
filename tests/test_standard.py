@@ -1066,3 +1066,22 @@ def test_deferred_services_are_assumptions_not_part_of_the_stack():
     names = [a.split(" (", 1)[1].split(") is left out")[0] for a in deferred]
     choices = [s["choice"] for s in out["stack"]["supporting"]]
     assert not set(names) & set(choices) and "Deferred" not in json.dumps(out["stack"]["supporting"]), (names, choices)
+
+
+def test_a_scenario_file_can_carry_questionnaire_answers_in_an_extensions_block(outputs):
+    doc = edit("P3")
+    doc["extensions"] = {"data_shapes": ["document"], "consistency": "eventual_ok", "lock_in_tolerance": "low"}
+    out = run(doc)
+    assert out["status"] != "invalid_input" and out["stack"]["database"]["choice"].startswith("MongoDB"), out["stack"]
+    assert "extensions.data_shapes" in out["stack"]["database"]["driven_by"]
+    assert any(a.startswith("extensions.consistency = 'eventual_ok'") for a in out["assumptions"])
+    bad = edit("P3")
+    bad["extensions"] = {"consistency": "maybe"}
+    assert run(bad)["validation_errors"] == [{"field": "extensions.consistency", "message": "must be one of: strong, eventual_ok"}]
+    odd = edit("P3")
+    odd["extensions"] = {"colour": "blue"}
+    assert [w["fields"] for w in run(odd)["warnings"] if w["code"] == "UNKNOWN_FIELD"] == [["extensions.colour"]]
+    assert core(run(odd)) == core(outputs["P3"])  # an unknown extension changes nothing
+    india = edit("P2")
+    india["extensions"] = {"regions": ["europe"]}  # residency india already fixes the region
+    assert core(run(india)) == core(outputs["P2"])

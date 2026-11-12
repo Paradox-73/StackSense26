@@ -99,7 +99,7 @@ Architecture preference (7%, [MonolithFirst](https://martinfowler.com/bliki/Mono
 
 - **Types, values and ranges.** Every field has its table 3.1 type, and enum values are lower-case strings exactly as written, so `availability: 99.9` as a number is an error that names the allowed strings. Counts are 0 or more, team size and weeks 1 or more, latency above 0 or null, priorities 1 to 5, numbers finite, the description any length and the platform list non-empty.
 - **Required fields.** `project.type`, `project.platforms`, `scale.users_at_launch`, `scale.users_12_months`, `team.size`, `team.experience`, `team.languages` (may be empty), `budget.monthly_infra_usd` and `timeline.mvp_weeks`. In an otherwise valid file a missing one takes its documented default with a `MISSING_REQUIRED_FIELD` warning; a missing optional field takes its default, noted in `assumptions`.
-- **Unknown keys.** An unknown enum value or priority key is an error; any other unknown key raises an `UNKNOWN_FIELD` info warning and is ignored.
+- **Unknown keys and extensions.** An unknown enum value or priority key is an error; any other unknown key raises an `UNKNOWN_FIELD` info warning and is ignored. An optional `extensions` object carries nine questionnaire answers the schema lacks (data shapes, consistency, regions, lock-in tolerance, cacheable share, background work, peak requests per second, data growth, tenancy), each checked against its question.
 - **Result.** Any error gives `invalid_input`, `stack` null and every problem in `validation_errors`; nothing raises. The questionnaire clamps a bad value with a warning instead (`VALUE_CLAMPED`).
 
 ### 4.5 What the measurements show
@@ -244,7 +244,7 @@ Appendix F has the tables behind 8.1 to 8.3.
 
 ### 8.1 Tests
 
-The 1276 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1278 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -429,12 +429,12 @@ Safety (new in 2023) is not scored: no infrastructure option changes whether the
 |---|---|
 | Scoring, constraints and cost | 476 |
 | Explanations match the engine | 130 |
-| Inputs, edge cases and warnings | 300 |
+| Inputs, edge cases and warnings | 302 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 192 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 93 |
-| **All** | **1276** |
+| **All** | **1278** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.

@@ -143,7 +143,13 @@ FIELD_HELP = {
     "compliance": "Regulations that apply (hard constraints)",
 }
 KNOWN_KEYS = {sec: {f[0].split(".", 1)[1] for f in FIELDS if f[0].startswith(sec + ".")} for sec in SECTIONS}
-TOP_LEVEL = set(SECTIONS) | {"scenario_id", "compliance", "priorities"}
+TOP_LEVEL = set(SECTIONS) | {"scenario_id", "compliance", "priorities", "extensions"}
+# Questionnaire answers a scenario file may add in an optional "extensions" object (report section 4): inputs the
+# standard schema has no field for. Each is checked against its question in data/questions.json and then used as
+# that answer; a key not listed here is an UNKNOWN_FIELD notice, as elsewhere.
+EXTENSION_KEYS = ("data_shapes", "consistency", "regions", "lock_in_tolerance", "cacheable_share", "background_work",
+                  "peak_rps", "data_growth_gb_month", "tenancy")
+EXTENSION_PATHS = tuple(f"extensions.{k}" for k in EXTENSION_KEYS)
 
 APP_TYPE = {"content_site": "content_site", "web_app": "saas", "saas_b2b": "saas", "ecommerce": "ecommerce",
             "marketplace": "ecommerce", "social": "social_network", "realtime_collab": "realtime_collab",
@@ -398,6 +404,22 @@ def _check(kind: str, value, allowed) -> tuple[object, str | None]:
     return (int(value) if kind != "num0" else value), None
 
 
+def _check_extension(spec: dict, value) -> str | None:
+    """The error for one extensions value against its question's type and options, or None."""
+    allowed = [o["value"] for o in spec.get("options", [])]
+    kind = spec.get("type")
+    if kind == "select" and value not in allowed:
+        return f"must be one of: {', '.join(allowed)}"
+    if kind == "multiselect" and (not isinstance(value, list) or not value or any(v not in allowed for v in value)):
+        return f"must be a non-empty list of: {', '.join(allowed)}"
+    if kind == "number" and (isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0
+                             or value != value or value in (float("inf"),)):
+        return "must be a number of 0 or more"
+    if kind == "bool" and not isinstance(value, bool):
+        return "must be true or false"
+    return None
+
+
 def validate(doc) -> tuple[dict, list[dict], list[str], list[str]]:
     """Every standard field read and checked: (fields by path, validation errors, missing required paths,
     unknown keys). Fields missing from the file get their default, so `fields` is complete."""
@@ -441,6 +463,21 @@ def validate(doc) -> tuple[dict, list[dict], list[str], list[str]]:
         if key.startswith("priorities."):
             errors.append({"field": key, "message": f"unknown priority; allowed keys: {', '.join(PRIORITY_KEYS)}"})
     unknown = [k for k in unknown if not k.startswith("priorities.")]
+    fields["extensions"] = {}
+    ext = doc.get("extensions")
+    if ext is not None and not isinstance(ext, dict):
+        errors.append({"field": "extensions", "message": "must be an object"})
+    elif ext:
+        specs = field_specs()
+        for key, value in ext.items():
+            if key not in EXTENSION_KEYS:
+                unknown.append(f"extensions.{key}")
+                continue
+            err = _check_extension(specs[key], value)
+            if err:
+                errors.append({"field": f"extensions.{key}", "message": err})
+            else:
+                fields["extensions"][key] = value
     if not errors:
         if fields["scale.users_at_launch"] is None and fields["scale.users_12_months"] is None:
             fields["scale.users_at_launch"] = fields["scale.users_12_months"] = 1000
@@ -753,6 +790,13 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
                                    ["infrastructure.existing_systems", "infrastructure.deployment_model"]))
             continue
         notes.append(f"Existing system '{text}': integrated through {how}; it stays the system of record for its own data")
+    for key, value in f.get("extensions", {}).items():
+        if key == "regions" and f["infrastructure.data_residency"] != "none":
+            notes.append(f"extensions.regions ignored: infrastructure.data_residency '{f['infrastructure.data_residency']}' "
+                         "already fixes where the data and its users are")
+            continue
+        put(key, value, f"extensions.{key}")
+        notes.append(f"extensions.{key} = {value!r}: answer taken from the scenario file's extensions block")
     return a, origin, notes, warns
 
 
@@ -992,7 +1036,7 @@ def _paths(keys, origin: dict) -> list[str]:
     out = []
     for key in keys:
         out += origin.get(key) or ENGINE_FIELDS.get(key, [])
-    return list(dict.fromkeys(p for p in out if p in FIELD_PATHS))
+    return list(dict.fromkeys(p for p in out if p in FIELD_PATHS or p in EXTENSION_PATHS))
 
 
 def _region(provider: str, f: dict) -> str | None:

@@ -4,7 +4,7 @@
 
 [![Python 3.10-3.13](https://img.shields.io/badge/python-3.10--3.13-3776ab)](https://www.python.org/downloads/)
 [![FastAPI 0.142](https://img.shields.io/badge/FastAPI-0.142-009688)](https://fastapi.tiangolo.com/)
-[![1276 tests](https://img.shields.io/badge/tests-1276-2ea44f)](tests/)
+[![1278 tests](https://img.shields.io/badge/tests-1278-2ea44f)](tests/)
 [![LLM optional](https://img.shields.io/badge/LLM-optional-6f42c1)](#switch-off-the-language-model)
 [![Deterministic](https://img.shields.io/badge/output-deterministic-0969da)](#validation-and-consistency)
 
@@ -147,6 +147,7 @@ python cli.py --no-llm --scenario hidden/ --out results                 # hidden
 - With a folder, or an `--out` that is not a `.json` name, each output goes to `<out>/<scenario_id>_output.json`, for example `outputs/P2_output.json`. One line per scenario prints its status, the four picks and the file.
 - A file may hold a JSON array of scenarios: each element gets its own output. `POST /api/scenario` takes one scenario or an array of up to 100.
 - The command line needs no packages: any Python 3.10 or newer runs it.
+- Optional `extensions` object: questionnaire answers the standard schema has no field for, for example `"extensions": {"data_shapes": ["document"], "consistency": "eventual_ok", "lock_in_tolerance": "low"}`. Allowed keys: `data_shapes`, `consistency`, `regions`, `lock_in_tolerance`, `cacheable_share`, `background_work`, `peak_rps`, `data_growth_gb_month`, `tenancy` (values as in `data/questions.json`). A file without it works as before.
 - In the browser, **Scenario file** loads a file, shows the result and offers **Download output JSON**.
 - `outputs/P1_output.json` to `P6_output.json` are the engine's output for the public scenarios.
 
@@ -218,7 +219,7 @@ Sources:
 
 ## Key results
 
-- **Tests:** 1276 tests, including checks that every warning code is tested and that the numbers in this file match the code (`tests/test_docs.py`).
+- **Tests:** 1278 tests, including checks that every warning code is tested and that the numbers in this file match the code (`tests/test_docs.py`).
 - **Benchmark** (`python tools/bench.py`): 40 project briefs against an answer key written before measurement. Result: 82% top-1 (129 of the 158 layer picks that have a best pick) and 96% acceptable (154 of all 160 layer picks); on the ten briefs held out from tuning, 72% and 95%. A language model playing three architect personas wrote the key, blind to the engine; no human architect checked it.
 - **LLM-only comparison** (`python tools/llm_baseline.py --show`, offline, not part of the engine): LLM 84% top-1 on 158 picks, 94% acceptable on 160, against the engine's 82% and 96%, but the model breaks a hard requirement in 7 of the 40 briefs; the engine's picks break none.
 - **Random projects** (`python tools/fuzz.py --n 1000 --growth-n 100`): 1,000 seeded random projects against 15 properties (hard constraints, identical repeats, renaming and reordering, no return to an earlier pick as users grow): 0 violations.
