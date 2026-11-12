@@ -108,7 +108,7 @@ The pipeline runs in seven stages ([pipeline figure](pipeline.svg)). Stage 7 cov
    - Data volume, if not given = about 0.2-4 MB of database rows per daily user a month by app type (0.5 MB for a SaaS, 1.5 MB for a social feed, ~4 MB for a device reporting once a minute) at the user count typical of the scale tier, with one month of growth at launch. It is the same at every user count of a tier, so the growth path agrees with every run. A content site keeps its own default (1 GB + 0.1 GB a month).
    - Implied requirements: fintech forces strong consistency, and fintech in India adds Indian data residency (RBI payment-data rule); a mobile-first app adds iOS and Android; a realtime-collaboration app forces realtime = core.
 3. **Detect conflicts** (`conflicts.py`)
-   - 22 cross-field checks (65 warning codes across the whole engine), including: 1 developer + microservices, HIPAA on a ₹0 budget, 99.99% availability with 2 people, a 20 ms target across continents, EU + India residency together, and a peak RPS that contradicts the DAU.
+   - 22 cross-field checks (66 warning codes across the whole engine), including: 1 developer + microservices, HIPAA on a ₹0 budget, 99.99% availability with 2 people, a 20 ms target across continents, EU + India residency together, and a peak RPS that contradicts the DAU.
    - Each check states how it was resolved.
    - Resolution priority: compliance > deployment model > physics and team capacity > budget and preferences.
 4. **Build criterion weights** (`scoring.py`)

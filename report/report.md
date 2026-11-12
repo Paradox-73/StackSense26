@@ -129,7 +129,7 @@ Every score therefore splits into the points each answer added. `driven_by` list
 | Constraint | How the engine applies it |
 |---|---|
 | `data_residency` | Only providers with a region there stay, and storage, sign-in, cache, monitoring and model services must sit there too; `rbi_localisation` adds India; `other` raises `RESIDENCY_UNVERIFIED`. |
-| `compliance` | Never relaxed. HIPAA needs a BAA from the host, a backend-as-a-service and a managed-only database; PCI DSS a host attestation; SOC 2 and ISO 27001 a published report or certificate. GDPR adds a data-processing note; DPDP adds duties, not a region filter. |
+| `compliance` | Never relaxed. HIPAA needs a BAA from the host, a backend-as-a-service and a managed-only database; PCI DSS a host attestation; SOC 2 and ISO 27001 a published report or certificate. GDPR adds a data-processing note, and with no residency an EU region; DPDP adds duties, not a region filter. |
 | `deployment_model` | `self_hosted_cloud_vm` keeps what runs on a plain VM (self-managed database, Keycloak, Grafana); `on_premise` removes public-cloud services and flags payments, SMS and push as outside services (`ONPREM_EXTERNAL`, critical); `air_gapped` keeps self-hostable components and moves payments, SMS and push outside or replaces them. |
 | explicit `cloud_preference` | `aws`, `gcp` or `azure` keeps only that cloud; `none` removes all three. |
 | budget, timeline, priorities | Soft: weights and penalties. An estimate's top over the budget raises `BUDGET_RANGE_OVER`; its low end over it, a critical `BUDGET_STRETCH` or `BUDGET_INFEASIBLE`. |
@@ -175,13 +175,13 @@ Three intermediate engineers (JavaScript, TypeScript, Python) with nobody on ope
 
 ### 6.3 P3 BoardRoom: realtime collaborative whiteboard
 
-![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io, $1,190 to $2,792 a month, with a budget warning and a no-SLA info warning](screenshots/s-P3.png)
+![P3 BoardRoom: React SPA, Go, PostgreSQL and Fly.io in Frankfurt, $1,190 to $2,792 a month, with a budget warning and a no-SLA info warning](screenshots/s-P3.png)
 
-Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1. PostgreSQL leads Microsoft SQL Server by 2.1; Supporting services add Yjs shared documents (CRDTs), Upstash Redis for the cache and pub/sub across instances, River jobs in PostgreSQL, Cloudflare R2 storage, Stripe hosted checkout and Auth0 sign-in. Fly.io publishes no SLA, so the output carries an info warning `NO_PUBLISHED_SLA`.
+Five seniors (TypeScript, Go) build a write-heavy whiteboard for 5,000 concurrent users and a 100 ms target. Go matches the team; Elixir + Phoenix has the better realtime fit but loses 3.1 stack points because nobody knows Elixir. Fly.io holds long-lived WebSockets (realtime 5/5) and leads Cloud Run by 3.1; GDPR with no residency places it in Frankfurt. PostgreSQL leads Microsoft SQL Server by 2.1; Supporting services add Yjs shared documents (CRDTs), Upstash Redis for the cache and pub/sub across instances, River jobs in PostgreSQL, Cloudflare R2 storage, Stripe hosted checkout and Auth0 sign-in. Fly.io publishes no SLA, so the output carries an info warning `NO_PUBLISHED_SLA`.
 
 ### 6.4 P4 QuickCredit: digital lending in India (in depth)
 
-![P4 QuickCredit: React SPA, Spring Boot, PostgreSQL and AWS ECS on Fargate, $1,962 to $6,967 a month, with a budget warning](screenshots/s-P4.png)
+![P4 QuickCredit: React SPA, Spring Boot, PostgreSQL and AWS ECS on Fargate, $1,962 to $6,967 a month, with a budget warning and a warning that the team lists no Swift](screenshots/s-P4.png)
 
 P4 is the most constrained scenario: AWS required, RBI localisation, PCI DSS, ISO 27001 and 99.95%, for eight seniors (Java, Kotlin, TypeScript) who can run infrastructure, sized at about 60,000 daily users and 833 requests per second at peak.
 
@@ -200,7 +200,7 @@ Two C# developers build a tool for 1,200 employees on Azure in India under ISO 2
 
 ### 6.6 P6 KhetSurvey: offline-first crop survey app
 
-![P6 KhetSurvey: React Native, Django, PostgreSQL and DigitalOcean, $84 to $169 a month with the $49 PowerSync Pro plan, with a budget warning](screenshots/s-P6.png)
+![P6 KhetSurvey: React Native, Django, PostgreSQL and DigitalOcean, $35 to $169 a month (PowerSync Free plan, Pro at $49 at the top), with a budget warning](screenshots/s-P6.png)
 
 Two developers (JavaScript, Python) build an Android-only survey app that must work offline, in India, for $100 a month; type `other` on phones only is scored as a mobile-first app. React Native (Expo) leads Flutter by 3.5 points on skills, and PowerSync keeps a local SQLite copy in sync with PostgreSQL. Django and DigitalOcean in Bangalore win ties (0.5 and 0.6 points), and of about 100 GB in a year, the photos (about 97 GB) go to DigitalOcean Spaces and the survey records (about 3 GB) to PostgreSQL.
 
@@ -244,7 +244,7 @@ Appendix F has the tables behind 8.1 to 8.3.
 
 ### 8.1 Tests
 
-The 1263 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1265 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -425,12 +425,12 @@ Safety (new in 2023) is not scored: no infrastructure option changes whether the
 |---|---|
 | Scoring, constraints and cost | 470 |
 | Explanations match the engine | 130 |
-| Inputs, edge cases and warnings | 294 |
+| Inputs, edge cases and warnings | 296 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 192 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 92 |
-| **All** | **1263** |
+| **All** | **1265** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.
