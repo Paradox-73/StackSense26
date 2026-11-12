@@ -890,7 +890,15 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
                           f"{_money(min_cost - d['budget_usd'], p)} over" if pair > min_cost + 0.5 else "") + ". ")
             res += "Cost was weighted up. Raise the budget or reduce scale/compliance scope."
         else:
-            res = (f"A cheaper stack exists but scored lower on your other priorities: hosting + database from about "
+            # The redundancy a stated availability target adds is often what breaks a small budget: price the same
+            # stack at 99% (one app instance, no database standby) and offer that relaxation first.
+            single = estimate_cost(p, dict(d, availability=99.0), dict(stack_items, api_host=api_host["item"])
+                                   if api_host else stack_items, services)["total_low"]
+            res = (f"The same stack fits at 99% availability: with one app instance and no database standby it starts "
+                   f"at about {_money(single, p)}, within the budget; that relaxes the {d['availability']:g}% target "
+                   "(requirements.availability). Otherwise raise the budget. " if single < cost["total_low"]
+                   and single <= d["budget_usd"] else
+                   f"A cheaper stack exists but scored lower on your other priorities: hosting + database from about "
                    f"{_money(min_cost, p)} ({cheapest_pair}); see the 'Budget cut' scenario under 'What would change'.")
         core["warnings"].append(_warn("BUDGET_INFEASIBLE" if min_cost > d["budget_usd"] else "BUDGET_STRETCH",
                                       sev, "Budget below estimated cost", detail, res, ["budget_monthly", "dau"]))

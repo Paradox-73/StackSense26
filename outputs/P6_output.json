@@ -2,7 +2,7 @@
   "scenario_id": "P6",
   "engine_version": "1.0.0",
   "status": "ok_with_warnings",
-  "summary": "A modular monolith build: React Native on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $35-169 a month. It keeps data in India under DPDP, builds on the team's Python, keeps working offline, and ships as one deployable that a team of 2 can build in 10 weeks.",
+  "summary": "A modular monolith build: React Native on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $35-148 a month. It keeps data in India under DPDP, builds on the team's Python, keeps working offline, and ships as one deployable that a team of 2 can build in 10 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -319,14 +319,14 @@
   },
   "estimated_monthly_cost_usd": {
     "min": 35,
-    "max": 169,
+    "max": 148,
     "assumptions": [
       "Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
       "Scale tier: Small (50-500 users online at once)",
       "Budget check: $100/month stated, status 'stretch'",
       "Hosting: DigitalOcean (App Platform + Managed DBs): $12-59 (Small (50-500 users online at once) price band, from the band's floor up to its price at ~3x the load, for 200 users online at once (60% of the way up the tier, log scale))",
       "Database: PostgreSQL: $15-15 (Small (50-500 users online at once) database tier (~3 GB in 12 months), from the band's floor up to its price at ~3x the load, for 8 req/s at peak (22% of the way up the tier, log scale))",
-      "Background jobs: Redis / Valkey: $5-36 (Small (50-500 users online at once) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 200 users online at once (60% of the way up the tier, log scale))",
+      "Background jobs: Redis / Valkey: $5-15 (Small (50-500 users online at once) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 200 users online at once (60% of the way up the tier, log scale))",
       "Object storage: $1-2 (~97 GB of uploaded files (the stated total less the database's ~3 GB) at $0.015-0.025/GB-month (https://developers.cloudflare.com/r2/pricing/ and https://aws.amazon.com/s3/pricing/))",
       "Media delivery: $1-5 (~60 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)",
       "Phone login (SMS OTP): $1-3 (~600 SMS a month (one login every ~20 days per active user) at $0.002-0.005 each)",
@@ -337,7 +337,7 @@
     {
       "code": "BUDGET_RANGE_OVER",
       "severity": "warning",
-      "message": "Budget below the top of the estimate. $35-$169/month against $100/month: the top (~3x today's load) and the middle are over, most of the rise in Offline sync and DigitalOcean. Raise the budget before the load grows.",
+      "message": "Budget below the top of the estimate. $35-$148/month against $100/month: the top (~3x today's load) is over, most of the rise in Offline sync and DigitalOcean. Raise the budget before the load grows.",
       "fields": [
         "budget.monthly_infra_usd",
         "scale.users_12_months"

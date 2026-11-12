@@ -261,7 +261,7 @@
       },
       {
         "layer": "auth",
-        "choice": "Amazon Cognito in the Mumbai region (ap-south-1)",
+        "choice": "Spring Security's one-time token login in your API, with one-time codes sent through the SMS gateway and the users in your database in your Indian region: Amazon Cognito would cost about $4,350 a month at ~300,000 monthly users",
         "justification": "Do not hand-roll password storage, MFA or SSO. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.auth",
@@ -280,7 +280,7 @@
         "tradeoffs": [
           "Sign-in depends on the identity provider staying up; moving users off it later is a migration"
         ],
-        "source": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-identity-federation.html"
+        "source": "https://docs.spring.io/spring-security/reference/servlet/authentication/onetimetoken.html"
       },
       {
         "layer": "other",

@@ -2,7 +2,7 @@
   "scenario_id": "P3",
   "engine_version": "1.0.0",
   "status": "ok_with_warnings",
-  "summary": "A modular monolith build: React SPA on the frontend, Go for the backend, PostgreSQL for data, hosted on Fly.io for about $1,190-2,792 a month. It plans for GDPR, builds on the team's Go, pushes live updates, and ships as one deployable that a team of 5 can build in 12 weeks.",
+  "summary": "A modular monolith build: React SPA on the frontend, Go for the backend, PostgreSQL for data, hosted on Fly.io for about $1,190-2,817 a month. It plans for GDPR, builds on the team's Go, pushes live updates, and ships as one deployable that a team of 5 can build in 12 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -283,7 +283,7 @@
       },
       {
         "layer": "auth",
-        "choice": "Auth0",
+        "choice": "Clerk",
         "justification": "Do not hand-roll password storage, MFA or SSO. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
         "driven_by": [
           "requirements.auth"
@@ -301,7 +301,7 @@
         "tradeoffs": [
           "Sign-in depends on the identity provider staying up; moving users off it later is a migration"
         ],
-        "source": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+        "source": "https://clerk.com/docs"
       },
       {
         "layer": "observability",
@@ -344,7 +344,7 @@
   },
   "estimated_monthly_cost_usd": {
     "min": 1190,
-    "max": 2792,
+    "max": 2817,
     "assumptions": [
       "Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
       "Scale tier: Large (5,000-50,000 users online at once)",
@@ -352,14 +352,15 @@
       "Hosting: Fly.io: $375-845 (Large (5,000-50,000 users online at once) price band, from the band's floor up to its price at ~3x the load, for 521 req/s at peak (2% of the way up the tier, log scale); x1.5 for 99.9% availability (redundant instances))",
       "Database: PostgreSQL: $600-1,244 (Large (5,000-50,000 users online at once) database tier (~200 GB in 12 months), from the band's floor up to its price at ~3x the load, for 521 req/s at peak (2% of the way up the tier, log scale); upper end for ~200 GB of data: the band's top is priced for the largest data of the tier; x1.5 for 99.9% availability (standby/replicas))",
       "Cache: Redis / Valkey: $200-568 (Large (5,000-50,000 users online at once) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 521 req/s at peak (2% of the way up the tier, log scale))",
-      "Media delivery: $15-135 (~1,500 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)"
+      "Media delivery: $15-135 (~1,500 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)",
+      "Authentication: $0-25 (Clerk's free Hobby plan holds up to 50,000 monthly users (~50,000 here); its Pro plan, $25/month, adds production features (https://clerk.com/pricing))"
     ]
   },
   "warnings": [
     {
       "code": "BUDGET_RANGE_OVER",
       "severity": "warning",
-      "message": "Budget below the top of the estimate. $1,190-$2,792/month against $1,500/month: the top (~3x today's load) and the middle are over, most of the rise in PostgreSQL and Fly.io. Raise the budget before the load grows.",
+      "message": "Budget below the top of the estimate. $1,190-$2,817/month against $1,500/month: the top (~3x today's load) and the middle are over, most of the rise in PostgreSQL and Fly.io. Raise the budget before the load grows.",
       "fields": [
         "budget.monthly_infra_usd",
         "scale.users_12_months"

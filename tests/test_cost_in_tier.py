@@ -220,3 +220,25 @@ def test_budget_rules_never_move_p2_to_a_stack_still_over_its_budget():
         assert out["stack"]["hosting"]["choice"].startswith("DigitalOcean"), (budget, out["stack"]["hosting"]["choice"])
     out = _p2(priorities__performance=4)
     assert not out["stack"]["hosting"]["choice"].startswith("AWS Lambda"), out["stack"]["hosting"]["choice"]
+
+
+def _p2_at(budget: float) -> dict:
+    doc = json.loads(open("scenarios/public/P2.json", encoding="utf-8").read())
+    doc["budget"]["monthly_infra_usd"] = budget
+    return run_text(json.dumps(doc))
+
+
+def test_an_over_budget_stack_offers_the_same_stack_without_redundancy_when_that_fits():
+    out = _p2_at(150)  # 99.9% stated: two app instances and a database standby put the floor over $150
+    warn = next(w for w in out["warnings"] if w["code"] == "BUDGET_STRETCH")
+    assert "The same stack fits at 99% availability" in warn["message"], warn["message"]
+    single = float(warn["message"].split("starts at about $")[1].split("/month")[0].replace(",", ""))
+    assert single <= 150 < out["estimated_monthly_cost_usd"]["min"], (single, out["estimated_monthly_cost_usd"])
+    tight = _p2_at(100)  # below even the single-instance floor: the cheaper-stack advice stays
+    msg = next(w["message"] for w in tight["warnings"] if w["code"].startswith("BUDGET"))
+    assert "same stack fits" not in msg and "cheaper stack" in msg, msg
+
+
+def test_digitalocean_valkey_is_priced_at_its_smallest_plan():
+    lines = _p2_at(150)["estimated_monthly_cost_usd"]["assumptions"]
+    assert any(a.startswith("Background jobs: Redis / Valkey: $15-15") for a in lines), lines

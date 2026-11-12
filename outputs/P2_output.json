@@ -2,7 +2,7 @@
   "scenario_id": "P2",
   "engine_version": "1.0.0",
   "status": "ok_with_warnings",
-  "summary": "A modular monolith build: Next.js on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $207-623 a month. It keeps data in India under DPDP, builds on the team's Python, pushes live updates, and ships as one deployable that a team of 3 can build in 8 weeks.",
+  "summary": "A modular monolith build: Next.js on the frontend, Python + Django for the backend, PostgreSQL for data, hosted on DigitalOcean for about $192-524 a month. It keeps data in India under DPDP, builds on the team's Python, pushes live updates, and ships as one deployable that a team of 3 can build in 8 weeks.",
   "architecture_style": "modular_monolith",
   "stack": {
     "frontend": {
@@ -366,15 +366,15 @@
     ]
   },
   "estimated_monthly_cost_usd": {
-    "min": 207,
-    "max": 623,
+    "min": 192,
+    "max": 524,
     "assumptions": [
       "Planning estimate from published price bands at your scale tier, each read where the project sits inside its tier, with the usage terms listed per line; excludes salaries, third-party SaaS (auth, email, payments fees) and egress spikes.",
       "Scale tier: Medium (500-5,000 users online at once)",
       "Budget check: $150/month stated, status 'over'",
       "Hosting: DigitalOcean (App Platform + Managed DBs): $75-233 (Medium (500-5,000 users online at once) price band, from the band's floor up to its price at ~3x the load, for 800 users online at once (20% of the way up the tier, log scale); x1.5 for 99.9% availability (redundant instances))",
       "Database: PostgreSQL: $75-150 (Medium (500-5,000 users online at once) database tier (~34 GB in 12 months), from the band's floor up to its price at ~3x the load, for ~34 GB of data (the bottom of the tier: that measure alone is below it); upper end for ~34 GB of data: the band's top is priced for the largest data of the tier; priced as DigitalOcean Managed PostgreSQL; x1.5 for 99.9% availability (standby/replicas))",
-      "Background jobs: Redis / Valkey: $30-114 (Medium (500-5,000 users online at once) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 800 users online at once (20% of the way up the tier, log scale))",
+      "Background jobs: Redis / Valkey: $15-15 (Medium (500-5,000 users online at once) price band (the app's scale), from the band's floor up to its price at ~3x the load, for 800 users online at once (20% of the way up the tier, log scale))",
       "Object storage: $0-0 (~16 GB of uploaded files (the stated total less the database's ~34 GB) at $0.015-0.025/GB-month (https://developers.cloudflare.com/r2/pricing/ and https://aws.amazon.com/s3/pricing/))",
       "Media delivery: $9-81 (~900 GB served a month (5 MB per active user a day) at $0.01-0.09/GB)",
       "Phone login (SMS OTP): $18-45 (~9,000 SMS a month (one login every ~20 days per active user) at $0.002-0.005 each)"
@@ -384,7 +384,7 @@
     {
       "code": "BUDGET_STRETCH",
       "severity": "critical",
-      "message": "Budget below estimated cost. Estimated minimum spend $207/month exceeds your budget of $150/month at Medium (500-5,000 users online at once) scale. A cheaper stack exists but scored lower on your other priorities: hosting + database from about $55/month (AWS Lambda + API Gateway with Amazon DynamoDB).",
+      "message": "Budget below estimated cost. Estimated minimum spend $192/month exceeds your budget of $150/month at Medium (500-5,000 users online at once) scale. The same stack fits at 99% availability: with one app instance and no database standby it starts at about $142/month, within the budget; that relaxes the 99.9% target (requirements.availability). Otherwise raise the budget.",
       "fields": [
         "budget.monthly_infra_usd",
         "scale.users_12_months"
@@ -412,7 +412,7 @@
     "Vendor lock-in tolerance: Not provided; using default 'medium'.",
     "compliance: DPDP Act 2023 (in force through the DPDP Rules 2025, notified November 2025 and phased in over 18 months) allows cross-border transfer except to notified countries, so it adds consent/breach-notice duties but not an India-region filter. Set infrastructure.data_residency to india if a sector rule (e.g. RBI) applies.",
     "Stored data: The stated 50 GB counts uploaded files too. The database is sized for ~34 GB of rows (0.5 MB per daily user a month for this app type, at ~5,335 daily users, launch plus 12 months), and the other ~16 GB of files is priced as object storage on the stack's cloud.",
-    "Relaxed or flagged (BUDGET_STRETCH): Budget below estimated cost. Estimated minimum spend $207/month exceeds your budget of $150/month at Medium (500-5,000 users online at once) scale. A cheaper stack exists but scored lower on your other priorities: hosting + database from about $55/month (AWS Lambda + API Gateway with Amazon DynamoDB)."
+    "Relaxed or flagged (BUDGET_STRETCH): Budget below estimated cost. Estimated minimum spend $192/month exceeds your budget of $150/month at Medium (500-5,000 users online at once) scale. The same stack fits at 99% availability: with one app instance and no database standby it starts at about $142/month, within the budget; that relaxes the 99.9% target (requirements.availability). Otherwise raise the budget."
   ],
   "validation_errors": []
 }

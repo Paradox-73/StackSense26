@@ -563,6 +563,17 @@
           30000
         ]
       ],
+      "host_plans": [
+        {
+          "name": "DigitalOcean Managed Caching (Valkey, 1 GiB RAM, 1 vCPU)",
+          "vendor": "DigitalOcean",
+          "usd": 15.0,
+          "max_tier": 2,
+          "max_data_gb": 1000000,
+          "limits": "one node with 1 GiB RAM and 1 vCPU, enough for cache keys, sessions, job queues and pub/sub up to a few thousand users online at once; no standby (a matching standby node costs the same again)",
+          "source": "https://www.digitalocean.com/pricing/managed-databases"
+        }
+      ],
       "managed_offerings": {
         "aws": "ElastiCache (Valkey)",
         "gcp": "Memorystore",

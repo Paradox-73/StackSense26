@@ -659,7 +659,8 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         name, src, system = _auth(env, p, d, be)
         add("Authentication", name, "Do not hand-roll password storage, MFA or SSO."
             + (" Customers sign in with their own identity provider (Entra ID, Okta, Google Workspace) over SAML 2.0 or "
-               "OIDC, and the API sees one token format." if sso_needed else ""), src, system=system)
+               "OIDC, and the API sees one token format." if sso_needed else ""), src, system=system,
+            usage=auth_cost(name, env, p))
     if p.get("enterprise_sso"):
         sso = be.get("sso")
         if sso:
@@ -1129,7 +1130,74 @@ IDENTITY_PLATFORM_SAML = "https://cloud.google.com/identity-platform/docs/web/sa
 AUTH0_ENTERPRISE = "https://auth0.com/docs/authenticate/enterprise-connections"
 
 
+# Hosted sign-in prices per monthly user, from each vendor's pricing page (read 12 Nov 2026).
+CLERK_FREE_MRU, CLERK_PRO_USD, CLERK_USD_PER_MRU = 50_000, 25.0, 0.02  # https://clerk.com/pricing (Hobby, Pro)
+AUTH0_FREE_MAU, AUTH0_BLOCK, AUTH0_USD_PER_BLOCK = 25_000, 500, 35.0  # https://auth0.com/pricing (Free; B2C Essentials)
+COGNITO_FREE_MAU, COGNITO_USD_PER_MAU = 10_000, 0.015  # https://aws.amazon.com/cognito/pricing/ (Essentials tier)
+# Keycloak on two containers of 1 vCPU and 2 GB each: its sizing guide puts one instance at about 1.25 GB of memory.
+KEYCLOAK_USD = (60.0, 120.0)
+KEYCLOAK_SIZING = "https://www.keycloak.org/high-availability/concepts-memory-and-cpu-sizing"
+# Above this monthly price for a hosted sign-in, a team that runs servers is better off running Keycloak itself.
+AUTH_SELF_HOST_ABOVE_USD = 500.0
+
+
+def auth_cost(name: str, env: dict, p: dict) -> tuple[float, float, str] | None:
+    """(low, high, basis) of the sign-in product's monthly bill at the project's monthly users, or None when its price
+    is not published per user (BAA and enterprise plans, federation) or it runs on the team's own servers."""
+    mau = p.get("dau", 0) / SSO_DAU_PER_MAU
+    if name.startswith("Clerk"):
+        if mau <= CLERK_FREE_MRU:
+            return (0.0, CLERK_PRO_USD, f"Clerk's free Hobby plan holds up to {CLERK_FREE_MRU:,} monthly users (~{mau:,.0f} "
+                    f"here); its Pro plan, ${CLERK_PRO_USD:g}/month, adds production features (https://clerk.com/pricing)")
+        usd = CLERK_PRO_USD + (mau - CLERK_FREE_MRU) * CLERK_USD_PER_MRU
+        return (usd, usd, f"Clerk Pro: ${CLERK_PRO_USD:g}/month plus ${CLERK_USD_PER_MRU} for each of the ~"
+                f"{mau - CLERK_FREE_MRU:,.0f} monthly users above {CLERK_FREE_MRU:,} (https://clerk.com/pricing)")
+    if name.startswith("Auth0") and "BAA" not in name and "enterprise" not in name:
+        if mau <= AUTH0_FREE_MAU:
+            return (0.0, 0.0, f"Auth0's Free plan holds up to {AUTH0_FREE_MAU:,} monthly active users with social sign-in "
+                    f"(~{mau:,.0f} here; https://auth0.com/pricing)")
+        usd = -(-mau // AUTH0_BLOCK) * AUTH0_USD_PER_BLOCK
+        return (usd, usd, f"Auth0 B2C Essentials at ~{mau:,.0f} monthly active users: ${AUTH0_USD_PER_BLOCK:g} per "
+                f"{AUTH0_BLOCK}, billed at the next tier up (https://auth0.com/pricing)")
+    if name.startswith("Amazon Cognito") and "federated" not in name:
+        usd = max(0.0, mau - COGNITO_FREE_MAU) * COGNITO_USD_PER_MAU
+        return (usd, usd, f"Amazon Cognito Essentials: {COGNITO_FREE_MAU:,} monthly active users free, then "
+                f"${COGNITO_USD_PER_MAU} each (~{mau:,.0f} here; https://aws.amazon.com/cognito/pricing/)")
+    if name.startswith("Keycloak") and not (env["onprem"] or env["self_managed"] or env["hybrid"] or env["air_gapped"]):
+        return (*KEYCLOAK_USD, f"two containers of 1 vCPU and 2 GB for Keycloak on your host ({KEYCLOAK_SIZING}); its "
+                "tables live in your database")
+    return None
+
+
+# The sign-in library each backend framework ships or documents, for one-time codes kept in the app itself.
+FRAMEWORK_AUTH = {"spring_boot": ("Spring Security's one-time token login", "https://docs.spring.io/spring-security/reference/servlet/authentication/onetimetoken.html"),
+                  "django": ("Django's built-in authentication (django.contrib.auth)", "https://docs.djangoproject.com/en/stable/topics/auth/"),
+                  "dotnet": ("ASP.NET Core Identity", "https://learn.microsoft.com/aspnet/core/security/authentication/identity"),
+                  "rails": ("Rails' built-in authentication generator", "https://guides.rubyonrails.org/security.html"),
+                  "laravel": ("Laravel's starter-kit authentication", "https://laravel.com/docs/authentication")}
+
+
 def _auth(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None]:
+    """The identity provider of _auth_pick, unless a hosted one would cost more than AUTH_SELF_HOST_ABOVE_USD a month
+    at the project's users. Then phone one-time codes move into the app (the SMS gateway already sends them), and other
+    sign-in moves to Keycloak, self-hosted in the same place, when the team runs servers."""
+    name, src, system = _auth_pick(env, p, d, be)
+    cost = auth_cost(name, env, p)
+    if not cost or cost[0] <= AUTH_SELF_HOST_ABOVE_USD or env["hipaa"]:
+        return name, src, system
+    why = (f"{name.split(' (')[0].split(' in ')[0]} would cost about ${cost[0]:,.0f} a month at "
+           f"~{p.get('dau', 0) / SSO_DAU_PER_MAU:,.0f} monthly users")
+    where = " in your Indian region" if env["india"] else " in your EU region" if env["eu"] else ""
+    if "phone_otp" in p.get("special_workloads", ()):
+        lib, lib_src = FRAMEWORK_AUTH.get(be.get("id"), ("Your backend framework's built-in authentication", AUTH_DOCS))
+        return (f"{lib} in your API, with one-time codes sent through the SMS gateway and the users in your database"
+                f"{where}: {why}", lib_src, None)
+    if p.get("has_devops"):
+        return f"Keycloak (self-hosted{where}): {why}", KEYCLOAK_DOCS, "keycloak"
+    return name, src, system
+
+
+def _auth_pick(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None]:
     """(product, source, system the team runs) of the project's one identity provider, enterprise SSO included.
     A self-hosted Keycloak needs a team that runs servers and a budget for one; its identity brokering (one SAML or
     OIDC connection per customer) is for multi-tenant B2B, while one customer's directory is a plain federation."""
@@ -1181,7 +1249,9 @@ def _auth(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None]:
     # On AWS the cloud's own user directory (it also sends the SMS codes of phone sign-in); elsewhere a hosted one.
     if env["cloud"] == "aws":
         return "Amazon Cognito", COGNITO_FEDERATION, None
-    return "Auth0" + (" (EU tenant)" if env["eu"] else ""), AUTH_DOCS, None
+    if env["eu"]:  # Auth0 runs tenants in its EU region; Clerk keeps user data in the US
+        return "Auth0 (EU tenant)", AUTH_DOCS, None
+    return "Clerk", "https://clerk.com/docs", None
 
 
 def _observability(env: dict) -> str:
