@@ -488,6 +488,27 @@ def test_description_keywords_add_notes_that_quote_them_and_change_no_pick(outpu
     assert not notes(unrelated), notes(unrelated)
 
 
+def test_a_native_app_in_an_unlisted_language_is_a_warning(outputs):
+    code = "MOBILE_LANGUAGE_NOT_LISTED"
+    p4 = [w for w in outputs["P4"]["warnings"] if w["code"] == code]  # Java, Kotlin, TypeScript team; native iOS app
+    assert len(p4) == 1 and "Swift" in p4[0]["message"] and "React Native (Expo)" in p4[0]["message"], p4
+    assert p4[0]["severity"] == "warning" and "team.languages" in p4[0]["fields"]
+    swift = run(edit("P4", team={"languages": ["java", "kotlin", "typescript", "swift"]}))
+    assert not [w for w in swift["warnings"] if w["code"] == code]
+    for name in ("P2", "P6"):  # React Native apps
+        assert not [w for w in outputs[name]["warnings"] if w["code"] == code], name
+
+
+def test_gdpr_without_residency_places_the_stack_in_an_eu_region(outputs):
+    p3 = outputs["P3"]  # gdpr, data_residency none
+    assert p3["stack"]["hosting"]["choice"] == "Fly.io, region fra (Frankfurt)", p3["stack"]["hosting"]["choice"]
+    assert "users in Europe" in p3["stack"]["hosting"]["justification"]
+    assert any(a.startswith("gdpr with no data_residency") for a in p3["assumptions"])
+    plain = run(edit("P3", compliance=[]))
+    assert ", region" not in plain["stack"]["hosting"]["choice"]
+    assert not any(a.startswith("gdpr with no data_residency") for a in plain["assumptions"])
+
+
 @pytest.mark.parametrize("cloud,host", [("aws", "AWS S3 + CloudFront"), ("gcp", "Firebase Hosting"),
                                         ("azure", "Azure Static Web Apps")])
 def test_a_static_site_on_a_named_cloud_gets_that_clouds_static_host(cloud, host):

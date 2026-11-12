@@ -118,8 +118,8 @@ def test_the_hosted_sync_subscription_is_in_the_cost_band_and_the_self_hosted_on
     def sync_line(doc):
         lines = run(doc)["estimated_monthly_cost_usd"]["assumptions"]
         return next((a for a in lines if a.startswith("Offline sync")), None)
-    assert sync_line(_doc("P6")).startswith("Offline sync: $49-49 (PowerSync Cloud Pro plan"), sync_line(_doc("P6"))
-    assert run(_doc("P6"))["estimated_monthly_cost_usd"]["min"] >= 49
+    assert sync_line(_doc("P6")).startswith("Offline sync: $0-49 (PowerSync Cloud Free plan"), sync_line(_doc("P6"))
+    assert "Pro plan from $49/month" in sync_line(_doc("P6"))
     onprem = _with("P6", infrastructure={"deployment_model": "on_premise", "cloud_preference": "none"})
     assert sync_line(onprem) is None
 

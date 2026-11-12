@@ -404,6 +404,15 @@
       ]
     },
     {
+      "code": "MOBILE_LANGUAGE_NOT_LISTED",
+      "severity": "warning",
+      "message": "Native app in a language the team did not list. team.languages does not list Swift, so the iOS app (Swift) is a language the team must learn; React Native (Expo) would reuse the team's TypeScript instead. Plan time to learn it or hire for it before the first release.",
+      "fields": [
+        "team.languages",
+        "project.platforms"
+      ]
+    },
+    {
       "code": "PCI_SCOPE",
       "severity": "info",
       "message": "Card payments: the hosted checkout collects card numbers on the payment provider's page, so your PCI DSS check is the shortest self-assessment (SAQ A). Putting card fields on your own pages, or storing card numbers, widens the audit.",

@@ -647,6 +647,12 @@ def to_answers(f: dict) -> tuple[dict, dict, list[str], list[dict]]:
                                    f"relaxed for the payment data, so keep any other data that must stay in the "
                                    f"{residency.upper()} in a separate deployment there.",
                                    ["compliance", "infrastructure.data_residency"]))
+    if "gdpr" in compliance and residency == "none":
+        # GDPR applies to people in the EU, so the users are placed there: hosts are scored for EU users and the stack
+        # gets an EU region. data_residency stays unset, so this is a preference, not a hard rule.
+        put("regions", ["europe"], "compliance")
+        notes.append("gdpr with no data_residency: the users are taken to be in the EU, so the stack is placed in an EU "
+                     "region; this is a preference, not a residency rule")
     if "gdpr" in compliance:
         notes.append("gdpr: sign a data processing agreement (DPA) with every vendor that stores or processes personal "
                      "data (host, database, sign-in, payments, monitoring); "
@@ -903,6 +909,17 @@ def _language_warning(result: dict, f: dict, a: dict) -> list[dict]:
                       "release.", ["team.languages"])]
 
 
+def _mobile_language_warning(result: dict, f: dict) -> list[dict]:
+    """A native phone app in a language team.languages does not list (the card says so too): a delivery risk."""
+    gap = _native_language_gap(result["stack"]["frontend"]["pick"]["id"], (result.get("companion") or {}).get("id"), f=f)
+    if not gap:
+        return []
+    return [_std_warn("MOBILE_LANGUAGE_NOT_LISTED", "warning",
+                      "Native app in a language the team did not list." + gap
+                      + " Plan time to learn it or hire for it before the first release.",
+                      ["team.languages", "project.platforms"])]
+
+
 RBI_STORAGE = "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11244"
 PLATFORMS_INFO_WEEKS = 8  # our planning judgement: 3+ client platforms in 5-8 weeks is tight (4 or fewer is critical)
 
@@ -972,6 +989,8 @@ def _region(provider: str, f: dict) -> str | None:
     res = f["infrastructure.data_residency"]
     if "rbi_localisation" in f["compliance"]:
         res = "india"
+    elif res == "none" and "gdpr" in f["compliance"]:
+        res = "eu"  # GDPR with no residency places the users in the EU (to_answers)
     return REGION.get((provider, res))
 
 
@@ -1329,6 +1348,7 @@ def run(doc) -> dict:
     warnings += extra + _warnings(result, origin)
     if result.get("feasible"):
         warnings += _language_warning(result, fields, answers)
+        warnings += _mobile_language_warning(result, fields)
         warnings += _compliance_info(_store_billing(result, fields), fields, warnings)
     absent = [path for path, _kind, required, *_ in FIELDS if not required and _get(doc, path)[1] is None
               and not (path == "requirements.p95_latency_ms" and _get(doc, path)[0])]

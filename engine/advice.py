@@ -290,8 +290,8 @@ PLATFORM_QUEUES = {"aws": ("Amazon SQS with a Lambda consumer", "https://docs.aw
                         "https://upstash.com/docs/qstash/overall/getstarted")}
 POWERSYNC_REGIONS_DOCS = "https://docs.powersync.com/configuration/powersync-service/cloud-instances.md"
 POWERSYNC_SELF_HOST_DOCS = "https://docs.powersync.com/self-hosting/getting-started"
-# PowerSync Cloud's plans (https://www.powersync.com/pricing): Free pauses an instance after a week without activity
-# and is called a starter plan, Pro ("for production applications") is from $49 a month, Team (the HIPAA plan) from $599.
+# PowerSync Cloud's plans (https://www.powersync.com/pricing): Free (50 peak concurrent clients, 2 GB synced a month,
+# paused after a week without activity), Pro ("for production applications") from $49 a month, Team (HIPAA) from $599.
 POWERSYNC_PRO_USD, POWERSYNC_TEAM_USD = 49.0, 599.0
 # QStash runs in two regions, EU (the default) and US (upstash.com/docs/qstash/howto/multi-region); under a residency rule
 # it has no region for, the jobs stay in the app's own database and a scheduled function drains them.
@@ -698,10 +698,12 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
                     (f"PowerSync Cloud{region}: a local SQLite copy on the device kept in sync with Postgres",
                      POWERSYNC_REGIONS_DOCS if region else "https://docs.powersync.com/"))
             if sync[0].startswith("PowerSync Cloud"):  # a subscription beside the database bill
-                plan, usd = ("Team", POWERSYNC_TEAM_USD) if env["hipaa"] else ("Pro", POWERSYNC_PRO_USD)
-                sync_cost = (usd, usd, f"PowerSync Cloud {plan} plan, from ${usd:g}/month "
-                             "(https://www.powersync.com/pricing); the Free plan pauses an idle instance, so a "
-                             "production app starts here; data beyond the plan's allowance is billed per GB")
+                sync_cost = ((POWERSYNC_TEAM_USD, POWERSYNC_TEAM_USD, f"PowerSync Cloud Team plan, from "
+                              f"${POWERSYNC_TEAM_USD:g}/month, the plan its pricing page lists for HIPAA "
+                              "(https://www.powersync.com/pricing)") if env["hipaa"] else
+                             (0.0, POWERSYNC_PRO_USD, "PowerSync Cloud Free plan (up to 50 devices syncing at once "
+                              f"and 2 GB synced a month) to the Pro plan from ${POWERSYNC_PRO_USD:g}/month once the "
+                              "app passes those limits (https://www.powersync.com/pricing)"))
         else:
             sync = ("Local SQLite on the device plus a sync API with per-record version numbers",
                     "https://www.sqlite.org/whentouse.html")

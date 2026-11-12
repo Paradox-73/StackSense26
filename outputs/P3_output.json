@@ -56,11 +56,11 @@
         },
         {
           "choice": "Node.js + Express",
-          "why_not": "Swapping it in lowers the stack score by 5.1 points. Go (net/http, chi or Gin) is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0); Node.js + Express is stronger on development speed (4.0 vs 3.0), ecosystem maturity (5.0 vs 4.0)."
+          "why_not": "Swapping it in lowers the stack score by 5.1 points. Go (net/http, chi or Gin) is stronger on performance / latency (5.0 vs 3.0), scalability (5.0 vs 4.0); Node.js + Express is stronger on development speed (4.0 vs 3.0), ecosystem maturity (5.0 vs 4.0). 1.0 of the 5.1 points come from a stack compatibility rule: Tiny static binaries give near-instant cold starts on scale-to-zero platforms."
         },
         {
           "choice": "Python + Django",
-          "why_not": "Swapping it in lowers the stack score by 11.0 points. Go (net/http, chi or Gin) is stronger on realtime fit (4.0 vs 2.0), performance / latency (5.0 vs 3.0); Python + Django is stronger on development speed (5.0 vs 3.0), ecosystem maturity (5.0 vs 4.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn."
+          "why_not": "Swapping it in lowers the stack score by 11.0 points. Go (net/http, chi or Gin) is stronger on realtime fit (4.0 vs 2.0), performance / latency (5.0 vs 3.0); Python + Django is stronger on development speed (5.0 vs 3.0), ecosystem maturity (5.0 vs 4.0); Python + Django takes a penalty: Nobody on the team listed Python or a closely related skill: a new server language to learn. 1.0 of the 11.0 points come from a stack compatibility rule: Tiny static binaries give near-instant cold starts on scale-to-zero platforms."
         },
         {
           "choice": "No server code (static site)",
@@ -74,7 +74,7 @@
     },
     "database": {
       "choice": "PostgreSQL: Fly Managed Postgres",
-      "justification": "Your data is mainly relational and reaches about 200 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $600-$1,244 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server, by 2.1 stack points.",
+      "justification": "Your data is mainly relational and reaches about 200 GB within 12 months; PostgreSQL fits relational data 5/5. Strong consistency is assumed, since no input says stale reads are acceptable, and PostgreSQL gives it: a read after a write always sees that write. The workload is write-heavy, and its write scaling scores 3/5. Its share of the estimated bill is $600-$1,244 a month, against a total budget of $1,500 a month. It leads the runner-up, Microsoft SQL Server, by 2.2 stack points.",
       "driven_by": [
         "priorities.scalability",
         "priorities.performance",
@@ -87,11 +87,11 @@
       "alternatives": [
         {
           "choice": "Microsoft SQL Server",
-          "why_not": "Swapping it in lowers the stack score by 2.1 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0), portability (low lock-in) (5.0 vs 3.0)."
+          "why_not": "Swapping it in lowers the stack score by 2.2 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0), portability (low lock-in) (5.0 vs 3.0)."
         },
         {
           "choice": "MySQL",
-          "why_not": "Swapping it in lowers the stack score by 3.1 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0); MySQL takes a penalty: Customers share one database and in MySQL privileges stop at table and column level, so the tenant filter lives in every application query."
+          "why_not": "Swapping it in lowers the stack score by 3.2 points. PostgreSQL is stronger on realtime fit (3.0 vs 2.0); MySQL takes a penalty: Customers share one database and in MySQL privileges stop at table and column level, so the tenant filter lives in every application query."
         },
         {
           "choice": "MongoDB",
@@ -109,8 +109,8 @@
       ]
     },
     "hosting": {
-      "choice": "Fly.io",
-      "justification": "Fly.io hosts the stack for users in regions you did not state at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~521 requests/s at peak. Its share of the estimated bill is $375-$845 a month, against a total budget of $1,500 a month. It leads the runner-up, Google Cloud Run, by 3.1 stack points.",
+      "choice": "Fly.io, region fra (Frankfurt)",
+      "justification": "Fly.io hosts the stack for users in Europe at a 99.9% availability target. It runs the Go API as long-running processes with WebSockets, sized for ~521 requests/s at peak. Its share of the estimated bill is $375-$845 a month, against a total budget of $1,500 a month. It leads the runner-up, Google Cloud Run, by 3.1 stack points.",
       "driven_by": [
         "requirements.realtime",
         "project.type",
@@ -123,7 +123,7 @@
       "alternatives": [
         {
           "choice": "Google Cloud Run",
-          "why_not": "Swapping it in lowers the stack score by 3.1 points. Fly.io is stronger on realtime fit (5.0 vs 3.0), performance / latency (5.0 vs 4.0); Google Cloud Run is stronger on scalability (5.0 vs 4.0), low ops burden (5.0 vs 4.0)."
+          "why_not": "Swapping it in lowers the stack score by 3.1 points. Fly.io is stronger on realtime fit (5.0 vs 3.0), performance / latency (5.0 vs 4.0); Google Cloud Run is stronger on scalability (5.0 vs 4.0), low ops burden (5.0 vs 4.0). 1.0 of the 3.1 points come from a stack compatibility rule: Anycast + multi-region VMs keep websocket round-trips short for global users."
         },
         {
           "choice": "Vercel",
@@ -387,12 +387,12 @@
     "project.description sets no field in a scenario file: every choice comes from the structured fields, so wording cannot move the stack (in the app, the description reader only suggests fields for you to confirm); a fixed keyword list adds the 'Read from project.description' notes, which change no pick",
     "Read from project.description ('per seat'): bill through the payment provider's subscriptions with the seat count as the quantity, updated when an organisation adds or removes members",
     "Sized for scale.users_12_months: 50,000 users, about 10,000 active on a day (20% daily-to-monthly ratio); scale.users_at_launch (1,000) is the starting point",
+    "gdpr with no data_residency: the users are taken to be in the EU, so the stack is placed in an EU region; this is a preference, not a residency rule",
     "gdpr: sign a data processing agreement (DPA) with every vendor that stores or processes personal data (host, database, sign-in, payments, monitoring); with no EU residency stated, personal data may leave the EU only under an adequacy decision or the vendor's Standard Contractual Clauses (GDPR Chapter V); set infrastructure.data_residency to eu to keep it in EU regions",
     "Priorities rated 4 or 5 raise their criteria's weights, strongest first: scalability (5), performance (5), maintainability (4)",
     "Priorities rated 1 or 2 (cost) keep their criteria at the baseline weight",
     "What kinds of data do you store? (pick the main kind first): Not provided; using default 'relational'.",
     "If two people change the same thing at the same moment, must everyone see one agreed result at once?: Not provided; using default 'strong'.",
-    "Where are your users?: Not provided: no region is favoured when hosts are scored.",
     "Architecture preference: Not provided; using default 'auto'.",
     "Vendor lock-in tolerance: Not provided; using default 'medium'."
   ],
