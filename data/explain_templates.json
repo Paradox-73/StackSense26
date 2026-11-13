@@ -354,7 +354,7 @@
       },
       {
         "open": true,
-        "text": "{name} hosts the stack for {regions_txt} at a {availability}% availability target."
+        "text": "{name} hosts the stack for {regions_txt} at {availability}."
       },
       {
         "when": {

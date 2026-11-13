@@ -411,7 +411,7 @@ def _money_txt(lo: float, hi: float, p: dict) -> str:
 
 def _ctx(layer: str, s: dict, items: dict, p: dict, d: dict, cost: dict, provided: bool, api_host: dict | None = None) -> dict:
     from .advice import short_name
-    from .export import _num
+    from .export import _num, availability_text
     from .kb import field_specs
     from .recommender import _article
     specs = field_specs()
@@ -453,7 +453,7 @@ def _ctx(layer: str, s: dict, items: dict, p: dict, d: dict, cost: dict, provide
         "regions_txt": ("users worldwide" if "global" in p["regions"] else
                         "users in " + " and ".join(opt("regions", r) for r in p["regions"])) if p["regions"]
                        else "users in regions you did not state",
-        "availability": f"{d['availability']:g}", "backend": short_name(items["backend"]),
+        "availability": availability_text(d), "backend": short_name(items["backend"]),
         "long_running": 1 if runs.get("long_running") else 0,
         "ws_phrase": " with WebSockets" if runs.get("websockets") and p["realtime"] != "none" else "",
         "hipaa": 1 if comp.get("hipaa") else 0, "pci": 1 if comp.get("pci") else 0,

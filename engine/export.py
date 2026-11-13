@@ -11,6 +11,13 @@ def _num(x: float) -> str:
     return f"{x:,.0f}" if abs(x) >= 10 else f"{x:.1f}" if abs(x) >= 0.1 else "<0.1"
 
 
+def availability_text(d: dict) -> str:
+    """The availability the stack is planned for; a default nobody stated is not called a target."""
+    if "availability" in d.get("defaulted", ()):
+        return f"{d['availability']:g}% availability (assumed; no target was stated)"
+    return f"a {d['availability']:g}% availability target"
+
+
 MARGIN_WORDS = {"high": "clear (4+ points)", "medium": "solid (1.5-4 points)", "low": "close call (under 1.5)"}
 
 
@@ -186,7 +193,7 @@ def to_adr(r: dict) -> str:
     comp = ", ".join(p["compliance"]) or "none"
     context = (f"{p['team_size']} engineer(s), {p['timeline_weeks']} weeks, about {p['dau']:,} daily users "
                f"(~{_num(d['peak_rps']) if d['peak_rps'] else '<0.1'} requests/s at peak), about {_num(d['data_12mo_gb'])} GB of data "
-               f"within 12 months, a {d['availability']:g}% availability target, a budget of about ${d['budget_usd']:,.0f}/month, "
+               f"within 12 months, {availability_text(d)}, a budget of about ${d['budget_usd']:,.0f}/month, "
                f"compliance: {comp}.")
     for i, l in enumerate(LAYERS, 1):
         s, e = r["stack"][l], r["stack"][l]["explanation"]

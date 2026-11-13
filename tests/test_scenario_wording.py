@@ -112,3 +112,55 @@ def test_counts_are_worded_as_singular_or_plural():
     out = run(dict(load("P1"), timeline={"mvp_weeks": 1}, project=dict(load("P1")["project"], platforms=["web", "android", "ios"])))
     assert not found({"x": out}, r"\(s\)"), found({"x": out}, r"\(s\)")
     assert any("1 week is not enough to ship all of them with 1 engineer." in t for t in texts(out))
+
+
+def _eu_store() -> dict:
+    """A furniture store on Azure under PCI DSS, built by a PHP team, with social sign-in."""
+    return {"scenario_id": "eu_store", "project": {"name": "x", "type": "ecommerce", "platforms": ["web"],
+                                                    "description": "Furniture store selling across the EU."},
+            "scale": {"traffic_pattern": "seasonal", "workload": "read_heavy", "users_at_launch": 5000,
+                      "users_12_months": 120000, "peak_concurrent_users": 3000, "data_volume_gb_12_months": 150},
+            "team": {"has_devops": False, "size": 4, "experience": "intermediate", "languages": ["php", "javascript"]},
+            "budget": {"monthly_infra_usd": 1200}, "timeline": {"mvp_weeks": 10},
+            "infrastructure": {"cloud_preference": "azure", "deployment_model": "managed_cloud", "data_residency": "eu",
+                               "existing_systems": []},
+            "requirements": {"realtime": False, "offline_support": False, "full_text_search": True,
+                             "file_media_storage": True, "payments": True, "auth": "social", "multi_tenant": False,
+                             "ml_features": "none", "seo_critical": True, "availability": "99.9", "p95_latency_ms": None},
+            "compliance": ["gdpr", "pci_dss"]}
+
+
+def test_an_unstated_availability_is_called_assumed_not_a_target():
+    doc = {"scenario_id": "tiny", "project": {"name": "tiny", "type": "internal_tool", "description": "x",
+                                              "platforms": ["desktop"]},
+           "scale": {"users_at_launch": 5, "users_12_months": 10},
+           "team": {"size": 1, "experience": "senior", "languages": ["csharp"]},
+           "budget": {"monthly_infra_usd": 0}, "timeline": {"mvp_weeks": 1},
+           "infrastructure": {"deployment_model": "on_premise"}}
+    out = run(doc)
+    host = out["stack"]["hosting"]["justification"]
+    obs = next(s for s in out["stack"]["supporting"] if s["layer"] == "observability")["justification"]
+    assert "99.9% availability (assumed; no target was stated)" in host and "availability target." not in host, host
+    assert "requirements.availability was not given, so 99.9% is assumed" in obs, obs
+    doc["requirements"] = {"availability": "99.9"}  # a stated target keeps its wording
+    assert "at a 99.9% availability target" in run(doc)["stack"]["hosting"]["justification"]
+
+
+def test_framework_sign_in_names_its_social_library_only_for_social_sign_in():
+    auth = lambda doc: next(s for s in run(doc)["stack"]["supporting"] if s["layer"] == "auth")["choice"]
+    doc = _eu_store()
+    assert auth(doc).startswith("Laravel's starter-kit authentication with Laravel Socialite for social sign-in"), \
+        auth(doc)
+    doc["requirements"]["auth"] = "email_password"
+    assert "Socialite" not in auth(doc)
+
+
+def test_azure_audit_without_residency_keeps_uploads_off_front_door_on_both_lines():
+    doc = _eu_store()
+    doc["infrastructure"]["data_residency"] = "none"
+    sup = run(doc)["stack"]["supporting"]
+    store = next(s for s in sup if s["layer"] == "storage")["choice"]
+    cdn = next(s for s in sup if s["layer"] == "cdn")["choice"]
+    assert "Front Door for public, non-personal files only" in store and "SAS URLs" in store, store
+    assert "in front of the uploads bucket" not in cdn and "public, non-personal files only" in cdn \
+        and "SAS URLs" in cdn, cdn

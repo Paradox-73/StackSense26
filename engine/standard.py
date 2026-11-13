@@ -14,7 +14,7 @@ import json
 import re
 
 from . import __version__
-from .advice import SSO_DAU_PER_MAU, service_notes
+from .advice import SSO_DAU_PER_MAU, service_notes, with_social
 from .explain import LANG_LABELS, mobile_name
 from .kb import LAYERS, field_specs, load_kb
 from .recommender import recommend
@@ -1143,10 +1143,13 @@ def _native_language_gap(*ids, f: dict) -> str:
 ONE_PER_LAYER = ("auth", "cdn", "storage")
 
 
-def _quote(layer: str, f: dict) -> str:
+def _quote(layer: str, f: dict, assumed: bool = False) -> str:
     """One number from the scenario that a supporting service is chosen or sized for."""
     if layer == "observability":
         a = float(f["requirements.availability"])
+        if assumed:
+            return (f" requirements.availability was not given, so {a:g}% is assumed, which allows about "
+                    f"{(100 - a) / 100 * 30 * 24 * 60:,.0f} minutes of downtime a month, so failures must show within minutes.")
         return (f" A {a:g}% availability target (requirements.availability) allows about "
                 f"{(100 - a) / 100 * 30 * 24 * 60:,.0f} minutes of downtime a month, so failures must show within minutes.")
     if layer == "cache" and f["requirements.p95_latency_ms"]:
@@ -1217,7 +1220,8 @@ def _supporting(result: dict, f: dict) -> list[dict]:
             fields = fields + ["infrastructure.data_residency"]  # the residency rule shaped this service too
         layer = s.get("layer") or layer
         alts = [{"choice": c, "why_not": w} for c, w in alts if c.split(" (")[0] not in s["name"]]
-        entry = {"layer": layer, "choice": s["name"], "justification": why, "driven_by": fields,
+        social = s["role"] == "Authentication" and f["requirements.auth"] == "social"
+        entry = {"layer": layer, "choice": with_social(s["name"]) if social else s["name"], "justification": why, "driven_by": fields,
                  "alternatives": alts, "tradeoffs": tradeoffs, "source": s.get("source"), "role": s["role"]}
         first = next((x for x in out if x["layer"] == layer), None) if layer in ONE_PER_LAYER else None
         if first:  # one sign-in product, one CDN, one file store: a second line of the layer adds to the first
@@ -1237,7 +1241,7 @@ def _supporting(result: dict, f: dict) -> list[dict]:
         out = [x for x in out if x not in replaced]
         out.insert(first, _reuse_identity(idps[0], replaced))
     for x in out:  # each justification quotes the scenario number the service answers to
-        x["justification"] += _quote(x["layer"], f)
+        x["justification"] += _quote(x["layer"], f, "availability" in result.get("derived", {}).get("defaulted", ()))
         x.pop("role", None)
     out.append(_ci_cd(f))
     out[-1]["justification"] += _quote("ci_cd", f)

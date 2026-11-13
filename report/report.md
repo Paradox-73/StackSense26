@@ -244,7 +244,7 @@ Appendix F has the tables behind 8.1 to 8.3.
 
 ### 8.1 Tests
 
-The 1287 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
+The 1290 tests cover scoring, explanations, inputs and warnings, stability, the language-model checks, accuracy and the app. `tests/test_edge_cases.py` fails if a warning code has no test that names it, and `tests/test_llm_off.py` fails if `outputs/` differs from the engine's output.
 
 ### 8.2 Benchmark against an answer key
 
@@ -428,13 +428,13 @@ Safety (new in 2023) is not scored: no infrastructure option changes whether the
 | What is checked | Tests |
 |---|---|
 | Scoring, constraints and cost | 476 |
-| Explanations match the engine | 130 |
+| Explanations match the engine | 133 |
 | Inputs, edge cases and warnings | 311 |
 | Stability and properties | 76 |
 | Language-model layer (checks and fallbacks) | 192 |
 | Accuracy against the answer key | 9 |
 | App, packaging and documents | 93 |
-| **All** | **1287** |
+| **All** | **1290** |
 <!-- END validation -->
 
 `report/validation.md` lists every test file with its count.

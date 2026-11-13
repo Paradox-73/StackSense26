@@ -223,9 +223,9 @@ def architecture(p: dict, d: dict, stack: dict) -> dict:
         why = f"With {team} engineer(s), one deployable with strict internal module boundaries is the fastest and cheapest to run; modules can be extracted into services later."
     if pref not in ("auto",) and d["architecture"] != pref:
         why += f" (Your preference '{pref}' was overridden; see warnings.)"
-    from .export import _num
+    from .export import _num, availability_text
     why += (f" Sized for ~{_num(d['peak_rps']) if d['peak_rps'] else '<0.1'} requests/s at peak, about "
-            f"{_num(d['data_12mo_gb'])} GB of data within 12 months and a {d['availability']:g}% availability target.")
+            f"{_num(d['data_12mo_gb'])} GB of data within 12 months and {availability_text(d)}.")
     if single_instance(stack) and backend.get("kind") != "baas" and d["availability"] >= 99.9:
         # A second instance would need its own copy of the database file, so no redundancy is possible.
         db = short_name(stack["database"])
@@ -944,6 +944,10 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, p
             # Under a residency rule (RBI's included) a CDN's edge caches would copy the files out of the country.
             "Short-lived signed URLs from the private bucket in your region, issued by the API after an access check "
             "(no public CDN)" if residency(env) else
+            # Under an audit Front Door carries public files only (the storage line says so too).
+            "Azure Front Door for public, non-personal files only (product and page images, CSS and JavaScript); "
+            "users' own uploads stay in the private container behind short-lived SAS URLs"
+            if env["cloud"] == "azure" and env["audit_rules"] else
             f"{CDN_BY_PROVIDER.get(env['cloud'] or prov, 'Cloudflare CDN')} in front of the uploads bucket",
             "Hand uploads out from the object storage, not the app server; each signed URL expires within minutes and "
             "every download is logged for the HIPAA audit trail." if env["hipaa"] and not env["onprem"] else
@@ -956,6 +960,10 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, p
             and not env["onprem"] else
             "Serve uploads from the object store through the reverse proxy, not the app server; resize images on the fly "
             "instead of storing every size." if env["onprem"] else
+            "Public files are the same for every visitor and hold no personal data, so Front Door caches them; users' "
+            "uploads stay out of it, since its audit scope must be confirmed in Microsoft's compliance documents: the API "
+            "hands them out from the private container after an access check, and each SAS URL expires within minutes."
+            if env["cloud"] == "azure" and env["audit_rules"] else
             "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.",
             "https://developers.cloudflare.com/r2/pricing/",
             usage=(gb * EGRESS_USD_PER_GB[0], gb * EGRESS_USD_PER_GB[1],
@@ -1096,10 +1104,10 @@ def _object_storage(env: dict, prov: str, private: bool = True) -> tuple[str, st
     if env["cloud"] == "azure" and env["audit_rules"]:
         # Microsoft's Azure Storage page puts Blobs in Azure's ISO, SOC and PCI DSS audits; Front Door's audit scope is
         # in the Azure Compliance Offerings document on the Service Trust Portal, so here it carries public files only.
-        # Under a residency rule the uploads also stay private: short-lived SAS URLs, as on the other clouds.
+        # Users' uploads stay private (short-lived SAS URLs), in the required region under a residency rule.
         notes = [x for x, on in (("after you confirm it is in scope for Microsoft's HIPAA BAA", env["hipaa"]),
-                                 ("a private container in your required region with short-lived SAS URLs",
-                                  residency(env))) if on]
+                                 ("a private container" + (" in your required region" if residency(env) else "")
+                                  + " with short-lived SAS URLs", private or residency(env))) if on]
         said = "".join(f", {x}" for x in notes)
         return (f"Blob Storage{said} (Front Door for public, non-personal files only)",
                 AZURE_HIPAA_DOCS if env["hipaa"] else
@@ -1215,6 +1223,18 @@ FRAMEWORK_AUTH = {"spring_boot": ("Spring Security's one-time token login", "htt
                   "nestjs": ("NestJS authentication with Passport", "https://docs.nestjs.com/security/authentication"),
                   "fastapi": ("FastAPI's OAuth2 password flow with hashed passwords",
                               "https://fastapi.tiangolo.com/tutorial/security/")}
+# The library each framework's docs name for OAuth social sign-in (Google, Apple, GitHub), beside its own sign-in.
+SOCIAL_AUTH = {"laravel": "Laravel Socialite", "django": "django-allauth", "rails": "OmniAuth",
+               "spring_boot": "Spring Security's OAuth2 client"}
+
+
+def with_social(name: str) -> str:
+    """A framework sign-in pick with its social sign-in library named after the framework's own library."""
+    for fw, social in SOCIAL_AUTH.items():
+        lib = FRAMEWORK_AUTH[fw][0]
+        if name.startswith(lib):
+            return f"{lib} with {social} for social sign-in{name[len(lib):]}"
+    return name
 
 
 def _auth(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None, str]:
