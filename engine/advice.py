@@ -68,7 +68,7 @@ def offering_gaps(item: dict, host: dict, compliance=()) -> list[str]:
 
 
 def portable_offering(item: dict, host: dict, onprem: bool, hybrid: bool, no_hyperscaler: bool = False,
-                      compliance=()) -> str | None:
+                      compliance=(), single: bool = False) -> str | None:
     """Managed offering for a datastore. Under hybrid deployment, name the cloud service and its
     on-premises twin (same engine and version), so the same code runs in both places. With AWS, Google Cloud and
     Azure ruled out, an offering that names one of them gives way to the self-managed setup, and so does a
@@ -79,6 +79,8 @@ def portable_offering(item: dict, host: dict, onprem: bool, hybrid: bool, no_hyp
                      if rule in compliance and host.get("provider") in r), None)
     # Kubernetes on your servers runs a database operator; plain VMs or Docker hosts run the VM setup (Patroni).
     mine = "onprem_k8s" if host.get("id") == "onprem_k8s" and "onprem_k8s" in offers else "onprem"
+    if single and mine == "onprem" and "onprem_single" in offers:  # see single_node_db
+        mine = "onprem_single"
     cloud = (None if onprem else regional) or offers.get(mine if onprem else host.get("provider")) or offers.get("any")
     gaps = [] if onprem else offering_gaps(item, host, compliance)
     if gaps and offers.get("onprem"):
@@ -95,12 +97,19 @@ def portable_offering(item: dict, host: dict, onprem: bool, hybrid: bool, no_hyp
     return cloud
 
 
-def database_offering(db: dict, host: dict, p: dict) -> str:
+def single_node_db(p: dict, d: dict | None) -> bool:
+    """A database the team runs itself stays on one server with backups, no standby: nobody stated an availability
+    target (the 99.9% default is a goal, and _avail prices no standby for it) and the project is tiny (the smallest
+    scale tier, or a solo developer)."""
+    return bool(d) and "availability" in d.get("defaulted", ()) and (d["compute_tier"] == 0 or p["team_size"] <= 1)
+
+
+def database_offering(db: dict, host: dict, p: dict, d: dict | None = None) -> str:
     """The managed offering the stack's database runs as on this host (the API's host under split hosting)."""
     # 3. Self-managed cloud VMs (EC2-style or a VPS such as Hetzner) run the database themselves, as on-premises.
     onprem = host.get("kind") == "onprem" or (bool(p.get("self_managed")) and (host.get("vm", False) or host.get("kind") == "vps"))
     return portable_offering(db, host, onprem, p["deployment"] == "hybrid", p.get("cloud_preference") == "no_hyperscaler",
-                             p["compliance"]) or \
+                             p["compliance"], single_node_db(p, d)) or \
         f"a managed {db['name']} service in the same region as your compute"
 
 
@@ -135,7 +144,9 @@ def _env(p: dict, host: dict) -> dict:
             # The team runs its own software on cloud VMs: no managed database, identity or monitoring service.
             "self_managed": bool(p.get("self_managed")) and p["deployment"] == "cloud",
             "cloud": host.get("provider") if host.get("provider") in HYPERSCALER else None,
-            "no_hyperscaler": p.get("cloud_preference") == "no_hyperscaler"}
+            "no_hyperscaler": p.get("cloud_preference") == "no_hyperscaler",
+            # Pages anyone can read (a shop, a content site, search-ranked pages) serve public files a CDN may cache.
+            "public_cdn": p["seo"] == "critical" or p["app_type"] in ("ecommerce", "content_site")}
 
 
 # Dedicated servers that run each live match and hold its authoritative state; the fleet's hours are not in the estimate.
@@ -222,6 +233,10 @@ def architecture(p: dict, d: dict, stack: dict) -> dict:
                       f"restart or host failure is downtime. This stack does not meet the {d['availability']:g}% "
                       "target; it needs a server database with automated failover")
         return {"style": style, "why": why, "redundancy": redundancy, "sources": sources}
+    if onprem and single_node_db(p, d):
+        return {"style": style, "why": why, "sources": sources,
+                "redundancy": "Single server + nightly backups copied off the machine (no availability target was "
+                              "stated, so no standby is planned or priced)"}
     if onprem:
         redundancy = {99.0: "Single server + nightly backups copied off the machine",
                       99.9: "2+ app instances behind a load balancer, database replica with automated failover (e.g. Patroni)",
@@ -476,6 +491,11 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
             # Priced at the app's scale: by the data it copies when data volume is the trigger, by traffic otherwise.
             kb["index"][wh]["sources"][0], wh, d["db_tier"] if big_dashboard else tier, wh,
             None if big_dashboard else "when dashboard or reporting queries on the primary database take more than ~2 s")
+        if p["app_type"] != "analytics_dashboard" and (
+                d["budget_usd"] == 0 or (p["team_size"] == 1 and p["team_experience"] == "beginner")):
+            # Analytics is not what the project is for: a second paid store waits, whatever the operations budget says.
+            out[-1]["hold"] = (f"{'a zero budget' if d['budget_usd'] == 0 else 'a solo beginner'} should not run and pay "
+                               f"for a second data store the project did not ask for, so reports run on {db['name']}")
 
     # Write volume follows the users and the request rate; open connections alone (users online at once) do not
     # need a log in front of the database.
@@ -656,11 +676,12 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
     # One identity provider: enterprise SSO is a feature of the sign-in product, not a second system beside it.
     sso_needed = p.get("enterprise_sso") and not be.get("sso")
     if (be.get("kind") != "baas" and "sign_in" in d["user_actions"]) or sso_needed:
-        name, src, system = _auth(env, p, d, be)
+        name, src, system, price = _auth(env, p, d, be)
         add("Authentication", name, "Do not hand-roll password storage, MFA or SSO."
             + (" Customers sign in with their own identity provider (Entra ID, Okta, Google Workspace) over SAML 2.0 or "
-               "OIDC, and the API sees one token format." if sso_needed else ""), src, system=system,
-            usage=auth_cost(name, env, p))
+               "OIDC, and the API sees one token format." if sso_needed else "") + (f" {price}" if price else ""), src,
+            system=system, usage=auth_cost(name, env, p))
+        out[-1]["price_note"] = price
     if p.get("enterprise_sso"):
         sso = be.get("sso")
         if sso:
@@ -781,7 +802,11 @@ def supporting_services(p: dict, d: dict, stack: dict, db_candidates: list[dict]
         add("Model serving", ml, "Keep GPU inference separate from the web tier so each scales on its own metric.", src,
             usage=gpu, tier_usage=gpu)
 
-    if static:
+    if static and env["onprem"]:  # no host service to read from: the web server's own logs stay inside the network
+        add("Observability", "An uptime check from inside your network plus the web server's access logs",
+            "With no server code there is nothing to trace; watch that the pages are up, and read requests and errors "
+            "from the logs your web server already writes.", "https://nginx.org/en/docs/http/ngx_http_log_module.html")
+    elif static:
         add("Observability", "An uptime check plus the host's web analytics",
             "With no server code there is nothing to trace; watch that the pages are up and how fast they load.",
             "https://web.dev/articles/vitals")
@@ -913,12 +938,19 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, p
             # Uploads under HIPAA hold health information: no public CDN caches them (the storage line says so too).
             "Short-lived signed URLs from the object storage, issued by the API after an access check (no public CDN "
             "for PHI)" if env["hipaa"] else
+            f"{CDN_BY_PROVIDER.get(env['cloud'] or prov, 'Cloudflare CDN')} for public, non-personal files only "
+            "(product and page images, CSS and JavaScript); users' own uploads stay in the private bucket in your region "
+            "behind short-lived signed URLs" if residency(env) and env["public_cdn"] else
             # Under a residency rule (RBI's included) a CDN's edge caches would copy the files out of the country.
             "Short-lived signed URLs from the private bucket in your region, issued by the API after an access check "
             "(no public CDN)" if residency(env) else
             f"{CDN_BY_PROVIDER.get(env['cloud'] or prov, 'Cloudflare CDN')} in front of the uploads bucket",
             "Hand uploads out from the object storage, not the app server; each signed URL expires within minutes and "
             "every download is logged for the HIPAA audit trail." if env["hipaa"] and not env["onprem"] else
+            "Public files are the same for every visitor and hold no personal data, so edge copies outside your region "
+            "break no residency rule; files that hold personal data never enter the CDN: the API hands them out from the "
+            "private bucket after an access check, and each signed URL expires within minutes." if residency(env)
+            and env["public_cdn"] and not env["onprem"] else
             "Hand uploads out from the bucket, not the app server; a public CDN would cache copies at edge sites outside "
             "the country your data must stay in, and each signed URL expires within minutes." if residency(env)
             and not env["onprem"] else
@@ -930,7 +962,7 @@ def _special_workloads(p: dict, d: dict, env: dict, add, has_storage, storage, p
                    f"~{gb:,.0f} GB served a month ({MEDIA_GB_PER_USER_DAY * 1000:.0f} MB per active user a day) "
                    f"at ${EGRESS_USD_PER_GB[0]}-{EGRESS_USD_PER_GB[1]}/GB"),
             # Signed URLs and a reverse proxy hand files out of the store itself: part of the storage, not a CDN.
-            layer="storage" if env["onprem"] or env["hipaa"] or residency(env) else None)
+            layer="storage" if env["onprem"] or env["hipaa"] or (residency(env) and not env["public_cdn"]) else None)
     if "video_on_demand" in work:
         name = ("FFmpeg transcoding workers + Ceph Object Gateway + an HLS-serving web server (self-hosted)" if env["onprem"] else
                 "S3 + AWS Elemental MediaConvert + CloudFront under the AWS BAA" if env["hipaa"] else
@@ -1053,21 +1085,23 @@ def residency(env: dict) -> bool:
 def _object_storage(env: dict, prov: str, private: bool = True) -> tuple[str, str]:
     """The object store for uploaded files, and its source. private=False names a public bucket in the same place (a
     static site's media, which nothing signs)."""
-    lock = ", a private bucket with short-lived signed URLs (no public CDN)" if private else ""
+    # Public, non-personal files (product images, CSS, JavaScript) break no residency rule in a CDN's edge caches.
+    shut = "a CDN for public, non-personal files only" if env.get("public_cdn") else "no public CDN"
+    lock = f", a private bucket with short-lived signed URLs ({shut})" if private else ""
     if env["onprem"]:
         return "Ceph Object Gateway (S3-compatible, self-hosted)", CEPH_RGW_DOCS
     if env["hybrid"]:
         return ("S3 API everywhere: the cloud's object storage in the cloud, Ceph Object Gateway on-premises (same S3 "
                 "client code)"), CEPH_RGW_DOCS
     if env["cloud"] == "azure" and env["audit_rules"]:
-        # Front Door holds none of these audits in data/kb/hosting.json (no public Microsoft page lists its scope);
-        # Microsoft's Azure Storage page puts Blobs in Azure's ISO, SOC and PCI DSS audits.
+        # Microsoft's Azure Storage page puts Blobs in Azure's ISO, SOC and PCI DSS audits; Front Door's audit scope is
+        # in the Azure Compliance Offerings document on the Service Trust Portal, so here it carries public files only.
         # Under a residency rule the uploads also stay private: short-lived SAS URLs, as on the other clouds.
         notes = [x for x, on in (("after you confirm it is in scope for Microsoft's HIPAA BAA", env["hipaa"]),
                                  ("a private container in your required region with short-lived SAS URLs",
                                   residency(env))) if on]
-        said = "".join(f", {x}" for x in notes) + ("," if notes else "")
-        return (f"Blob Storage{said} without Front Door (no public Microsoft page lists Front Door's audit scope)",
+        said = "".join(f", {x}" for x in notes)
+        return (f"Blob Storage{said} (Front Door for public, non-personal files only)",
                 AZURE_HIPAA_DOCS if env["hipaa"] else
                 "https://learn.microsoft.com/en-us/azure/storage/common/storage-compliance-offerings")
     if env["cloud"] and env["hipaa"]:  # uploads hold health information: a CDN may carry only public files
@@ -1078,12 +1112,12 @@ def _object_storage(env: dict, prov: str, private: bool = True) -> tuple[str, st
                 "azure": ("Blob Storage, after you confirm it is in scope for Microsoft's HIPAA BAA (Front Door for "
                           "public, non-PHI files only)", AZURE_HIPAA_DOCS)}[env["cloud"]]
     if env["cloud"] and residency(env):  # CDN edge caches keep copies outside the country, so uploads skip the CDN
-        return {"aws": ("Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN)",
+        return {"aws": (f"Amazon S3, a private bucket in your required region (short-lived signed URLs, {shut})",
                         "https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html"),
-                "gcp": ("Cloud Storage, a private bucket in your required region (short-lived signed URLs, no public CDN)",
+                "gcp": (f"Cloud Storage, a private bucket in your required region (short-lived signed URLs, {shut})",
                         "https://cloud.google.com/storage/docs/access-control/signed-urls"),
-                "azure": ("Blob Storage, a private container in your required region (short-lived SAS URLs, no public "
-                          "CDN)", "https://learn.microsoft.com/azure/storage/common/storage-sas-overview")}[env["cloud"]]
+                "azure": (f"Blob Storage, a private container in your required region (short-lived SAS URLs, {shut})",
+                          "https://learn.microsoft.com/azure/storage/common/storage-sas-overview")}[env["cloud"]]
     if env["cloud"]:
         return {"aws": ("Amazon S3 + CloudFront", S3_DOCS),
                 "gcp": ("Cloud Storage + Cloud CDN", "https://cloud.google.com/cdn/docs/setting-up-cdn-with-bucket"),
@@ -1183,25 +1217,26 @@ FRAMEWORK_AUTH = {"spring_boot": ("Spring Security's one-time token login", "htt
                               "https://fastapi.tiangolo.com/tutorial/security/")}
 
 
-def _auth(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None]:
-    """The identity provider of _auth_pick, unless a hosted one would cost more than AUTH_SELF_HOST_ABOVE_USD a month
-    at the project's users. Then phone one-time codes move into the app (the SMS gateway already sends them), and other
-    sign-in moves to Keycloak, self-hosted in the same place, when the team runs servers."""
+def _auth(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None, str]:
+    """(product, source, system, price sentence): the identity provider of _auth_pick, unless a hosted one would cost
+    more than AUTH_SELF_HOST_ABOVE_USD a month at the project's users. Then phone one-time codes move into the app (the
+    SMS gateway already sends them), and other sign-in moves to Keycloak, self-hosted in the same place, when the team
+    runs servers; the price sentence says what the hosted one would cost, for the reason, not the product name."""
     name, src, system = _auth_pick(env, p, d, be)
     cost = auth_cost(name, env, p)
     if not cost or cost[0] <= AUTH_SELF_HOST_ABOVE_USD or p.get("enterprise_sso"):
-        return name, src, system
+        return name, src, system, ""
     why = (f"{name.split(' (')[0].split(' in ')[0]} would cost about ${cost[0]:,.0f} a month at "
-           f"~{p.get('dau', 0) / SSO_DAU_PER_MAU:,.0f} monthly users")
+           f"~{p.get('dau', 0) / SSO_DAU_PER_MAU:,.0f} monthly users.")
     where = (" in your Indian region" if env["india"] else " in your EU region" if env["eu"] else "") + (
         ", on BAA-covered servers" if env["hipaa"] else "")
     if p.get("has_devops") and "phone_otp" not in p.get("special_workloads", ()):
-        return f"Keycloak (self-hosted{where}): {why}", KEYCLOAK_DOCS, "keycloak"
+        return f"Keycloak (self-hosted{where})", KEYCLOAK_DOCS, "keycloak", why
     # No one to run an identity server, or phone codes (which Keycloak needs an extension for): sign-in moves into the
     # API's own framework library, with the users in the app's database and no per-user bill.
     lib, lib_src = FRAMEWORK_AUTH.get(be.get("id"), ("Your backend framework's built-in authentication", AUTH_DOCS))
     codes = "one-time codes sent through the SMS gateway and " if "phone_otp" in p.get("special_workloads", ()) else ""
-    return f"{lib} in your API, with {codes}the users in your database{where}: {why}", lib_src, None
+    return f"{lib} in your API, with {codes}the users in your database{where}", lib_src, None, why
 
 
 def _auth_pick(env: dict, p: dict, d: dict, be: dict) -> tuple[str, str, str | None]:
@@ -1489,6 +1524,8 @@ def apply_ops_budget(p: dict, services: list[dict]) -> tuple[list[dict], list[di
                         key=lambda s: priority.index(s["system"]) if s["system"] in priority else len(priority))
     allowed = set()
     for s in deferrable:
+        if s.get("hold"):  # deferred for its own reason (supporting_services), not for the operations budget
+            continue
         if s["system"] in systems or cap is None or len(systems) < cap:
             systems.add(s["system"])
             allowed.add(id(s))
@@ -1922,7 +1959,7 @@ def estimate_cost(p: dict, d: dict, stack: dict, services: list[dict], usage: bo
     db = stack["database"]
     if be.get("bundled_database") != db["id"] and not db.get("static_only"):
         dbhost = stack.get("api_host") or host  # the database sits next to the API
-        offer = database_offering(db, dbhost, p)
+        offer = database_offering(db, dbhost, p, d)
         dbx = with_usable_plans(db, offer, p)
         lo, hi = usage_cost(dbx, dbt, p, d, per_op=usage, at=db_at)
         basis = [f"{d['db_tier_label']} database tier (~{d['data_12mo_gb']:,.0f} GB in 12 months)"
@@ -2085,7 +2122,7 @@ def min_feasible_cost(p: dict, d: dict, hosting_feasible: list[dict], db_feasibl
     host = min(hosting_feasible, key=lambda x: tier_cost(x["item"], d["compute_tier"], p)[0])["item"]
 
     def floor(db: dict) -> float:
-        return (self_run_db_cost(p, d, db, host)[0] if self_run_db(db, host, database_offering(db, host, p))
+        return (self_run_db_cost(p, d, db, host)[0] if self_run_db(db, host, database_offering(db, host, p, d))
                 else tier_cost(db, d["db_tier"], p, d)[0])
 
     def bill(db: dict) -> float:

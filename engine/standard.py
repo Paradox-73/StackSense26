@@ -1160,7 +1160,7 @@ def _quote(layer: str, f: dict) -> str:
     if layer in ("storage", "search") and f["scale.data_volume_gb_12_months"] is not None:
         return (f" The scenario stores {f['scale.data_volume_gb_12_months']:,g} GB within 12 months "
                 "(scale.data_volume_gb_12_months).")
-    return f" Sized for the {f['scale.users_12_months']:,.0f} users expected at 12 months (scale.users_12_months)."
+    return ""  # the users the stack is sized for are stated once, in assumptions
 
 
 def _left_out(s: dict, f: dict) -> bool:
@@ -1173,16 +1173,16 @@ def _left_out(s: dict, f: dict) -> bool:
 def _deferred(result: dict, f: dict) -> list[str]:
     """Services the operations budget keeps out of the first release, as assumptions with their trigger: they are
     not part of the recommended stack, so stack.supporting does not list them."""
-    return [f"Deferred: {s['role']} ({s['name']}) is left out of the first release, because the team's operations "
-            f"budget allows no more systems to run; add it {s['trigger']}." for s in result.get("deferred_services", [])
-            if not _left_out(s, f)]
+    ops = "the team's operations budget allows no more systems to run"
+    return [f"Deferred: {s['role']} ({s['name']}) is left out of the first release, because {s.get('hold') or ops}; "
+            f"add it {s['trigger']}." for s in result.get("deferred_services", []) if not _left_out(s, f)]
 
 
 AUTH_WHY = {
     "email_password": "Password sign-in needs salted hashing, email verification, password resets and optional MFA, "
                       "which a maintained sign-in product or library does correctly.",
     "social": "Social sign-in (Google, Apple, GitHub) needs OAuth 2.0 and OpenID Connect flows, account linking and token "
-              "refresh, which a maintained sign-in product handles.",
+              "refresh, which a maintained sign-in product or framework library handles.",
     "phone_otp": "Phone sign-in needs one-time codes with expiry, retry limits and lockouts against SMS-pumping fraud; the "
                  "codes go out through the SMS gateway listed with the services.",
 }
@@ -1206,8 +1206,7 @@ def _supporting(result: dict, f: dict) -> list[dict]:
         why = s["why"]
         if s["role"] == "Authentication" and f["requirements.auth"] in AUTH_WHY:
             # Say what this sign-in method needs, and where a per-user price decided the product, the users it is for.
-            why = AUTH_WHY[f["requirements.auth"]] + (f" {s['name'].split(': ', 1)[1][0].upper()}"
-                                                      f"{s['name'].split(': ', 1)[1][1:]}." if ": " in s["name"] else "")
+            why = AUTH_WHY[f["requirements.auth"]] + (f" {s['price_note']}" if s.get("price_note") else "")
             fields = fields + ["scale.users_12_months"]
             if "gdpr" in f["compliance"] and s["name"].startswith("Clerk"):
                 why += (" Clerk is a US company, so under GDPR sign its data processing agreement with Standard "
@@ -1313,8 +1312,8 @@ def _warnings(result: dict, origin: dict) -> list[dict]:
 def _assumptions(result: dict) -> list[str]:
     out, defaults = [], []
     for a in result.get("assumptions", []):
-        if a.get("field") == "latency_target_ms":
-            continue  # to_answers already states the latency default in the standard field's words
+        if a.get("field") == "latency_target_ms" or (a.get("field") == "availability" and a.get("kind") == "default"):
+            continue  # run() and to_answers already state these defaults in the standard fields' words
         reason = a.get("reason", "")
         m = re.fullmatch(r"Not provided; using default '(.*)'\.", reason)
         if m and a.get("field"):
@@ -1358,7 +1357,9 @@ def _summary(result: dict, stack: dict, style: str, cost: dict, f: dict, a: dict
              else style.replace("_", " ").replace("service oriented", "service-oriented"))
     host = names["hosting"]
     host = f"with hosting {host[0].lower()}{host[1:]}" if host.startswith("Provided by") else f"hosted on {host}"
+    over = any(w["code"] == "BUDGET_INFEASIBLE" for w in result.get("warnings", []))
     first = (f"A {label} build: {', '.join(used)}, {host} for about {money} a month"
+             + (f", a relaxed recommendation over your ${f['budget.monthly_infra_usd']:,.0f} budget" if over else "")
              + (f"; no {' or '.join(unused)} is needed" if unused else "") + ".")
     items = {l: load_kb()["index"].get(result["stack"][l]["pick"]["id"], {}) for l in LAYERS}
     reasons = []
@@ -1442,19 +1443,25 @@ def run(doc) -> dict:
                     assumptions=[], validation_errors=errors)
 
     answers, origin, notes, extra = to_answers(fields)
+    absent = [path for path, _kind, required, *_ in FIELDS if not required and _get(doc, path)[1] is None
+              and not (path == "requirements.p95_latency_ms" and _get(doc, path)[0])]
+    if "requirements.availability" in absent:
+        # Left to the engine's own default, so it is planned as a goal, not a stated target (no standby priced).
+        answers.pop("availability")
     result = recommend(answers, with_counterfactuals=False)
     warnings = [_std_warn("MISSING_REQUIRED_FIELD", "warning",
                           f"{m} is required but missing; the documented default "
                           f"{fields[m]!r} was used (listed in assumptions).", [m]) for m in missing]
     warnings += [_std_warn("UNKNOWN_FIELD", "info", f"{k} is not part of the standard schema and was ignored.", [k])
                  for k in unknown]
-    warnings += extra + _warnings(result, origin)
+    relaxed = {w["code"] for w in extra if w["severity"] == "critical"}
+    # SEO turned off here (an air-gapped network) is not the user marking it unnecessary.
+    warnings += extra + [w for w in _warnings(result, origin)
+                         if not (w["code"] == "SEO_HINT" and "SEO_RESTRICTED_DEPLOYMENT" in relaxed)]
     if result.get("feasible"):
         warnings += _language_warning(result, fields, answers)
         warnings += _mobile_language_warning(result, fields)
         warnings += _compliance_info(_store_billing(result, fields), fields, warnings)
-    absent = [path for path, _kind, required, *_ in FIELDS if not required and _get(doc, path)[1] is None
-              and not (path == "requirements.p95_latency_ms" and _get(doc, path)[0])]
     absent += [f"priorities.{k}" for k in PRIORITY_KEYS if (doc.get("priorities") or {}).get(k) is None]
     assumptions = ([f"{m} missing: used {fields[m]!r}" for m in missing]
                    + [f"{a} not given: {ABSENT_NOTE.get(a) or f'default {fields[a]!r}'}" for a in absent]
@@ -1473,10 +1480,22 @@ def run(doc) -> dict:
                            "projects of this type usually add one")
     result = _store_billing(_reuse_services(result, fields), fields)
     assumptions += _deferred(result, fields)
+    db = result["stack"]["database"]
+    if db.get("managed_offering") and db["managed_offering"] == (
+            load_kb()["index"][db["pick"]["id"]].get("managed_offerings") or {}).get("onprem_single"):
+        assumptions.append("requirements.availability not given and the project is small: the database runs on one "
+                           "server with nightly backups copied off the machine, with no standby or automated failover; "
+                           "state a target of 99.9 or higher to plan and price a replica")
     stack = {l: _component(l, result["stack"][l], origin, fields, result) for l in LAYERS}
     stack["supporting"] = _supporting(result, fields)
     style = _style(result)
     cost = _cost(result, fields)
+    if any(w["code"] == "BUDGET_INFEASIBLE" for w in warnings):
+        assumptions.append(f"Relaxed: budget (budget.monthly_infra_usd). No stack that meets the other hard constraints "
+                           f"fits ${fields['budget.monthly_infra_usd']:,.0f} a month, so this recommendation relaxes "
+                           f"the budget: it still meets the compliance, data residency and deployment rules, and "
+                           f"costs ${cost['min']:,}-{cost['max']:,} a month against your "
+                           f"${fields['budget.monthly_infra_usd']:,.0f}")
     worst = {w["severity"] for w in warnings}
     status = "ok_with_warnings" if worst & {"warning", "critical"} else "ok"
     return dict(head, status=status, summary=_summary(result, stack, style, cost, fields, answers), architecture_style=style,

@@ -84,6 +84,7 @@
         "digitalocean": "DigitalOcean Managed PostgreSQL",
         "hetzner": "Self-managed Postgres in Docker with automated backups",
         "onprem": "Self-managed with Patroni (replication and automated failover on your VMs)",
+        "onprem_single": "Self-managed PostgreSQL on one server, with nightly backups copied off the machine (no standby)",
         "onprem_k8s": "Self-managed with the CloudNativePG operator on your Kubernetes cluster",
         "cloudflare": "Supabase Postgres connected through Hyperdrive"
       },
@@ -247,6 +248,7 @@
         "digitalocean": "DigitalOcean Managed MySQL",
         "hetzner": "Self-managed MySQL",
         "onprem": "Self-managed MySQL (InnoDB Cluster) or Vitess operator",
+        "onprem_single": "Self-managed MySQL on one server, with nightly backups copied off the machine (no standby)",
         "cloudflare": "PlanetScale connected through Hyperdrive"
       },
       "strengths": [
@@ -366,7 +368,8 @@
       ],
       "managed_offerings": {
         "any": "MongoDB Atlas (runs on AWS, GCP or Azure in the same region as your compute)",
-        "onprem": "MongoDB Community/Enterprise replica set or the Kubernetes operator"
+        "onprem": "MongoDB Community/Enterprise replica set or the Kubernetes operator",
+        "onprem_single": "Self-managed MongoDB Community on one server, with nightly backups copied off the machine (no standby)"
       },
       "strengths": [
         "Flexible schema for catalogues, user-generated content, varied payloads",

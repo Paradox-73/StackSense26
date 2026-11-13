@@ -105,7 +105,7 @@ CATEGORIES = {
                                       "test_redteam_text", "test_paragraph_wording", "test_scenario_wording"],
     "Inputs, edge cases and warnings": ["test_standard", "test_edge_cases", "test_input_validation", "test_input_questions", "test_questions", "test_next",
                                         "test_sensitivity", "test_defaults_used", "test_scale_warnings", "test_question_influence", "test_question_wording",
-                                        "test_review_fixes"],
+                                        "test_review_fixes", "test_scenario_scope"],
     "Stability and properties": ["test_stability", "test_invariants", "test_scenarios"],
     "Language-model layer (checks and fallbacks)": ["test_llm_off", "test_llm", "test_brief", "test_brief_audit", "test_brief_regression", "test_summary", "test_whatif", "test_llm_baseline"],
     "Accuracy against the answer key": ["test_benchmark"],

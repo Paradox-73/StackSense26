@@ -780,7 +780,7 @@ def recommend(raw: dict | None, with_counterfactuals: bool = True) -> dict:
         managed = None
         if layer == "database":
             # The database sits next to the API: under split hosting, the offering is the API host's.
-            managed = database_offering(pick["item"], api_host["item"] if api_host else stack_items["hosting"], p)
+            managed = database_offering(pick["item"], api_host["item"] if api_host else stack_items["hosting"], p, d)
             if stack_items["backend"].get("bundled_database") == pick["id"]:
                 managed = f"Included with {stack_items['backend']['name']}"
         layers_out[layer] = {

@@ -1613,9 +1613,11 @@ function deferredPanel(r) {
   const later = r.deferred_services || [];
   if (!later.length) return "";
   const ob = r.ops_budget;
-  return `<h4 class="small">Add later (ops budget: ${ob.cap} extra system${ob.cap === 1 ? "" : "s"} for a team of ${ob.team_size})</h4>
-    <p class="muted small">${esc(ob.note)}</p>
-    <ul class="services">${later.map((s) => `<li><span class="sv-r">${esc(s.role)}</span><b>${esc(s.name)}</b><span class="muted">Add ${esc(s.trigger)}.</span></li>`).join("")}</ul>`;
+  // A service held back for its own reason (s.hold) says so; the rest wait on the team's cap of extra systems.
+  const capped = later.some((s) => !s.hold);
+  return `<h4 class="small">${capped ? `Add later (ops budget: ${ob.cap} extra system${ob.cap === 1 ? "" : "s"} for a team of ${ob.team_size})` : "Add later"}</h4>
+    ${capped ? `<p class="muted small">${esc(ob.note)}</p>` : ""}
+    <ul class="services">${later.map((s) => `<li><span class="sv-r">${esc(s.role)}</span><b>${esc(s.name)}</b><span class="muted">${s.hold ? `Held back: ${esc(s.hold)}. ` : ""}Add ${esc(s.trigger)}.</span></li>`).join("")}</ul>`;
 }
 
 /* ================================================================== knowledge base */

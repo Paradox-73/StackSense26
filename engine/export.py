@@ -140,10 +140,14 @@ def to_markdown(r: dict) -> str:
     L.append("")
     if r.get("deferred_services"):
         ob = r["ops_budget"]
-        L += ["### Add later (ops budget)", "",
-              f"A team of {ob['team_size']} is kept to {ob['cap']} extra system(s) to operate. {ob['note']}", ""]
+        # A service held back for its own reason (advice.supporting_services "hold") states it; the rest wait on the cap.
+        capped = any(not s.get("hold") for s in r["deferred_services"])
+        L += ["### Add later (ops budget)" if capped else "### Add later", ""]
+        if capped:
+            L += [f"A team of {ob['team_size']} is kept to {ob['cap']} extra system(s) to operate. {ob['note']}", ""]
         for s in r["deferred_services"]:
-            L.append(f"- **{s['role']}**: {s['name']}: add {s['trigger']}. {s['why']}")
+            held = f"Held back: {s['hold']}. " if s.get("hold") else ""
+            L.append(f"- **{s['role']}**: {s['name']}: add {s['trigger']}. {held}{s['why']}")
         L.append("")
     c = r["cost"]
     L += ["## Estimated monthly cost", "", "| Component | Low (USD) | High (USD) | Basis |", "|---|---|---|---|"]

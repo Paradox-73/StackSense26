@@ -53,7 +53,7 @@ def detect(p: dict, d: dict) -> list[dict]:
                        f"failover. A sustainable on-call rotation needs about {SLA_ONCALL_MIN_TEAM} people; {team} cannot staff it.",
                        "Weighted towards fully managed services; consider 99.9% as a realistic SLO.",
                        ["availability", "team_size"]))
-    if budget == 0 and d["availability"] >= 99.9:
+    if budget == 0 and d["availability"] >= 99.9 and p["deployment"] != "on_prem":  # own servers have no free tier
         w.append(_warn("FREE_TIER_NO_SLA", "warning", f"{p['availability']}% availability on free tiers only",
                        "Free plans of hosting and database vendors carry no uptime guarantee (no SLA), and many pause or throttle idle projects.",
                        "Treat the availability target as a goal; a paid plan is needed to get a written SLA.",

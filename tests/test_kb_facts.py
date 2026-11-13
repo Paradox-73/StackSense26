@@ -183,17 +183,16 @@ def test_each_object_store_line_cites_the_store_it_names(env, prov):
         assert src == BAA_PAGES[first] and "under Microsoft's BAA" not in name, (name, src)
 
 
-@pytest.mark.parametrize("rules,front_door", [([], True), (["hipaa"], True), (["pci_dss"], False), (["soc2"], False),
-                                              (["iso27001"], False), (["hipaa", "iso27001"], False)])
-def test_azure_uploads_skip_front_door_under_an_audit_it_does_not_publish(rules, front_door):
-    """The knowledge base records Blob Storage + Front Door with no PCI DSS, SOC 2 or ISO 27001 audit (no public Microsoft
-    page lists Front Door's scope), and Microsoft's Azure Storage page puts Blobs in all three: under any of them uploads
-    skip Front Door, citing that page. HIPAA alone keeps Front Door for public, non-PHI files."""
-    held = load_kb()["index"]["azure_blob_frontdoor"]["compliance"]
-    assert not (held["pci"] or held["soc2"] or held["iso27001"])
+@pytest.mark.parametrize("rules,audit", [([], False), (["hipaa"], False), (["pci_dss"], True), (["soc2"], True),
+                                         (["iso27001"], True), (["hipaa", "iso27001"], True)])
+def test_azure_uploads_under_an_audit_keep_front_door_for_public_files_only(rules, audit):
+    """Microsoft's Azure Storage page puts Blobs in Azure's PCI DSS, SOC 2 and ISO 27001 audits, citing that page; Front
+    Door's scope is in Microsoft's compliance-offerings document, so under an audit it carries public, non-personal
+    files only. The line never claims Microsoft publishes no scope for Front Door."""
     env = dict(NO_RULES, cloud="azure", hipaa="hipaa" in rules, audit_rules=[r for r in rules if r != "hipaa"])
     name, src = _object_storage(env, "azure")
-    assert ("without Front Door" not in name) == front_door and "Front Door" in name, name
+    assert "Front Door" in name and "without Front Door" not in name and "no public Microsoft page" not in name, name
+    assert ("public, non-personal files only" in name) == audit, name
     assert ("in scope for Microsoft's HIPAA BAA" in name) == ("hipaa" in rules), name
-    if not front_door and "hipaa" not in rules:
+    if audit and "hipaa" not in rules:
         assert src == "https://learn.microsoft.com/en-us/azure/storage/common/storage-compliance-offerings", src
