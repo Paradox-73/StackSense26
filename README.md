@@ -10,6 +10,8 @@
 
 Synergy '26 StackSense Challenge entry by Kanav Bhardwaj (IIIT Bangalore). Repository: <https://github.com/Paradox-73/StackSense26>
 
+**Demo video (3 min):** [youtu.be/yPWIpu2T2AA](https://youtu.be/yPWIpu2T2AA)
+
 StackSense reads a project's parameters in the challenge's standard input schema, through a web questionnaire, a scenario form or the command line. It filters 70 technologies by the hard constraints (compliance, residency, deployment model, cloud), scores the rest on weighted criteria, searches whole stacks with 65 compatibility rules, and writes the standard output JSON. Each component lists the inputs that drove it, at least one alternative with the reason it lost, its trade-offs and a monthly cost band. Contradictions and broken constraints come back as warnings with a severity. The same input always gives the same stack.
 
 ## Contents
