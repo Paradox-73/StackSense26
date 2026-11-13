@@ -27,7 +27,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 ### How the parts fit
 
 1. **Request path**: The browser loads React SPA (Vite)'s built files from Amazon S3 + CloudFront; it sends API calls to the Python + Django service on AWS ECS on Fargate (~69 requests/s at peak), which queries PostgreSQL.
-2. **Sign-in**: Sign-in uses Django's built-in authentication (django.contrib.auth) in your API, with the users in your database, on BAA-covered servers: Amazon Cognito would cost about $1,350 a month at ~100,000 monthly users; the Python + Django API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses Django's built-in authentication (django.contrib.auth) in your API, with the users in your database, on BAA-covered servers; the Python + Django API checks the session or token on every request.
 3. **Data**: PostgreSQL is the system of record (about 280 GB within 12 months); uploaded files go to Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only). PHI (protected health information) stays in the database and object storage, encrypted at rest, on services covered by a signed BAA; keep it out of logs, analytics and push notification text.
 4. **Deploy**: CI builds a container image and rolls it out on AWS ECS on Fargate with health checks and zero-downtime restarts. The frontend's built files are uploaded to Amazon S3 and the CDN cache is invalidated. Database schema changes run as versioned migrations before the new code serves traffic.
 
@@ -311,7 +311,7 @@ Runs here: the Python + Django API as long-running processes. React SPA is built
 - **Background jobs**: Celery (Redis/Valkey broker): Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (ElastiCache (Valkey)).
 - **Static frontend**: Amazon S3 + CloudFront: React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Python + Django instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.
 - **Object storage**: Amazon S3 under the AWS BAA (CloudFront for public, non-PHI files only): Media and documents belong in object storage, not the database.
-- **Authentication**: Django's built-in authentication (django.contrib.auth) in your API, with the users in your database, on BAA-covered servers: Amazon Cognito would cost about $1,350 a month at ~100,000 monthly users: Do not hand-roll password storage, MFA or SSO.
+- **Authentication**: Django's built-in authentication (django.contrib.auth) in your API, with the users in your database, on BAA-covered servers: Do not hand-roll password storage, MFA or SSO. Amazon Cognito would cost about $1,350 a month at ~100,000 monthly users.
 - **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS. Push services are not covered by a BAA: put no health information in the notification text (e.g. 'You have a new message') and show the content only after the user signs in.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 - **Audit & security**: Encrypted storage (KMS), audit logging, least-privilege IAM, WAF: The HIPAA Security Rule requires access controls, audit trails and encryption.

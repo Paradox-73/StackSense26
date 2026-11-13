@@ -122,7 +122,7 @@
       {
         "layer": "queue",
         "choice": "Amazon SQS with Spring Cloud AWS listeners",
-        "justification": "Send emails, process uploads and call slow APIs outside the request path. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Send emails, process uploads and call slow APIs outside the request path.",
         "driven_by": [
           "requirements.file_media_storage",
           "scale.workload"
@@ -179,7 +179,7 @@
       {
         "layer": "other",
         "choice": "MSG91, with DLT-registered SMS templates",
-        "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India. The SMS gateway runs outside AWS, which your cloud rule requires for the servers and data: only phone numbers and codes pass through it. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India. The SMS gateway runs outside AWS, which your cloud rule requires for the servers and data: only phone numbers and codes pass through it.",
         "driven_by": [
           "requirements.auth",
           "infrastructure.data_residency"
@@ -202,7 +202,7 @@
       {
         "layer": "payments",
         "choice": "Razorpay with hosted checkout (card tokens)",
-        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.",
         "driven_by": [
           "requirements.payments",
           "compliance",
@@ -230,7 +230,7 @@
       {
         "layer": "cdn",
         "choice": "Amazon S3 + CloudFront",
-        "justification": "React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Java/Kotlin + Spring Boot instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Java/Kotlin + Spring Boot instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.",
         "driven_by": [
           "project.platforms",
           "scale.users_12_months"
@@ -252,8 +252,8 @@
       },
       {
         "layer": "auth",
-        "choice": "Spring Security's one-time token login in your API, with one-time codes sent through the SMS gateway and the users in your database in your Indian region: Amazon Cognito would cost about $4,350 a month at ~300,000 monthly users",
-        "justification": "Phone sign-in needs one-time codes with expiry, retry limits and lockouts against SMS-pumping fraud; the codes go out through the SMS gateway listed with the services. Amazon Cognito would cost about $4,350 a month at ~300,000 monthly users. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
+        "choice": "Spring Security's one-time token login in your API, with one-time codes sent through the SMS gateway and the users in your database in your Indian region",
+        "justification": "Phone sign-in needs one-time codes with expiry, retry limits and lockouts against SMS-pumping fraud; the codes go out through the SMS gateway listed with the services. Amazon Cognito would cost about $4,350 a month at ~300,000 monthly users.",
         "driven_by": [
           "requirements.auth",
           "infrastructure.data_residency",
@@ -277,7 +277,7 @@
       {
         "layer": "other",
         "choice": "Firebase Cloud Messaging (+ APNs)",
-        "justification": "Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region. Firebase Cloud Messaging and Apple's push service run outside AWS: your servers and data stay on AWS, and only the notification passes through them. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region. Firebase Cloud Messaging and Apple's push service run outside AWS: your servers and data stay on AWS, and only the notification passes through them.",
         "driven_by": [
           "project.platforms",
           "infrastructure.data_residency"
@@ -300,7 +300,7 @@
       {
         "layer": "ml",
         "choice": "Amazon SageMaker real-time endpoint for your own model (Amazon Bedrock for a hosted one)",
-        "justification": "Serve the model from its own endpoint, versioned and monitored apart from the web tier; a small scoring model runs on CPU. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Serve the model from its own endpoint, versioned and monitored apart from the web tier; a small scoring model runs on CPU.",
         "driven_by": [
           "requirements.ml_features",
           "infrastructure.data_residency"
@@ -346,7 +346,7 @@
       {
         "layer": "other",
         "choice": "Encrypted storage (KMS), audit logging, least-privilege IAM, WAF",
-        "justification": "PCI-DSS requires access controls, audit trails and encryption. Sized for the 300,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "PCI-DSS requires access controls, audit trails and encryption.",
         "driven_by": [
           "compliance"
         ],

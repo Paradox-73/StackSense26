@@ -26,7 +26,7 @@ Availability approach: The platform runs the functions across zones, with no ins
 ### How the parts fit
 
 1. **Request path**: The browser loads Next.js (React) from Google Cloud Run; it sends API calls to the Python + FastAPI service on Google Cloud Run (~69 requests/s at peak), which queries PostgreSQL.
-2. **Sign-in**: Sign-in uses FastAPI's OAuth2 password flow with hashed passwords in your API, with the users in your database: Clerk would cost about $2,025 a month at ~150,000 monthly users; the Python + FastAPI API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses FastAPI's OAuth2 password flow with hashed passwords in your API, with the users in your database; the Python + FastAPI API checks the session or token on every request.
 3. **Data**: PostgreSQL is the system of record (about 560 GB within 12 months); uploaded files go to Cloud Storage + Cloud CDN.
 4. **Deploy**: CI builds a container image and rolls it out on Google Cloud Run with health checks and zero-downtime restarts. Database schema changes run as versioned migrations before the new code serves traffic.
 
@@ -311,7 +311,7 @@ Runs here: Next.js (server rendering + static files), the Python + FastAPI API a
 - **Vector search**: pgvector extension in the primary Postgres: Keeps embeddings next to relational data with transactional consistency; move to a dedicated vector DB only past ~10M+ vectors.
 - **Background jobs**: Celery (Redis/Valkey broker): Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (Memorystore).
 - **Object storage**: Cloud Storage + Cloud CDN: Media and documents belong in object storage, not the database.
-- **Authentication**: FastAPI's OAuth2 password flow with hashed passwords in your API, with the users in your database: Clerk would cost about $2,025 a month at ~150,000 monthly users: Do not hand-roll password storage, MFA or SSO.
+- **Authentication**: FastAPI's OAuth2 password flow with hashed passwords in your API, with the users in your database: Do not hand-roll password storage, MFA or SSO. Clerk would cost about $2,025 a month at ~150,000 monthly users.
 - **Model serving**: Vertex AI endpoints: Keep GPU inference separate from the web tier so each scales on its own metric.
 - **Observability**: OpenTelemetry instrumentation -> Cloud Monitoring/Trace: Traces, metrics and error tracking from day one; required to defend an availability target.
 

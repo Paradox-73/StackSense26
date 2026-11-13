@@ -26,7 +26,7 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 ### How the parts fit
 
 1. **Request path**: The browser loads React SPA (Vite) from Fly.io; it sends API calls to the Go service on Fly.io (~3,472 requests/s at peak), which queries MongoDB.
-2. **Sign-in**: Sign-in uses Your backend framework's built-in authentication in your API, with the users in your database: Clerk would cost about $19,025 a month at ~1,000,000 monthly users; the Go API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses Your backend framework's built-in authentication in your API, with the users in your database; the Go API checks the session or token on every request.
 3. **Data**: MongoDB is the system of record (about 170 GB within 12 months).
 4. **Deploy**: CI builds a container image and rolls it out on Fly.io with health checks and zero-downtime restarts. MongoDB keeps no fixed schema: new code reads both the old and the new document shape during a rollout, and backfills that rewrite old documents run as versioned scripts (indexes and validation rules ship the same way).
 
@@ -303,7 +303,7 @@ Runs here: React SPA (static files), the Go API as long-running processes. The d
 - **Realtime**: Redis pub/sub for cross-instance fan-out (Upstash Redis on Fly): With several app instances, a message published on one must reach sockets on all others.
 - **Collaboration sync**: Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus as the sync server (a Node.js service beside the Go API): Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke. Hocuspocus runs on Node.js, so it is a second runtime to deploy and monitor beside Go; the Go API keeps sign-in and permissions and Hocuspocus calls it to check each connection.
 - **Ingestion buffer**: Redpanda/Kafka or NATS JetStream: A durable log absorbs write bursts and keeps device ingestion separate from database writes, and lets you replay messages.
-- **Authentication**: Your backend framework's built-in authentication in your API, with the users in your database: Clerk would cost about $19,025 a month at ~1,000,000 monthly users: Do not hand-roll password storage, MFA or SSO.
+- **Authentication**: Your backend framework's built-in authentication in your API, with the users in your database: Do not hand-roll password storage, MFA or SSO. Clerk would cost about $19,025 a month at ~1,000,000 monthly users.
 - **Observability**: OpenTelemetry instrumentation -> Grafana Cloud: Traces, metrics and error tracking from day one; required to defend an availability target.
 
 ## Estimated monthly cost

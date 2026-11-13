@@ -165,7 +165,7 @@
       {
         "layer": "other",
         "choice": "Yjs shared documents (CRDTs) synced over the WebSocket connection, with Hocuspocus as the sync server (a Node.js service beside the Go API)",
-        "justification": "Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke. Hocuspocus runs on Node.js, so it is a second runtime to deploy and monitor beside Go; the Go API keeps sign-in and permissions and Hocuspocus calls it to check each connection. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Many people editing one document at once need conflict-free merging; CRDTs merge concurrent edits without locks, and the server stores snapshots, not every stroke. Hocuspocus runs on Node.js, so it is a second runtime to deploy and monitor beside Go; the Go API keeps sign-in and permissions and Hocuspocus calls it to check each connection.",
         "driven_by": [
           "project.type",
           "requirements.realtime"
@@ -188,7 +188,7 @@
       {
         "layer": "queue",
         "choice": "River (jobs in PostgreSQL)",
-        "justification": "Send emails, process uploads and call slow APIs outside the request path. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Send emails, process uploads and call slow APIs outside the request path.",
         "driven_by": [
           "requirements.file_media_storage",
           "scale.workload"
@@ -233,7 +233,7 @@
       {
         "layer": "cdn",
         "choice": "Cloudflare CDN in front of the uploads bucket",
-        "justification": "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size. Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Serve uploads from the CDN, not the app server; resize images on the fly instead of storing every size.",
         "driven_by": [
           "project.platforms",
           "scale.users_12_months"
@@ -256,7 +256,7 @@
       {
         "layer": "payments",
         "choice": "Stripe with hosted checkout (card tokens)",
-        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A).",
         "driven_by": [
           "requirements.payments",
           "compliance"
@@ -279,7 +279,7 @@
       {
         "layer": "auth",
         "choice": "Clerk",
-        "justification": "Social sign-in (Google, Apple, GitHub) needs OAuth 2.0 and OpenID Connect flows, account linking and token refresh, which a maintained sign-in product handles. Clerk is a US company, so under GDPR sign its data processing agreement with Standard Contractual Clauses (GDPR Chapter V). Sized for the 50,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Social sign-in (Google, Apple, GitHub) needs OAuth 2.0 and OpenID Connect flows, account linking and token refresh, which a maintained sign-in product or framework library handles. Clerk is a US company, so under GDPR sign its data processing agreement with Standard Contractual Clauses (GDPR Chapter V).",
         "driven_by": [
           "requirements.auth",
           "scale.users_12_months",

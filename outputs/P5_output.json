@@ -130,7 +130,7 @@
       {
         "layer": "queue",
         "choice": "Hangfire",
-        "justification": "Send emails, process uploads and call slow APIs outside the request path. Sized for the 1,500 users expected at 12 months (scale.users_12_months).",
+        "justification": "Send emails, process uploads and call slow APIs outside the request path.",
         "driven_by": [
           "requirements.file_media_storage",
           "scale.workload"
@@ -152,7 +152,7 @@
       },
       {
         "layer": "storage",
-        "choice": "Blob Storage, a private container in your required region with short-lived SAS URLs, without Front Door (no public Microsoft page lists Front Door's audit scope)",
+        "choice": "Blob Storage, a private container in your required region with short-lived SAS URLs (Front Door for public, non-personal files only)",
         "justification": "Uploaded files and video belong in object storage, not the database. The scenario stores 20 GB within 12 months (scale.data_volume_gb_12_months).",
         "driven_by": [
           "requirements.file_media_storage",
@@ -176,7 +176,7 @@
       {
         "layer": "auth",
         "choice": "Microsoft Entra ID (existing), signed in through OpenID Connect",
-        "justification": "infrastructure.existing_systems lists Microsoft Entra ID: users sign in with the accounts it already manages, so there is no new user store, MFA and password rules come from it, and removing someone there removes their access here. Sized for the 1,500 users expected at 12 months (scale.users_12_months).",
+        "justification": "infrastructure.existing_systems lists Microsoft Entra ID: users sign in with the accounts it already manages, so there is no new user store, MFA and password rules come from it, and removing someone there removes their access here.",
         "driven_by": [
           "infrastructure.existing_systems",
           "requirements.auth"

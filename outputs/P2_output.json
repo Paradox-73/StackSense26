@@ -149,7 +149,7 @@
       {
         "layer": "queue",
         "choice": "Celery (Redis/Valkey broker)",
-        "justification": "Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (DigitalOcean Managed Caching (Valkey)). Sized for the 30,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Send emails, process uploads and call slow APIs outside the request path. Celery with a Redis broker (or RQ / Dramatiq) keeps its jobs in Redis, so the app needs a Redis/Valkey instance (DigitalOcean Managed Caching (Valkey)).",
         "driven_by": [
           "requirements.file_media_storage",
           "scale.workload"
@@ -194,13 +194,11 @@
       },
       {
         "layer": "storage",
-        "choice": "DigitalOcean Spaces in BLR1 (Bangalore), a private bucket with short-lived signed URLs (no public CDN)",
-        "justification": "Uploaded files and video belong in object storage, not the database. Hand uploads out from the bucket, not the app server; a public CDN would cache copies at edge sites outside the country your data must stay in, and each signed URL expires within minutes. The scenario stores 50 GB within 12 months (scale.data_volume_gb_12_months).",
+        "choice": "DigitalOcean Spaces in BLR1 (Bangalore), a private bucket with short-lived signed URLs (a CDN for public, non-personal files only)",
+        "justification": "Uploaded files and video belong in object storage, not the database. The scenario stores 50 GB within 12 months (scale.data_volume_gb_12_months).",
         "driven_by": [
           "requirements.file_media_storage",
-          "infrastructure.data_residency",
-          "project.platforms",
-          "scale.users_12_months"
+          "infrastructure.data_residency"
         ],
         "alternatives": [
           {
@@ -210,7 +208,23 @@
           {
             "choice": "Files in database columns",
             "why_not": "They bloat backups and the database disk, which costs several times more per GB than object storage"
-          },
+          }
+        ],
+        "tradeoffs": [
+          "Files and their database rows can drift apart: delete or replace both together"
+        ],
+        "source": "https://docs.digitalocean.com/products/spaces/details/availability/"
+      },
+      {
+        "layer": "cdn",
+        "choice": "DigitalOcean Spaces CDN for public, non-personal files only (product and page images, CSS and JavaScript); users' own uploads stay in the private bucket in your region behind short-lived signed URLs",
+        "justification": "Public files are the same for every visitor and hold no personal data, so edge copies outside your region break no residency rule; files that hold personal data never enter the CDN: the API hands them out from the private bucket after an access check, and each signed URL expires within minutes.",
+        "driven_by": [
+          "project.platforms",
+          "scale.users_12_months",
+          "infrastructure.data_residency"
+        ],
+        "alternatives": [
           {
             "choice": "Public links to the object store",
             "why_not": "No resizing or edge caching, and private files would be reachable by anyone with the link"
@@ -221,15 +235,14 @@
           }
         ],
         "tradeoffs": [
-          "Files and their database rows can drift apart: delete or replace both together",
           "Links that leak can be shared until they expire, so keep their lifetime short"
         ],
-        "source": "https://docs.digitalocean.com/products/spaces/details/availability/"
+        "source": "https://developers.cloudflare.com/r2/pricing/"
       },
       {
         "layer": "other",
         "choice": "MSG91, with DLT-registered SMS templates",
-        "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India. Sized for the 30,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates. MSG91 stores its data only in India (Google Cloud, Mumbai) according to its 2024 data-localisation audit, which notes some processing in Singapore with the data brought back to India; Twilio Verify runs in Twilio's US region (twilio.com/docs/global-infrastructure), so codes and phone numbers would be processed and stored outside India.",
         "driven_by": [
           "requirements.auth",
           "infrastructure.data_residency"
@@ -252,7 +265,7 @@
       {
         "layer": "payments",
         "choice": "Razorpay with hosted checkout (card tokens)",
-        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads. Sized for the 30,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.",
         "driven_by": [
           "requirements.payments",
           "compliance",
@@ -280,7 +293,7 @@
       {
         "layer": "auth",
         "choice": "Django's built-in authentication (django.contrib.auth), with the users in your database in India",
-        "justification": "Phone sign-in needs one-time codes with expiry, retry limits and lockouts against SMS-pumping fraud; the codes go out through the SMS gateway listed with the services. Sized for the 30,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Phone sign-in needs one-time codes with expiry, retry limits and lockouts against SMS-pumping fraud; the codes go out through the SMS gateway listed with the services.",
         "driven_by": [
           "requirements.auth",
           "infrastructure.data_residency",
@@ -304,7 +317,7 @@
       {
         "layer": "other",
         "choice": "Firebase Cloud Messaging",
-        "justification": "Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region. Sized for the 30,000 users expected at 12 months (scale.users_12_months).",
+        "justification": "Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region.",
         "driven_by": [
           "project.platforms",
           "infrastructure.data_residency"

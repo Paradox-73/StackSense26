@@ -26,7 +26,7 @@ Availability approach: 2+ app instances behind a load balancer, managed DB with 
 ### How the parts fit
 
 1. **Request path**: The browser loads React SPA (Vite)'s built files from Amazon S3 + CloudFront; it sends API calls to the Go service on AWS ECS on Fargate (~4,000 requests/s at peak), which queries TimescaleDB (Postgres).
-2. **Sign-in**: Sign-in uses Your backend framework's built-in authentication in your API, with the users in your database in your EU region: Amazon Cognito would cost about $2,850 a month at ~200,000 monthly users; the Go API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses Your backend framework's built-in authentication in your API, with the users in your database in your EU region; the Go API checks the session or token on every request.
 3. **Data**: TimescaleDB (Postgres) is the system of record (about 5,600 GB within 12 months). Every store above is placed in the region your residency rule requires.
 4. **Deploy**: CI builds a container image and rolls it out on AWS ECS on Fargate with health checks and zero-downtime restarts. The frontend's built files are uploaded to Amazon S3 and the CDN cache is invalidated. Database schema changes run as versioned migrations before the new code serves traffic.
 
@@ -308,7 +308,7 @@ Runs here: the Go API as long-running processes. React SPA is built to static fi
 - **Realtime**: WebSockets in the Go app (coder/websocket): Chat and live updates for a part of the product: the app server holds the connections itself; add Redis pub/sub only when a second instance must reach the same users.
 - **Ingestion buffer**: Amazon Kinesis Data Streams (MQTT via AWS IoT Core): A durable log absorbs write bursts and keeps device ingestion separate from database writes, and lets you replay messages.
 - **Static frontend**: Amazon S3 + CloudFront: React SPA is built to static files (HTML, JavaScript, CSS): a bucket behind the cloud's CDN serves them from the edge, so the Go instances on AWS ECS on Fargate only answer API calls, and a frontend release is an upload plus a cache invalidation.
-- **Authentication**: Your backend framework's built-in authentication in your API, with the users in your database in your EU region: Amazon Cognito would cost about $2,850 a month at ~200,000 monthly users: Do not hand-roll password storage, MFA or SSO.
+- **Authentication**: Your backend framework's built-in authentication in your API, with the users in your database in your EU region: Do not hand-roll password storage, MFA or SSO. Amazon Cognito would cost about $2,850 a month at ~200,000 monthly users.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 
 ## Estimated monthly cost

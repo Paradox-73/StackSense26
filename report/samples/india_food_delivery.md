@@ -27,7 +27,7 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 ### How the parts fit
 
 1. **Request path**: The browser loads Next.js (React) from AWS EKS (Kubernetes); it sends API calls to the Node.js + NestJS service on AWS EKS (Kubernetes) (~6,944 requests/s at peak), which queries PostgreSQL.
-2. **Sign-in**: Sign-in uses NestJS authentication with Passport in your API, with one-time codes sent through the SMS gateway and the users in your database: Amazon Cognito would cost about $74,850 a month at ~5,000,000 monthly users; the Node.js + NestJS API checks the session or token on every request.
+2. **Sign-in**: Sign-in uses NestJS authentication with Passport in your API, with one-time codes sent through the SMS gateway and the users in your database; the Node.js + NestJS API checks the session or token on every request.
 3. **Data**: PostgreSQL is the system of record (about 2,800 GB within 12 months); uploaded files go to Amazon S3 + CloudFront. Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens.
 4. **Deploy**: CI builds container images and rolls them out on AWS EKS (Kubernetes) (manifests or Helm), one service at a time. Database schema changes run as versioned migrations before the new code serves traffic.
 
@@ -321,7 +321,7 @@ Runs here: Next.js (server rendering + static files), the Node.js + NestJS API a
 - **Maps & live location**: Google Maps Platform + location updates over the realtime channel: Send position updates every few seconds over WebSockets (not polling) and keep only the latest point per device in a fast store; map tiles and routing come from a maps provider.
 - **Phone login (SMS OTP)**: MSG91, with DLT-registered SMS templates: One-time codes need an SMS gateway with rate limits against SMS-pumping fraud; Indian operators deliver only DLT-registered templates.
 - **Payments**: Razorpay with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.
-- **Authentication**: NestJS authentication with Passport in your API, with one-time codes sent through the SMS gateway and the users in your database: Amazon Cognito would cost about $74,850 a month at ~5,000,000 monthly users: Do not hand-roll password storage, MFA or SSO.
+- **Authentication**: NestJS authentication with Passport in your API, with one-time codes sent through the SMS gateway and the users in your database: Do not hand-roll password storage, MFA or SSO. Amazon Cognito would cost about $74,850 a month at ~5,000,000 monthly users.
 - **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 - **Audit & security**: Encrypted storage (KMS), audit logging, least-privilege IAM, WAF: PCI-DSS requires access controls, audit trails and encryption.

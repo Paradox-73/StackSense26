@@ -27,8 +27,8 @@ Availability approach: Multi-AZ app and database, health checks, zero-downtime d
 ### How the parts fit
 
 1. **Request path**: The browser loads Next.js (React) from AWS EKS (Kubernetes); it sends API calls to the Java/Kotlin + Spring Boot service on AWS EKS (Kubernetes) (~25,000 requests/s at peak), which queries MySQL.
-2. **Sign-in**: Sign-in uses Spring Security's one-time token login in your API, with the users in your database in your Indian region: Amazon Cognito would cost about $149,850 a month at ~10,000,000 monthly users; the Java/Kotlin + Spring Boot API checks the session or token on every request.
-3. **Data**: MySQL is the system of record (about 1,520 GB within 12 months); uploaded files go to Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN). Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens. Every store above is placed in the region your residency rule requires.
+2. **Sign-in**: Sign-in uses Spring Security's one-time token login in your API, with the users in your database in your Indian region; the Java/Kotlin + Spring Boot API checks the session or token on every request.
+3. **Data**: MySQL is the system of record (about 1,520 GB within 12 months); uploaded files go to Amazon S3, a private bucket in your required region (short-lived signed URLs, a CDN for public, non-personal files only). Card and bank details never reach your servers: the payment provider's hosted checkout or SDK collects them, and you store only its tokens. Every store above is placed in the region your residency rule requires.
 4. **Deploy**: CI builds container images and rolls them out on AWS EKS (Kubernetes) (manifests or Helm), one service at a time. Database schema changes run as versioned migrations before the new code serves traffic.
 
 ## Inputs used
@@ -327,8 +327,8 @@ Runs here: Next.js (server rendering + static files), the Java/Kotlin + Spring B
 - **Background jobs**: Amazon SQS with Spring Cloud AWS listeners: Send emails, process uploads and call slow APIs outside the request path.
 - **Search**: Amazon OpenSearch Service: Search across ~507 GB of documents (an estimate: the document share of your ~1,520 GB total, from your 2 data shapes) needs an inverted index with relevance ranking, highlighting and filters; database text indexes slow down and rank poorly at this size.
 - **Payments**: Razorpay with hosted checkout (card tokens): Card data never touches your servers, which keeps your PCI-DSS audit scope to the smallest self-assessment form (SAQ A). Stripe accepts new businesses in India by invitation only, so an Indian gateway leads.
-- **Object storage**: Amazon S3, a private bucket in your required region (short-lived signed URLs, no public CDN): Media and documents belong in object storage, not the database.
-- **Authentication**: Spring Security's one-time token login in your API, with the users in your database in your Indian region: Amazon Cognito would cost about $149,850 a month at ~10,000,000 monthly users: Do not hand-roll password storage, MFA or SSO.
+- **Object storage**: Amazon S3, a private bucket in your required region (short-lived signed URLs, a CDN for public, non-personal files only): Media and documents belong in object storage, not the database.
+- **Authentication**: Spring Security's one-time token login in your API, with the users in your database in your Indian region: Do not hand-roll password storage, MFA or SSO. Amazon Cognito would cost about $149,850 a month at ~10,000,000 monthly users.
 - **Push notifications**: Firebase Cloud Messaging (+ APNs): Standard channel for mobile engagement on Android and iOS. Notification text leaves your residency region: Firebase Cloud Messaging may process messages anywhere Google has facilities, so send only an ID and let the app fetch the content from your servers in the region.
 - **Observability**: OpenTelemetry instrumentation -> CloudWatch + X-Ray: Traces, metrics and error tracking from day one; required to defend an availability target.
 - **Audit & security**: Encrypted storage (KMS), audit logging, least-privilege IAM, WAF: PCI-DSS requires access controls, audit trails and encryption.
