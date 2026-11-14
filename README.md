@@ -1,3 +1,5 @@
+<img src="docs/figures/banner.svg" alt="StackSense: stack picks that explain themselves. 70 technologies, 65 compatibility rules, 1,290 tests, 82% top-1 and 96% acceptable on 40 briefs. Synergy '26 StackSense Challenge, IIIT Bangalore. Kanav Bhardwaj." width="100%">
+
 # StackSense
 
 **Recommends a frontend, backend, database and hosting platform, plus the supporting services a project needs, from its scale, team, budget and compliance constraints. Deterministic rules over a cited knowledge base choose every component; a language model is optional and never picks one.**
